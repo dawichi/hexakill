@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-sync-scripts */
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import '../styles/global.scss'
@@ -20,7 +21,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 			<main>
 				<Component {...pageProps} />
 			</main>
-
 		</>
 	)
 }
