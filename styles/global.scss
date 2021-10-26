@@ -22,7 +22,6 @@ a {
 	box-sizing: border-box;
 }
 
-
 .cursor-pointer {
 	cursor: pointer;
 
@@ -32,16 +31,8 @@ a {
 	}
 }
 
-.sprite {
-	height: 16px;
-	width: 16px;
-	float: left;
-
-	&.grass {background: url('/images/overworld.png') 0 0;}
-
-	&.sea1 {background: url('/images/overworld.png') 0px -16px;}
-	&.sea2 {background: url('/images/overworld.png') -16px -16px;}
-
-	&.border_top {background: url('/images/overworld.png') -48px -128px;}
-	&.border_right {background: url('/images/overworld.png') -36px -112px;}
+.backgroundPlaying {
+	background-image: url('/images/background.jpg');
+	background-size: cover;
+	background-position: center;
 }
