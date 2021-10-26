@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap');
+
+html, body {
+	padding: 0;
+	margin: 0;
+	// font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+	font-family: 'IBM Plex Mono', monospace;
+}
+
+html { overflow-x: hidden; }
+
+a {
+	color: #0070f3;
+	text-decoration: none;
+
+	&:hover, &:focus, &:active {
+		text-decoration: underline;
+	}
+}
+
+* {
+	box-sizing: border-box;
+}
+
+
+.cursor-pointer {
+	cursor: pointer;
+
+	&:hover {
+		transform: scale(1.03);
+		transition: all .3s ease-in;
+	}
+}
