@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useState } from 'react'
 import ProgressBar from 'react-bootstrap/ProgressBar'
 
@@ -21,16 +22,16 @@ const Base = () => {
 	}
 
 	return (
-		<div className="backgroundPlaying h-screen">
+		<div className="backgroundPlaying h-screen text-white">
 			<div className="bg-gray-800 h-100 opacity-90">
 				<div className="container h-100">
 					<div className="row p-2 md:p-5 h-100">
 						<div className="col-3 h-100">
 							<div className="border-black rounded bg-black h-100">
 								<div>
-									<h2 className="text-white text-center font-bold tracking-wider text-2xl p-3">Stats</h2>
+									<h2 className="text-center font-bold tracking-wider text-2xl p-3">Stats</h2>
 									<hr style={{backgroundColor: 'white', width: '80%', margin: 'auto'}}/>
-									<ul className="text-white p-5">
+									<ul className="p-5">
 										<li>HP: 1000</li>
 										<li>HP: 1000</li>
 										<li>HP: 1000</li>
@@ -42,18 +43,25 @@ const Base = () => {
 						</div>
 						<div className="col-6 h-100">
 							<div className="border-black rounded bg-black h-100">
-								<div className="p-5 text-white">
-									<p>HP: {life}%</p>
-									<ProgressBar striped animated variant={colorHP(life)} key={1} now={life} />
+								<div className="row">
+									<div className="col-6">
+										<img src={'/images/slime/idle.gif'} className="w-32 m-auto" alt="slime"/>
+										<div className="mt-2 p-3">
+											<p>HP: {life}%</p>
+											<ProgressBar striped animated variant={colorHP(life)} key={1} now={life} />
+										</div>
+									</div>
+									<div className="col-6 flex justify-content items-end flex-col">
+									</div>
 								</div>
-								<button className="border p-3 m-4 bg-white" onClick={() => getDamage(5)}>DAMAGE</button>
-								<button className="border p-3 m-4 bg-white" onClick={() => getHealth(5)}>CURASION</button>
+								<button className="border p-3 m-4 bg-white text-red-600 font-bold" onClick={() => getDamage(5)}>DAMAGE</button>
+								<button className="border p-3 m-4 bg-white text-green-600 font-bold" onClick={() => getHealth(5)}>CURASION</button>
 							</div>
 						</div>
 						<div className="col-3 h-100">
 							<div className="border-black rounded bg-black h-100">
 								<div>
-									<h2 className="text-white text-center font-bold tracking-wider text-2xl p-3">Items</h2>
+									<h2 className="text-center font-bold tracking-wider text-2xl p-3">Items</h2>
 									<hr style={{backgroundColor: 'white', width: '80%', margin: 'auto'}}/>
 								</div>
 							</div>
