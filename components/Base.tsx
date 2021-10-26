@@ -1,6 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 import React, { useState } from 'react'
-import ProgressBar from 'react-bootstrap/ProgressBar'
+import Enemie from './Enemie'
 
 const Base = () => {
 
@@ -20,19 +19,7 @@ const Base = () => {
 		setLife(life + health)
 	}
 
-	const colorHP = (hp: number) => {
-		if (hp < 10) return 'danger'
-		if (hp >= 10 && hp < 31) return 'warning'
-		return 'success'
-	}
-
 	const [animation, setAnimation] = useState(0)
-
-	const animations = {
-		0: 'idle.gif',
-		1: 'attack.gif',
-		2: 'die.gif',
-	}
 
 	const attack = () => {
 		setAnimation(1)
@@ -59,18 +46,8 @@ const Base = () => {
 							</div>
 						</div>
 						<div className="col-6 h-100">
-							<div className="border-black rounded bg-black h-100">
-								<div className="row">
-									<div className="col-6">
-										<img src={'/images/slime/' + animations[animation]} className="w-32 m-auto" alt="slime"/>
-										<div className="mt-2 p-4">
-											<p>HP: {life}%</p>
-											<ProgressBar striped animated variant={colorHP(life)} key={1} now={life} />
-										</div>
-									</div>
-									<div className="col-6 flex justify-content items-end flex-col">
-									</div>
-								</div>
+							<div className="border-black rounded bg-black h-100 p-3">
+								<Enemie life={life} animation={animation} />
 								<div className="inline-block border m-4 p-3">
 									<button className="border p-3 m-2 bg-white text-red-600 font-bold" onClick={() => getDamage(5)}>DAMAGE</button>
 									<button className="border p-3 m-2 bg-white text-green-600 font-bold" onClick={() => getHealth(5)}>CURASION</button>
