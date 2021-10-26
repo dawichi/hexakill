@@ -7,7 +7,7 @@ const Base = () => {
 	const [life, setLife] = useState(100)
 
 	const getDamage = (damage: number) => {
-		if (damage > life) {
+		if (damage >= life) {
 			setLife(0)
 			setAnimation(2)
 		} else {
@@ -75,6 +75,23 @@ const Base = () => {
 									<button className="border p-3 m-2 bg-white text-red-600 font-bold" onClick={() => getDamage(5)}>DAMAGE</button>
 									<button className="border p-3 m-2 bg-white text-green-600 font-bold" onClick={() => getHealth(5)}>CURASION</button>
 									<button className="border p-3 m-2 bg-white text-blue-600 font-bold" onClick={() => attack()}>ATTACK</button>
+								</div>
+								{/* prueba */}
+								<div className="container">
+									<div className="row">
+										<div className="col-6">
+											<div className="cursor-pointer p-3 m-2 rounded bg-red-600 hover:bg-red-700 text-white text-center text-xl font-bold"><i className="bi bi-emoji-angry"></i> FIGHT</div>
+										</div>
+										<div className="col-6">
+											<div className="cursor-pointer p-3 m-2 rounded bg-yellow-600 hover:bg-yellow-700 text-white text-center text-xl font-bold"><i className="bi bi-emoji-angry"></i> ITEMS</div>
+										</div>
+										<div className="col-6">
+											<div className="cursor-pointer p-3 m-2 rounded bg-green-600 hover:bg-green-700 text-white text-center text-xl font-bold"><i className="bi bi-emoji-angry"></i> CHAMPS</div>
+										</div>
+										<div className="col-6">
+											<div className="cursor-pointer p-3 m-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-center text-xl font-bold"><i className="bi bi-emoji-angry"></i> RUN</div>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
