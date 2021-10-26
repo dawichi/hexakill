@@ -7,10 +7,15 @@ const Base = () => {
 	const [life, setLife] = useState(100)
 
 	const getDamage = (damage: number) => {
-		if (damage > life) return
-		setLife(life - damage)
+		if (damage > life) {
+			setLife(0)
+			setAnimation(2)
+		} else {
+			setLife(life - damage)
+		}
 	}
 	const getHealth = (health: number) => {
+		setAnimation(0)
 		if (health + life > 100) return
 		setLife(life + health)
 	}
@@ -19,6 +24,18 @@ const Base = () => {
 		if (hp < 10) return 'danger'
 		if (hp >= 10 && hp < 31) return 'warning'
 		return 'success'
+	}
+
+	const [animation, setAnimation] = useState(0)
+
+	const animations = {
+		0: 'idle.gif',
+		1: 'attack.gif',
+		2: 'die.gif',
+	}
+
+	const attack = () => {
+		setAnimation(1)
 	}
 
 	return (
@@ -45,8 +62,8 @@ const Base = () => {
 							<div className="border-black rounded bg-black h-100">
 								<div className="row">
 									<div className="col-6">
-										<img src={'/images/slime/idle.gif'} className="w-32 m-auto" alt="slime"/>
-										<div className="mt-2 p-3">
+										<img src={'/images/slime/' + animations[animation]} className="w-32 m-auto" alt="slime"/>
+										<div className="mt-2 p-4">
 											<p>HP: {life}%</p>
 											<ProgressBar striped animated variant={colorHP(life)} key={1} now={life} />
 										</div>
@@ -54,8 +71,11 @@ const Base = () => {
 									<div className="col-6 flex justify-content items-end flex-col">
 									</div>
 								</div>
-								<button className="border p-3 m-4 bg-white text-red-600 font-bold" onClick={() => getDamage(5)}>DAMAGE</button>
-								<button className="border p-3 m-4 bg-white text-green-600 font-bold" onClick={() => getHealth(5)}>CURASION</button>
+								<div className="inline-block border m-4 p-3">
+									<button className="border p-3 m-2 bg-white text-red-600 font-bold" onClick={() => getDamage(5)}>DAMAGE</button>
+									<button className="border p-3 m-2 bg-white text-green-600 font-bold" onClick={() => getHealth(5)}>CURASION</button>
+									<button className="border p-3 m-2 bg-white text-blue-600 font-bold" onClick={() => attack()}>ATTACK</button>
+								</div>
 							</div>
 						</div>
 						<div className="col-3 h-100">
