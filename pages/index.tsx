@@ -8,11 +8,20 @@ export default function Index() {
 
 	const start = (loadLastgame: boolean) => {
 		if (loadLastgame) {setGameState(load())}
-		console.log(load())
 		setPlaying(true)
 	}
+	
+	const [gameState, setGameState] = useState({
+		name: 'David',
+		type: 'coffee',
+		dmg: 60,
+		armor: 20,
+		level: 1,
+		exp: 0,
+	})
 
-	const [gameState, setGameState] = useState({})
+	save(gameState)
+	
 	const [menuVisibility, setMenuVisibility] = useState(false)
 	const [firstRender, setFirstRender] = useState(true)
 	const [playing, setPlaying] = useState(false)
@@ -37,7 +46,7 @@ export default function Index() {
 				start={start}
 			/>
 		}
-		{ playing && <Base gameState={gameState} /> }
+		{ playing && <Base gameState={gameState} setGameState={setGameState} /> }
 		</>
 	)
 }

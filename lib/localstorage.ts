@@ -1,5 +1,10 @@
-interface gameState {
-	hp: number
+export interface gameState {
+	name: string,
+	type: string,
+	dmg: number,
+	armor: number,
+	level: number,
+	exp: number,
 }
 
 export function save(gameState: gameState) {
