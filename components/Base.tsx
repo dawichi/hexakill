@@ -27,14 +27,25 @@ const Base = ({gameState, setGameState}) => {
 	}
 
 	const addExp = (state: gameState, exp: number) => {
-		setGameState({
-			name: state.name,
-			type: state.type,
-			dmg: state.dmg,
-			armor: state.armor,
-			level: state.level,
-			exp: state.exp + exp,
-		})
+		if (state.exp + exp >= 100) {
+			setGameState({
+				name: state.name,
+				type: state.type,
+				dmg: state.dmg,
+				armor: state.armor,
+				level: state.level + 1,
+				exp: state.exp + exp - 100,
+			})
+		} else {
+			setGameState({
+				name: state.name,
+				type: state.type,
+				dmg: state.dmg,
+				armor: state.armor,
+				level: state.level,
+				exp: state.exp + exp,
+			})
+		}
 	}
 
 	return (
