@@ -7,7 +7,20 @@ import { load, save } from '../lib/localstorage'
 export default function Index() {
 
 	const start = (loadLastgame: boolean) => {
-		if (loadLastgame) {setGameState(load())}
+		if (loadLastgame) {
+			// recover stored game
+			setGameState(load())
+		} else {
+			// new game
+			setGameState({
+				name: 'David',
+				type: 'coffee',
+				dmg: 60,
+				armor: 20,
+				level: 1,
+				exp: 0,
+			})
+		}
 		setPlaying(true)
 	}
 	
@@ -19,8 +32,6 @@ export default function Index() {
 		level: 1,
 		exp: 0,
 	})
-
-	save(gameState)
 	
 	const [menuVisibility, setMenuVisibility] = useState(false)
 	const [firstRender, setFirstRender] = useState(true)
@@ -33,6 +44,18 @@ export default function Index() {
 	const animation = firstRender ? 'opacity-0' : menuVisibility ? coming : leaving
 
 	// if (loading) return <Loader />
+
+	useEffect(() => {
+		const saveme = {
+			name: gameState.name,
+			type: gameState.type,
+			dmg: gameState.dmg,
+			armor: gameState.armor,
+			level: gameState.level,
+			exp: gameState.exp
+		}
+		save(saveme)
+	}, [gameState])
 
 	return (
 		<>
