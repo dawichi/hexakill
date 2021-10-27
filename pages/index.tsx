@@ -6,14 +6,13 @@ import { load, save } from '../lib/localstorage'
 
 export default function Index() {
 
-	const state = {
-		hp: 12
-	}
-
-	const start = (load: boolean) => {
+	const start = (loadLastgame: boolean) => {
+		if (loadLastgame) {setGameState(load())}
+		console.log(load())
 		setPlaying(true)
 	}
-	
+
+	const [gameState, setGameState] = useState({})
 	const [menuVisibility, setMenuVisibility] = useState(false)
 	const [firstRender, setFirstRender] = useState(true)
 	const [playing, setPlaying] = useState(false)
@@ -38,7 +37,7 @@ export default function Index() {
 				start={start}
 			/>
 		}
-		{ playing && <Base /> }
+		{ playing && <Base gameState={gameState} /> }
 		</>
 	)
 }
