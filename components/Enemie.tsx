@@ -6,8 +6,8 @@ import enemies from '../lib/enemies'
 const Enemie = ({life, animation, enemy_index}) => {
 
 	const colorHpBar = (hp: number) => {
-		if (hp < 10) return 'danger'
-		if (hp >= 10 && hp < 31) return 'warning'
+		if (hp < 11) return 'danger'
+		if (hp > 10 && hp < 31) return 'warning'
 		return 'success'
 	}
 
@@ -43,6 +43,9 @@ const Enemie = ({life, animation, enemy_index}) => {
 			'fire': 'bg-red-600',
 			'iron': 'bg-gray-600',
 			'magic': 'bg-purple-600',
+			'ground': 'bg-brown-600',
+			'ice': 'bg-white-600',
+			'dragon': 'bg-indigo-700',
 		}
 		return <span className={"rounded py-1 px-2 " + types[type] + " capitalize"}>{type}</span>
 	}
