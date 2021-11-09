@@ -17,7 +17,7 @@ export default function Index() {
 				type: 'coffee',
 				dmg: 60,
 				armor: 20,
-				level: 100,
+				level: 1,
 				exp: 0,
 			})
 		}
