@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
 import React from 'react'
-import ProgressBar from 'react-bootstrap/ProgressBar'
 import enemies from '../lib/enemies'
 
 const Enemie = ({life, animation, enemy_index}) => {
@@ -58,7 +57,7 @@ const Enemie = ({life, animation, enemy_index}) => {
 				<img src={'/images/' + enemy.path + '/' + animations[animation]} className="w-32 m-auto" alt="slime"/>
 				<div className="mt-2 p-4"> 
 					<p>HP: {enemy.hp}</p>
-					<ProgressBar striped animated variant={colorHpBar(life)} key={1} now={life} label={`${life}%`} />
+					{/* <ProgressBar striped animated variant={colorHpBar(life)} key={1} now={life} label={`${life}%`} /> */}
 				</div>
 			</div>
 			<div className="col-6">
