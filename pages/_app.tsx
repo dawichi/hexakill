@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
+import { GameContext } from '../hooks/gameContext'
 import 'tailwindcss/tailwind.css'
 import '../styles/global.scss'
 
@@ -8,7 +9,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     // Context of the app
     const [context, setContext] = useState()
 
-    return (
+	return (
         <>
             <Head>
                 <title>Hexakill</title>
@@ -21,7 +22,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             </Head>
 
             <main>
-                <Component {...pageProps} />
+				<GameContext.Provider value={{ context, setContext }}>
+                    <Component {...pageProps} />
+                </GameContext.Provider>
             </main>
         </>
     )

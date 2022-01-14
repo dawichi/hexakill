@@ -1,29 +1,52 @@
 /* eslint-disable @next/next/no-img-element */
-import React from 'react'
+import React, { useContext, useState } from 'react'
+import { GameContext } from '../hooks/gameContext'
 
-const Welcome = ({ setFirstRender, setMenuVisibility, menuVisibility, title_class, animation, start }) => {
+const Welcome = () => {
+    const { context, setContext } = useContext(GameContext)
+	
+	const [showOptions, setShowOptions] = useState(false)
+    const [firstRender, setFirstRender] = useState(true)
+	
+	// TODO: useEffect, get context from localStorage
+
+	const coming = ' animate__animated animate__fadeIn animate__fast'
+    const leaving = ' animate__animated animate__fadeOut animate__fast '
+    const animation = firstRender ? 'opacity-0' : showOptions ? coming : leaving
+
+	const title_class = 'text-white text-xl p-3 rounded-xl bg-gradient-to-br'
+
+	const handleCreateGame = (new_game: boolean) => {
+		setContext({
+			name: 'David',
+			type: 'coffee',
+			dmg: 60,
+			armor: 20,
+			level: 1,
+			exp: 0,
+		})
+	}
+
     return (
-        <div className='bg-gray-800 h-screen'>
-            <div className='h-100 flex justify-center align-items-center flex-col'>
-                <img className='block w-20 mb-5' src='https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg' alt='Hexastats' />
-                <button
-                    onClick={() => {
-                        setFirstRender(false)
-                        setMenuVisibility(!menuVisibility)
-                    }}
-                    className={title_class + ' cursor-pointer from-purple-500 to-indigo-500 mb-2 hover:from-purple-800 hover:to-indigo-800'}
-                >
-                    Welcome to Hexakill!
-                </button>
-                <ul className={title_class + animation + ' from-blue-500 to-violet-800'}>
-                    <li onClick={() => start(false)} className='cursor-pointer p-2'>
-                        <i className='bi bi-arrow-right'></i> New game
-                    </li>
-                    <li onClick={() => start(true)} className='cursor-pointer p-2'>
-                        <i className='bi bi-arrow-right'></i> Continue saved game
-                    </li>
-                </ul>
-            </div>
+        <div className='bg-gray-800 h-screen flex flex-col justify-center items-center'>
+			<img className='block w-20 mb-5' src='https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg' alt='Hexastats' />
+			<button
+				onClick={() => {
+					setFirstRender(false)
+					setShowOptions(!showOptions)
+				}}
+				className='text-white font-bold tracking-wider text-xl p-3 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 mb-2 hover:from-purple-800 hover:to-indigo-800'
+			>
+				Welcome to Hexakill!
+			</button>
+			<div className={`${title_class} ${animation} from-blue-500 to-violet-800 w-72 flex flex-col justify-center items-start`}>
+				<button onClick={() => handleCreateGame(true)} className='p-2 hover:font-bold'>
+					<i className='bi bi-arrow-right'></i> New game
+				</button>
+				<button onClick={() => handleCreateGame(false)} className='p-2 hover:font-bold'>
+					<i className='bi bi-arrow-right'></i> Continue 
+				</button>
+			</div>
         </div>
     )
 }
