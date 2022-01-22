@@ -1,6 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
-import React from 'react'
-import enemies from '../utils/enemies'
+import enemies from 'utils/enemies'
 
 const Enemie = ({ life, animation, enemy_index }) => {
     const colorHpBar = (hp: number) => {

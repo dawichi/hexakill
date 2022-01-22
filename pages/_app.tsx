@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
-import { GameContext } from '../hooks/gameContext'
+import { GameContext } from 'hooks/gameContext'
 import 'tailwindcss/tailwind.css'
-import '../styles/global.scss'
+import 'styles/global.scss'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
     // Context of the app

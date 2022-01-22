@@ -1,13 +1,4 @@
-export interface gameState {
-    name: string
-    type: string
-    dmg: number
-    armor: number
-    level: number
-    exp: number
-}
-
-export function save(gameState: gameState) {
+export function save(gameState) {
     localStorage.setItem('gameState', JSON.stringify(gameState))
 }
 

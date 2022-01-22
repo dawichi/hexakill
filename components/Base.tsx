@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { gameState } from '../utils/localstorage'
-import Enemie from './Enemie'
+import { useState } from 'react'
+import { gameState } from 'utils/localstorage'
+import { Enemie } from 'components'
 
 const Base = ({ gameState, setGameState }) => {
     const [life, setLife] = useState(100)

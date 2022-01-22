@@ -1,6 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
-import React, { useContext, useState } from 'react'
-import { GameContext } from '../hooks/gameContext'
+import { useContext, useState } from 'react'
+import { GameContext } from 'hooks/gameContext'
 
 const Welcome = () => {
     const { context, setContext } = useContext(GameContext)
