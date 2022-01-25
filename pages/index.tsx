@@ -30,7 +30,8 @@ export default function Index() {
 
             <div className='relative container m-auto h-full bg-zinc-700 grid grid-rows-2'>
                 <GameView player={player_1} />
-                <Interface />
+                <Interface player={player_1} />
+
                 {alerting && (
                     <div className='absolute top-0 left-0 h-full w-full'>
                         <div className='flex justify-center items-end h-1/2'>
