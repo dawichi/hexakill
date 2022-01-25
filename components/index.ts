@@ -1,5 +1,6 @@
 // Interface
 export { default as MusicToggle } from './interface/MusicToggle'
+export { default as DisplayInfo } from './interface/DisplayInfo'
 
 // Layout
 export { default as GameView } from './layout/GameView'
