@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react'
-import { GameView, Interface, MusicToggle, Welcome } from 'components'
+import { DisplayInfo, GameView, Interface, MusicToggle, Welcome } from 'components'
 import { GameContext } from 'hooks/gameContext'
-import DisplayInfo from 'components/interface/DisplayInfo'
+
 
 export default function Index() {
     // Consume context
