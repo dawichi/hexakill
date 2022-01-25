@@ -1,10 +1,12 @@
 const GameView = () => {
     return (
-        <div className='grid grid-cols-2'>
-            {/* LEFT COLUMN: DATA */}
+        <div className='grid grid-cols-3'>
+            {/* LEFT: ENEMY DATA */}
             <div className='bg-green-200/50'>enemy stats</div>
-            {/* RIGHT COLUMN: ACTIONS */}
-            <div className='bg-blue-200/50'>enemy view</div>
+            {/* CENTER: YOU */}
+            <div className='bg-red-200/50'>TU</div>
+            {/* RIGHT: ENEMIE */}
+            <div className='bg-blue-200/50'>EL OTRO WEY</div>
         </div>
     )
 }
