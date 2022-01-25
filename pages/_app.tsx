@@ -9,7 +9,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     // Context of the app
     const [context, setContext] = useState()
 
-	return (
+    return (
         <>
             <Head>
                 <title>Hexakill</title>
@@ -22,7 +22,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             </Head>
 
             <main>
-				<GameContext.Provider value={{ context, setContext }}>
+                <GameContext.Provider value={{ context, setContext }}>
                     <Component {...pageProps} />
                 </GameContext.Provider>
             </main>

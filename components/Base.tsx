@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { gameState } from 'utils/localstorage'
+// import { gameState } from 'utils/localstorage'
 import { Enemie } from 'components'
 
 const Base = ({ gameState, setGameState }) => {
@@ -25,7 +25,7 @@ const Base = ({ gameState, setGameState }) => {
         setAnimation(1)
     }
 
-    const addExp = (state: gameState, exp: number) => {
+    const addExp = (state, exp: number) => {
         if (state.exp + exp >= 100) {
             setGameState({
                 name: state.name,
