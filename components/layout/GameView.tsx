@@ -2,14 +2,14 @@ import { useState } from "react"
 
 const GameView = ({ player }) => {
 
-	const [data, setData] = useState(false)
+	const [resetHTML, setResetHTML] = useState(false)
 
 	const UpLevel = () => (
 		<button
 			className="bg-zinc-800 text-white rounded-xl"
 			onClick={() => {
 				player.upLevel()
-				setData(!data)
+				setResetHTML(!resetHTML)
 			}}
 		><i className="bi bi-arrow-up"></i> UP LEVEL</button>
 	)
@@ -19,7 +19,7 @@ const GameView = ({ player }) => {
 			className="bg-zinc-800 text-white rounded-xl"
 			onClick={() => {
 				player.getDamage(100)
-				setData(!data)
+				setResetHTML(!resetHTML)
 			}}
 		><i className="bi bi-emoji-angry"></i> MAKE 100 DMG</button>
 	)

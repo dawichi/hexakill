@@ -4,7 +4,7 @@ const DisplayStats = ({ player }) => {
             
             <p>
                 <span className='rounded px-1 text-white bg-green-600'>health: {player.health}
-                <i className='px-1 bi bi bi-heart-fill text-black'></i>
+                <i className='px-1 bi bi bi-heart-fill text-red-500'></i>
                 </span>
             </p>
 
