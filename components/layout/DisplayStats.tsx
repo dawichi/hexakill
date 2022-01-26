@@ -1,52 +1,67 @@
 const DisplayStats = ({ player }) => {
+   const stats=[
+       {
+           title:'Ability Power',
+           keyword:'ability_power',
+           color:'bg-blue-600',
+           icon:'magic'
+       },
+       {
+        title:'Attack Damage',
+        keyword:'attack_damage',
+        color:'bg-red-600',
+        icon:'sword'
+    },
+    {
+        title:'Critical Hit',
+        keyword:'critical_hit',
+        color:'bg-yellow-600',
+        icon:'bullseye'
+    },
+    {
+        title:'Magic Resist',
+        keyword:'magic_resist',
+        color:'bg-purple-600',
+        icon:'round-shield'
+    },
+    {
+        title:'Armor',
+        keyword:'armor',
+        color:'bg-amber-900',
+        icon:'shield'
+    },
+    {
+        title:'Movement Speed',
+        keyword:'movement_speed',
+        color:'bg-cyan-400',
+        icon:'wind'
+    },
+    {
+        title:'Luck',
+        keyword:'luck',
+        color:'bg-lime-400',
+        icon:'flower2'
+    },
+
+   ]
+
     return (
-        <div> 
-            
+        <div>
             <p>
-                <span className='rounded px-1 text-white bg-green-600'>health: {player.health}
-                <i className='px-1 bi bi bi-heart-fill text-red-500'></i>
+                <span title='Health points' className='rounded px-1 text-white bg-green-600'>
+                    <i className='bi bi-heart-fill'></i>
+                    {player.health}
                 </span>
             </p>
 
-            <p>
-            <span className='rounded px-1 text-white bg-blue-600'>ability_power: {player.ability_power}</span>
-            <i className='px-1 bi bi bi-magic'></i>
-                </p>
+            {
+                stats.map((stat, idx) => (
+                    <p title={stat.title} key={idx} className={'rounded px-1 text-white ' + stat.color} >
+                        <i className={'ra ra-' + stat.icon}></i> {player[stat.keyword]}
+                    </p>
+                ))
+            }
 
-            <p>
-            <span className='rounded px-1 text-white bg-red-600'>attack_damage: {player.attack_damage}</span>
-            <i className='px-1 bi bi-hammer'></i>
-            </p>
-
-            <p>
-            <span className='rounded px-1 text-white bg-yellow-600'>crit_chance: {player.critical_hit}
-            <i className='px-1 bi bi bi bi-bullseye'></i>
-            </span>
-            </p>
-
-            <p>
-            <span className='rounded px-1 text-white bg-purple-600'>magic_resist: {player.magic_resist}
-            <i className='px-1 bi bi bi-stars'></i>
-            </span>
-            </p>
-
-            <p>
-            <span className='rounded px-1 text-white bg-amber-900'>armor: {player.armor}
-            <i className='px-1 bi bi-shield-shaded'></i>
-            </span>
-            </p>
-
-            <p>
-            <span className='rounded px-1 text-white bg-cyan-400'>movement_speed: {player.movement_speed}
-            <i className='px-1 bi bi-wind'></i>
-            </span>
-            </p>
-
-            <p>
-            <span className='rounded px-1 text-white bg-lime-400'>luck: {player.luck}</span>
-            <i className='px-1 bi bi-flower2'></i>
-            </p>
-        
         </div>
     )
 }
