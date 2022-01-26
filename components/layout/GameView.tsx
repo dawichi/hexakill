@@ -1,21 +1,59 @@
+import { useState } from "react"
+
 const GameView = ({ player }) => {
+
+	const [data, setData] = useState(false)
+
+	const UpLevel = () => (
+		<button
+			className="bg-zinc-800 text-white rounded-xl"
+			onClick={() => {
+				player.upLevel()
+				setData(!data)
+			}}
+		><i className="bi bi-arrow-up"></i> UP LEVEL</button>
+	)
+
+	const DealDmg = () => (
+		<button
+			className="bg-zinc-800 text-white rounded-xl"
+			onClick={() => {
+				player.getDamage(100)
+				setData(!data)
+			}}
+		><i className="bi bi-emoji-angry"></i> MAKE 100 DMG</button>
+	)
+
     return (
         <div className='grid grid-cols-3'>
             {/* LEFT: ENEMY DATA */}
             <div className='bg-green-200/50'>enemy stats</div>
             {/* CENTER: YOU */}
             <div className='bg-red-200/50'>
-				<p>health: {player.health}</p>
-				<p>ability_power: {player.ability_power}</p>
-				<p>attack_damage: {player.attack_damage}</p>
-				<p>critical_hit: {player.critical_hit}</p>
-				<p>magic_resist: {player.magic_resist}</p>
-				<p>armor: {player.armor}</p>
-				<p>movement_speed: {player.movement_speed}</p>
-				<p>luck: {player.luck}</p>
+				<div className="m-5 p-4 rounded bg-red-100/50">
+					<h1 className="text-xl">PLAYER: {player.name}</h1>
+					<h1 className="text-xl">LV: {player.level}</h1>
+					<hr/>
+					<div className="grid grid-cols-3 gap-4">
+						<p className="bg-green-200">{player.health - player.dmgRecieved}/{player.health} {'<3'}</p>
+						<p className="bg-cyan-200">{player.ability_power} &nbsp; &nbsp; AP</p>
+						<p className="bg-red-200">{player.attack_damage} &nbsp; &nbsp; AD</p>
+						<p className="bg-orange-200">{player.critical_hit} &nbsp; &nbsp; crit % </p>
+						<p className="bg-violet-200">{player.magic_resist} &nbsp; &nbsp; MR</p>
+						<p className="bg-amber-200">{player.armor} &nbsp; &nbsp; armor</p>
+						<p className="bg-blue-200">{player.movement_speed} &nbsp; &nbsp; speed</p>
+						<p className="bg-green-200">{player.luck} &nbsp; &nbsp; luck</p>
+					</div>
+				</div>
+				<div className="m-5 p-4 grid grid-cols-3 gap-4 bg-yellow-200/75">
+					<UpLevel/>
+					<DealDmg/>
+				</div>
 			</div>
             {/* RIGHT: ENEMIE */}
-            <div className='bg-blue-200/50'>EL OTRO WEY</div>
+            <div className='bg-blue-200/50'>
+				<span>EL OTRO WEY</span>
+			</div>
         </div>
     )
 }
