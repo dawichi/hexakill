@@ -3,7 +3,6 @@ import { DisplayInfo, GameView, Interface, MusicToggle, Welcome } from 'componen
 import { GameContext } from 'hooks/gameContext'
 import Alex from 'characters/Alex/Alex'
 
-
 export default function Index() {
     // Consume context
     const { context, setContext } = useContext(GameContext)
@@ -19,7 +18,7 @@ export default function Index() {
 
     // <Base gameState={context} setGameState={setContext}/>
 
-	const player_1 = new Alex('David', 1)
+    const player_1 = new Alex('David', 1)
 
     return (
         <div className='bg-zinc-900 h-screen py-20 relative'>
