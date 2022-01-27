@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import { StatsTable } from 'components'
+
 const PlayerView = ({ player }) => {
     const health_width = ((player.health - player.dmgRecieved) / player.health) * 100
     return (
