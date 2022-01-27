@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import { DisplayInfo, GameView, Interface, MusicToggle, Welcome } from 'components'
+import { DisplayInfo, DisplayStats, PlayerView, MusicToggle, Welcome, OptionMenu, ActionButton, ActionMenu } from 'components'
 import { GameContext } from 'hooks/gameContext'
 import Alex from 'characters/Alex/Alex'
 
@@ -18,7 +18,8 @@ export default function Index() {
 
     // <Base gameState={context} setGameState={setContext}/>
 
-    const player_1 = new Alex('David', 1)
+    const player_1 = new Alex('David')
+    const player_2 = new Alex('Bruno')
 
     return (
         <div className='bg-zinc-900 h-screen py-20 relative'>
@@ -28,8 +29,16 @@ export default function Index() {
             </div>
 
             <div className='relative container m-auto h-full bg-zinc-700 grid grid-rows-2'>
-                <GameView player={player_1} />
-                <Interface player={player_1} />
+                <div className='grid grid-cols-3'>
+                    <DisplayStats player={player_2} />
+                    <PlayerView player={player_2} />
+                    <OptionMenu />
+                </div>
+                <div className='grid grid-cols-3'>
+                    <DisplayStats player={player_1} />
+                    <PlayerView player={player_1} />
+                    <ActionMenu player={player_1} />
+                </div>
 
                 {alerting && (
                     <div className='absolute top-0 left-0 h-full w-full'>
