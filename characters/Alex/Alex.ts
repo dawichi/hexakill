@@ -73,20 +73,20 @@ class Alex extends BaseEntity {
     passive() {}
 
     attack() {
-		 console.log('attack')
-	}
+        console.log('attack')
+    }
 
     defend() {
-		console.log('defend')
-	}
+        console.log('defend')
+    }
 
     skillshot() {
-		console.log('skillshot')
-	}
+        console.log('skillshot')
+    }
 
     ultimate() {
-		console.log('ultimate')
-	}
+        console.log('ultimate')
+    }
 }
 
 export default Alex
