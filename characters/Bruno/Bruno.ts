@@ -1,6 +1,6 @@
 import BaseEntity from '../Base/baseEntity'
 
-class Alex extends BaseEntity {
+class Bruno extends BaseEntity {
     dmgRecieved: number
     health: number
     ability_power: number
@@ -23,7 +23,7 @@ class Alex extends BaseEntity {
         this.armor = 25
         this.movement_speed = 2
         this.luck = 5
-		this.image = '/images/slime-blue/attack.gif'
+		this.image = '/images/slime-green/attack.gif'
     }
 
     upLevel() {
@@ -103,4 +103,4 @@ class Alex extends BaseEntity {
     }
 }
 
-export default Alex
+export default Bruno
