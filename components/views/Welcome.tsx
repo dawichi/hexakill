@@ -17,14 +17,7 @@ const Welcome = () => {
     const title_class = 'text-white text-xl p-3 rounded-xl bg-gradient-to-br'
 
     const handleCreateGame = (new_game: boolean) => {
-        setContext({
-            name: 'David',
-            type: 'coffee',
-            dmg: 60,
-            armor: 20,
-            level: 1,
-            exp: 0,
-        })
+        setContext([1])
     }
 
     return (

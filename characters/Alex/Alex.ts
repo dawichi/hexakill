@@ -15,17 +15,21 @@ class Alex extends BaseEntity {
         super(name, level)
         this.dmgRecieved = 0
         this.health = 200
-        this.ability_power = 20
-        this.attack_damage = 20
-        this.critical_hit = 20
-        this.magic_resist = 20
-        this.armor = 20
+        this.ability_power = 60
+        this.attack_damage = 40
+        this.critical_hit = 5
+        this.magic_resist = 25
+        this.armor = 25
         this.movement_speed = 2
-        this.luck = 20
+        this.luck = 5
     }
 
     upLevel() {
-        this.level++
+		if (this.level >= 18){
+			return 
+		}
+        
+		this.level++
 
         // TODO: make a random range in increments
         const props_updates = [
@@ -35,27 +39,27 @@ class Alex extends BaseEntity {
             },
             {
                 stat: 'ability_power',
-                increment: 5,
+                increment: 20,
             },
             {
                 stat: 'attack_damage',
-                increment: 5,
+                increment: 20,
             },
             {
                 stat: 'critical_hit',
-                increment: 5,
+                increment: 1,
             },
             {
                 stat: 'magic_resist',
-                increment: 5,
+                increment: 10,
             },
             {
                 stat: 'armor',
-                increment: 5,
+                increment: 10,
             },
             {
                 stat: 'movement_speed',
-                increment: 5,
+                increment: 3,
             },
             {
                 stat: 'luck',
@@ -63,17 +67,22 @@ class Alex extends BaseEntity {
             },
         ]
 
-        props_updates.forEach(prop => (this[prop.stat] += prop.increment))
-    }
+        props_updates.forEach(prop => (this[prop.stat] += parseInt((Math.log2(prop.increment*this.level)/Math.log2(5)).toFixed(1))))
+    }	
 
     getDamage(damage: number) {
-        this.dmgRecieved += damage
+		if  (this.dmgRecieved + damage >= this.health){
+			this.dmgRecieved = this.health
+		}
+		else{
+			this.dmgRecieved += damage
+		}     
     }
 
     passive() {}
 
     attack() {
-        console.log('attack')
+        
     }
 
     defend() {
