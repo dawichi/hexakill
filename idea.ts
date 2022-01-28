@@ -10,10 +10,10 @@ export const alex = {
 export const bruno = {
     // AD
     passive: 'sus habilidades de daño aplican sangrado',
-    attack: 'navajazo',
+    attack: 'navajazo: te apuñala y hace daño',
     defend: 'voy a hacer deporte: sube todas sus stats',
-    skillshot: 'abuela tanque',
-    ultimate: '',
+    skillshot: 'abuela tanque: se defiende del próximo ataque y devuelve el daño, si falla pierde 1 turno',
+    ultimate: 'Me cansé: mete un putaso, cuantas mas marcas mas daño hace',
 }
 
 export const marcos = {
@@ -27,10 +27,10 @@ export const marcos = {
 
 export const cristian = {
     // AP
-    passive: 'cocacola: se cura cada turno',
-    attack: '',
-    defend: 'limpia efectos de estado, cooldown de x turnos',
-    skillshot: '',
+    passive: 'cocacola: por cada ataque que le hagan lo acumula  en un 15% de escudo',
+    attack: 'Putaso: ni idea todavía :/',
+    defend: 'Nocturnidad:limpia efectos de estado, cooldown de x turnos',
+    skillshot: ' :Peta el escudo y hace daño',
     ultimate: 'ahegao: ',
 }
 
@@ -45,4 +45,12 @@ export const david = {
     defend: '',
     skillshot: 'programar: selecciona la skill del rival y la usa',
     ultimate: '',
+}
+export const pato = {
+    passive: 'insomnio: hace daño cada turno si el enemigo esta dormido',
+    attack: 'Melatonina: duerme al oponente',
+    defend: 'Safar: esquiva la sigueinte habilidad',
+    skillshot: 'Despertar: Si el enemigo esta dormido lo despierta y hace mucho daño',
+    ultimate: 'Caos: ',
+
 }

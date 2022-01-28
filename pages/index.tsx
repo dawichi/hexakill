@@ -18,8 +18,8 @@ export default function Index() {
 
     // <Base gameState={context} setGameState={setContext}/>
 
-    const player_1 = new Alex('David')
-    const player_2 = new Alex('Bruno')
+    const player_1 = new Alex('David Lvl')
+    const player_2 = new Alex('Bruno Lvl')
 
     return (
         <div className='bg-zinc-900 h-screen py-20 relative'>
