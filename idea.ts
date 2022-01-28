@@ -54,3 +54,12 @@ export const pato = {
     ultimate: 'Caos: ',
 
 }
+
+export const carmen = {
+    passive: 'Descarga: cada vez que hace o recibe un ataque inflinge daño al enemigo',
+    attack: '',
+    defend: '',
+    skillshot: '',
+    ultimate: '',
+
+}
