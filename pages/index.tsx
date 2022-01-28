@@ -4,6 +4,9 @@ import { GameContext } from 'hooks/gameContext'
 import Alex from 'characters/Alex/Alex'
 
 export default function Index() {
+
+	const [resetHTML, setResetHTML] = useState(false)
+
     // Consume context
     const { context, setContext } = useContext(GameContext)
 
