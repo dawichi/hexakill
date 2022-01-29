@@ -1,82 +1,93 @@
 import BaseEntity from '../Base/baseEntity'
 
+interface playerStat {
+	value : number,
+	increment: number,
+	level: number
+}
+
+const props = ['health', 'ability_power', 'attack_damage', 'critical_hit', 'magic_resist', 'armor', 'movement_speed', 'luck']
+
 class Alex extends BaseEntity {
     dmgRecieved: number
-    health: number
-    ability_power: number
-    attack_damage: number
-    critical_hit: number
-    magic_resist: number
-    armor: number
-    movement_speed: number
-    luck: number
+    health: playerStat
+    ability_power: playerStat
+    attack_damage: playerStat
+    critical_hit: playerStat
+    magic_resist: playerStat
+    armor: playerStat
+    movement_speed: playerStat
+    luck: playerStat
 	image: string
 
     constructor(name: string, level: number = 1) {
         super(name, level)
         this.dmgRecieved = 0
-        this.health = 200
-        this.ability_power = 60
-        this.attack_damage = 40
-        this.critical_hit = 5
-        this.magic_resist = 25
-        this.armor = 25
-        this.movement_speed = 2
-        this.luck = 5
+        this.health = {
+			value : 200,
+			increment: 40,
+			level: 0
+		}
+        this.ability_power = {
+			value : 60,
+			increment: 20,
+			level: 0
+		}
+        this.attack_damage = {
+			value : 40,
+			increment: 20,
+			level: 0
+		}
+        this.critical_hit = {
+			value : 5,
+			increment: 1,
+			level: 0
+		}
+        this.magic_resist = {
+			value : 25,
+			increment: 10,
+			level: 0
+		}
+        this.armor = {
+			value : 25,
+			increment: 10,
+			level: 0
+		}
+        this.movement_speed = {
+			value : 2,
+			increment: 3,
+			level: 0
+		}
+        this.luck = {
+			value : 5,
+			increment: 1,
+			level: 0
+		}
 		this.image = '/images/slime-blue/attack.gif'
     }
 
     upLevel() {
-		if (this.level >= 18){
-			return 
+		if (this.level < 18){ 
+			this.level++
+
+			props.forEach(prop => {
+				this[prop].value += parseInt((Math.log2(this[prop].increment*this.level)/Math.log2(5)).toFixed(1))
+			})
 		}
-        
-		this.level++
-
-        // TODO: make a random range in increments
-        const props_updates = [
-            {
-                stat: 'health',
-                increment: 40,
-            },
-            {
-                stat: 'ability_power',
-                increment: 20,
-            },
-            {
-                stat: 'attack_damage',
-                increment: 20,
-            },
-            {
-                stat: 'critical_hit',
-                increment: 1,
-            },
-            {
-                stat: 'magic_resist',
-                increment: 10,
-            },
-            {
-                stat: 'armor',
-                increment: 10,
-            },
-            {
-                stat: 'movement_speed',
-                increment: 3,
-            },
-            {
-                stat: 'luck',
-                increment: 1,
-            },
-        ]
-
-        props_updates.forEach(prop => (this[prop.stat] += parseInt((Math.log2(prop.increment*this.level)/Math.log2(5)).toFixed(1))))
     }	
 
+	upSkill(prop: string){
+		if (this[prop].level < 3){
+			this[prop].value += this[prop].increment*(this[prop].level+1)*2
+			this[prop].level += 1
+		}	
+	}
+
     getDamage(damage: number) {
-		if  (this.dmgRecieved + damage >= this.health){
-			this.dmgRecieved = this.health
+		if  (this.dmgRecieved + damage >= this.health.value){
+			this.dmgRecieved = this.health.value
 		}
-		if (this.dmgRecieved + damage <= 0){
+		else if (this.dmgRecieved + damage <= 0){
 			this.dmgRecieved = 0
 		}
 		else{
