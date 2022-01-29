@@ -76,7 +76,7 @@ class Bruno extends BaseEntity {
 		if  (this.dmgRecieved + damage >= this.health){
 			this.dmgRecieved = this.health
 		}
-		if (this.dmgRecieved + damage <= 0){
+		else if (this.dmgRecieved + damage <= 0){
 			this.dmgRecieved = 0
 		}
 		else{

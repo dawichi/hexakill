@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { StatsTable } from 'components'
 
+
 const DisplayStats = ({ player }) => {
 
 	const [resetHTML, setResetHTML] = useState(false)

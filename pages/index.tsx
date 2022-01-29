@@ -1,15 +1,14 @@
 import { useContext, useState } from 'react'
-import { DisplayInfo, DisplayStats, PlayerView, MusicToggle, Welcome, OptionMenu, ActionButton, ActionMenu } from 'components'
+import { DisplayInfo, DisplayStats, PlayerView, MusicToggle, Welcome, OptionMenu, ActionMenu } from 'components'
 import { GameContext } from 'hooks/gameContext'
 import Alex from 'characters/Alex/Alex'
 import Bruno from 'characters/Bruno/Bruno'
 
 export default function Index() {
 
-	const [resetHTML, setResetHTML] = useState(false)
 
     // Consume context
-    const { context, setContext } = useContext(GameContext)
+    const {context, setContext } = useContext(GameContext)
 
     // Currently displaying messages for the player
     const [alerting, setAlerting] = useState(false)
