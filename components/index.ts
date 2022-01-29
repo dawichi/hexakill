@@ -2,7 +2,6 @@
 export { default as MusicToggle } from './interface/MusicToggle'
 export { default as DisplayInfo } from './interface/DisplayInfo'
 export { default as ActionButton } from './interface/ActionButton'
-export { default as StatsTable } from './interface/StatsTable'
 
 // Layout
 export { default as DisplayStats } from './layout/DisplayStats'

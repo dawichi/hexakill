@@ -8,7 +8,7 @@ interface playerStat {
 
 const props = ['health', 'ability_power', 'attack_damage', 'critical_hit', 'magic_resist', 'armor', 'movement_speed', 'luck']
 
-class Alex extends BaseEntity {
+class Bruno extends BaseEntity {
     dmgRecieved: number
     health: playerStat
     ability_power: playerStat
@@ -63,7 +63,7 @@ class Alex extends BaseEntity {
 			increment: 1,
 			level: 0
 		}
-		this.image = '/images/slime-blue/attack.gif'
+		this.image = '/images/slime-green/attack.gif'
     }
 
     upLevel() {
@@ -114,4 +114,4 @@ class Alex extends BaseEntity {
     }
 }
 
-export default Alex
+export default Bruno

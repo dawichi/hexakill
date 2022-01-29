@@ -1,14 +1,14 @@
 import { useContext, useState } from 'react'
-import { DisplayInfo, DisplayStats, PlayerView, MusicToggle, Welcome, OptionMenu, ActionButton, ActionMenu } from 'components'
+import { DisplayInfo, DisplayStats, PlayerView, MusicToggle, Welcome, OptionMenu, ActionMenu } from 'components'
 import { GameContext } from 'hooks/gameContext'
 import Alex from 'characters/Alex/Alex'
+import Bruno from 'characters/Bruno/Bruno'
 
 export default function Index() {
 
-	const [resetHTML, setResetHTML] = useState(false)
 
     // Consume context
-    const { context, setContext } = useContext(GameContext)
+    const {context, setContext } = useContext(GameContext)
 
     // Currently displaying messages for the player
     const [alerting, setAlerting] = useState(false)
@@ -22,7 +22,7 @@ export default function Index() {
     // <Base gameState={context} setGameState={setContext}/>
 
     const player_1 = new Alex('David Lvl')
-    const player_2 = new Alex('Bruno Lvl')
+    const player_2 = new Bruno('Bruno Lvl')
 
     return (
         <div className='bg-zinc-900 h-screen py-20 relative'>
