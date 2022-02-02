@@ -18,7 +18,7 @@ const StatsTable = ({ entity }) => {
     }
 
     return (
-        <section className='bg-white dark:bg-zinc-900 shadow p-2 m-2 rounded relative'>
+        <section className='bg-zinc-900 shadow p-2 m-2 rounded relative'>
 			<div className='h-full flex flex-col items-center justify-between'>
 				<h2 className='text-xl'>
 					{entity.name} - lv {entity.level}

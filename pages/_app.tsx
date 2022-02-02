@@ -17,7 +17,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
                 <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css' />
             </Head>
 
-            <main className='dark:text-white'>
+            <main className='text-white'>
                 <Component {...pageProps} />
             </main>
         </>
