@@ -1,16 +1,33 @@
-import { useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { DisplayInfo, StatsTable, MusicToggle, Welcome } from 'components'
-import { Barbarian, Character, Eagle, Enemy, Knight, Slime } from 'entities'
+import { Eagle, Knight, Samurai, Slime, Warrior, Wizard } from 'entities'
 
 export default function Single() {
-    const [playing, setPlaying] = useState(false)
+	// Character selected. If 0, ask for one in the Welcome screen
+	const [playerData, setPlayerData] = useState({
+		name: '',
+		character: 0,
+	})
+	if (!playerData.character) return <Welcome setPlayerData={setPlayerData} />
 
-    const enemies_pool = [Eagle, Knight, Slime]
+	// Characters available
+	const characters_available = [
+		Wizard,
+		Samurai,
+		Warrior,
+	]
+	
+	const player = new characters_available[playerData.character - 1](5, playerData.name)
+	
+	// ------------------------------------------------------
+	//    THE GAME STARTS !
+	// ------------------------------------------------------
+	const enemies_pool = [Eagle, Knight, Slime]
 
-    const player = new Barbarian(7, 'David')
-    const enemy = new Knight(13)
+    const enemy = new Warrior(13, 'Pedro')
+	
 
-    player._getDamage(200)
+	player._getDamage(200)
     enemy._getDamage(3236)
 
     // while (playing) {
@@ -30,28 +47,24 @@ export default function Single() {
                 <MusicToggle />
             </nav>
 
-            {!playing ? (
-                <Welcome setPlaying={setPlaying} />
-            ) : (
-                <section className='bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1'>
-                    <div className='grid grid-cols-3'>
-                        <StatsTable entity={player} />
-                        <StatsTable entity={enemy} />
-                        <div className='bg-zinc-900 shadow p-2 m-2 rounded relative'>
-                            <h4 className='text-center text-lg p-2'>Info</h4>
-                            <hr />
-                            <article className='p-4'>
-                                <p>fdjsafjkhasdjkfa jsdhfjka sdfkjasd jfajsdfkjasdh fj</p>
-                                <p>fdjsafjkhkjasd jfajasdjkfa jsdhfjka sdfsdfkjas</p>
-                                <p>fdjsafjkhsdfkjasd jfajsdfasdjkfa jsdhfjka kjasdhsdfsdf sas</p>
-                            </article>
-                        </div>
-                    </div>
-                    <div className='bg-zinc-900 shadow p-2 m-2 rounded relative col-span-3'>
-                        <p>fasdfasdfasd</p>
-                    </div>
-                </section>
-            )}
+			<section className='bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1'>
+				<div className='grid grid-cols-3'>
+					<StatsTable entity={player} />
+					<StatsTable entity={enemy} />
+					<div className='bg-zinc-900 shadow p-2 m-2 rounded relative'>
+						<h4 className='text-center text-lg p-2'>Info</h4>
+						<hr />
+						<article className='p-4'>
+							<p>fdjsafjkhasdjkfa jsdhfjka sdfkjasd jfajsdfkjasdh fj</p>
+							<p>fdjsafjkhkjasd jfajasdjkfa jsdhfjka sdfsdfkjas</p>
+							<p>fdjsafjkhsdfkjasd jfajsdfasdjkfa jsdhfjka kjasdhsdfsdf sas</p>
+						</article>
+					</div>
+				</div>
+				<div className='bg-zinc-900 shadow p-2 m-2 rounded relative col-span-3'>
+					<p>fasdfasdfasd</p>
+				</div>
+			</section>
         </div>
     )
 }

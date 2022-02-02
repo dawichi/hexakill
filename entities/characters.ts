@@ -5,6 +5,7 @@ const base = config.base
 
 export class Character extends Base_Entity {
     exp: number
+	image: string
 
     constructor(level: number, name: string) {
         super(level, name)
@@ -42,6 +43,7 @@ export class Character extends Base_Entity {
 export class Wizard extends Character {
     constructor(level: number, name: string) {
         super(level, `${name} (Wizard)`)
+		this.image = 'wizard'
     }
 
     _levelUp() {
@@ -56,9 +58,10 @@ export class Wizard extends Character {
 }
 
 // Sick AD, low MR
-export class Thieve extends Character {
+export class Samurai extends Character {
     constructor(level: number, name: string) {
-        super(level, `${name} (Thieve)`)
+        super(level, `${name} (Samurai)`)
+		this.image = 'samurai'
     }
 
     _levelUp() {
@@ -73,9 +76,10 @@ export class Thieve extends Character {
 }
 
 // Sick resists and HP
-export class Barbarian extends Character {
+export class Warrior extends Character {
     constructor(level: number, name: string) {
-        super(level, `${name} (Barbarian)`)
+        super(level, `${name} (Warrior)`)
+		this.image = 'warrior'
     }
 
     _levelUp() {
