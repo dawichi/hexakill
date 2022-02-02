@@ -46,6 +46,6 @@ https://creativecommons.org/licenses/by-sa/3.0/
  
 
 #### Game assets
-https://lionheart963.itch.io/knight-sprite
-https://luizmelo.itch.io/wizard-pack
-https://luizmelo.itch.io/martial-hero
+https://lionheart963.itch.io/
+https://luizmelo.itch.io/
+https://rvros.itch.io/

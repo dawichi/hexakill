@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Samurai, Warrior, Wizard } from 'entities'
+import { Samurai, Warrior, Wizard } from 'characters'
 import useFormInput from 'hooks/useFormInput'
 import Image from 'next/image'
 

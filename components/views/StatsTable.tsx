@@ -1,12 +1,17 @@
+import { Character, Enemy } from 'characters'
 import Image from 'next/image'
 
-const StatsTable = ({ entity }) => {
+interface StatsTableProps {
+    entity: Character | Enemy
+}
+
+const StatsTable = ({ entity }: StatsTableProps) => {
     const icons = {
-        ad: 'sword',
-        ap: 'fire-symbol',
-        armor: 'shield',
-        mr: 'round-shield',
-        speed: 'player-dodge',
+        ad: ['sword', 'red'],
+        ap: ['fire-symbol', 'blue'],
+        armor: ['shield', 'amber'],
+        mr: ['round-shield', 'fuchsia'],
+        speed: ['player-dodge', 'cyan'],
     }
 
     const health_width = ((entity.health - entity.dmgRecieved) / entity.health) * 100
@@ -23,7 +28,7 @@ const StatsTable = ({ entity }) => {
                 <h2 className='text-xl'>
                     {entity.name} - lv {entity.level}
                 </h2>
-                <div className='relative h-32 w-32'>
+                <div className={'relative ' + entity.size}>
                     <Image src={`/images/${entity.image}/idle.gif`} alt={'a'} layout='fill' />
                 </div>
                 <div className='w-full flex flex-col items-center mb-5'>
@@ -38,7 +43,7 @@ const StatsTable = ({ entity }) => {
             <div className='absolute top-0 left-0 m-5 rounded '>
                 {Object.keys(icons).map((stat, idx) => (
                     <p key={idx} className='rounded py-1 px-3'>
-                        <i className={'ra ra-' + icons[stat]}></i> {entity[stat]}
+                        <i className={`ra ra-${icons[stat][0]} text-${icons[stat][1]}-400`}></i> {entity[stat]}
                     </p>
                 ))}
             </div>

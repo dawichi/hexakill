@@ -4,6 +4,8 @@ const base = config.base
 
 export class Base_Entity {
     name: string
+    image: string
+    size: string
     level: number
     dmgRecieved: number
     health: number
@@ -14,8 +16,9 @@ export class Base_Entity {
     speed: number
 
     constructor(level: number, name: string) {
-        this.level = level
         this.name = name
+        this.size = 'w-full h-full'
+        this.level = level
         this.dmgRecieved = 0
         this.health = level * base.health
         this.ad = level * base.ad
