@@ -1,16 +1,9 @@
 // Interface
-export { default as MusicToggle } from './interface/MusicToggle'
 export { default as DisplayInfo } from './interface/DisplayInfo'
-export { default as ActionButton } from './interface/ActionButton'
-
-// Layout
-export { default as DisplayStats } from './layout/DisplayStats'
-export { default as PlayerView } from './layout/PlayerView'
-export { default as OptionMenu } from './layout/OptionMenu'
-export { default as ActionMenu } from './layout/ActionMenu'
+export { default as Toggles } from './interface/Toggles'
 
 // Views
-export { default as Welcome } from './views/Welcome'
+export { default as StatsTable } from './views/StatsTable'
 
 // Others
 export { default as Base } from './Base'

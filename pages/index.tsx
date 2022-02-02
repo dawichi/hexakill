@@ -1,55 +1,43 @@
-import { useContext, useState } from 'react'
-import { DisplayInfo, DisplayStats, PlayerView, MusicToggle, Welcome, OptionMenu, ActionMenu } from 'components'
-import { GameContext } from 'hooks/gameContext'
-import Alex from 'characters/Alex/Alex'
-import Bruno from 'characters/Bruno/Bruno'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useState } from 'react'
 
-export default function Index() {
+export default function Index () {
 
+    const [showOptions, setShowOptions] = useState(false)
+    const [firstRender, setFirstRender] = useState(true)
 
-    // Consume context
-    const {context, setContext } = useContext(GameContext)
+    const coming = ' animate__animated animate__fadeIn animate__fast'
+    const leaving = ' animate__animated animate__fadeOut animate__fast '
+    const animation = firstRender ? 'opacity-0' : showOptions ? coming : leaving
 
-    // Currently displaying messages for the player
-    const [alerting, setAlerting] = useState(false)
-
-    if (!context) {
-        return <Welcome />
-    }
-
-    // TODO: if (loading) return <Loader />
-
-    // <Base gameState={context} setGameState={setContext}/>
-
-    const player_1 = new Alex('David Lvl')
-    const player_2 = new Bruno('Bruno Lvl')
+    const title_class = 'text-white text-xl p-3 rounded-xl bg-gradient-to-br'
 
     return (
-        <div className='bg-zinc-900 h-screen py-20 relative'>
-            <h1 className='absolute top-0 left-0 text-white text-3xl p-5 text-center w-full'>Hexakill !</h1>
-            <div className='absolute top-0 right-10 text-white text-2xl'>
-                <MusicToggle />
+        <div className='bg-gray-800 h-screen flex flex-col justify-center items-center'>
+            <div className='h-20 w-20 mb-5 relative'>
+                <Image src='/logo.svg' alt='Hexakill' layout='fill' />
             </div>
-
-            <div className='relative container m-auto h-full bg-zinc-700 grid grid-rows-2'>
-                <div className='grid grid-cols-3'>
-                    <DisplayStats player={player_2} />
-                    <PlayerView player={player_2} />
-                    <OptionMenu />
-                </div>
-                <div className='grid grid-cols-3'>
-                    <DisplayStats player={player_1} />
-                    <PlayerView player={player_1} />
-                    <ActionMenu player={player_1} />
-                </div>
-
-                {alerting && (
-                    <div className='absolute top-0 left-0 h-full w-full'>
-                        <div className='flex justify-center items-end h-1/2'>
-                            <DisplayInfo title='A weno' text='Info super  super importante' />
-                        </div>
-                    </div>
-                )}
+            <button
+                onClick={() => {
+                    setFirstRender(false)
+                    setShowOptions(!showOptions)
+                }}
+                className='text-white font-bold tracking-wider text-xl p-3 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 mb-2 hover:from-purple-800 hover:to-indigo-800'
+            >
+                Welcome to Hexakill!
+            </button>
+            <div className={`${title_class} ${animation} from-blue-500 to-violet-800 w-72 flex flex-col justify-center items-start`}>
+				<Link href='/single' passHref>
+					<button className='p-2 hover:font-bold'>
+                    	<i className='bi bi-arrow-right'></i> Singleplayer
+					</button>
+				</Link>
+				<Link href='/single' passHref>
+					<button className='p-2 hover:font-bold'>
+                    	<i className='bi bi-arrow-right'></i> Multiplayer
+					</button>
+				</Link>
             </div>
         </div>
     )

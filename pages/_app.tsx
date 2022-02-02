@@ -1,13 +1,9 @@
-import { useState } from 'react'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
-import { GameContext } from 'hooks/gameContext'
 import 'tailwindcss/tailwind.css'
 import 'styles/global.scss'
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-    // Context of the app
-    const [context, setContext] = useState()
 
     return (
         <>
@@ -21,10 +17,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
                 <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css' />
             </Head>
 
-            <main>
-                <GameContext.Provider value={{ context, setContext }}>
-                    <Component {...pageProps} />
-                </GameContext.Provider>
+            <main className='dark:text-white'>
+                <Component {...pageProps} />
             </main>
         </>
     )
