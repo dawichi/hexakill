@@ -52,7 +52,6 @@ export const pato = {
     defend: 'Safar: esquiva la sigueinte habilidad',
     skillshot: 'Despertar: Si el enemigo esta dormido lo despierta y hace mucho daño',
     ultimate: 'Caos: ',
-
 }
 
 export const carmen = {
@@ -61,5 +60,4 @@ export const carmen = {
     defend: '',
     skillshot: '',
     ultimate: '',
-
 }

@@ -9,7 +9,6 @@ export { Warrior as Warrior } from './characters'
 // Base enemy
 export { Enemy as Enemy } from './enemies'
 
-
 // Enemies
 export { Slime as Slime } from './enemies'
 export { Eagle as Eagle } from './enemies'

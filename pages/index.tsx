@@ -2,8 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
-export default function Index () {
-
+export default function Index() {
     const [showOptions, setShowOptions] = useState(false)
     const [firstRender, setFirstRender] = useState(true)
 
@@ -28,16 +27,16 @@ export default function Index () {
                 Welcome to Hexakill!
             </button>
             <div className={`${title_class} ${animation} from-blue-500 to-violet-800 w-72 flex flex-col justify-center items-start`}>
-				<Link href='/single' passHref>
-					<button className='p-2 hover:font-bold'>
-                    	<i className='bi bi-arrow-right'></i> Singleplayer
-					</button>
-				</Link>
-				<Link href='/single' passHref>
-					<button className='p-2 hover:font-bold'>
-                    	<i className='bi bi-arrow-right'></i> Multiplayer
-					</button>
-				</Link>
+                <Link href='/single' passHref>
+                    <button className='p-2 hover:font-bold'>
+                        <i className='bi bi-arrow-right'></i> Singleplayer
+                    </button>
+                </Link>
+                <Link href='/single' passHref>
+                    <button className='p-2 hover:font-bold'>
+                        <i className='bi bi-arrow-right'></i> Multiplayer
+                    </button>
+                </Link>
             </div>
         </div>
     )

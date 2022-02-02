@@ -13,7 +13,10 @@ const MusicToggle = () => {
     }, [musicPlaying, play, stop])
 
     return (
-        <button className='relative m-3 p-2 rounded bg-zinc-700 hover:bg-orange-500 text-2xl' onClick={() => setMusicPlaying(!musicPlaying)}>
+        <button
+            className='relative m-3 p-2 rounded bg-zinc-700 hover:bg-orange-500 text-2xl'
+            onClick={() => setMusicPlaying(!musicPlaying)}
+        >
             <i className='bi bi-music-note-beamed'></i>
             {musicPlaying && (
                 <span>
