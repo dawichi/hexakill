@@ -30,7 +30,9 @@ export default function Single() {
                 <MusicToggle />
             </nav>
 
-            {playing ? (
+            {!playing ? (
+                <Welcome setPlaying={setPlaying} />
+            ) : (
                 <section className='bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1'>
                     <div className='grid grid-cols-3'>
                         <StatsTable entity={player} />
@@ -49,35 +51,6 @@ export default function Single() {
                         <p>fasdfasdfasd</p>
                     </div>
                 </section>
-            ) : (
-                <section className='container mx-auto text-center'>
-					<hr/>
-					<h1 className='text-2xl py-10'>Welcome to the hexakill game!</h1>
-					<h2 className='text-green-400 text-xl py-5'>HOW TO PLAY :</h2>
-					<p className='py-5'>Farm to <span className='text-cyan-400'>level up</span> your character and improve his stats 💪🏻</p>
-					<p className='py-5'>
-						You will fight different enemies with strengths and weaknesses.<br/>
-						Play the correct damage and build to reach the final boss and win hexakill!
-					</p>
-					<p className='py-5'>
-						In hexakill, there are 2 types of damage:<br/>
-						- <span className='text-red-400'>Attacks (AD)</span> : <span className='text-red-400'>10%</span> critic chance. <span className='text-red-400'>10%</span> missing chance.<br/>
-						- <span className='text-blue-400'>Magic (AP)</span> : <span className='text-blue-400'>40%</span> critic chance. <span className='text-blue-400'>30%</span> missing chance.
-					</p>
-					<p>It&apos;s on you which one priorize! Remember that some enemies are stronger vs a specific type of damage!</p>
-					<p><span className='text-amber-400'>Armor</span> and <span className='text-fuchsia-400'>Magic Resist (MR)</span> reduces by a flat amount the damage recieved.</p>
-
-					<br/>
-					<br/>
-					<br/>
-
-					<button
-						className='font-bold text-xl p-3 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 mb-2 hover:from-purple-700 hover:to-indigo-700'
-						onClick={() => setPlaying(true)}
-					>
-						START GAME
-					</button>
-				</section>
             )}
         </div>
     )

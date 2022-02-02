@@ -36,8 +36,16 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 -------------------------------
 
+#### Credits
+
+##### Music
 Campfire Vibes (w/ Artificial.Music) by Babasmas | https://soundcloud.com/babasmasmoosic
 Music promoted by https://www.chosic.com/free-music/all/
 Creative Commons CC BY-SA 3.0
 https://creativecommons.org/licenses/by-sa/3.0/
  
+
+#### Game assets
+https://lionheart963.itch.io/knight-sprite
+https://luizmelo.itch.io/wizard-pack
+https://luizmelo.itch.io/martial-hero
