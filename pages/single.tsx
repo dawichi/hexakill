@@ -39,12 +39,18 @@ export default function Single() {
     const characters_available = [Wizard, Samurai, Warrior]
     const player = new characters_available[playerData.character - 1](4, playerData.name)
 
+
     // ------------------------------------------------------
     //    THE GAME STARTS !
     // ------------------------------------------------------
     const initFight = () => {
         setEnemy(generateEnemy(player.level))
     }
+
+	const HandleMainDamage = () => {
+		player._getDamage(200)
+		enemy._getDamage(200)
+	}
 
     return (
         <div className='animate__animated animate__fadeIn bg-zinc-900 h-screen pt-20 pb-10 relative'>
@@ -78,6 +84,7 @@ export default function Single() {
                 </div>
                 <div className='bg-zinc-900 shadow p-2 m-2 rounded relative col-span-3'>
                     <Button2 onClick={initFight}>FIGHT</Button2>
+					<Button2 onClick={HandleMainDamage}>Damage</Button2>
                 </div>
             </section>
         </div>

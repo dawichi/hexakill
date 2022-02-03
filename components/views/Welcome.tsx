@@ -34,7 +34,7 @@ export default function Welcome({ setPlayerData }) {
 
                         {user.inputProp.value.length > 2 && (
                             <>
-                                <h3 className='text-xl mt-10'>Great! Now select your class</h3>
+                                <h3 className='text-xl mt-10'>Great! Now select your class.</h3>
                                 <div className='container mx-auto max-w-3xl grid grid-cols-3'>
                                     {characters.map((character, idx) => (
                                         <div
@@ -59,7 +59,7 @@ export default function Welcome({ setPlayerData }) {
                                     ))}
                                 </div>
                                 {playerCharacter != 0 && (
-                                    <Button2 className='m-auto mt-10' onClick={handleSetPlayerData}>
+                                    <Button2 className={`m-auto mt-10 ${characters[playerCharacter-1].button}`} onClick={handleSetPlayerData}>
                                         START GAME!
                                     </Button2>
                                 )}
@@ -71,21 +71,21 @@ export default function Welcome({ setPlayerData }) {
                         <h1 className='text-2xl py-10'>Welcome to the hexakill game!</h1>
                         <h2 className='text-green-400 text-xl py-5'>HOW TO PLAY :</h2>
                         <p className='py-5'>
-                            Farm to <span className='text-cyan-400'>level up</span> your character and improve his stats 💪🏻
+                            Farm to <span className='text-cyan-400'>level up</span> your character and improve its stats 💪🏻.
                         </p>
                         <p className='py-5'>
-                            You will fight different enemies with strengths and weaknesses.
+                            You will fight different enemies with its strengths and weaknesses.
                             <br />
-                            Play the correct damage and build to reach the final boss and win hexakill!
+                            Use the best strategy to reach the final boss and win hexakill!
                         </p>
                         <p className='py-5'>
                             In hexakill, there are 2 types of damage:
                             <br />- <span className='text-red-400'>Attacks (AD)</span> : <span className='text-red-400'>10%</span> critic
-                            chance. <span className='text-red-400'>10%</span> missing chance.
+                            chance but <span className='text-red-400'>10%</span> missing chance.
                             <br />- <span className='text-blue-400'>Magic (AP)</span> : <span className='text-blue-400'>40%</span> critic
-                            chance. <span className='text-blue-400'>30%</span> missing chance.
+                            chance but <span className='text-blue-400'>30%</span> missing chance.
                         </p>
-                        <p>It&apos;s on you which one priorize! Remember that some enemies are stronger vs a specific type of damage!</p>
+                        <p>It&apos;s up to you which one to prioritize! Remember that some enemies are stronger vs a specific type of damage!</p>
                         <p>
                             <span className='text-amber-400'>Armor</span> and <span className='text-fuchsia-400'>Magic Resist (MR)</span>{' '}
                             reduces by a flat amount the damage recieved.
@@ -110,27 +110,30 @@ const characters = [
         name: 'Wizard',
         image_path: 'wizard',
         bg: 'bg-indigo-700/50',
-        desc: 'destroy with explosions',
+        desc: 'Destroy with explosions',
         subdesc: 'weak vs AD',
         size: 'w-24 h-36',
         shadow: 'shadow-lg shadow-indigo-400',
+		button: 'from-indigo-500 to-indigo-900 hover:from-indigo-700 hover:to-indigo-900'
     },
     {
         name: 'Samurai',
         image_path: 'samurai',
         bg: 'bg-red-700/50',
-        desc: 'the power of pure AD',
+        desc: 'The power of pure AD',
         subdesc: 'weak vs AP',
         size: 'h-36',
         shadow: 'shadow-lg shadow-red-400',
+		button: 'from-red-500 to-red-900 hover:from-red-700 hover:to-red-900'
     },
     {
         name: 'Warrior',
         image_path: 'warrior',
         bg: 'bg-amber-700/50',
-        desc: 'Oneshots are not for him',
+        desc: 'One-shots are not for him',
         subdesc: 'low damage',
         size: 'w-36 h-36',
         shadow: 'shadow-lg shadow-amber-400',
+		button: 'from-amber-500 to-amber-900 hover:from-amber-700 hover:to-amber-900'
     },
 ]
