@@ -4,17 +4,21 @@ import useFormInput from 'hooks/useFormInput'
 import Image from 'next/image'
 import { Button2 } from 'components'
 
-export default function Welcome({ setPlayerData }) {
+export default function Welcome({ setPlayer }) {
     // Search params
     const user = useFormInput('')
     const [askPlayer, setAskPlayer] = useState(false)
     const [playerCharacter, setPlayerCharacter] = useState(0)
 
+    // ------------------------------------------------------
+    //    CHARACTER SELECTION
+    // ------------------------------------------------------
+    // Characters available
+    const characters_available = [Wizard, Samurai, Warrior]
+
     const handleSetPlayerData = () => {
-        setPlayerData({
-            name: user.inputProp.value,
-            character: playerCharacter,
-        })
+		const player = new characters_available[playerCharacter - 1](4, user.inputProp.value)
+		setPlayer(player)
     }
 
     return (

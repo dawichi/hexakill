@@ -1,56 +1,56 @@
 import { ReactElement, useEffect, useState } from 'react'
 import { StatsTable, MusicToggle, Welcome, Button2 } from 'components'
-import { Adventurer, Enemy, EvilTree, FireWorm, Knight, Martial, Samurai, Slime, Warrior, Wizard } from 'characters'
+import { Adventurer, Character, Enemy, EvilTree, FireWorm, Knight, Martial, Samurai, Slime, Warrior, Wizard } from 'characters'
 
 export default function Single() {
     const [messages, setMessages] = useState<Array<ReactElement>>([])
     const [fighting, setFighting] = useState<boolean>(false)
     const [enemy, setEnemy] = useState<Enemy>()
-    const [playerData, setPlayerData] = useState({
-        name: '',
-        character: 0,
-    })
+    const [player, setPlayer] = useState<Character>()
+	const [resetHtml, setResetHtml] = useState(false)
 
     const textRed = (text: string | number) => <span className='text-red-400'>{text}</span>
 
-	// ------------------------------------------------------
+    // ------------------------------------------------------
     //    ENEMY MODIFICATION TRIGGER
     // ------------------------------------------------------
-	// Each time a new enemy comes
+    // Each time a new enemy comes
     useEffect(() => {
-        if (!enemy) return
-		const msg = <p>{textRed(enemy.name)} lv {textRed(enemy.level)} has appeared!<br/><br/></p>
-		if (messages.length < 6) {
+		if (!enemy) return
+        const msg = (
+			<p>
+                {textRed(enemy.name)} lv {textRed(enemy.level)} has appeared!
+                <br />
+                <br />
+            </p>
+        )
+        if (messages.length < 6) {
 			setMessages([...messages, msg])
-		} else {
-			const msgs = messages.filter((x,i) => i != 0)
-			setMessages([...msgs, msg])
-		}
-		setFighting(true)
+        } else {
+            const msgs = messages.filter((x, i) => i != 0)
+            setMessages([...msgs, msg])
+        }
+        setFighting(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [enemy])
-
-    // ------------------------------------------------------
-    //    CHARACTER SELECTION
-    // ------------------------------------------------------
-    // Returns the number of character [1-3]
-    if (!playerData.character) return <Welcome setPlayerData={setPlayerData} />
-
-    // Characters available
-    const characters_available = [Wizard, Samurai, Warrior]
-    const player = new characters_available[playerData.character - 1](4, playerData.name)
-
-
+	
+	
     // ------------------------------------------------------
     //    THE GAME STARTS !
     // ------------------------------------------------------
     const initFight = () => {
-        setEnemy(generateEnemy(player.level))
+		setEnemy(generateEnemy(player.level))
+    }
+	
+    const HandleMainDamage = () => {
+		setResetHtml(!resetHtml)
+        player._getDamage(200)
+        console.log(player.dmgRecieved)
+        enemy._getDamage(200)
+        console.log(enemy.dmgRecieved)
     }
 
-	const HandleMainDamage = () => {
-		player._getDamage(200)
-		enemy._getDamage(200)
-	}
+	if (!player) return <Welcome setPlayer={setPlayer} />
 
     return (
         <div className='animate__animated animate__fadeIn bg-zinc-900 h-screen pt-20 pb-10 relative'>
@@ -61,9 +61,9 @@ export default function Single() {
 
             <section className='bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1'>
                 <div className='grid grid-cols-3'>
-                    <StatsTable entity={player} />
+                    <StatsTable entity={player} resetHtml={resetHtml} />
                     {enemy != undefined ? (
-                        <StatsTable entity={enemy} />
+                        <StatsTable entity={enemy} resetHtml={resetHtml} />
                     ) : (
                         <section className='bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center'>
                             <Button2 onClick={initFight}>FIGHT</Button2>
@@ -83,8 +83,9 @@ export default function Single() {
                     </div>
                 </div>
                 <div className='bg-zinc-900 shadow p-2 m-2 rounded relative col-span-3'>
-                    <Button2 onClick={initFight}>FIGHT</Button2>
-					<Button2 onClick={HandleMainDamage}>Damage</Button2>
+					
+                    <Button2 onClick={() => setEnemy(null)}>END FIGHT</Button2>
+                    <Button2 onClick={HandleMainDamage}>Damage</Button2>
                 </div>
             </section>
         </div>
@@ -102,3 +103,21 @@ const generateEnemy = (level: number) => {
     const enemy_pick = enemies_pool[Math.floor(Math.random() * enemies_pool.length)]
     return new enemy_pick(enemy_level)
 }
+
+
+const enemy_action = (enemy: Enemy) => {
+    let choice: number
+    const enemy_action_generator = Math.random()
+
+    if ((enemy.health - enemy.dmgRecieved) / enemy.health < 0.2) {
+        // If less than 20% hp, always heals
+        choice = 2
+    } else if ((enemy.health - enemy.dmgRecieved) / enemy.health > 0.6) {
+        // If more than 60% hp, never heals
+        choice = enemy_action_generator < 0.5 ? 0 : 1
+    } else {
+        choice = enemy_action_generator < 0.33 ? 0 : enemy_action_generator < 0.66 ? 1 : 2
+    }
+    return choice
+}
+

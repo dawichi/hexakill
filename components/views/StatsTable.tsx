@@ -3,9 +3,10 @@ import Image from 'next/image'
 
 interface StatsTableProps {
     entity: Character | Enemy
+	resetHtml: boolean
 }
 
-const StatsTable = ({ entity }: StatsTableProps) => {
+const StatsTable = ({ entity, resetHtml }: StatsTableProps) => {
     const icons = {
         ad: ['sword', 'text-red-400'],
         ap: ['fire-symbol', 'text-blue-400'],
@@ -28,6 +29,7 @@ const StatsTable = ({ entity }: StatsTableProps) => {
                 <h2 className='text-xl'>
                     {entity.name} - lv {entity.level}
                 </h2>
+				{resetHtml && <span></span>}
                 <div className={'relative ' + entity.size}>
                     <Image src={`/images/${entity.image}/idle.gif`} alt={entity.name} layout='fill' />
                 </div>
