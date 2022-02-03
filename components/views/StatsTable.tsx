@@ -29,7 +29,7 @@ const StatsTable = ({ entity }: StatsTableProps) => {
                     {entity.name} - lv {entity.level}
                 </h2>
                 <div className={'relative ' + entity.size}>
-                    <Image src={`/images/${entity.image}/idle.gif`} alt={'a'} layout='fill' />
+                    <Image src={`/images/${entity.image}/idle.gif`} alt={entity.name} layout='fill' />
                 </div>
                 <div className='w-full flex flex-col items-center mb-5'>
                     <p className='flex justify-center items-center'>

@@ -12,7 +12,7 @@ interface configInterface {
 export const config: configInterface = {
     base: {
         // multiples of 4
-        // so u can multiply by: 0.75, 1.15, 1.75, ...
+        // so u can multiply by: 0.75, 1.25, 1.75, ...
         health: 200,
         ad: 32,
         ap: 40,
