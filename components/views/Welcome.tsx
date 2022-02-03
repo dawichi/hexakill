@@ -2,12 +2,20 @@ import { useState } from 'react'
 import { Samurai, Warrior, Wizard } from 'characters'
 import useFormInput from 'hooks/useFormInput'
 import Image from 'next/image'
+import { Button2 } from 'components'
 
 export default function Welcome({ setPlayerData }) {
     // Search params
     const user = useFormInput('')
     const [askPlayer, setAskPlayer] = useState(false)
     const [playerCharacter, setPlayerCharacter] = useState(0)
+
+    const handleSetPlayerData = () => {
+        setPlayerData({
+            name: user.inputProp.value,
+            character: playerCharacter,
+        })
+    }
 
     return (
         <div className='bg-zinc-900 h-screen pt-20 pb-10 relative'>
@@ -50,20 +58,10 @@ export default function Welcome({ setPlayerData }) {
                                         </div>
                                     ))}
                                 </div>
-                                {playerCharacter ? (
-                                    <button
-                                        className='m-auto mt-10 font-bold text-xl p-3 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 mb-2 hover:from-purple-700 hover:to-indigo-700'
-                                        onClick={() =>
-                                            setPlayerData({
-                                                name: user.inputProp.value,
-                                                character: playerCharacter,
-                                            })
-                                        }
-                                    >
+                                {playerCharacter != 0 && (
+                                    <Button2 className='m-auto mt-10' onClick={handleSetPlayerData}>
                                         START GAME!
-                                    </button>
-                                ) : (
-                                    ''
+                                    </Button2>
                                 )}
                             </>
                         )}
@@ -97,12 +95,9 @@ export default function Welcome({ setPlayerData }) {
                         <br />
                         <br />
 
-                        <button
-                            className='font-bold text-xl p-3 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 mb-2 hover:from-purple-700 hover:to-indigo-700'
-                            onClick={() => setAskPlayer(true)}
-                        >
-                            START
-                        </button>
+						<Button2 onClick={() => setAskPlayer(true)}>
+							START
+						</Button2>
                     </div>
                 )}
             </section>

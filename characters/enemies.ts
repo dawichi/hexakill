@@ -82,3 +82,20 @@ export class Knight extends Enemy {
         this.speed = level * (base.speed * 0.75)
     }
 }
+
+export class EvilTree extends Enemy {
+    // AD, HP and armor  =>  but low AP, MR and speed
+    constructor(level: number = 1, name: string = 'EVIL TREE') {
+        super(level, name)
+        this.image = 'evil-tree'
+        this.size = 'w-48 h-48'
+        // + buff
+        this.health = level * (base.health * 1.5)
+        this.ad = level * (base.ad * 1.25)
+        this.armor = level * (base.armor * 1.25)
+        // - nerf
+        this.ap = level * (base.ap * 0.5)
+        this.mr = level * (base.mr * 0.75)
+        this.speed = level * (base.speed * 0.75)
+    }
+}

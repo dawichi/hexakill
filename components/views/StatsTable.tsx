@@ -7,11 +7,11 @@ interface StatsTableProps {
 
 const StatsTable = ({ entity }: StatsTableProps) => {
     const icons = {
-        ad: ['sword', 'red'],
-        ap: ['fire-symbol', 'blue'],
-        armor: ['shield', 'amber'],
-        mr: ['round-shield', 'fuchsia'],
-        speed: ['player-dodge', 'cyan'],
+        ad: ['sword', 'text-red-400'],
+        ap: ['fire-symbol', 'text-blue-400'],
+        armor: ['shield', 'text-amber-400'],
+        mr: ['round-shield', 'text-fuchsia-400'],
+        speed: ['player-dodge', 'text-cyan-400'],
     }
 
     const health_width = ((entity.health - entity.dmgRecieved) / entity.health) * 100
@@ -23,7 +23,7 @@ const StatsTable = ({ entity }: StatsTableProps) => {
     }
 
     return (
-        <section className='bg-zinc-900 shadow p-2 m-2 rounded relative'>
+        <section className='animate__animated animate__fadeIn bg-zinc-900 shadow p-2 m-2 rounded relative'>
             <div className='h-full flex flex-col items-center justify-between'>
                 <h2 className='text-xl'>
                     {entity.name} - lv {entity.level}
@@ -43,7 +43,7 @@ const StatsTable = ({ entity }: StatsTableProps) => {
             <div className='absolute top-0 left-0 m-5 rounded '>
                 {Object.keys(icons).map((stat, idx) => (
                     <p key={idx} className='rounded py-1 px-3'>
-                        <i className={`ra ra-${icons[stat][0]} text-${icons[stat][1]}-400`}></i> {entity[stat]}
+                        <i className={`ra ra-${icons[stat][0]} ${icons[stat][1]}`}></i> {entity[stat]}
                     </p>
                 ))}
             </div>
