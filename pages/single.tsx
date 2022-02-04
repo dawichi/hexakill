@@ -2,7 +2,6 @@ import { ReactElement, useEffect, useState } from 'react'
 import { StatsTable, MusicToggle, Welcome, Button2 } from 'components'
 import { Adventurer, Character, Enemy, EvilTree, FireWorm, Knight, Martial, Slime } from 'entities'
 import { textBlue, textCyan, textGreen, textRed } from 'utils/colorText'
-import { isEntityName } from 'typescript'
 
 export default function Single() {
     // ╔══════════════════════════════════════════════════════
@@ -16,7 +15,7 @@ export default function Single() {
     // Is there any combat currently active?
     const [fighting, setFighting] = useState(false)
     // Is the player turn? Or the enemy turn.
-    const [playerTurn, setPlayerTurn] = useState(false)
+    const [playerTurn, setPlayerTurn] = useState<boolean>()
     // Side function to force child components to refresh
     const [resetHtml, setResetHtml] = useState(false)
 
@@ -38,20 +37,36 @@ export default function Single() {
     // ╚══════════════════════════════════════════════════════
     useEffect(() => {
         if (!enemy) return
+        const text = player.speed > enemy.speed ? textGreen(player.name) : textRed(enemy.name)
         logMsg(
-            <p className='mt-2'>
+            <p>
                 {textRed(enemy.name)} lv {textRed(enemy.level)} has appeared!
+                <br />
+                <span className='mt-2'>Is the {text} turn!</span>
             </p>,
         )
+        player.speed > enemy.speed ? setPlayerTurn(true) : setPlayerTurn(false)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [enemy])
+
+    // ╔══════════════════════════════════════════════════════
+    // ║ Turn trigger: executes every time the turn changes
+    // ╚══════════════════════════════════════════════════════
+    useEffect(() => {
+        if (!enemy) return
+		playerTurn ? entityAction(player, enemy) : entityAction(enemy, player)
+		setTimeout(() => {
+			setPlayerTurn(!playerTurn)
+		}, 1500);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [playerTurn])
 
     // ╔══════════════════════════════════════════════════════
     // ║ Initialize a combat with a new enemie
     // ╚══════════════════════════════════════════════════════
     const initFight = () => {
-        setFighting(true)
         setEnemy(enemyGenerator(player.level))
+        setFighting(true)
     }
 
     // ╔══════════════════════════════════════════════════════
@@ -59,7 +74,7 @@ export default function Single() {
     // ╚══════════════════════════════════════════════════════
     const entityAction = (entity: Character | Enemy, rival: Character | Enemy) => {
         const is_a_player = entity['exp'] != undefined
-		const colored_entity_name = is_a_player ? textGreen(entity.name) : textRed(entity.name)
+        const colored_entity_name = is_a_player ? textGreen(entity.name) : textRed(entity.name)
 
         const choice = is_a_player ? enemyChoiceActionGenerator(player) : enemyChoiceActionGenerator(enemy)
         const action_text = choice === 0 ? 'attack! 🔪' : 'magic! ☄'
@@ -77,13 +92,17 @@ export default function Single() {
                 dmgRecieved = rival.recieveMagic(damage)
                 break
             default:
-				const healed = entity.heal()
-                logMsg(<p className='mt-2'>{colored_entity_name} healed +{textCyan(healed)}! 🍷</p>)
+                const healed = entity.heal()
+                logMsg(
+                    <p className='mt-2'>
+                        {colored_entity_name} healed +{textCyan(healed)}! 🍷
+                    </p>,
+                )
                 break
         }
         if (choice != 2) {
             logMsg(
-                <p className='mt-2'>
+                <p>
                     {colored_entity_name} used {action_text}! <br />
                     {colored_entity_name} did {choice ? textBlue(dmgRecieved) : textRed(dmgRecieved)} damage!
                 </p>,
@@ -100,7 +119,7 @@ export default function Single() {
     const playerDefeat = () => {
         setFighting(false)
         logMsg(
-            <p className='mt-2'>
+            <p>
                 I&apos;m sorry {textBlue(player.name)}, you have been defeated 😔 <br />
                 Better luck the next time!
             </p>,
@@ -120,7 +139,7 @@ export default function Single() {
         const exp = parseInt(((enemy.level / player.level) * 75).toFixed(0))
         const leveledUp = player.gainExp(exp)
         logMsg(
-            <p className='mt-2'>
+            <p>
                 {textRed(enemy.name)} lv {textRed(enemy.level)} has been defeated! 🎉🎉
                 <br />
                 Well done, you recieved <span className='text-cyan-400'>{exp}</span> exp! 💪🏻
@@ -176,8 +195,8 @@ export default function Single() {
                     <hr />
                     <article className='p-4 h-4/5 overflow-y-hidden'>
                         {messages.map((msg, idx) => (
-                            <div className='animate__animated animate__fadeIn' key={idx}>
-                                <p className={idx + 1 === messages.length ? '' : 'opacity-25'}>{msg}</p>
+                            <div className='animate__animated animate__fadeIn mt-2' key={idx}>
+                                <div className={idx + 1 === messages.length ? '' : 'opacity-25'}>{msg}</div>
                             </div>
                         ))}
                     </article>
