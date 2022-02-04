@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 interface StatsTableProps {
     entity: Character | Enemy
-	resetHtml: boolean
+    resetHtml: boolean
 }
 
 const StatsTable = ({ entity, resetHtml }: StatsTableProps) => {
@@ -27,9 +27,8 @@ const StatsTable = ({ entity, resetHtml }: StatsTableProps) => {
         <section className='animate__animated animate__fadeIn bg-zinc-900 shadow p-2 m-2 rounded relative'>
             <div className='h-full flex flex-col items-center justify-between'>
                 <h2 className='text-xl'>
-                    {entity.name} - lv {entity.level}
+                    {entity.name} - lv {entity.level} {resetHtml && <span></span>}
                 </h2>
-				{resetHtml && <span></span>}
                 <div className={'relative ' + entity.size}>
                     <Image src={`/images/${entity.image}/idle.gif`} alt={entity.name} layout='fill' />
                 </div>

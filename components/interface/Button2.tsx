@@ -1,11 +1,11 @@
 import React, { MouseEventHandler } from 'react'
 
 interface ButtonProps {
-	onClick: MouseEventHandler<HTMLButtonElement>,
-	className?: string,
-	children: string,
-} 
-const Button2 = ({onClick, className, children}: ButtonProps) => {
+    onClick: MouseEventHandler<HTMLButtonElement>
+    className?: string
+    children: string
+}
+const Button2 = ({ onClick, className, children }: ButtonProps) => {
     return (
         <button
             onClick={onClick}

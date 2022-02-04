@@ -17,8 +17,8 @@ export default function Welcome({ setPlayer }) {
     const characters_available = [Wizard, Samurai, Warrior]
 
     const handleSetPlayerData = () => {
-		const player = new characters_available[playerCharacter - 1](4, user.inputProp.value)
-		setPlayer(player)
+        const player = new characters_available[playerCharacter - 1](4, user.inputProp.value)
+        setPlayer(player)
     }
 
     return (
@@ -63,7 +63,10 @@ export default function Welcome({ setPlayer }) {
                                     ))}
                                 </div>
                                 {playerCharacter != 0 && (
-                                    <Button2 className={`m-auto mt-10 ${characters[playerCharacter-1].button}`} onClick={handleSetPlayerData}>
+                                    <Button2
+                                        className={`m-auto mt-10 ${characters[playerCharacter - 1].button}`}
+                                        onClick={handleSetPlayerData}
+                                    >
                                         START GAME!
                                     </Button2>
                                 )}
@@ -89,7 +92,10 @@ export default function Welcome({ setPlayer }) {
                             <br />- <span className='text-blue-400'>Magic (AP)</span> : <span className='text-blue-400'>40%</span> critic
                             chance but <span className='text-blue-400'>30%</span> missing chance.
                         </p>
-                        <p>It&apos;s up to you which one to prioritize! Remember that some enemies are stronger vs a specific type of damage!</p>
+                        <p>
+                            It&apos;s up to you which one to prioritize! Remember that some enemies are stronger vs a specific type of
+                            damage!
+                        </p>
                         <p>
                             <span className='text-amber-400'>Armor</span> and <span className='text-fuchsia-400'>Magic Resist (MR)</span>{' '}
                             reduces by a flat amount the damage recieved.
@@ -99,9 +105,7 @@ export default function Welcome({ setPlayer }) {
                         <br />
                         <br />
 
-						<Button2 onClick={() => setAskPlayer(true)}>
-							START
-						</Button2>
+                        <Button2 onClick={() => setAskPlayer(true)}>START</Button2>
                     </div>
                 )}
             </section>
@@ -118,7 +122,7 @@ const characters = [
         subdesc: 'weak vs AD',
         size: 'w-24 h-36',
         shadow: 'shadow-lg shadow-indigo-400',
-		button: 'from-indigo-500 to-indigo-900 hover:from-indigo-700 hover:to-indigo-900'
+        button: 'from-indigo-500 to-indigo-900 hover:from-indigo-700 hover:to-indigo-900',
     },
     {
         name: 'Samurai',
@@ -128,7 +132,7 @@ const characters = [
         subdesc: 'weak vs AP',
         size: 'h-36',
         shadow: 'shadow-lg shadow-red-400',
-		button: 'from-red-500 to-red-900 hover:from-red-700 hover:to-red-900'
+        button: 'from-red-500 to-red-900 hover:from-red-700 hover:to-red-900',
     },
     {
         name: 'Warrior',
@@ -138,6 +142,6 @@ const characters = [
         subdesc: 'low damage',
         size: 'w-36 h-36',
         shadow: 'shadow-lg shadow-amber-400',
-		button: 'from-amber-500 to-amber-900 hover:from-amber-700 hover:to-amber-900'
+        button: 'from-amber-500 to-amber-900 hover:from-amber-700 hover:to-amber-900',
     },
 ]
