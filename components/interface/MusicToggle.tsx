@@ -12,6 +12,8 @@ const MusicToggle = ({ color }) => {
         musicPlaying ? play() : stop()
     }, [musicPlaying, play, stop])
 
+	const tailwind_bgs = 'bg-indigo-600 bg-red-600 bg-amber-600'
+
     const styles = {
         indigo: 'from-indigo-500 to-indigo-900 hover:from-indigo-700 hover:to-indigo-900',
         red: 'from-red-500 to-red-900 hover:from-red-700 hover:to-red-900',
@@ -26,8 +28,8 @@ const MusicToggle = ({ color }) => {
             <i className='bi bi-music-note-beamed'></i>
             {musicPlaying && (
                 <span>
-                    <span className={`h-3 w-3 absolute top-[-5px] left-[-5px] rounded-full bg-${color}-400 animate-ping`}></span>
-                    <span className={`h-3 w-3 absolute top-[-5px] left-[-5px] rounded-full bg-${color}-400`}></span>
+                    <span className={`h-3 w-3 absolute top-[-5px] left-[-5px] rounded-full bg-${color}-600 animate-ping`}></span>
+                    <span className={`h-3 w-3 absolute top-[-5px] left-[-5px] rounded-full bg-${color}-600`}></span>
                 </span>
             )}
         </button>

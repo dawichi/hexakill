@@ -1,19 +1,29 @@
 import { ReactElement, useEffect, useState } from 'react'
 import { StatsTable, MusicToggle, Welcome, Button2 } from 'components'
 import { Adventurer, Character, Enemy, EvilTree, FireWorm, Knight, Martial, Slime } from 'entities'
-import { textBlue, textCyan, textRed } from 'utils/colorText'
+import { textBlue, textCyan, textGreen, textRed } from 'utils/colorText'
+import { isEntityName } from 'typescript'
 
 export default function Single() {
-    const [messages, setMessages] = useState<Array<ReactElement>>([])
-    const [colorTheme, setColorTheme] = useState<string>('')
-    const [fighting, setFighting] = useState<boolean>(false)
+    // ╔══════════════════════════════════════════════════════
+    // ║ UseStates! All the variables of the game
+    // ╚══════════════════════════════════════════════════════
+    // Color theme (it depends of the character selected)
+    const [colorTheme, setColorTheme] = useState('')
+    // Enemy and Player, the protagonists
     const [enemy, setEnemy] = useState<Enemy>()
     const [player, setPlayer] = useState<Character>()
+    // Is there any combat currently active?
+    const [fighting, setFighting] = useState(false)
+    // Is the player turn? Or the enemy turn.
+    const [playerTurn, setPlayerTurn] = useState(false)
+    // Side function to force child components to refresh
     const [resetHtml, setResetHtml] = useState(false)
 
     // ╔══════════════════════════════════════════════════════
-    // ║ Logger ✍🏻
+    // ║ ✍🏻 Logger: stores the info-messages of the game
     // ╚══════════════════════════════════════════════════════
+    const [messages, setMessages] = useState<Array<ReactElement>>([])
     const logMsg = (text: JSX.Element) => {
         if (messages.length < 4) {
             setMessages([...messages, text])
@@ -41,43 +51,69 @@ export default function Single() {
     // ╚══════════════════════════════════════════════════════
     const initFight = () => {
         setFighting(true)
-        setEnemy(generateEnemy(player.level))
+        setEnemy(enemyGenerator(player.level))
     }
 
     // ╔══════════════════════════════════════════════════════
-    // ║ Game functions: GET DAMAGE 🎯
+    // ║ Entity action: executes the action
     // ╚══════════════════════════════════════════════════════
-    const playerGetDamage = () => {
-        player._getDamage(200)
-        setResetHtml(!resetHtml)
-        if (player.dmgRecieved === player.health) {
-            playerDefeat()
-        }
-    }
+    const entityAction = (entity: Character | Enemy, rival: Character | Enemy) => {
+        const is_a_player = entity['exp'] != undefined
+		const colored_entity_name = is_a_player ? textGreen(entity.name) : textRed(entity.name)
 
-    const enemyGetDamage = () => {
-        enemy._getDamage(200)
-        setResetHtml(!resetHtml)
-        if (enemy.dmgRecieved === enemy.health) {
-            enemyDefeat()
+        const choice = is_a_player ? enemyChoiceActionGenerator(player) : enemyChoiceActionGenerator(enemy)
+        const action_text = choice === 0 ? 'attack! 🔪' : 'magic! ☄'
+
+        let damage: number
+        let dmgRecieved: number
+
+        switch (choice) {
+            case 0:
+                damage = entity.attack()
+                dmgRecieved = rival.recieveAttack(damage)
+                break
+            case 1:
+                damage = entity.magic()
+                dmgRecieved = rival.recieveMagic(damage)
+                break
+            default:
+				const healed = entity.heal()
+                logMsg(<p className='mt-2'>{colored_entity_name} healed +{textCyan(healed)}! 🍷</p>)
+                break
+        }
+        if (choice != 2) {
+            logMsg(
+                <p className='mt-2'>
+                    {colored_entity_name} used {action_text}! <br />
+                    {colored_entity_name} did {choice ? textBlue(dmgRecieved) : textRed(dmgRecieved)} damage!
+                </p>,
+            )
+        }
+        if (rival.dmgRecieved === rival.health) {
+            is_a_player ? enemyDefeat() : playerDefeat()
         }
     }
 
     // ╔══════════════════════════════════════════════════════
-    // ║ Game functions: PLAYER DEFEATED ❌
+    // ║ ❌ PLAYER DEFEATED
     // ╚══════════════════════════════════════════════════════
     const playerDefeat = () => {
         setFighting(false)
-        logMsg(<p className='mt-2'>I&apos;m sorry {textBlue(player.name)}, you have been defeated 😔</p>)
-        logMsg(<p className='mt-2'>Better luck the next time!</p>)
+        logMsg(
+            <p className='mt-2'>
+                I&apos;m sorry {textBlue(player.name)}, you have been defeated 😔 <br />
+                Better luck the next time!
+            </p>,
+        )
         setTimeout(() => {
             setPlayer(null)
             setEnemy(null)
-        }, 2000)
+            setMessages([])
+        }, 3000)
     }
 
     // ╔══════════════════════════════════════════════════════
-    // ║ Game functions: ENEMY DEFEATED ✅
+    // ║ ✅ ENEMY DEFEATED
     // ╚══════════════════════════════════════════════════════
     const enemyDefeat = () => {
         setFighting(false)
@@ -97,7 +133,7 @@ export default function Single() {
     }
 
     // ╔══════════════════════════════════════════════════════
-    // ║ Game view
+    // ║ 💻 Game view
     // ╚══════════════════════════════════════════════════════
 
     // If player is not defined, go to welcome to create one!
@@ -113,13 +149,15 @@ export default function Single() {
             <section className='bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1'>
                 <div className='grid grid-cols-3'>
                     <div className='bg-zinc-900 shadow p-2 m-2 rounded flex gap-4 justify-center items-center'>
-                        <Button2 onClick={playerGetDamage} style={colorTheme}>
-                            HIT player
-                        </Button2>
                         {fighting && (
-                            <Button2 onClick={enemyGetDamage} style={colorTheme}>
-                                HIT enemy
-                            </Button2>
+                            <>
+                                <Button2 onClick={() => entityAction(player, enemy)} style={colorTheme}>
+                                    player action
+                                </Button2>
+                                <Button2 onClick={() => entityAction(enemy, player)} style={colorTheme}>
+                                    enemy action
+                                </Button2>
+                            </>
                         )}
                     </div>
                     <StatsTable entity={player} resetHtml={resetHtml} />
@@ -149,7 +187,7 @@ export default function Single() {
     )
 }
 
-const generateEnemy = (level: number) => {
+const enemyGenerator = (level: number) => {
     // range of levels
     const min_enemy_level = Math.floor(level / 2)
     const max_enemy_level = level * 2
@@ -161,7 +199,7 @@ const generateEnemy = (level: number) => {
     return new enemy_pick(enemy_level)
 }
 
-const enemy_action = (enemy: Enemy) => {
+const enemyChoiceActionGenerator = (enemy: Enemy) => {
     let choice: number
     const enemy_action_generator = Math.random()
 

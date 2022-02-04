@@ -15,7 +15,6 @@ const StatsTable = ({ entity, resetHtml }: StatsTableProps) => {
         speed: ['player-dodge', 'text-cyan-400'],
     }
 
-    console.log(entity['exp'] != undefined ? 'ci' : 'no')
     const health_width = ((entity.health - entity.dmgRecieved) / entity.health) * 100
 
     const colorHpBar = (hp_width: number) => {
