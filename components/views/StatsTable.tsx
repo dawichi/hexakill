@@ -1,4 +1,4 @@
-import { Character, Enemy } from 'characters'
+import { Character, Enemy } from 'entities'
 import Image from 'next/image'
 
 interface StatsTableProps {
@@ -15,6 +15,7 @@ const StatsTable = ({ entity, resetHtml }: StatsTableProps) => {
         speed: ['player-dodge', 'text-cyan-400'],
     }
 
+    console.log(entity['exp'] != undefined ? 'ci' : 'no')
     const health_width = ((entity.health - entity.dmgRecieved) / entity.health) * 100
 
     const colorHpBar = (hp_width: number) => {
@@ -29,6 +30,11 @@ const StatsTable = ({ entity, resetHtml }: StatsTableProps) => {
                 <h2 className='text-xl'>
                     {entity.name} - lv {entity.level} {resetHtml && <span></span>}
                 </h2>
+                {entity['exp'] != undefined && (
+                    <div className='bg-zinc-600/75 rounded-xl w-2/5'>
+                        <div className='rounded-xl bg-cyan-500 h-1' style={{ width: `${entity['exp']}%` }}></div>
+                    </div>
+                )}
                 <div className={'relative ' + entity.size}>
                     <Image src={`/images/${entity.image}/idle.gif`} alt={entity.name} layout='fill' />
                 </div>

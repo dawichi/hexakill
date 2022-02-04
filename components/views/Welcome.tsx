@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Samurai, Warrior, Wizard } from 'characters'
+import { Samurai, Warrior, Wizard } from 'entities'
 import useFormInput from 'hooks/useFormInput'
 import Image from 'next/image'
 import { Button2 } from 'components'
 
-export default function Welcome({ setPlayer }) {
+export default function Welcome({ setPlayer, setColorTheme }) {
     // Search params
     const user = useFormInput('')
     const [askPlayer, setAskPlayer] = useState(false)
@@ -19,6 +19,7 @@ export default function Welcome({ setPlayer }) {
     const handleSetPlayerData = () => {
         const player = new characters_available[playerCharacter - 1](4, user.inputProp.value)
         setPlayer(player)
+        setColorTheme(characters[playerCharacter - 1].color)
     }
 
     return (
@@ -64,8 +65,9 @@ export default function Welcome({ setPlayer }) {
                                 </div>
                                 {playerCharacter != 0 && (
                                     <Button2
-                                        className={`m-auto mt-10 ${characters[playerCharacter - 1].button}`}
                                         onClick={handleSetPlayerData}
+                                        className={'mt-16'}
+                                        style={characters[playerCharacter - 1].color}
                                     >
                                         START GAME!
                                     </Button2>
@@ -122,7 +124,7 @@ const characters = [
         subdesc: 'weak vs AD',
         size: 'w-24 h-36',
         shadow: 'shadow-lg shadow-indigo-400',
-        button: 'from-indigo-500 to-indigo-900 hover:from-indigo-700 hover:to-indigo-900',
+        color: 'indigo',
     },
     {
         name: 'Samurai',
@@ -132,7 +134,7 @@ const characters = [
         subdesc: 'weak vs AP',
         size: 'h-36',
         shadow: 'shadow-lg shadow-red-400',
-        button: 'from-red-500 to-red-900 hover:from-red-700 hover:to-red-900',
+        color: 'red',
     },
     {
         name: 'Warrior',
@@ -142,6 +144,6 @@ const characters = [
         subdesc: 'low damage',
         size: 'w-36 h-36',
         shadow: 'shadow-lg shadow-amber-400',
-        button: 'from-amber-500 to-amber-900 hover:from-amber-700 hover:to-amber-900',
+        color: 'amber',
     },
 ]

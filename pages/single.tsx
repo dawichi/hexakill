@@ -1,19 +1,18 @@
 import { ReactElement, useEffect, useState } from 'react'
 import { StatsTable, MusicToggle, Welcome, Button2 } from 'components'
-import { Adventurer, Character, Enemy, EvilTree, FireWorm, Knight, Martial, Samurai, Slime, Warrior, Wizard } from 'characters'
+import { Adventurer, Character, Enemy, EvilTree, FireWorm, Knight, Martial, Slime } from 'entities'
+import { textBlue, textCyan, textRed } from 'utils/colorText'
 
 export default function Single() {
     const [messages, setMessages] = useState<Array<ReactElement>>([])
+    const [colorTheme, setColorTheme] = useState<string>('')
     const [fighting, setFighting] = useState<boolean>(false)
     const [enemy, setEnemy] = useState<Enemy>()
     const [player, setPlayer] = useState<Character>()
     const [resetHtml, setResetHtml] = useState(false)
 
-    const textRed = (text: string | number) => <span className='text-red-400'>{text}</span>
-    const textBlue = (text: string | number) => <span className='text-blue-400'>{text}</span>
-
-    const logMsg = (text: JSX.Element, style?: string) => {
-        if (messages.length < 6) {
+    const logMsg = (text: JSX.Element) => {
+        if (messages.length < 4) {
             setMessages([...messages, text])
         } else {
             const msgs = messages.filter((x, i) => i != 0)
@@ -28,11 +27,10 @@ export default function Single() {
     useEffect(() => {
         if (!enemy) return
         logMsg(
-            <p className='mt-10'>
+            <p className='mt-2'>
                 {textRed(enemy.name)} lv {textRed(enemy.level)} has appeared!
             </p>,
         )
-        setFighting(true)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [enemy])
 
@@ -40,11 +38,12 @@ export default function Single() {
     //    THE GAME STARTS !
     // ------------------------------------------------------
     const initFight = () => {
+        setFighting(true)
         setEnemy(generateEnemy(player.level))
     }
 
     const playerGetDamage = () => {
-        player._getDamage(50)
+        player._getDamage(200)
         setResetHtml(!resetHtml)
         if (player.dmgRecieved === player.health) {
             playerDefeat()
@@ -52,7 +51,7 @@ export default function Single() {
     }
 
     const enemyGetDamage = () => {
-        enemy._getDamage(50)
+        enemy._getDamage(200)
         setResetHtml(!resetHtml)
         if (enemy.dmgRecieved === enemy.health) {
             enemyDefeat()
@@ -60,6 +59,7 @@ export default function Single() {
     }
 
     const playerDefeat = () => {
+        setFighting(false)
         logMsg(<p className='mt-2'>I&apos;m sorry {textBlue(player.name)}, you have been defeated 😔</p>)
         logMsg(<p className='mt-2'>Better luck the next time!</p>)
         setTimeout(() => {
@@ -69,18 +69,23 @@ export default function Single() {
     }
 
     const enemyDefeat = () => {
+        setFighting(false)
+        const exp = parseInt(((enemy.level / player.level) * 75).toFixed(0))
+        const leveledUp = player.gainExp(exp)
         logMsg(
             <p className='mt-2'>
                 {textRed(enemy.name)} lv {textRed(enemy.level)} has been defeated! 🎉🎉
+                <br />
+                Well done, you recieved <span className='text-cyan-400'>{exp}</span> exp! 💪🏻
+                <br />
+                {leveledUp ? <span>You level up! Lv: {textCyan(player.level)}</span> : ''}
             </p>,
         )
-        setTimeout(() => {
-            setEnemy(null)
-            logMsg(<p className='mt-2'>Waiting for a new enemy...</p>)
-        }, 2000)
+        // TODO: powerups?
+        setTimeout(() => setEnemy(null), 1000)
     }
 
-    if (!player) return <Welcome setPlayer={setPlayer} />
+    if (!player) return <Welcome setPlayer={setPlayer} setColorTheme={setColorTheme} />
 
     return (
         <div className='animate__animated animate__fadeIn bg-zinc-900 h-screen pt-20 pb-10 relative'>
@@ -92,25 +97,33 @@ export default function Single() {
             <section className='bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1'>
                 <div className='grid grid-cols-3'>
                     <div className='bg-zinc-900 shadow p-2 m-2 rounded flex gap-4 justify-center items-center'>
-                        <Button2 onClick={playerGetDamage}>HIT player</Button2>
-                        {enemy != undefined && <Button2 onClick={enemyGetDamage}>HIT enemy</Button2>}
+                        <Button2 onClick={playerGetDamage} style={colorTheme}>
+                            HIT player
+                        </Button2>
+                        {fighting && (
+                            <Button2 onClick={enemyGetDamage} style={colorTheme}>
+                                HIT enemy
+                            </Button2>
+                        )}
                     </div>
                     <StatsTable entity={player} resetHtml={resetHtml} />
                     {enemy != undefined ? (
                         <StatsTable entity={enemy} resetHtml={resetHtml} />
                     ) : (
                         <section className='bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center'>
-                            <Button2 onClick={initFight}>FIGHT</Button2>
+                            <Button2 onClick={initFight} style={colorTheme}>
+                                FIGHT
+                            </Button2>
                         </section>
                     )}
                 </div>
                 <div className='bg-zinc-900 shadow p-2 m-2 rounded relative col-span-3'>
                     <h4 className='text-center text-lg p-2'>Info</h4>
                     <hr />
-                    <article className='p-4'>
+                    <article className='p-4 h-4/5 overflow-y-hidden'>
                         {messages.map((msg, idx) => (
                             <div className='animate__animated animate__fadeIn' key={idx}>
-                                {msg}
+                                <p className={idx + 1 === messages.length ? '' : 'opacity-25'}>{msg}</p>
                             </div>
                         ))}
                     </article>
