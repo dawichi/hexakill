@@ -13,7 +13,9 @@ export class Samurai extends Character {
         super(level, `${name} (Samurai)`)
         this.image = 'samurai'
         this.size = 'w-64 h-64'
-        this.ad = level * base.ad * 2
+        this.ad = level * base.health * 1.5
+        this.ad = level * base.ap * 1.5
+        this.ad = level * base.ad * 2.5
     }
 
     _levelUp() {
