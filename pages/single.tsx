@@ -11,6 +11,9 @@ export default function Single() {
     const [player, setPlayer] = useState<Character>()
     const [resetHtml, setResetHtml] = useState(false)
 
+    // ╔══════════════════════════════════════════════════════
+    // ║ Logger ✍🏻
+    // ╚══════════════════════════════════════════════════════
     const logMsg = (text: JSX.Element) => {
         if (messages.length < 4) {
             setMessages([...messages, text])
@@ -20,10 +23,9 @@ export default function Single() {
         }
     }
 
-    // ------------------------------------------------------
-    //    ENEMY TRIGGER
-    // ------------------------------------------------------
-    // Each time a new enemy comes
+    // ╔══════════════════════════════════════════════════════
+    // ║ Enemy trigger: executes every time the enemy changes
+    // ╚══════════════════════════════════════════════════════
     useEffect(() => {
         if (!enemy) return
         logMsg(
@@ -34,14 +36,17 @@ export default function Single() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [enemy])
 
-    // ------------------------------------------------------
-    //    THE GAME STARTS !
-    // ------------------------------------------------------
+    // ╔══════════════════════════════════════════════════════
+    // ║ Initialize a combat with a new enemie
+    // ╚══════════════════════════════════════════════════════
     const initFight = () => {
         setFighting(true)
         setEnemy(generateEnemy(player.level))
     }
 
+    // ╔══════════════════════════════════════════════════════
+    // ║ Game functions: GET DAMAGE 🎯
+    // ╚══════════════════════════════════════════════════════
     const playerGetDamage = () => {
         player._getDamage(200)
         setResetHtml(!resetHtml)
@@ -58,6 +63,9 @@ export default function Single() {
         }
     }
 
+    // ╔══════════════════════════════════════════════════════
+    // ║ Game functions: PLAYER DEFEATED ❌
+    // ╚══════════════════════════════════════════════════════
     const playerDefeat = () => {
         setFighting(false)
         logMsg(<p className='mt-2'>I&apos;m sorry {textBlue(player.name)}, you have been defeated 😔</p>)
@@ -68,6 +76,9 @@ export default function Single() {
         }, 2000)
     }
 
+    // ╔══════════════════════════════════════════════════════
+    // ║ Game functions: ENEMY DEFEATED ✅
+    // ╚══════════════════════════════════════════════════════
     const enemyDefeat = () => {
         setFighting(false)
         const exp = parseInt(((enemy.level / player.level) * 75).toFixed(0))
@@ -85,13 +96,18 @@ export default function Single() {
         setTimeout(() => setEnemy(null), 1000)
     }
 
+    // ╔══════════════════════════════════════════════════════
+    // ║ Game view
+    // ╚══════════════════════════════════════════════════════
+
+    // If player is not defined, go to welcome to create one!
     if (!player) return <Welcome setPlayer={setPlayer} setColorTheme={setColorTheme} />
 
     return (
         <div className='animate__animated animate__fadeIn bg-zinc-900 h-screen pt-20 pb-10 relative'>
             <h1 className='absolute top-0 left-0 text-3xl p-5 text-center text-white w-full'>Hexakill !</h1>
             <nav className='absolute top-0 right-10 text-white'>
-                <MusicToggle />
+                <MusicToggle color={colorTheme} />
             </nav>
 
             <section className='bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1'>
