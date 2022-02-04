@@ -3,6 +3,8 @@ import { config } from '..'
 
 const base = config.base
 
+const slimes = ['blue', 'gold', 'green', 'purple', 'red']
+
 // ╔══════════════════════════════════════════════════════
 // ║ +: AP, speed, armor
 // ╠══════════════════════════════════════════════════════
@@ -11,7 +13,7 @@ const base = config.base
 export class Slime extends Enemy {
     constructor(level: number = 1, name: string = 'SLIME') {
         super(level, name + ' ' + config.names[Math.floor(Math.random() * config.names.length)])
-        this.image = 'slime-blue'
+        this.image = `slime-${slimes[Math.floor(Math.random() * slimes.length)]}`
         this.size = 'w-36 h-36'
         // + buff
         this.health = level * (base.health * 1.25)
