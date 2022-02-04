@@ -12,7 +12,7 @@ const MusicToggle = ({ color }) => {
         musicPlaying ? play() : stop()
     }, [musicPlaying, play, stop])
 
-	const tailwind_bgs = 'bg-indigo-600 bg-red-600 bg-amber-600'
+    const tailwind_bgs = 'bg-indigo-600 bg-red-600 bg-amber-600'
 
     const styles = {
         indigo: 'from-indigo-500 to-indigo-900 hover:from-indigo-700 hover:to-indigo-900',

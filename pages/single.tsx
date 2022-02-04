@@ -23,6 +23,7 @@ export default function Single() {
     // ╔══════════════════════════════════════════════════════
     // ║ ✍🏻 Logger: stores the info-messages of the game
     // ╚══════════════════════════════════════════════════════
+    // TODO: separate in 2 loggers: 1 for player and 1 for enemy msg
     const [messages, setMessages] = useState<Array<ReactElement>>([])
     const logMsg = (text: JSX.Element) => {
         if (messages.length < 4) {
@@ -138,7 +139,7 @@ export default function Single() {
     // ╚══════════════════════════════════════════════════════
     const enemyDefeat = () => {
         setFighting(false)
-        const exp = parseInt(((enemy.level / player.level) * 75).toFixed(0))
+        const exp = parseInt(((enemy.level / player.level) * 100).toFixed(0))
         const leveledUp = player.gainExp(exp)
         logMsg(
             <p>
@@ -218,7 +219,7 @@ export default function Single() {
 const enemyGenerator = (level: number) => {
     // range of levels
     const min_enemy_level = Math.floor(level / 2)
-    const max_enemy_level = level * 2
+    const max_enemy_level = level * 1.75
     const enemy_level = parseInt((Math.floor(Math.random() * (max_enemy_level - min_enemy_level + 1)) + min_enemy_level).toFixed(0))
 
     // create the enemy

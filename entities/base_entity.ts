@@ -1,8 +1,8 @@
-import { config } from './config'
+import { config } from '.'
 
 const base = config.base
 
-export class Base_Entity {
+class Base_Entity {
     name: string
     image: string
     size: string
@@ -93,3 +93,5 @@ export class Base_Entity {
         return heal
     }
 }
+
+export default Base_Entity

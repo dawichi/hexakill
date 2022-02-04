@@ -1,18 +1,31 @@
-// Character (base)
-export { Character as Character } from './characters'
+// ╔══════════════════════════════════════════════════════
+// ║ Config and Base class
+// ╚══════════════════════════════════════════════════════
+export { default as config } from './config'
+export { default as Base_Entity } from './base_entity'
 
-// Characters
-export { Wizard as Wizard } from './characters'
-export { Samurai as Samurai } from './characters'
-export { Warrior as Warrior } from './characters'
+// ╔══════════════════════════════════════════════════════
+// ║ Character and Enemy base
+// ╚══════════════════════════════════════════════════════
+export { default as Character } from './characters/base_character'
+export { default as Enemy } from './enemies/base_enemy'
 
-// Enemy (base)
-export { Enemy as Enemy } from './enemies'
+// ╔══════════════════════════════════════════════════════
+// ║ Characters
+// ╚══════════════════════════════════════════════════════
+export { default as Wizard } from './characters/Wizard'
+export { default as Samurai } from './characters/Samurai'
+export { default as Warrior } from './characters/Warrior'
 
-// Enemies
-export { Slime as Slime } from './enemies'
-export { Knight as Knight } from './enemies'
-export { Adventurer as Adventurer } from './enemies'
-export { FireWorm as FireWorm } from './enemies'
-export { Martial as Martial } from './enemies'
-export { EvilTree as EvilTree } from './enemies'
+// ╔══════════════════════════════════════════════════════
+// ║ Enemies
+// ╚══════════════════════════════════════════════════════
+// AP
+export { default as Slime } from './enemies/Slime'
+export { default as FireWorm } from './enemies/FireWorm'
+// AD
+export { default as Adventurer } from './enemies/Adventurer'
+export { default as Martial } from './enemies/Martial'
+// Tank
+export { default as Knight } from './enemies/Knight'
+export { default as EvilTree } from './enemies/EvilTree'

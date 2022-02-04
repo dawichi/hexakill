@@ -7,6 +7,7 @@ interface configInterface {
         mr: number
         speed: number
     }
+    names: string[]
 }
 
 export const config: configInterface = {
@@ -20,4 +21,7 @@ export const config: configInterface = {
         mr: 12,
         speed: 4,
     },
+    names: ['Pablo', 'Miguel', 'Paco', 'Jose Luis', 'Berto', 'Juan'],
 }
+
+export default config
