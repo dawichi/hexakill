@@ -15,7 +15,6 @@ export default function Single() {
     // Is there any combat currently active?
     const [fighting, setFighting] = useState(false)
     // Is the player turn? Or the enemy turn.
-    // const [playerTurn, setPlayerTurn] = useState<boolean>()
     const [playerAction, setPlayerAction] = useState(0)
     // Side function to force child components to refresh
     const [resetHtml, setResetHtml] = useState(false)
@@ -23,14 +22,31 @@ export default function Single() {
     // ╔══════════════════════════════════════════════════════
     // ║ ✍🏻 Logger: stores the info-messages of the game
     // ╚══════════════════════════════════════════════════════
-    // TODO: separate in 2 loggers: 1 for player and 1 for enemy msg
     const [messages, setMessages] = useState<Array<ReactElement>>([])
+    const [messagesPlayer, setMessagesPlayer] = useState<Array<ReactElement>>([])
+    const [messagesEnemy, setMessagesEnemy] = useState<Array<ReactElement>>([])
     const logMsg = (text: JSX.Element) => {
         if (messages.length < 4) {
             setMessages([...messages, text])
         } else {
             const msgs = messages.filter((x, i) => i != 0)
             setMessages([...msgs, text])
+        }
+    }
+    const logMsgPlayer = (text: JSX.Element) => {
+        if (messagesPlayer.length < 4) {
+            setMessagesPlayer([...messagesPlayer, text])
+        } else {
+            const msgs = messagesPlayer.filter((x, i) => i != 0)
+            setMessagesPlayer([...msgs, text])
+        }
+    }
+    const logMsgEnemy = (text: JSX.Element) => {
+        if (messagesEnemy.length < 4) {
+            setMessagesEnemy([...messagesEnemy, text])
+        } else {
+            const msgs = messagesEnemy.filter((x, i) => i != 0)
+            setMessagesEnemy([...msgs, text])
         }
     }
 
@@ -84,6 +100,8 @@ export default function Single() {
         let damage: number
         let dmgRecieved: number
 
+        const log = is_a_player ? logMsgPlayer : logMsgEnemy
+
         switch (choice) {
             case 0:
                 damage = entity.attack()
@@ -95,7 +113,7 @@ export default function Single() {
                 break
             default:
                 const healed = entity.heal()
-                logMsg(
+                log(
                     <p className='mt-2'>
                         {colored_entity_name} healed +{textCyan(healed)}! 🍷
                     </p>,
@@ -103,7 +121,7 @@ export default function Single() {
                 break
         }
         if (choice != 2) {
-            logMsg(
+            log(
                 <p>
                     {colored_entity_name} used {action_text}! <br />
                     {colored_entity_name} did {choice ? textBlue(dmgRecieved) : textRed(dmgRecieved)} damage!
@@ -121,7 +139,7 @@ export default function Single() {
     // ╚══════════════════════════════════════════════════════
     const playerDefeat = () => {
         setFighting(false)
-        logMsg(
+        logMsgPlayer(
             <p>
                 I&apos;m sorry {textBlue(player.name)}, you have been defeated 😔 <br />
                 Better luck the next time!
@@ -141,7 +159,7 @@ export default function Single() {
         setFighting(false)
         const exp = parseInt(((enemy.level / player.level) * 100).toFixed(0))
         const leveledUp = player.gainExp(exp)
-        logMsg(
+        logMsgEnemy(
             <p>
                 {textRed(enemy.name)} lv {textRed(enemy.level)} has been defeated! 🎉🎉
                 <br />
@@ -203,12 +221,28 @@ export default function Single() {
                 <div className='bg-zinc-900 shadow p-2 m-2 rounded relative col-span-3'>
                     <h4 className='text-center text-lg p-2'>Info</h4>
                     <hr />
-                    <article className='p-4 h-4/5 overflow-y-hidden'>
-                        {messages.map((msg, idx) => (
-                            <div className='animate__animated animate__fadeIn mt-2' key={idx}>
-                                <div className={idx + 1 === messages.length ? '' : 'opacity-25'}>{msg}</div>
-                            </div>
-                        ))}
+                    <article className='p-4 h-4/5 overflow-y-hidden grid grid-cols-3 gap-4'>
+                        <div>
+                            {messagesPlayer.map((msg, idx) => (
+                                <div className='animate__animated animate__fadeIn mt-2' key={idx}>
+                                    <div className={idx + 1 === messagesPlayer.length ? '' : 'opacity-25'}>{msg}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <div>
+                            {messages.map((msg, idx) => (
+                                <div className='animate__animated animate__fadeIn mt-2' key={idx}>
+                                    <div className={idx + 1 === messages.length ? '' : 'opacity-25'}>{msg}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <div>
+                            {messagesEnemy.map((msg, idx) => (
+                                <div className='animate__animated animate__fadeIn mt-2' key={idx}>
+                                    <div className={idx + 1 === messagesEnemy.length ? '' : 'opacity-25'}>{msg}</div>
+                                </div>
+                            ))}
+                        </div>
                     </article>
                 </div>
             </section>
