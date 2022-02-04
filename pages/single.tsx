@@ -15,7 +15,8 @@ export default function Single() {
     // Is there any combat currently active?
     const [fighting, setFighting] = useState(false)
     // Is the player turn? Or the enemy turn.
-    const [playerTurn, setPlayerTurn] = useState<boolean>()
+    // const [playerTurn, setPlayerTurn] = useState<boolean>()
+    const [playerAction, setPlayerAction] = useState(0)
     // Side function to force child components to refresh
     const [resetHtml, setResetHtml] = useState(false)
 
@@ -42,10 +43,9 @@ export default function Single() {
             <p>
                 {textRed(enemy.name)} lv {textRed(enemy.level)} has appeared!
                 <br />
-                <span className='mt-2'>Is the {text} turn!</span>
+                <span className='mt-2'>{text} attacks first!</span>
             </p>,
         )
-        player.speed > enemy.speed ? setPlayerTurn(true) : setPlayerTurn(false)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [enemy])
 
@@ -53,13 +53,14 @@ export default function Single() {
     // ║ Turn trigger: executes every time the turn changes
     // ╚══════════════════════════════════════════════════════
     useEffect(() => {
-        if (!enemy) return
-		playerTurn ? entityAction(player, enemy) : entityAction(enemy, player)
-		setTimeout(() => {
-			setPlayerTurn(!playerTurn)
-		}, 1500);
+        if (!enemy || !playerAction) return
+        player.speed >= enemy.speed ? entityAction(player, enemy) : entityAction(enemy, player)
+        setTimeout(() => {
+            player.speed < enemy.speed ? entityAction(player, enemy) : entityAction(enemy, player)
+        }, 1500)
+        setPlayerAction(0)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [playerTurn])
+    }, [playerAction])
 
     // ╔══════════════════════════════════════════════════════
     // ║ Initialize a combat with a new enemie
@@ -76,7 +77,7 @@ export default function Single() {
         const is_a_player = entity['exp'] != undefined
         const colored_entity_name = is_a_player ? textGreen(entity.name) : textRed(entity.name)
 
-        const choice = is_a_player ? enemyChoiceActionGenerator(player) : enemyChoiceActionGenerator(enemy)
+        const choice = is_a_player ? playerAction - 1 : enemyChoiceActionGenerator(player)
         const action_text = choice === 0 ? 'attack! 🔪' : 'magic! ☄'
 
         let damage: number
@@ -110,6 +111,7 @@ export default function Single() {
         }
         if (rival.dmgRecieved === rival.health) {
             is_a_player ? enemyDefeat() : playerDefeat()
+            // setPlayerTurn(null)
         }
     }
 
@@ -148,7 +150,7 @@ export default function Single() {
             </p>,
         )
         // TODO: powerups?
-        setTimeout(() => setEnemy(null), 1000)
+        setTimeout(() => setEnemy(null), 2000)
     }
 
     // ╔══════════════════════════════════════════════════════
@@ -167,16 +169,23 @@ export default function Single() {
 
             <section className='bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1'>
                 <div className='grid grid-cols-3'>
-                    <div className='bg-zinc-900 shadow p-2 m-2 rounded flex gap-4 justify-center items-center'>
-                        {fighting && (
-                            <>
-                                <Button2 onClick={() => entityAction(player, enemy)} style={colorTheme}>
-                                    player action
-                                </Button2>
-                                <Button2 onClick={() => entityAction(enemy, player)} style={colorTheme}>
-                                    enemy action
-                                </Button2>
-                            </>
+                    <div className='bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center'>
+                        {fighting && playerAction === 0 && (
+                            <div>
+                                <h4 className='text-center text-lg p-2'>What do you want to do?</h4>
+                                <hr />
+                                <div className='flex gap-4 justify-center items-center p-4'>
+                                    <Button2 onClick={() => setPlayerAction(1)} style={'red'}>
+                                        Attack
+                                    </Button2>
+                                    <Button2 onClick={() => setPlayerAction(2)} style={'blue'}>
+                                        Magic
+                                    </Button2>
+                                    <Button2 onClick={() => setPlayerAction(3)} style={'green'}>
+                                        Heal
+                                    </Button2>
+                                </div>
+                            </div>
                         )}
                     </div>
                     <StatsTable entity={player} resetHtml={resetHtml} />
