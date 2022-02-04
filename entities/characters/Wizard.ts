@@ -13,8 +13,8 @@ class Wizard extends Character {
         super(level, `${name} (Wizard)`)
         this.image = 'wizard'
         this.size = 'w-36 h-56'
-        this.ad = level * base.health * 1.5
-        this.ad = level * base.ap * 2.5
+        this.health = level * base.health * 1.5
+        this.ap = level * base.ap * 2.5
         this.ad = level * base.ad * 1.5
     }
 
