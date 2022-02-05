@@ -21,7 +21,7 @@ export const config: configInterface = {
         mr: 12,
         speed: 4,
     },
-    names: ['Pablo', 'Miguel', 'Paco', 'Jose Luis', 'Berto', 'Juan'],
+    names: ['Pablo', 'Miguel', 'Paco', 'Jose Luis', 'Berto', 'Juan', 'Rodolfo', 'Rigoberto', 'Ricardo', 'Manolo', 'Geh', ''],
 }
 
 export default config

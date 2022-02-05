@@ -72,9 +72,7 @@ export default function Single() {
     useEffect(() => {
         if (!enemy || !playerAction) return
         player.speed >= enemy.speed ? entityAction(player, enemy) : entityAction(enemy, player)
-        setTimeout(() => {
-            player.speed < enemy.speed ? entityAction(player, enemy) : entityAction(enemy, player)
-        }, 1500)
+        setTimeout(() => (player.speed < enemy.speed ? entityAction(player, enemy) : entityAction(enemy, player)), 1500)
         setPlayerAction(0)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerAction])
