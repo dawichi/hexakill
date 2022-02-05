@@ -255,8 +255,7 @@ const enemyGenerator = (level: number) => {
     const enemy_level = parseInt((Math.floor(Math.random() * (max_enemy_level - min_enemy_level + 1)) + min_enemy_level).toFixed(0))
 
     // create the enemy
-    // const enemies_pool = [Adventurer, EvilTree, FireWorm, Knight, Martial, Slime, Archer, ArmoredHuntress, BringerOfDeath, EvilWizard, WildHuntress, WitchBlue]
-    const enemies_pool = [WitchBlue]
+    const enemies_pool = [Adventurer, EvilTree, FireWorm, Knight, Martial, Slime, Archer, ArmoredHuntress, BringerOfDeath, EvilWizard, WildHuntress, WitchBlue]
     const enemy_pick = enemies_pool[Math.floor(Math.random() * enemies_pool.length)]
     return new enemy_pick(enemy_level)
 }
