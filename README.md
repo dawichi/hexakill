@@ -49,3 +49,6 @@ https://creativecommons.org/licenses/by-sa/3.0/
 https://lionheart963.itch.io/
 https://luizmelo.itch.io/
 https://rvros.itch.io/
+https://9e0.itch.io/
+https://clembod.itch.io/
+https://chierit.itch.io/
