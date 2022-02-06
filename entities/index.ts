@@ -23,9 +23,15 @@ export { default as Warrior } from './characters/Warrior'
 // AP
 export { default as Slime } from './enemies/Slime'
 export { default as FireWorm } from './enemies/FireWorm'
+export { default as EvilWizard } from './enemies/EvilWizard'
+export { default as WitchBlue } from './enemies/WitchBlue'
 // AD
 export { default as Adventurer } from './enemies/Adventurer'
 export { default as Martial } from './enemies/Martial'
+export { default as Archer } from './enemies/Archer'
+export { default as WildHuntress } from './enemies/WildHuntress'
 // Tank
 export { default as Knight } from './enemies/Knight'
 export { default as EvilTree } from './enemies/EvilTree'
+export { default as ArmoredHuntress } from './enemies/ArmoredHuntress'
+export { default as BringerOfDeath } from './enemies/BringerOfDeath'

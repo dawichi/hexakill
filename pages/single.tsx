@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useState } from 'react'
 import { StatsTable, MusicToggle, Welcome, Button2 } from 'components'
-import { Adventurer, Character, Enemy, EvilTree, FireWorm, Knight, Martial, Slime } from 'entities'
+import { Adventurer, Archer, ArmoredHuntress, BringerOfDeath, Character, Enemy, EvilTree, EvilWizard, FireWorm, Knight, Martial, Slime, WildHuntress, WitchBlue } from 'entities'
 import { textBlue, textCyan, textGreen, textRed } from 'utils/colorText'
 
 export default function Single() {
@@ -255,7 +255,7 @@ const enemyGenerator = (level: number) => {
     const enemy_level = parseInt((Math.floor(Math.random() * (max_enemy_level - min_enemy_level + 1)) + min_enemy_level).toFixed(0))
 
     // create the enemy
-    const enemies_pool = [Adventurer, EvilTree, FireWorm, Knight, Martial, Slime]
+    const enemies_pool = [Adventurer, EvilTree, FireWorm, Knight, Martial, Slime, Archer, ArmoredHuntress, BringerOfDeath, EvilWizard, WildHuntress, WitchBlue]
     const enemy_pick = enemies_pool[Math.floor(Math.random() * enemies_pool.length)]
     return new enemy_pick(enemy_level)
 }
