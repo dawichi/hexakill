@@ -13,8 +13,8 @@ export class Warrior extends Character {
         super(level, `${name} (Warrior)`)
         this.image = 'warrior'
         this.size = 'w-64 h-52'
-        this.ad = level * base.health * 2.5
-        this.ad = level * base.ap * 1.5
+        this.health = level * base.health * 2.5
+        this.ap = level * base.ap * 1.5
         this.ad = level * base.ad * 1.5
     }
 
