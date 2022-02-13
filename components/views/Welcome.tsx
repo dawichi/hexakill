@@ -100,7 +100,7 @@ export default function Welcome({ setPlayer, setColorTheme }) {
                         </p>
                         <p>
                             <span className='text-amber-400'>Armor</span> and <span className='text-fuchsia-400'>Magic Resist (MR)</span>{' '}
-                            reduces by a flat amount the damage recieved.
+                            reduces by a flat amount the damage received.
                         </p>
 
                         <br />

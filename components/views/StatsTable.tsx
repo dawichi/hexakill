@@ -15,7 +15,7 @@ const StatsTable = ({ entity, resetHtml }: StatsTableProps) => {
         speed: ['player-dodge', 'text-cyan-400'],
     }
 
-    const health_width = ((entity.health - entity.dmgRecieved) / entity.health) * 100
+    const health_width = ((entity.health - entity.dmgReceived) / entity.health) * 100
 
     const colorHpBar = (hp_width: number) => {
         if (hp_width < 11) return 'bg-red-600'
@@ -39,7 +39,7 @@ const StatsTable = ({ entity, resetHtml }: StatsTableProps) => {
                 </div>
                 <div className='w-full flex flex-col items-center mb-5'>
                     <p className='flex justify-center items-center'>
-                        {entity.health - entity.dmgRecieved} / {entity.health} <i className='ra ra-hearts text-red-600'></i>
+                        {entity.health - entity.dmgReceived} / {entity.health} <i className='ra ra-hearts text-red-600'></i>
                     </p>
                     <div className='bg-zinc-600/75 rounded-xl w-4/5 '>
                         <div className={`${colorHpBar(health_width)} rounded-xl h-3`} style={{ width: `${health_width}%` }}></div>

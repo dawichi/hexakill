@@ -96,18 +96,18 @@ export default function Single() {
         const action_text = choice === 0 ? 'attack! 🔪' : 'magic! ☄'
 
         let damage: number
-        let dmgRecieved: number
+        let dmgReceived: number
 
         const log = is_a_player ? logMsgPlayer : logMsgEnemy
 
         switch (choice) {
             case 0:
                 damage = entity.attack()
-                dmgRecieved = rival.recieveAttack(damage)
+                dmgReceived = rival.receiveAttack(damage)
                 break
             case 1:
                 damage = entity.magic()
-                dmgRecieved = rival.recieveMagic(damage)
+                dmgReceived = rival.receiveMagic(damage)
                 break
             default:
                 const healed = entity.heal()
@@ -122,11 +122,11 @@ export default function Single() {
             log(
                 <p>
                     {colored_entity_name} used {action_text}! <br />
-                    {colored_entity_name} did {choice ? textBlue(dmgRecieved) : textRed(dmgRecieved)} damage!
+                    {colored_entity_name} did {choice ? textBlue(dmgReceived) : textRed(dmgReceived)} damage!
                 </p>,
             )
         }
-        if (rival.dmgRecieved === rival.health) {
+        if (rival.dmgReceived === rival.health) {
             is_a_player ? enemyDefeat() : playerDefeat()
             // setPlayerTurn(null)
         }
@@ -161,7 +161,7 @@ export default function Single() {
             <p>
                 {textRed(enemy.name)} lv {textRed(enemy.level)} has been defeated! 🎉🎉
                 <br />
-                Well done, you recieved <span className='text-cyan-400'>{exp}</span> exp! 💪🏻
+                Well done, you received <span className='text-cyan-400'>{exp}</span> exp! 💪🏻
                 <br />
                 {leveledUp ? <span>You level up! Lv: {textCyan(player.level)}</span> : ''}
             </p>,
@@ -264,10 +264,10 @@ const enemyChoiceActionGenerator = (enemy: Enemy) => {
     let choice: number
     const enemy_action_generator = Math.random()
 
-    if ((enemy.health - enemy.dmgRecieved) / enemy.health < 0.2) {
+    if ((enemy.health - enemy.dmgReceived) / enemy.health < 0.2) {
         // If less than 20% hp, always heals
         choice = 2
-    } else if ((enemy.health - enemy.dmgRecieved) / enemy.health > 0.6) {
+    } else if ((enemy.health - enemy.dmgReceived) / enemy.health > 0.6) {
         // If more than 60% hp, never heals
         choice = enemy_action_generator < 0.5 ? 0 : 1
     } else {
