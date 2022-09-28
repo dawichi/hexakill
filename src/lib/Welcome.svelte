@@ -4,11 +4,14 @@
     This component is used to welcome the user to the game.
 -->
 <script lang="ts">
-    import { playing } from '$lib/data/stores'
+    import { gameData } from '$lib/data/stores'
     import { styles } from './config/styles'
 
     function startPlaying() {
-        playing.set(true)
+        gameData.update(n => {
+            n.playing = true
+            return n
+        })
     }
 </script>
 

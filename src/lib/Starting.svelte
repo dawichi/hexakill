@@ -4,27 +4,38 @@
     This component is used to enter the name of the player and select his character.
 -->
 <script lang="ts">
-    import { player } from '$lib/data/stores'
+    import { gameData } from '$lib/data/stores'
     import { characters } from './config/characters'
     import { styles } from './config/styles'
 
     let nameInput: string = ''
-    let characterSelected: number = 0
+    let characterSelected: number = -1
+    
+
+    gameData.subscribe(n => {
+        characterSelected = n.character
+    })
 
     function setName() {
-        player.update(n => {
-            n.name = nameInput
+        gameData.update(n => {
+            n.username = nameInput
             return n
         })
     }
 
-    function setCharacter() {
-        player.update(n => {
-            n.character = characterSelected
+    function setCharacter(idx: number) {
+        gameData.update(n => {
+            n.character = idx
             return n
         })
     }
-    characters
+
+    // function setCharacter() {
+    //     gameData.update(n => {
+    //         n.character = characterSelected
+    //         return n
+    //     })
+    // }
 </script>
 
 <section class="container mx-auto text-center pt-20">
@@ -34,7 +45,24 @@
     </div>
 
     {#if nameInput.length >= 3}
-        <p>opciones</p>
+        <h3 class='text-xl mt-10'>Great! Now select your class.</h3>
+        {#each characters as character, idx}
+            <div
+                class={`${character.bg} m-2 p-4 cursor-pointer rounded-lg ${++idx === characterSelected ? character.shadow : ''}`}
+                on:click={() => setCharacter(idx + 1)}
+            >
+                <h4 class='text-xl'>{character.name}</h4>
+                <hr class='my-2' />
+                <p>{character.desc}</p>
+                <p>({character.subDesc})</p>
+                <div class={`relative m-auto mt-2 ${character.size}`}>
+                    <img
+                        src={`/images/${character.imgPath}/idle.gif`}
+                        alt={character.name}
+                    />
+                </div>
+            </div>
+        {/each}
     {/if}
 
     <button class={styles.button.base + styles.button[characters[0].color]}>

@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { playing } from '$lib/data/stores'
+    import { gameData } from '$lib/data/stores'
     import Starting from '$lib/Starting.svelte'
     import Welcome from '$lib/Welcome.svelte'
 
     let isPlaying: boolean
 
-    playing.subscribe(value => {
-        isPlaying = value
+    gameData.subscribe(n => {
+        isPlaying = n.playing
     })
 </script>
 
