@@ -1,0 +1,55 @@
+<!--
+    @component
+    ## Welcome component
+    This component is used to welcome the user to the game.
+-->
+<script lang="ts">
+    import { playing } from '$lib/data/stores'
+    import { styles } from './config/styles'
+
+    function startPlaying() {
+        playing.set(true)
+    }
+</script>
+
+<div class="text-center container mx-auto">
+    <h1 class="text-4xl py-10">Welcome to the hexakill game!</h1>
+    <hr class="w-4/5 mx-auto" />
+
+    <p class="text-green-400 text-xl">HOW TO PLAY</p>
+    <p>
+        Win combats to <span class="text-cyan-400">level up</span> your character and improve its stats 💪🏻.
+    </p>
+    <p>
+        You will fight different enemies with its strengths and weaknesses.
+        <br />
+        Use the best strategy to survive as much as possible!
+    </p>
+    <p>
+        In hexakill, there are 2 types of damage:
+        <br />- <span class="text-red-400">Attacks (AD)</span> : <span class="text-red-400">10%</span> critic chance but
+        <span class="text-red-400">10%</span>
+        missing chance.
+        <br />- <span class="text-blue-400">Magic (AP)</span> : <span class="text-blue-400">40%</span> critic chance but
+        <span class="text-blue-400">30%</span> missing chance.
+    </p>
+    <p>
+        It&apos;s up to you which one to prioritize! <br /> Remember that some enemies are stronger vs a specific type of damage!
+    </p>
+    <p>
+        <span class="text-amber-400">Armor</span> and <span class="text-fuchsia-400">Magic Resist (MR)</span>{' '}
+        reduces by a flat amount the damage received.
+    </p>
+
+    <br />
+    <br />
+    <br />
+
+    <button on:click={startPlaying} class={styles.button.base + styles.button.indigo}> START </button>
+</div>
+
+<style>
+    p {
+        padding-top: 40px;
+    }
+</style>
