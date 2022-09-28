@@ -17,3 +17,7 @@
         <Starting />
     {/if}
 </div>
+
+<!-- <style lang="scss">
+    // @import "node_modules/rpg-awesome/scss/rpg-awesome";
+</style> -->

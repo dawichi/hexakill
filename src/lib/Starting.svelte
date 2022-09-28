@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
     import { player } from '$lib/data/stores'
+    import { characters } from './config/characters'
     import { styles } from './config/styles'
 
     let nameInput: string = ''
@@ -23,14 +24,24 @@
             return n
         })
     }
+    characters
 </script>
 
 <section class="container mx-auto text-center pt-20">
     <div>
-        <h2 for="name" class="text-xl pb-4">Enter your name:</h2>
-        <input type="text" id="name" placeholder="Player name" bind:value={nameInput} class="bg-zinc-700 p-2 w-64 h-12 rounded" />
+        <h2 class="text-xl pb-4">Enter your name:</h2>
+        <input placeholder="Player name" bind:value={nameInput} class="bg-zinc-700 p-2 w-64 h-12 rounded" />
     </div>
-    <button on:click={setName} class={styles.button.base + styles.button.green + ' mt-5'}>
-        CONFIRM
+
+    {#if nameInput.length >= 3}
+        <p>opciones</p>
+    {/if}
+
+    <button class={styles.button.base + styles.button[characters[0].color]}>
+        START GAME
     </button>
+
+    <!-- <button on:click={setName} class={styles.button.base + styles.button.green + ' mt-5'}>
+        CONFIRM
+    </button> -->
 </section>
