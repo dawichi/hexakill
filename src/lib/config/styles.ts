@@ -1,6 +1,6 @@
 export const styles = {
     button: {
-        base: 'font-bold tracking-wider text-xl p-3 mb-2 rounded-xl bg-gradient-to-br ',
+        base: 'font-bold tracking-wider text-xl py-2 px-3 mb-2 rounded-xl bg-gradient-to-br ',
         indigo: 'from-indigo-500 to-indigo-900 hover:from-indigo-700 hover:to-indigo-900',
         blue: 'from-blue-500 to-blue-900 hover:from-blue-700 hover:to-blue-900',
         red: 'from-red-500 to-red-900 hover:from-red-700 hover:to-red-900',

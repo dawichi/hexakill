@@ -1,5 +1,6 @@
 <script lang="ts">
     import { playing } from '$lib/data/stores'
+    import Starting from '$lib/Starting.svelte'
     import Welcome from '$lib/Welcome.svelte'
 
     let isPlaying: boolean
@@ -13,6 +14,6 @@
     {#if !isPlaying}
         <Welcome />
     {:else}
-        <h1>Step 1</h1>
+        <Starting />
     {/if}
 </div>
