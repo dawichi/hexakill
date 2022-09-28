@@ -1,23 +1,22 @@
 <script lang="ts">
     import { gameData } from '$lib/data/stores'
-    import Starting from '$lib/Starting.svelte'
-    import Welcome from '$lib/Welcome.svelte'
+    import Combat from '$lib/views/Combat.svelte'
+    import Starting from '$lib/views/Starting.svelte'
+    import Welcome from '$lib/views/Welcome.svelte'
 
-    let isPlaying: boolean
+    let step: string
 
     gameData.subscribe(n => {
-        isPlaying = n.playing
+        step = n.step
     })
 </script>
 
 <div>
-    {#if !isPlaying}
+    {#if step === 'welcome'}
         <Welcome />
-    {:else}
+    {:else if step === 'starting'}
         <Starting />
+    {:else if step === 'playing'}
+        <Combat />
     {/if}
 </div>
-
-<!-- <style lang="scss">
-    // @import "node_modules/rpg-awesome/scss/rpg-awesome";
-</style> -->

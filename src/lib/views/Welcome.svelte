@@ -5,11 +5,11 @@
 -->
 <script lang="ts">
     import { gameData } from '$lib/data/stores'
-    import { styles } from './config/styles'
+    import { styles } from '../config/styles'
 
     function startPlaying() {
         gameData.update(n => {
-            n.playing = true
+            n.step = 'starting'
             return n
         })
     }

@@ -1,0 +1,59 @@
+<!--
+  @component
+  ## EntityView
+  Display the entity data
+  @param entity - The entity to display
+-->
+<script lang="ts">
+    import BgImage from './BgImage.svelte'
+    import { icons } from './config/icons'
+    import { Character, type Enemy } from './models'
+    import Icon from '@iconify/svelte'
+
+    export let entity: Character | Enemy
+
+    const hpWidth = ((entity.health - entity.dmgReceived) / entity.health) * 100
+
+    const colorHpBar = (hpWidth: number) => {
+        if (hpWidth < 11) return 'bg-red-600'
+        if (hpWidth > 10 && hpWidth < 31) return 'bg-yellow-600'
+        return 'bg-green-600'
+    }
+</script>
+
+<section class="animate__animated animate__fadeIn bg-zinc-900 shadow p-2 m-2 rounded relative">
+    <div class="h-full flex flex-col items-center justify-between">
+        <h2 class="text-xl">
+            {entity.name} - lv {entity.level}
+        </h2>
+
+        {#if entity instanceof Character}
+            <div class="bg-zinc-600/75 rounded-xl w-2/5">
+                <div class="rounded-xl bg-cyan-500 h-1" style={`width: ${entity['exp']}%`} />
+            </div>
+        {/if}
+
+        <div class={'relative ' + entity.size}>
+            <BgImage image={`/images/${entity.image}/idle.gif`} />
+        </div>
+
+        <div class="w-full flex flex-col items-center mb-5">
+            <p class="flex justify-center items-center">
+                {entity.health - entity.dmgReceived} / {entity.health} <i class="ra ra-hearts text-red-600" />
+            </p>
+            <div class="bg-zinc-600/75 rounded-xl w-4/5 ">
+                <div class={`${colorHpBar(hpWidth)} rounded-xl h-3`} style={`width: ${hpWidth}%`} />
+            </div>
+        </div>
+    </div>
+    <div class="absolute top-0 left-0 m-5 rounded ">
+        {#each icons as icon}
+            <p class="flex items-center text-lg p-1" title={icon.stat}>
+                <span class="text-3xl">
+                    <Icon icon={icon.name} class={icon.style} />
+                </span>
+                <span class="pl-2">{entity[icon.stat]}</span>
+            </p>
+        {/each}
+    </div>
+</section>

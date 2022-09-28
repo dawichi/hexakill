@@ -1,8 +1,10 @@
-import type { Game } from '$lib/types/Game'
 import { writable, type Writable } from 'svelte/store'
+import type { Game } from '$lib/types/Game'
 
 export const gameData: Writable<Game> = writable({
-    playing: true,
+    step: 'starting',
     username: '',
-    character: -1,
+    characterIdx: -1,
+    character: null,
+    enemy: null,
 })
