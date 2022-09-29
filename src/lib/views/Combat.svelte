@@ -12,20 +12,18 @@
     import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
     import { loggerCleaner } from '$lib/utils/loggerCleaner'
-    
+
     // ╔══════════════════════════════════════════════════════
     // ║ Variables of the game
     // ╚══════════════════════════════════════════════════════
     // Values binded to global store
     let _player: Character | null
     let _enemy: Enemy | null
-    
+
     // Helpers
     let _fighting = false
     let _showButtons = true
     let _actionSelected: 0 | 1 | 2
-    let _isEnemyDead = false
-    let _isPlayerDead = false
 
     // Bind values
     gameData.subscribe(n => {
@@ -46,7 +44,7 @@
             n.enemy = enemyGenerator(_player?.level ?? 1)
             return n
         })
-        
+
         logs.update(n => {
             const isPlayerFaster: boolean = (_player?.speed ?? 0) > (_enemy?.speed ?? 0)
             const enemyName = _enemy?.name ?? 'Enemy'
@@ -68,16 +66,50 @@
     /**
      * ## Select Action
      * Modify the action selected by the player
-    */
+     */
     function selectAction(action: 0 | 1 | 2): void {
         _showButtons = false
         _actionSelected = action
 
         // Call the attack functions in order depending of who is faster
         const isPlayerFaster: boolean = (_player?.speed ?? 0) > (_enemy?.speed ?? 0)
-        if (_player && _enemy) isPlayerFaster ? executeActions(_player, _enemy) : executeActions(_enemy, _player)
+
+        /**
+         * ## Shared Turn function
+         * @param active The active entity
+         * @param passive The passive entity
+         * @param defeatFn The function to call when the passive entity is defeated
+         * @returns If the passive has died
+         */
+        function turn(active: Character | Enemy, passive: Character | Enemy, defeatFn: any): boolean {
+            executeActions(active, passive)
+            if (passive.dmgReceived === passive.health) {
+                defeatFn()
+                return true
+            }
+            return false
+        }
+
+        let hasAnybodyDied: boolean = false
+
+        // FIRST TURN
+        if (_player && _enemy) {
+            if (isPlayerFaster) {
+                if (turn(_player, _enemy, enemyDefeat)) hasAnybodyDied = true
+            } else {
+                if (turn(_enemy, _player, playerDefeat)) hasAnybodyDied = true
+            }
+        }
+
+        if (hasAnybodyDied) {
+            _actionSelected = 0
+            _showButtons = true
+        }
+
+        // SECOND TURN
         setTimeout(() => {
-            if (_player && _enemy) isPlayerFaster ? executeActions(_enemy, _player) : executeActions(_player, _enemy)
+            if (_player && _enemy) isPlayerFaster ? turn(_enemy, _player, playerDefeat) : turn(_player, _enemy, enemyDefeat)
+
             _actionSelected = 0
             _showButtons = true
         }, 1000)
@@ -127,10 +159,6 @@
             })
             return n
         })
-
-        if (passive.dmgReceived === passive.health) {
-            is_a_player ? enemyDefeat() : playerDefeat()
-        }
     }
 
     // ╔══════════════════════════════════════════════════════
@@ -160,13 +188,12 @@
             }
             return n
         })
-        _isEnemyDead = true
         setTimeout(() => {
             gameData.update(n => {
                 n.enemy = null
                 return n
             })
-        }, 1000)
+        }, 2000)
     }
 
     // ╔══════════════════════════════════════════════════════
@@ -181,7 +208,6 @@
             })
             return n
         })
-        _isPlayerDead = true
         setTimeout(() => {
             logs.set({
                 player: [],
@@ -216,20 +242,26 @@
                             <h4 class="text-center text-lg p-2">What do you want to do?</h4>
                             <hr />
                             <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_showButtons ? '' : 'opacity-20'}`}>
-                                <button disabled={!_showButtons} on:click={() => selectAction(0)} class={styles.button.base + styles.button.red}> Attack </button>
-                                <button disabled={!_showButtons} on:click={() => selectAction(1)} class={styles.button.base + styles.button.blue}> Magic </button>
-                                <button disabled={!_showButtons} on:click={() => selectAction(2)} class={styles.button.base + styles.button.green}> Heal </button>
+                                <button disabled={!_showButtons} on:click={() => selectAction(0)} class={styles.button.base + styles.button.red}>
+                                    Attack
+                                </button>
+                                <button disabled={!_showButtons} on:click={() => selectAction(1)} class={styles.button.base + styles.button.blue}>
+                                    Magic
+                                </button>
+                                <button disabled={!_showButtons} on:click={() => selectAction(2)} class={styles.button.base + styles.button.green}>
+                                    Heal
+                                </button>
                             </div>
                         </div>
                     {/if}
                 </div>
 
                 {#if _player}
-                    <EntityView showing='character' opacity={_isPlayerDead} />
+                    <EntityView showing="character" />
                 {/if}
 
                 {#if _enemy}
-                    <EntityView showing='enemy' opacity={_isEnemyDead} />
+                    <EntityView showing="enemy" />
                 {:else}
                     <section class="bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center">
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>

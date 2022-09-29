@@ -12,7 +12,6 @@
     import { gameData } from './data/stores'
 
     export let showing: 'character' | 'enemy'
-    export let opacity: boolean
     let _entity: Character | Enemy
 
     gameData.subscribe(n => {
@@ -27,7 +26,7 @@
     }
 </script>
 
-<section class={`animate__animated animate__fadeIn bg-zinc-900 shadow p-4 m-2 rounded relative ${opacity ? 'opacity-30 transition-all duration-500' : ''}`}>
+<section class="animate__animated animate__fadeIn bg-zinc-900 shadow p-4 m-2 rounded relative">
     <div class="h-full flex flex-col items-center justify-between">
         <h2 class="text-xl">
             {_entity.name} - lv {_entity.level}
@@ -35,7 +34,7 @@
 
         {#if _entity instanceof Character}
             <div class="bg-zinc-600/75 rounded-xl w-2/5">
-                <div class="rounded-xl bg-cyan-500 h-1" style={`width: ${_entity['exp']}%`} />
+                <div class="rounded-xl bg-cyan-500 h-1 transition-all duration-1000" style={`width: ${_entity['exp']}%`} />
             </div>
         {/if}
 
@@ -49,7 +48,9 @@
             </p>
             <div class="bg-zinc-600/75 rounded-xl w-4/5 ">
                 <div
-                    class={`${colorHpBar(((_entity.health - _entity.dmgReceived) / _entity.health) * 100)} rounded-xl h-3 transition-all duration-500`}
+                    class={`${colorHpBar(
+                        ((_entity.health - _entity.dmgReceived) / _entity.health) * 100,
+                    )} rounded-xl h-3 transition-all duration-500`}
                     style={`width: ${((_entity.health - _entity.dmgReceived) / _entity.health) * 100}%`}
                 />
             </div>
