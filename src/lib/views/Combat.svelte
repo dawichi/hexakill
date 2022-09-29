@@ -104,6 +104,7 @@
         if (hasAnybodyDied) {
             _actionSelected = 0
             _showButtons = true
+            return
         }
 
         // SECOND TURN
@@ -228,14 +229,14 @@
     ║ 💻 Game view
     ╚══════════════════════════════════════════════════════ -->
 <div class="text-center container mx-auto">
-    <div class="animate__animated animate__fadeIn bg-zinc-900 h-screen pt-20 pb-10 relative">
+    <div class="animate__animated animate__fadeIn bg-zinc-900 lg:h-screen pt-20 pb-10 relative">
         <h1 class="absolute top-0 left-0 text-3xl p-5 text-center text-white w-full tracking-widest">HEXAKILL</h1>
         <!-- <nav class='absolute top-0 right-10 text-white'>
             <MusicToggle color={colorTheme} />
         </nav> -->
 
         <section class="bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1">
-            <div class="grid grid-cols-3">
+            <div class="grid lg:grid-cols-3">
                 <div class="bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center">
                     {#if _fighting}
                         <div>
@@ -269,7 +270,7 @@
                 {/if}
             </div>
 
-            <div class="grid grid-cols-2  col-span-3">
+            <div class="grid lg:grid-cols-2 col-span-3">
                 <div class="bg-zinc-900 shadow p-2 m-2 rounded">
                     <h4 class="text-center text-lg p-2">Items</h4>
                     <hr />

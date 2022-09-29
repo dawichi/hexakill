@@ -43,7 +43,7 @@
 
     {#if _nameInput.length >= 3}
         <h3 class='text-xl mt-10'>Great! Now select your class.</h3>
-        <div class="container mx-auto max-w-3xl grid grid-cols-3">
+        <div class="container mx-auto max-w-3xl grid lg:grid-cols-3">
             {#each characters as character, idx}
                 <div
                     class={`${character.bg} m-2 p-4 cursor-pointer rounded-lg ${idx === _character ? character.shadow : ''}`}
