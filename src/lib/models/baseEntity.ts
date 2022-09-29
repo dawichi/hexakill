@@ -95,8 +95,8 @@ export class BaseEntity {
 
     heal() {
         const heal = numberBetween(
-            this.dmgReceived * 0.1, // 10% of damage received
-            this.dmgReceived * 0.3, // 30% of damage received
+            this.dmgReceived * 0.10, // 10% of damage received
+            this.dmgReceived * 0.15, // 15% of damage received
         )
         this.dmgReceived -= heal
         if (this.dmgReceived < 0) this.dmgReceived = 0

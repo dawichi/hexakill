@@ -11,6 +11,7 @@
     import type { Character, Enemy } from '$lib/models'
     import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
+    import { loggerCleaner } from '$lib/utils/loggerCleaner'
     
     // ╔══════════════════════════════════════════════════════
     // ║ Variables of the game
@@ -20,9 +21,11 @@
     let _enemy: Enemy | null
     
     // Helpers
-    let _fighting: boolean = false
-    let _showButtons: boolean = true
+    let _fighting = false
+    let _showButtons = true
     let _actionSelected: 0 | 1 | 2
+    let _isEnemyDead = false
+    let _isPlayerDead = false
 
     // Bind values
     gameData.subscribe(n => {
@@ -47,13 +50,14 @@
         logs.update(n => {
             const isPlayerFaster: boolean = (_player?.speed ?? 0) > (_enemy?.speed ?? 0)
             const enemyName = _enemy?.name ?? 'Enemy'
-            n.enemy.push({
+
+            loggerCleaner(n.enemy, {
                 title: enemyName,
                 message: `has appeared!`,
             })
-            
+
             const logTo = isPlayerFaster ? 'player' : 'enemy'
-            n[logTo].push({
+            loggerCleaner(n[logTo], {
                 title: isPlayerFaster ? 'You' : enemyName,
                 message: isPlayerFaster ? `attack first!` : `attacks first!`,
             })
@@ -115,7 +119,7 @@
 
         gameData.update(n => n)
         logs.update(n => {
-            n[entity].push({
+            loggerCleaner(n[entity], {
                 title: active.name,
                 message: message,
                 value: dmgReceived,
@@ -125,8 +129,72 @@
         })
 
         if (passive.dmgReceived === passive.health) {
-            // is_a_player ? enemyDefeat() : playerDefeat()
+            is_a_player ? enemyDefeat() : playerDefeat()
         }
+    }
+
+    // ╔══════════════════════════════════════════════════════
+    // ║ ✅ ENEMY DEFEATED
+    // ╚══════════════════════════════════════════════════════
+    const enemyDefeat = () => {
+        _fighting = false
+        if (!_player || !_enemy) return
+        const exp = parseInt(((_enemy.level / _player.level) * 100).toFixed(0))
+        const leveledUp = _player.gainExp(exp)
+
+        logs.update(n => {
+            if (!_player || !_enemy) return n
+            loggerCleaner(n.enemy, {
+                title: _enemy.name,
+                message: `lv ${_enemy.level} has been defeated! 🎉🎉`,
+            })
+            loggerCleaner(n.player, {
+                title: '',
+                message: `Well done, you have gained ${exp} exp!`,
+            })
+            if (leveledUp) {
+                loggerCleaner(n.player, {
+                    title: '',
+                    message: `You have leveled up! 🎉🎉`,
+                })
+            }
+            return n
+        })
+        _isEnemyDead = true
+        setTimeout(() => {
+            gameData.update(n => {
+                n.enemy = null
+                return n
+            })
+        }, 1000)
+    }
+
+    // ╔══════════════════════════════════════════════════════
+    // ║ ❌ PLAYER DEFEATED
+    // ╚══════════════════════════════════════════════════════
+    const playerDefeat = () => {
+        _fighting = false
+        logs.update(n => {
+            loggerCleaner(n.player, {
+                title: 'Oh no!',
+                message: 'You have been defeated! 😭',
+            })
+            return n
+        })
+        _isPlayerDead = true
+        setTimeout(() => {
+            logs.set({
+                player: [],
+                enemy: [],
+            })
+            gameData.set({
+                step: 'welcome',
+                username: '',
+                characterIdx: -1,
+                character: null,
+                enemy: null,
+            })
+        }, 8000)
     }
 </script>
 
@@ -157,11 +225,11 @@
                 </div>
 
                 {#if _player}
-                    <EntityView _showing='character' />
+                    <EntityView showing='character' opacity={_isPlayerDead} />
                 {/if}
 
                 {#if _enemy}
-                    <EntityView _showing='enemy' />
+                    <EntityView showing='enemy' opacity={_isEnemyDead} />
                 {:else}
                     <section class="bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center">
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>

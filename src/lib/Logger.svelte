@@ -21,7 +21,7 @@
     <div>
         {#each _logs.player as log, idx}
             <div class="animate__animated animate__fadeIn mt-2">
-                <p class={idx > 2 ? 'opacity-25' : ''}>
+                <p class={idx < _logs.player.length - 4 ? 'opacity-25' : ''}>
                     <span class="text-green-400">{log.title}</span>
                     {#if ('value' in log)}
                         <!-- Damage log -->
@@ -41,7 +41,7 @@
     <div>
         {#each _logs.enemy as log, idx}
             <div class="animate__animated animate__fadeIn mt-2">
-                <p class={idx > 2 ? 'opacity-25' : ''}>
+                <p class={idx < _logs.enemy.length - 4 ? 'opacity-25' : ''}>
                     <span class="text-red-400">{log.title}</span>
                     {#if ('value' in log)}
                         <!-- Damage log -->

@@ -11,11 +11,12 @@
     import Icon from '@iconify/svelte'
     import { gameData } from './data/stores'
 
-    export let _showing: 'character' | 'enemy'
+    export let showing: 'character' | 'enemy'
+    export let opacity: boolean
     let _entity: Character | Enemy
 
     gameData.subscribe(n => {
-        const e = n[_showing]
+        const e = n[showing]
         if (e) _entity = e
     })
 
@@ -26,7 +27,7 @@
     }
 </script>
 
-<section class="animate__animated animate__fadeIn bg-zinc-900 shadow p-2 m-2 rounded relative">
+<section class={`animate__animated animate__fadeIn bg-zinc-900 shadow p-4 m-2 rounded relative ${opacity ? 'opacity-30 transition-all duration-500' : ''}`}>
     <div class="h-full flex flex-col items-center justify-between">
         <h2 class="text-xl">
             {_entity.name} - lv {_entity.level}
