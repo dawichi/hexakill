@@ -7,29 +7,32 @@
     import { styles } from '$lib/config/styles'
     import { gameData, logs } from '$lib/data/stores'
     import EntityView from '$lib/EntityView.svelte'
+    import Logger from '$lib/Logger.svelte'
     import type { Character, Enemy } from '$lib/models'
-    import type { Logger } from '$lib/types/Logger'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
 
     let _player: Character | null
     let _enemy: Enemy | null
     let _fighting: boolean = false
     let _playerTurn: boolean = true
-    let _logs: Logger
 
     gameData.subscribe(n => {
         _player = n.character
         _enemy = n.enemy
     })
 
-    logs.subscribe(n => {
-        _logs = n
-    })
-
     function attack() {}
     function magic() {}
     function heal() {}
 
+
+    /**
+     * ## Start Combat
+     * Executes every time a new combat starts
+     *   - Sets a new enemy
+     *   - Sets _fighting to true
+     *   - Logs information about it
+     */
     function startCombat() {
         gameData.update(n => {
             n.enemy = enemyGenerator(_player?.level ?? 1)
@@ -37,7 +40,18 @@
         })
         _fighting = true
         logs.update(n => {
-            n.general.push(`${_enemy?.name} lv ${_enemy?.level} has appeared!`)
+            const enemyName = _enemy?.name ?? 'Enemy'
+            n.enemy.push({
+                title: enemyName,
+                message: `has appeared!`,
+            })
+
+            const isPlayerFaster: boolean = (_player?.speed ?? 0) > (_enemy?.speed ?? 0)
+            const logTo = isPlayerFaster ? 'player' : 'enemy'
+            n[logTo].push({
+                title: isPlayerFaster ? 'You' : enemyName,
+                message: isPlayerFaster ? `attack first!` : `attacks first!`,
+            })
             return n
         })
     }
@@ -82,32 +96,16 @@
                 {/if}
             </div>
 
-            <div class="bg-zinc-900 shadow p-2 m-2 rounded relative col-span-3">
-                <h4 class="text-center text-lg p-2">Info</h4>
-                <hr />
-                <article class="p-4 h-4/5 overflow-y-hidden grid grid-cols-3 gap-4">
-                    <div>
-                        {#each _logs.player as log, idx}
-                            <div class='animate__animated animate__fadeIn mt-2'>
-                                <p class={idx > 2 ? 'opacity-25' : ''}>{log}</p>
-                            </div>
-                        {/each}
-                    </div>
-                    <div>
-                        {#each _logs.general as log, idx}
-                            <div class='animate__animated animate__fadeIn mt-2'>
-                                <p class={idx > 2 ? 'opacity-25' : ''}>{log}</p>
-                            </div>
-                        {/each}
-                    </div>
-                    <div>
-                        {#each _logs.enemy as log, idx}
-                            <div class='animate__animated animate__fadeIn mt-2'>
-                                <p class={idx > 2 ? 'opacity-25' : ''}>{log}</p>
-                            </div>
-                        {/each}
-                    </div>
-                </article>
+            <div class="grid grid-cols-2  col-span-3">
+                <div class="bg-zinc-900 shadow p-2 m-2 rounded">
+                    <h4 class="text-center text-lg p-2">Items</h4>
+                    <hr />
+                </div>
+                <div class="bg-zinc-900 shadow p-2 m-2 rounded relative">
+                    <h4 class="text-center text-lg p-2">Info</h4>
+                    <hr />
+                    <Logger />
+                </div>
             </div>
         </section>
     </div>

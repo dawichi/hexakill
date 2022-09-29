@@ -66,8 +66,4 @@
             START GAME
         </button>
     {/if}
-
-    <!-- <button on:click={setName} class={styles.button.base + styles.button.green + ' mt-5'}>
-        CONFIRM
-    </button> -->
 </section>
