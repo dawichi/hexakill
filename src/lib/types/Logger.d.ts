@@ -1,12 +1,13 @@
 type DamageLog = {
     title: string,
-    damage?: number,
+    message: string,
+    value?: number,
     icon?: string,
 }
 
 type GeneralLog = {
     title: string,
-    message?: string,
+    message: string,
 }
 
 export type LoggerDTO = {

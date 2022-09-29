@@ -9,22 +9,22 @@
     import EntityView from '$lib/EntityView.svelte'
     import Logger from '$lib/Logger.svelte'
     import type { Character, Enemy } from '$lib/models'
+    import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
 
+    // Variables binded to store
     let _player: Character | null
     let _enemy: Enemy | null
+    
+    // Helpers
     let _fighting: boolean = false
-    let _playerTurn: boolean = true
+    let _showButtons: boolean = true
+    let _actionSelected: 0 | 1 | 2
 
     gameData.subscribe(n => {
         _player = n.character
         _enemy = n.enemy
     })
-
-    function attack() {}
-    function magic() {}
-    function heal() {}
-
 
     /**
      * ## Start Combat
@@ -33,20 +33,21 @@
      *   - Sets _fighting to true
      *   - Logs information about it
      */
-    function startCombat() {
+    function startCombat(): void {
+        _fighting = true
         gameData.update(n => {
             n.enemy = enemyGenerator(_player?.level ?? 1)
             return n
         })
-        _fighting = true
+        
         logs.update(n => {
+            const isPlayerFaster: boolean = (_player?.speed ?? 0) > (_enemy?.speed ?? 0)
             const enemyName = _enemy?.name ?? 'Enemy'
             n.enemy.push({
                 title: enemyName,
                 message: `has appeared!`,
             })
-
-            const isPlayerFaster: boolean = (_player?.speed ?? 0) > (_enemy?.speed ?? 0)
+            
             const logTo = isPlayerFaster ? 'player' : 'enemy'
             n[logTo].push({
                 title: isPlayerFaster ? 'You' : enemyName,
@@ -54,6 +55,74 @@
             })
             return n
         })
+    }
+
+    /**
+     * ## Select Action
+     * Modify the action selected by the player
+    */
+    function selectAction(action: 0 | 1 | 2): void {
+        _showButtons = false
+        _actionSelected = action
+
+        // Call the attack functions in order depending of who is faster
+        const isPlayerFaster: boolean = (_player?.speed ?? 0) > (_enemy?.speed ?? 0)
+        if (_player && _enemy) isPlayerFaster ? executeActions(_player, _enemy) : executeActions(_enemy, _player)
+        setTimeout(() => {
+            if (_player && _enemy) isPlayerFaster ? executeActions(_enemy, _player) : executeActions(_player, _enemy)
+            _actionSelected = 0
+            _showButtons = true
+        }, 1000)
+    }
+
+    /**
+     * ## Execute Actions
+     * @param active - The one who deals the damage
+     * @param passive - The one who receives the damage
+     */
+    function executeActions(active: Character | Enemy, passive: Character | Enemy): void {
+        const is_a_player: boolean = 'exp' in active
+        const entity = is_a_player ? 'player' : 'enemy'
+        const choice = is_a_player ? _actionSelected : enemyActionChoice(active)
+
+        let damage: number
+        let dmgReceived: number
+        let message: string
+        let icon: string
+
+        switch (choice) {
+            case 0:
+                damage = active.attack()
+                dmgReceived = passive.receiveAttack(damage)
+                message = ''
+                icon = '🔪'
+                break
+            case 1:
+                damage = active.magic()
+                dmgReceived = passive.receiveMagic(damage)
+                message = ''
+                icon = '☄'
+                break
+            default:
+                const healed = active.heal()
+                message = `healed ${healed} HP! ❤`
+                break
+        }
+
+        gameData.update(n => n)
+        logs.update(n => {
+            n[entity].push({
+                title: active.name,
+                message: message,
+                value: dmgReceived,
+                icon: icon,
+            })
+            return n
+        })
+
+        if (passive.dmgReceived === passive.health) {
+            // is_a_player ? enemyDefeat() : playerDefeat()
+        }
     }
 </script>
 
@@ -70,14 +139,14 @@
         <section class="bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1">
             <div class="grid grid-cols-3">
                 <div class="bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center">
-                    {#if _fighting && _playerTurn}
+                    {#if _fighting}
                         <div>
                             <h4 class="text-center text-lg p-2">What do you want to do?</h4>
                             <hr />
-                            <div class="flex gap-4 justify-center items-center p-4">
-                                <button on:click={attack} class={styles.button.base + styles.button.red}> Attack </button>
-                                <button on:click={magic} class={styles.button.base + styles.button.blue}> Magic </button>
-                                <button on:click={heal} class={styles.button.base + styles.button.green}> Heal </button>
+                            <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_showButtons ? '' : 'opacity-20'}`}>
+                                <button disabled={!_showButtons} on:click={() => selectAction(0)} class={styles.button.base + styles.button.red}> Attack </button>
+                                <button disabled={!_showButtons} on:click={() => selectAction(1)} class={styles.button.base + styles.button.blue}> Magic </button>
+                                <button disabled={!_showButtons} on:click={() => selectAction(2)} class={styles.button.base + styles.button.green}> Heal </button>
                             </div>
                         </div>
                     {/if}
