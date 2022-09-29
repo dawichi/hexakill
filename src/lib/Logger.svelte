@@ -23,7 +23,15 @@
             <div class="animate__animated animate__fadeIn mt-2">
                 <p class={idx > 2 ? 'opacity-25' : ''}>
                     <span class="text-green-400">{log.title}</span>
-                    {#if !('damage' in log)}
+                    {#if ('value' in log)}
+                        <!-- Damage log -->
+                        {#if log.message}
+                            {log.message}
+                        {:else}
+                            did <span class="text-red-400">{log.value}</span> damage! {log.icon}
+                        {/if}
+                    {:else}
+                        <!-- Normal log -->
                         {log.message}
                     {/if}
                 </p>
@@ -35,7 +43,15 @@
             <div class="animate__animated animate__fadeIn mt-2">
                 <p class={idx > 2 ? 'opacity-25' : ''}>
                     <span class="text-red-400">{log.title}</span>
-                    {#if !('damage' in log)}
+                    {#if ('value' in log)}
+                        <!-- Damage log -->
+                        {#if log.message}
+                            {log.message}
+                        {:else}
+                            did <span class="text-blue-400">{log.value}</span> damage! {log.icon}
+                        {/if}
+                    {:else}
+                        <!-- Normal log -->
                         {log.message}
                     {/if}
                 </p>

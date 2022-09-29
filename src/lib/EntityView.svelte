@@ -9,14 +9,19 @@
     import { icons } from './config/icons'
     import { Character, type Enemy } from './models'
     import Icon from '@iconify/svelte'
+    import { gameData } from './data/stores'
 
-    export let entity: Character | Enemy
+    export let _showing: 'character' | 'enemy'
+    let _entity: Character | Enemy
 
-    const hpWidth = ((entity.health - entity.dmgReceived) / entity.health) * 100
+    gameData.subscribe(n => {
+        const e = n[_showing]
+        if (e) _entity = e
+    })
 
     const colorHpBar = (hpWidth: number) => {
-        if (hpWidth < 11) return 'bg-red-600'
-        if (hpWidth > 10 && hpWidth < 31) return 'bg-yellow-600'
+        if (hpWidth <= 10) return 'bg-red-600'
+        if (hpWidth > 10 && hpWidth <= 40) return 'bg-yellow-600'
         return 'bg-green-600'
     }
 </script>
@@ -24,25 +29,28 @@
 <section class="animate__animated animate__fadeIn bg-zinc-900 shadow p-2 m-2 rounded relative">
     <div class="h-full flex flex-col items-center justify-between">
         <h2 class="text-xl">
-            {entity.name} - lv {entity.level}
+            {_entity.name} - lv {_entity.level}
         </h2>
 
-        {#if entity instanceof Character}
+        {#if _entity instanceof Character}
             <div class="bg-zinc-600/75 rounded-xl w-2/5">
-                <div class="rounded-xl bg-cyan-500 h-1" style={`width: ${entity['exp']}%`} />
+                <div class="rounded-xl bg-cyan-500 h-1" style={`width: ${_entity['exp']}%`} />
             </div>
         {/if}
 
-        <div class={'relative ' + entity.size}>
-            <BgImage image={`/images/${entity.image}/idle.gif`} />
+        <div class={'relative ' + _entity.size}>
+            <BgImage image={`/images/${_entity.image}/idle.gif`} />
         </div>
 
         <div class="w-full flex flex-col items-center mb-5">
             <p class="flex justify-center items-center">
-                {entity.health - entity.dmgReceived} / {entity.health} <i class="ra ra-hearts text-red-600" />
+                {_entity.health - _entity.dmgReceived} / {_entity.health} <i class="ra ra-hearts text-red-600" />
             </p>
             <div class="bg-zinc-600/75 rounded-xl w-4/5 ">
-                <div class={`${colorHpBar(hpWidth)} rounded-xl h-3`} style={`width: ${hpWidth}%`} />
+                <div
+                    class={`${colorHpBar(((_entity.health - _entity.dmgReceived) / _entity.health) * 100)} rounded-xl h-3 transition-all duration-500`}
+                    style={`width: ${((_entity.health - _entity.dmgReceived) / _entity.health) * 100}%`}
+                />
             </div>
         </div>
     </div>
@@ -52,7 +60,7 @@
                 <span class="text-3xl">
                     <Icon icon={icon.name} class={icon.style} />
                 </span>
-                <span class="pl-2">{entity[icon.stat]}</span>
+                <span class="pl-2">{_entity[icon.stat]}</span>
             </p>
         {/each}
     </div>

@@ -11,8 +11,11 @@
     import type { Character, Enemy } from '$lib/models'
     import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
-
-    // Variables binded to store
+    
+    // ╔══════════════════════════════════════════════════════
+    // ║ Variables of the game
+    // ╚══════════════════════════════════════════════════════
+    // Values binded to global store
     let _player: Character | null
     let _enemy: Enemy | null
     
@@ -21,6 +24,7 @@
     let _showButtons: boolean = true
     let _actionSelected: 0 | 1 | 2
 
+    // Bind values
     gameData.subscribe(n => {
         _player = n.character
         _enemy = n.enemy
@@ -153,11 +157,11 @@
                 </div>
 
                 {#if _player}
-                    <EntityView entity={_player} />
+                    <EntityView _showing='character' />
                 {/if}
 
                 {#if _enemy}
-                    <EntityView entity={_enemy} />
+                    <EntityView _showing='enemy' />
                 {:else}
                     <section class="bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center">
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
