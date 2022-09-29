@@ -1,3 +1,4 @@
+import { numberBetween } from '$lib/utils/numberBetween'
 import { config } from '.'
 
 const base = config.base
@@ -50,16 +51,6 @@ export class BaseEntity {
     }
 
     /**
-     * Get a random natural number between min and max
-     * @param min min number
-     * @param max max number
-     * @returns random number
-     */
-    private numberBetween(min: number, max: number) {
-        return parseInt((Math.floor(Math.random() * (max - min + 1)) + min).toFixed(0))
-    }
-
-    /**
      * Action logic
      * 1. Gets a random damage between a range
      * 2. Calcs if the action is a critic or a miss
@@ -71,7 +62,7 @@ export class BaseEntity {
      */
     private action(min_hit: number, max_hit: number, critic_chance: number, misses_chance: number) {
         // Calc damage between the range
-        const damage = this.numberBetween(min_hit, max_hit)
+        const damage = numberBetween(min_hit, max_hit)
 
         // Calc the chances
         const chances = Math.random()
@@ -103,7 +94,7 @@ export class BaseEntity {
     }
 
     heal() {
-        const heal = this.numberBetween(
+        const heal = numberBetween(
             this.dmgReceived * 0.1, // 10% of damage received
             this.dmgReceived * 0.3, // 30% of damage received
         )

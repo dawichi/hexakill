@@ -27,7 +27,7 @@ export const icons: Array<Icon> = [
     },
     {
         stat: 'mr',
-        name: 'bxs:shield-alt-2',
+        name: 'game-icons:magic-shield',
         style: 'text-fuchsia-400',
     },
     {
