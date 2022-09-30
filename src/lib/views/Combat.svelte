@@ -4,6 +4,7 @@
     The view of the actual game, where the user can fight enemies.
 -->
 <script lang="ts">
+    import { powerups } from '$lib/config/powerups'
     import { styles } from '$lib/config/styles'
     import { gameData, logs } from '$lib/data/stores'
     import EntityView from '$lib/EntityView.svelte'
@@ -12,6 +13,7 @@
     import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
     import { loggerCleaner } from '$lib/utils/loggerCleaner'
+    import Icon from '@iconify/svelte'
 
     // ╔══════════════════════════════════════════════════════
     // ║ Variables of the game
@@ -24,6 +26,12 @@
     let _fighting = false
     let _showButtons = true
     let _actionSelected: 0 | 1 | 2
+    let _offerPowerUp = false
+    let _historyPowerUps: { [key: string]: number } = {
+        ad: 0,
+        ap: 0,
+        speed: 0,
+    }
 
     // Bind values
     gameData.subscribe(n => {
@@ -182,6 +190,7 @@
                 message: `Well done, you have gained ${exp} exp!`,
             })
             if (leveledUp) {
+                if (_player.level % 2 !== 0) _offerPowerUp = true
                 loggerCleaner(n.player, {
                     title: '',
                     message: `You have leveled up! 🎉🎉`,
@@ -209,6 +218,7 @@
             })
             return n
         })
+        // TODO: Dont go directly to home, show a button with "RETRY"
         setTimeout(() => {
             logs.set({
                 player: [],
@@ -222,6 +232,13 @@
                 enemy: null,
             })
         }, 8000)
+    }
+
+    function handlePowerUp(type: 'ad' | 'ap' | 'speed', value: number): void {
+        _offerPowerUp = false
+        _historyPowerUps[type] += 1
+        if (!_player) return
+        _player[type] += value
     }
 </script>
 
@@ -263,7 +280,7 @@
 
                 {#if _enemy}
                     <EntityView showing="enemy" />
-                {:else}
+                {:else if !_offerPowerUp}
                     <section class="bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center">
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
                     </section>
@@ -274,6 +291,30 @@
                 <div class="bg-zinc-900 shadow p-2 m-2 rounded">
                     <h4 class="text-center text-lg p-2">Items</h4>
                     <hr />
+                    <div>
+                        {#each Object.keys(_historyPowerUps) as powerupKey}
+                            <p>{powerupKey}: {_historyPowerUps[powerupKey]}</p>
+                        {/each}
+                    </div>
+
+                    {#if _offerPowerUp}
+                        <div class="grid lg:grid-cols-3 gap-1">
+                            {#each powerups as powerup}
+                                <div>
+                                    <button
+                                        on:click={() => handlePowerUp(powerup.type, powerup.value)}
+                                        class="border rounded m-2 p-4 flex items-center bg-zinc-800 hover:bg-zinc-700 w-4/5"
+                                    >
+                                        <span class="text-3xl mr-4"><Icon icon={powerup.icon} class={powerup.style} /></span>
+                                        <span>{powerup.title} </span>
+                                    </button>
+                                    <p>
+                                        Increase {powerup.title} by {powerup.value}
+                                    </p>
+                                </div>
+                            {/each}
+                        </div>
+                    {/if}
                 </div>
                 <div class="bg-zinc-900 shadow p-2 m-2 rounded relative">
                     <h4 class="text-center text-lg p-2">Info</h4>
