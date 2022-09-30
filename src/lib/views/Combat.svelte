@@ -13,7 +13,7 @@
     import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
     import { loggerCleaner } from '$lib/utils/loggerCleaner'
-    import Icon, { getIcon } from '@iconify/svelte'
+    import Icon from '@iconify/svelte'
 
     // ╔══════════════════════════════════════════════════════
     // ║ Variables of the game
@@ -27,6 +27,7 @@
     let _showButtons = true
     let _actionSelected: 0 | 1 | 2
     let _offerPowerUp = false
+    let _offeredUpgrades = 0
     let _historyPowerUps: { [key: string]: number } = {}
 
     // Bind values
@@ -173,6 +174,7 @@
         _fighting = false
         if (!_player || !_enemy) return
         const exp = parseInt(((_enemy.level / _player.level) * 100).toFixed(0))
+        const oldLevel = _player.level
         const leveledUp = _player.gainExp(exp)
 
         logs.update(n => {
@@ -186,7 +188,8 @@
                 message: `Well done, you have gained ${exp} exp!`,
             })
             if (leveledUp) {
-                if (_player.level % 2 !== 0) _offerPowerUp = true
+                _offeredUpgrades = oldLevel % 2 !== 0 ? ~~((_player.level - oldLevel) / 2) : parseInt(((_player.level - oldLevel) / 2).toFixed(0))
+                if (_offeredUpgrades) _offerPowerUp = true
                 loggerCleaner(n.player, {
                     title: '',
                     message: `You have leveled up! 🎉🎉`,
@@ -231,10 +234,12 @@
     }
 
     function handlePowerUp(type: 'health' | 'ad' | 'ap' | 'speed', value: number): void {
-        _offerPowerUp = false
+        _offeredUpgrades -= 1
+        if (!_offeredUpgrades) _offerPowerUp = false
         _historyPowerUps[type] ? (_historyPowerUps[type] += 1) : (_historyPowerUps[type] = 1)
         if (!_player) return
         _player[type] += value
+        gameData.update(n => n)
     }
 
     function calcTotalPowerupValue(value: number | string, quantity: number): number {
@@ -290,7 +295,12 @@
 
             <div class="grid lg:grid-cols-2 col-span-3">
                 <div class="bg-zinc-900 shadow p-2 m-2 rounded">
-                    <h4 class="text-center text-lg p-2">Powerups</h4>
+                    <h4 class="text-center text-lg p-2">
+                        <span>Powerups</span>
+                        {#if _offeredUpgrades}
+                            <span>(Pending: {_offeredUpgrades})</span>
+                        {/if}
+                    </h4>
                     <hr />
                     <div class="grid grid-cols-4 gap-3 p-4">
                         {#each Object.keys(_historyPowerUps) as powerupKey}
@@ -299,7 +309,7 @@
                                     <span class="text-3xl mr-4">
                                         <Icon icon={getPowerupProp(powerupKey, 'icon')} class={getPowerupProp(powerupKey, 'style')} />
                                     </span>
-                                    {#each [...Array(_historyPowerUps[powerupKey]).keys()] as x}
+                                    {#each [...Array(_historyPowerUps[powerupKey]).keys()] as _}
                                         <span class="text-yellow-400"><Icon icon="ant-design:star-filled" /></span>
                                     {/each}
                                 </div>
