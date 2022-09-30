@@ -260,25 +260,7 @@
 
         <section class="bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1">
             <div class="grid lg:grid-cols-3">
-                <div class="bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center">
-                    {#if _fighting}
-                        <div>
-                            <h4 class="text-center text-lg p-2">What do you want to do?</h4>
-                            <hr />
-                            <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_showButtons ? '' : 'opacity-20'}`}>
-                                <button disabled={!_showButtons} on:click={() => selectAction(0)} class={styles.button.base + styles.button.red}>
-                                    Attack
-                                </button>
-                                <button disabled={!_showButtons} on:click={() => selectAction(1)} class={styles.button.base + styles.button.blue}>
-                                    Magic
-                                </button>
-                                <button disabled={!_showButtons} on:click={() => selectAction(2)} class={styles.button.base + styles.button.green}>
-                                    Heal
-                                </button>
-                            </div>
-                        </div>
-                    {/if}
-                </div>
+                <div class="bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center" />
 
                 {#if _player}
                     <EntityView showing="character" />
@@ -295,13 +277,6 @@
 
             <div class="grid lg:grid-cols-2 col-span-3">
                 <div class="bg-zinc-900 shadow p-2 m-2 rounded">
-                    <h4 class="text-center text-lg p-2">
-                        <span>Powerups</span>
-                        {#if _offeredUpgrades}
-                            <span>(Pending: {_offeredUpgrades})</span>
-                        {/if}
-                    </h4>
-                    <hr />
                     <div class="grid grid-cols-4 gap-3 p-4">
                         {#each Object.keys(_historyPowerUps) as powerupKey}
                             <div class="flex flex-col items-start p-1 rounded bg-zinc-700">
@@ -317,7 +292,10 @@
                             </div>
                         {/each}
                     </div>
-
+                    {#if _offeredUpgrades}
+                        <span class="text-xl">Choose upgrades -> Pending: {_offeredUpgrades}</span>
+                        <hr class="m-2" />
+                    {/if}
                     {#if _offerPowerUp}
                         <div class="grid lg:grid-cols-3 gap-1">
                             {#each powerups as powerup}
@@ -334,6 +312,22 @@
                                     </p>
                                 </div>
                             {/each}
+                        </div>
+                    {/if}
+                    {#if _fighting}
+                        <div>
+                            <h4 class="text-center text-lg p-2 mt-8">What do you want to do?</h4>
+                            <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_showButtons ? '' : 'opacity-20'}`}>
+                                <button disabled={!_showButtons} on:click={() => selectAction(0)} class={styles.button.base + styles.button.red}>
+                                    Attack
+                                </button>
+                                <button disabled={!_showButtons} on:click={() => selectAction(1)} class={styles.button.base + styles.button.blue}>
+                                    Magic
+                                </button>
+                                <button disabled={!_showButtons} on:click={() => selectAction(2)} class={styles.button.base + styles.button.green}>
+                                    Heal
+                                </button>
+                            </div>
                         </div>
                     {/if}
                 </div>
