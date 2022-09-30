@@ -4,7 +4,7 @@
     The view of the actual game, where the user can fight enemies.
 -->
 <script lang="ts">
-    import { powerups } from '$lib/config/powerups'
+    import { getPowerupProp, powerups } from '$lib/config/powerups'
     import { styles } from '$lib/config/styles'
     import { gameData, logs } from '$lib/data/stores'
     import EntityView from '$lib/EntityView.svelte'
@@ -13,7 +13,7 @@
     import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
     import { loggerCleaner } from '$lib/utils/loggerCleaner'
-    import Icon from '@iconify/svelte'
+    import Icon, { getIcon } from '@iconify/svelte'
 
     // ╔══════════════════════════════════════════════════════
     // ║ Variables of the game
@@ -27,11 +27,7 @@
     let _showButtons = true
     let _actionSelected: 0 | 1 | 2
     let _offerPowerUp = false
-    let _historyPowerUps: { [key: string]: number } = {
-        ad: 0,
-        ap: 0,
-        speed: 0,
-    }
+    let _historyPowerUps: { [key: string]: number } = {}
 
     // Bind values
     gameData.subscribe(n => {
@@ -234,11 +230,16 @@
         }, 8000)
     }
 
-    function handlePowerUp(type: 'ad' | 'ap' | 'speed', value: number): void {
+    function handlePowerUp(type: 'health' | 'ad' | 'ap' | 'speed', value: number): void {
         _offerPowerUp = false
-        _historyPowerUps[type] += 1
+        _historyPowerUps[type] ? (_historyPowerUps[type] += 1) : (_historyPowerUps[type] = 1)
         if (!_player) return
         _player[type] += value
+    }
+
+    function calcTotalPowerupValue(value: number | string, quantity: number): number {
+        if (typeof value === 'string') value = parseInt(value)
+        return value * quantity
     }
 </script>
 
@@ -289,11 +290,21 @@
 
             <div class="grid lg:grid-cols-2 col-span-3">
                 <div class="bg-zinc-900 shadow p-2 m-2 rounded">
-                    <h4 class="text-center text-lg p-2">Items</h4>
+                    <h4 class="text-center text-lg p-2">Powerups</h4>
                     <hr />
-                    <div>
+                    <div class="grid grid-cols-4 gap-3 p-4">
                         {#each Object.keys(_historyPowerUps) as powerupKey}
-                            <p>{powerupKey}: {_historyPowerUps[powerupKey]}</p>
+                            <div class="flex flex-col items-start p-1 rounded bg-zinc-700">
+                                <div class="flex items-center">
+                                    <span class="text-3xl mr-4">
+                                        <Icon icon={getPowerupProp(powerupKey, 'icon')} class={getPowerupProp(powerupKey, 'style')} />
+                                    </span>
+                                    {#each [...Array(_historyPowerUps[powerupKey]).keys()] as x}
+                                        <span class="text-yellow-400"><Icon icon="ant-design:star-filled" /></span>
+                                    {/each}
+                                </div>
+                                <span>{'+' + calcTotalPowerupValue(getPowerupProp(powerupKey, 'value'), _historyPowerUps[powerupKey])}</span>
+                            </div>
                         {/each}
                     </div>
 

@@ -2,11 +2,21 @@ type Powerup = {
     title: string
     icon: string
     style: string
-    type: 'ad' | 'ap' | 'speed'
+    type: 'health' | 'ad' | 'ap' | 'speed'
     value: number
 }
 
+/**
+ * ## Powerups definitions
+ */
 export const powerups: Powerup[] = [
+    {
+        title: 'Health',
+        icon: 'ant-design:heart-filled',
+        style: 'text-green-400',
+        type: 'health',
+        value: 500,
+    },
     {
         title: 'Attack Damage',
         icon: 'akar-icons:double-sword',
@@ -29,3 +39,13 @@ export const powerups: Powerup[] = [
         value: 10,
     },
 ]
+
+/**
+ * ## Get Powerup Prop
+ * Get the powerup[prop] from the powerup.type
+ * @param type powerup.type
+ * @param prop powerup[prop] wanted
+ */
+export const getPowerupProp = (type: string, prop: keyof Powerup): string | number => {
+    return powerups.find(p => p.type === type)?.[prop] ?? ''
+}
