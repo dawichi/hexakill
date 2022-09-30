@@ -173,7 +173,7 @@
     const enemyDefeat = () => {
         _fighting = false
         if (!_player || !_enemy) return
-        const exp = parseInt(((_enemy.level / _player.level) * 800).toFixed(0))
+        const exp = parseInt(((_enemy.level / _player.level) * 100).toFixed(0))
         const oldLevel = _player.level
         const leveledUp = _player.gainExp(exp)
 
