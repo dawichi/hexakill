@@ -1,5 +1,5 @@
 type Character = {
-    name: string
+    name: 'Wizard' | 'Samurai' | 'Warrior'
     imgPath: string
     bg: string
     desc: string
@@ -36,7 +36,7 @@ export const characters: Character[] = [
     {
         name: 'Warrior',
         imgPath: 'warrior',
-        bg: 'bg-amber-700/50',
+        bg: 'bg-amber-600/50',
         desc: 'One-shots are not for him',
         subDesc: 'low damage',
         size: 'w-36 h-36',
@@ -44,3 +44,13 @@ export const characters: Character[] = [
         color: 'amber',
     },
 ]
+
+/**
+ * ## Get Character Style
+ * Get the character style based on name
+ * @param name character.name
+ * @returns character.style
+ */
+export const getCharacterStyle = (name: 'Wizard' | 'Samurai' | 'Warrior'): string => {
+    return characters.find(p => p.name === name)?.bg ?? ''
+}
