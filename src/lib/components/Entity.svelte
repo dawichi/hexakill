@@ -1,15 +1,15 @@
 <!--
   @component
-  ## EntityView
+  ## Entity
   Display the entity data
   @param entity - The entity to display
 -->
 <script lang="ts">
-    import BgImage from './BgImage.svelte'
-    import { icons } from './config/icons'
-    import { Character, type Enemy } from './models'
     import Icon from '@iconify/svelte'
-    import { gameData } from './data/stores'
+    import BgImage from './BgImage.svelte'
+    import { icons } from '$lib/config/icons'
+    import { gameData } from '$lib/data/stores'
+    import { Character, type Enemy } from '$lib/models'
 
     export let showing: 'character' | 'enemy'
     let _entity: Character | Enemy
@@ -48,9 +48,7 @@
             </p>
             <div class="bg-zinc-600/75 rounded-xl w-4/5 ">
                 <div
-                    class={`${colorHpBar(
-                        ((_entity.health - _entity.dmgReceived) / _entity.health) * 100,
-                    )} rounded-xl h-3 transition-all duration-500`}
+                    class={`${colorHpBar(((_entity.health - _entity.dmgReceived) / _entity.health) * 100)} rounded-xl h-3 transition-all duration-500`}
                     style={`width: ${((_entity.health - _entity.dmgReceived) / _entity.health) * 100}%`}
                 />
             </div>

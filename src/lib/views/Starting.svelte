@@ -4,11 +4,11 @@
     This component is used to enter the name of the player and select his character.
 -->
 <script lang="ts">
+    import BgImage from '$lib/components/BgImage.svelte'
+    import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/stores'
+    import { characters } from '$lib/config/characters'
     import { Samurai, Warrior, Wizard } from '$lib/models'
-    import BgImage from '../BgImage.svelte'
-    import { characters } from '../config/characters'
-    import { styles } from '../config/styles'
 
     let _nameInput: string = ''
     let _character: number = -1

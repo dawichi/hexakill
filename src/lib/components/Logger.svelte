@@ -4,8 +4,8 @@
   Diplays the log messages
 -->
 <script lang="ts">
-    import { logs } from './data/stores'
-    import type { LoggerDTO } from './types/Logger'
+    import { logs } from '$lib/data/stores'
+    import type { LoggerDTO } from '$lib/types/Logger'
 
     let _logs: LoggerDTO = {
         player: [],
@@ -23,7 +23,7 @@
             <div class="animate__animated animate__fadeIn mt-2">
                 <p class={idx < _logs.player.length - 4 ? 'opacity-25' : ''}>
                     <span class="text-green-400">{log.title}</span>
-                    {#if ('value' in log)}
+                    {#if 'value' in log}
                         <!-- Damage log -->
                         {#if log.message}
                             {log.message}
@@ -43,7 +43,7 @@
             <div class="animate__animated animate__fadeIn mt-2">
                 <p class={idx < _logs.enemy.length - 4 ? 'opacity-25' : ''}>
                     <span class="text-red-400">{log.title}</span>
-                    {#if ('value' in log)}
+                    {#if 'value' in log}
                         <!-- Damage log -->
                         {#if log.message}
                             {log.message}

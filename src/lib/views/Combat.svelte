@@ -8,8 +8,8 @@
     import { getPowerupProp, powerups } from '$lib/config/powerups'
     import { styles } from '$lib/config/styles'
     import { gameData, logs } from '$lib/data/stores'
-    import EntityView from '$lib/EntityView.svelte'
-    import Logger from '$lib/Logger.svelte'
+    import Entity from '$lib/components/Entity.svelte'
+    import Logger from '$lib/components/Logger.svelte'
     import type { Character, Enemy } from '$lib/models'
     import type { PersonalRecord } from '$lib/types/PersonalRecord'
     import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
@@ -302,11 +302,11 @@
                 </div>
 
                 {#if _player}
-                    <EntityView showing="character" />
+                    <Entity showing="character" />
                 {/if}
 
                 {#if _enemy}
-                    <EntityView showing="enemy" />
+                    <Entity showing="enemy" />
                 {:else if !_offerPowerUp}
                     <section class="bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center">
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
