@@ -9,6 +9,7 @@
     import BgImage from './BgImage.svelte'
     import { icons } from '$lib/config/icons'
     import { gameData } from '$lib/data/stores'
+    import { styles } from '$lib/config/styles'
     import { Character, type Enemy } from '$lib/models'
 
     export let showing: 'character' | 'enemy'
@@ -26,7 +27,7 @@
     }
 </script>
 
-<section class="animate__animated animate__fadeIn bg-zinc-900 shadow p-4 m-2 rounded relative">
+<section class={styles.cell + "animate__animated animate__fadeIn relative"}>
     <div class="h-full flex flex-col items-center justify-between">
         <h2 class="text-xl">
             {_entity.name} - lv {_entity.level}

@@ -4,7 +4,6 @@
     The view of the actual game, where the user can fight enemies.
 -->
 <script lang="ts">
-    import { getCharacterStyle } from '$lib/config/characters'
     import { getPowerupProp, powerups } from '$lib/config/powerups'
     import { styles } from '$lib/config/styles'
     import { gameData, logs } from '$lib/data/stores'
@@ -17,6 +16,7 @@
     import { localStorageService } from '$lib/utils/localStorageService'
     import { loggerCleaner } from '$lib/utils/loggerCleaner'
     import Icon from '@iconify/svelte'
+    import PersonalRecords from '$lib/components/PersonalRecords.svelte'
 
     // ╔══════════════════════════════════════════════════════
     // ║ Variables of the game
@@ -262,41 +262,17 @@
     ╚══════════════════════════════════════════════════════ -->
 <div class="text-center container mx-auto">
     <div class="animate__animated animate__fadeIn bg-zinc-900 lg:h-screen pt-20 pb-10 relative">
-        <h1 class="absolute top-0 left-0 text-3xl p-5 text-center text-white w-full tracking-widest">HEXAKILL</h1>
+        <h1 class="absolute top-0 text-3xl p-5 text-center w-full tracking-widest">HEXAKILL</h1>
         <!-- <nav class='absolute top-0 right-10 text-white'>
             <MusicToggle color={colorTheme} />
         </nav> -->
 
         <!-- Center section - 2 ROWS -->
-        <section class="bg-zinc-800 relative container mx-auto h-full grid grid-rows-2 grid-cols-1">
+        <section class="bg-zinc-800 h-full grid grid-rows-2 grid-cols-1">
             <!-- ROW 1 - 3 COLUMNS -->
             <div class="grid lg:grid-cols-3">
-                <div class="bg-zinc-900 shadow p-2 m-2 rounded grid grid-cols-2">
-                    <!-- Personal Records -->
-                    <div class="flex flex-col gap-2 p-2">
-                        <p class="flex justify-between">
-                            <span>Personal Record</span>
-                            {#if _personalRecords.length}
-                                <button
-                                    title="Delete all records"
-                                    on:click={() => {
-                                        localStorageService.clear()
-                                        _personalRecords = []
-                                    }}
-                                    class="bg-red-600 px-1 rounded"
-                                >
-                                    <i class="bi bi-x" />
-                                </button>
-                            {/if}
-                        </p>
-                        <hr />
-                        {#each _personalRecords as pr}
-                            <p class={'rounded flex justify-between px-2 ' + getCharacterStyle(pr.class)}>
-                                <span>{pr.name}</span>
-                                <span>lv {pr.record}</span>
-                            </p>
-                        {/each}
-                    </div>
+                <div class={styles.cell + "grid grid-cols-2"}>
+                    <PersonalRecords />
                     <!-- Items information -->
                     <div />
                 </div>
@@ -308,7 +284,7 @@
                 {#if _enemy}
                     <Entity showing="enemy" />
                 {:else if !_offerPowerUp}
-                    <section class="bg-zinc-900 shadow p-2 m-2 rounded flex justify-center items-center">
+                    <section class={styles.cell + "flex justify-center items-center"}>
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
                     </section>
                 {/if}
@@ -316,7 +292,7 @@
 
             <!-- ROW 2 - 2 COLUMNS -->
             <div class="grid lg:grid-cols-2 col-span-3">
-                <div class="bg-zinc-900 shadow p-2 m-2 rounded">
+                <div class={styles.cell}>
                     <div class="grid grid-cols-4 gap-3 p-4">
                         {#each Object.keys(_historyPowerUps) as powerupKey}
                             <div class="flex flex-col items-start p-1 rounded bg-zinc-700">
