@@ -5,39 +5,12 @@
   @param image - the URL to the image
 -->
 <script lang="ts">
-    import type { PersonalRecord } from "$lib/types/PersonalRecord"
+    import type { PersonalRecord } from '$lib/types/PersonalRecord'
     import { getCharacterStyle } from '$lib/config/characters'
+    import { localStorageService } from '$lib/services/localStorage.service'
 
-    const key = 'hxkllPersonalRecords'
-    let _personalRecords: PersonalRecord[] = get()
-
-    /**
-     * Get the personal records from localStorage
-     */
-    function get(): PersonalRecord[] {
-        const data = localStorage.getItem(key)
-        return data ? JSON.parse(data) : []
-    }
-
-    /**
-     * Add a new personal record to localStorage
-     */
-    function add(record: PersonalRecord) {
-        const data = localStorage.getItem(key)
-        const data_arr = data ? JSON.parse(data) : []
-        data_arr.push(record)
-        data_arr.sort((a: PersonalRecord, b: PersonalRecord) => b.record - a.record)
-        localStorage.setItem(key, JSON.stringify(data_arr.slice(0, 5)))
-    }
-
-    /**
-     * Clear the personal records from localStorage
-     */
-    function clear() {
-        localStorage.removeItem(key)
-    }
+    let _personalRecords: PersonalRecord[] = localStorageService.get()
 </script>
-
 
 <div class="flex flex-col gap-2 p-2">
     <p class="flex justify-between">
@@ -46,7 +19,7 @@
             <button
                 title="Delete all records"
                 on:click={() => {
-                    clear()
+                    localStorageService.clear()
                     _personalRecords = []
                 }}
                 class="bg-red-600 px-1 rounded"

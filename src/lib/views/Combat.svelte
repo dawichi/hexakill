@@ -4,19 +4,18 @@
     The view of the actual game, where the user can fight enemies.
 -->
 <script lang="ts">
-    import { getPowerupProp, powerups } from '$lib/config/powerups'
+    import Icon from '@iconify/svelte'
     import { styles } from '$lib/config/styles'
     import { gameData, logs } from '$lib/data/stores'
     import Entity from '$lib/components/Entity.svelte'
     import Logger from '$lib/components/Logger.svelte'
     import type { Character, Enemy } from '$lib/models'
-    import type { PersonalRecord } from '$lib/types/PersonalRecord'
-    import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
-    import { enemyGenerator } from '$lib/utils/enemyGenerator'
-    import { localStorageService } from '$lib/utils/localStorageService'
     import { loggerCleaner } from '$lib/utils/loggerCleaner'
-    import Icon from '@iconify/svelte'
+    import { enemyGenerator } from '$lib/utils/enemyGenerator'
+    import { getPowerupProp, powerups } from '$lib/config/powerups'
+    import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
+    import { localStorageService } from '$lib/services/localStorage.service'
 
     // ╔══════════════════════════════════════════════════════
     // ║ Variables of the game
@@ -25,20 +24,23 @@
     let _player: Character | null
     let _enemy: Enemy | null
 
-    // Helpers
-    let _fighting = false
-    let _showButtons = true
-    let _actionSelected: 0 | 1 | 2
-    let _offerPowerUp = false
-    let _offeredUpgrades = 0
-    let _historyPowerUps: { [key: string]: number } = {}
-    let _personalRecords: PersonalRecord[] = localStorageService.get()
-
     // Bind values
     gameData.subscribe(n => {
         _player = n.character
         _enemy = n.enemy
     })
+
+    // Helpers
+    let _fighting = false
+    let _showButtons = true
+    let _actionSelected: 0 | 1 | 2
+    let _powerUps: {
+        pending: number
+        history: { [key: string]: number }
+    } = {
+        pending: 0,
+        history: {},
+    }
 
     /**
      * ## Start Combat
@@ -177,7 +179,7 @@
     const enemyDefeat = () => {
         _fighting = false
         if (!_player || !_enemy) return
-        const exp = parseInt(((_enemy.level / _player.level) * 100).toFixed(0))
+        const exp = parseInt(((_enemy.level / _player.level) * 800).toFixed(0))
         const oldLevel = _player.level
         const leveledUp = _player.gainExp(exp)
 
@@ -192,8 +194,7 @@
                 message: `Well done, you have gained ${exp} exp!`,
             })
             if (leveledUp) {
-                _offeredUpgrades = oldLevel % 2 !== 0 ? ~~((_player.level - oldLevel) / 2) : parseInt(((_player.level - oldLevel) / 2).toFixed(0))
-                if (_offeredUpgrades) _offerPowerUp = true
+                _powerUps.pending = oldLevel % 2 !== 0 ? ~~((_player.level - oldLevel) / 2) : parseInt(((_player.level - oldLevel) / 2).toFixed(0))
                 loggerCleaner(n.player, {
                     title: '',
                     message: `You have leveled up! 🎉🎉`,
@@ -243,9 +244,8 @@
     }
 
     function handlePowerUp(type: 'health' | 'ad' | 'ap' | 'speed', value: number): void {
-        _offeredUpgrades -= 1
-        if (!_offeredUpgrades) _offerPowerUp = false
-        _historyPowerUps[type] ? (_historyPowerUps[type] += 1) : (_historyPowerUps[type] = 1)
+        _powerUps.pending -= 1
+        _powerUps.history[type] ? (_powerUps.history[type] += 1) : (_powerUps.history[type] = 1)
         if (!_player) return
         _player[type] += value
         gameData.update(n => n)
@@ -271,7 +271,7 @@
         <section class="bg-zinc-800 h-full grid grid-rows-2 grid-cols-1">
             <!-- ROW 1 - 3 COLUMNS -->
             <div class="grid lg:grid-cols-3">
-                <div class={styles.cell + "grid grid-cols-2"}>
+                <div class={styles.cell + 'grid grid-cols-2'}>
                     <PersonalRecords />
                     <!-- Items information -->
                     <div />
@@ -283,8 +283,8 @@
 
                 {#if _enemy}
                     <Entity showing="enemy" />
-                {:else if !_offerPowerUp}
-                    <section class={styles.cell + "flex justify-center items-center"}>
+                {:else if !_powerUps.pending}
+                    <section class={styles.cell + 'flex justify-center items-center'}>
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
                     </section>
                 {/if}
@@ -294,25 +294,25 @@
             <div class="grid lg:grid-cols-2 col-span-3">
                 <div class={styles.cell}>
                     <div class="grid grid-cols-4 gap-3 p-4">
-                        {#each Object.keys(_historyPowerUps) as powerupKey}
+                        {#each Object.keys(_powerUps.history) as powerupKey}
                             <div class="flex flex-col items-start p-1 rounded bg-zinc-700">
                                 <div class="flex items-center">
                                     <span class="text-3xl mr-4">
                                         <Icon icon={getPowerupProp(powerupKey, 'icon')} class={getPowerupProp(powerupKey, 'style')} />
                                     </span>
-                                    {#each [...Array(_historyPowerUps[powerupKey]).keys()] as _}
+                                    {#each [...Array(_powerUps.history[powerupKey]).keys()] as _}
                                         <span class="text-yellow-400"><Icon icon="ant-design:star-filled" /></span>
                                     {/each}
                                 </div>
-                                <span>{'+' + calcTotalPowerupValue(getPowerupProp(powerupKey, 'value'), _historyPowerUps[powerupKey])}</span>
+                                <span>{'+' + calcTotalPowerupValue(getPowerupProp(powerupKey, 'value'), _powerUps.history[powerupKey])}</span>
                             </div>
                         {/each}
                     </div>
-                    {#if _offeredUpgrades}
-                        <span class="text-xl">Choose upgrades -> Pending: {_offeredUpgrades}</span>
+                    {#if _powerUps.pending}
+                        <span class="text-xl">Choose upgrades -> Pending: {_powerUps.pending}</span>
                         <hr class="m-2" />
                     {/if}
-                    {#if _offerPowerUp}
+                    {#if _powerUps.pending}
                         <div class="grid lg:grid-cols-3 gap-1">
                             {#each powerups as powerup}
                                 <div>
