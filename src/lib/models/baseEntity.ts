@@ -5,11 +5,12 @@ const base = config.base
 
 export class BaseEntity {
     name: string
-    size: string
     level: number
+    size: string
     image: string
     dmgReceived: number
     health: number
+    potions: number
     ad: number
     ap: number
     armor: number
@@ -18,11 +19,12 @@ export class BaseEntity {
 
     constructor(level: number, name: string) {
         this.name = name
-        this.size = 'w-full h-full'
         this.level = level
+        this.size = 'w-full h-full'
         this.image = ''
         this.dmgReceived = 0
         this.health = level * base.health
+        this.potions = 5
         this.ad = level * base.ad
         this.ap = level * base.ap
         this.armor = level * base.armor
@@ -94,9 +96,10 @@ export class BaseEntity {
     }
 
     heal() {
+        this.potions -= 1
         const heal = numberBetween(
             this.dmgReceived * 0.10, // 10% of damage received
-            this.dmgReceived * 0.15, // 15% of damage received
+            this.dmgReceived * 0.30, // 30% of damage received
         )
         this.dmgReceived -= heal
         if (this.dmgReceived < 0) this.dmgReceived = 0

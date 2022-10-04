@@ -51,6 +51,7 @@
     function startCombat(): void {
         _fighting = true
         gameData.update(n => {
+            if (n.character) n.character.potions = 5
             n.enemy = enemyGenerator(_player?.level ?? 1)
             return n
         })
@@ -178,7 +179,7 @@
     const enemyDefeat = () => {
         _fighting = false
         if (!_player || !_enemy) return
-        const exp = parseInt(((_enemy.level / _player.level) * 800).toFixed(0))
+        const exp = parseInt(((_enemy.level / _player.level) * 100).toFixed(0))
         const oldLevel = _player.level
         const leveledUp = _player.gainExp(exp)
 
@@ -290,9 +291,11 @@
                                 <button disabled={!_showButtons} on:click={() => selectAction(1)} class={styles.button.base + styles.button.blue}>
                                     Magic
                                 </button>
-                                <button disabled={!_showButtons} on:click={() => selectAction(2)} class={styles.button.base + styles.button.green}>
-                                    Heal
-                                </button>
+                                {#if (_player?.potions ?? 0) > 0}
+                                    <button disabled={!_showButtons} on:click={() => selectAction(2)} class={styles.button.base + styles.button.green}>
+                                        Potion
+                                    </button>
+                                {/if}
                             </div>
                         </div>
                     {/if}

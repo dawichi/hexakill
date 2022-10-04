@@ -35,4 +35,9 @@ export const icons: Array<Icon> = [
         name: 'game-icons:boots',
         style: 'text-cyan-400',
     },
+    {
+        stat: 'potions',
+        name: 'game-icons:health-potion',
+        style: 'text-red-500',
+    }
 ]
