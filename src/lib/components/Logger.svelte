@@ -6,7 +6,7 @@
 <script lang="ts">
     import { logs } from '$lib/data/stores'
     import { styles } from '$lib/config/styles'
-    import type { LoggerDTO } from '$lib/types/Logger'
+    import type { LoggerDTO } from '$lib/types/Logger.dto'
 
     let _logs: LoggerDTO = {
         player: [],
@@ -27,16 +27,9 @@
                 <div class="animate__animated animate__fadeIn mt-2">
                     <p class={idx < _logs.player.length - 4 ? 'opacity-25' : ''}>
                         <span class="text-green-400">{log.title}</span>
+                        {log.message}
                         {#if 'value' in log}
-                            <!-- Damage log -->
-                            {#if log.message}
-                                {log.message}
-                            {:else}
-                                did <span class="text-red-400">{log.value}</span> damage! {log.icon}
-                            {/if}
-                        {:else}
-                            <!-- Normal log -->
-                            {log.message}
+                            did <span class="text-red-400">{log.value}</span> damage! {log.icon}
                         {/if}
                     </p>
                 </div>
@@ -47,16 +40,9 @@
                 <div class="animate__animated animate__fadeIn mt-2">
                     <p class={idx < _logs.enemy.length - 4 ? 'opacity-25' : ''}>
                         <span class="text-red-400">{log.title}</span>
+                        {log.message}
                         {#if 'value' in log}
-                            <!-- Damage log -->
-                            {#if log.message}
-                                {log.message}
-                            {:else}
-                                did <span class="text-blue-400">{log.value}</span> damage! {log.icon}
-                            {/if}
-                        {:else}
-                            <!-- Normal log -->
-                            {log.message}
+                            did <span class="text-blue-400">{log.value}</span> damage! {log.icon}
                         {/if}
                     </p>
                 </div>

@@ -1,7 +1,7 @@
-import type { Enemy } from "$lib/models"
+import type { BaseEntity } from "$lib/models"
 
 type Icon = {
-    stat: keyof Enemy
+    stat: keyof BaseEntity
     name: string
     style: string
 }

@@ -22,11 +22,13 @@
     // Values binded to global store
     let _player: Character | null
     let _enemy: Enemy | null
+    let _characterIdx: number
 
     // Bind values
     gameData.subscribe(n => {
         _player = n.character
         _enemy = n.enemy
+        _characterIdx = n.characterIdx
     })
 
     // Helpers
@@ -223,7 +225,7 @@
             return n
         })
         localStorageService.add({
-            class: 'Wizard',
+            classIdx: _characterIdx,
             name: _player?.name ?? '',
             record: _player?.level ?? 0,
         })

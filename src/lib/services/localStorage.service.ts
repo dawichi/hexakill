@@ -1,4 +1,4 @@
-import type { PersonalRecord } from '$lib/types/PersonalRecord'
+import type { PersonalRecord } from '$lib/types/PersonalRecord.dto'
 
 const key = 'hxkllPersonalRecords'
 

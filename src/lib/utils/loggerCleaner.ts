@@ -1,4 +1,4 @@
-import type { DamageLog, GeneralLog } from '$lib/types/Logger'
+import type { LogDTO } from '$lib/types/Logger.dto'
 
 /**
  * ## Cleans the old logs to update the store
@@ -6,7 +6,7 @@ import type { DamageLog, GeneralLog } from '$lib/types/Logger'
  * @param newLog - The new log to add
  * @returns The cleaned logs
  */
-export const loggerCleaner = (logs: DamageLog[] | GeneralLog[], newLog: GeneralLog | DamageLog): DamageLog[] | GeneralLog[] => {
+export const loggerCleaner = (logs: LogDTO[], newLog: LogDTO): LogDTO[] => {
     if (logs.length >= 8) {
         logs.shift()
     }

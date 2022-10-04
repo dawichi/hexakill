@@ -1,5 +1,5 @@
 export type PersonalRecord = {
-    class: 'Wizard' | 'Samurai' | 'Warrior'
+    classIdx: number
     name: string
     record: number
 }

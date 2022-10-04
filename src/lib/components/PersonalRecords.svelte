@@ -4,8 +4,8 @@
   Display a list of personal records (stored in localStorage)
 -->
 <script lang="ts">
-    import type { PersonalRecord } from '$lib/types/PersonalRecord'
-    import { getCharacterStyle } from '$lib/config/characters'
+    import type { PersonalRecord } from '$lib/types/PersonalRecord.dto'
+    import { characters } from '$lib/config/characters'
     import { localStorageService } from '$lib/services/localStorage.service'
 
     let _personalRecords: PersonalRecord[] = localStorageService.get()
@@ -28,8 +28,9 @@
         {/if}
     </p>
     <hr />
+
     {#each _personalRecords as pr}
-        <p class={'rounded flex justify-between px-2 ' + getCharacterStyle(pr.class)}>
+        <p class={'rounded flex justify-between px-2 ' + characters[pr.classIdx].bg}>
             <span>{pr.name}</span>
             <span>lv {pr.record}</span>
         </p>

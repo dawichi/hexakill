@@ -1,6 +1,6 @@
 import { writable, type Writable } from 'svelte/store'
-import type { Game } from '$lib/types/Game'
-import type { LoggerDTO } from '$lib/types/Logger'
+import type { Game } from '$lib/types/Game.dto'
+import type { LoggerDTO } from '$lib/types/Logger.dto'
 
 export const gameData: Writable<Game> = writable({
     step: 'welcome',
