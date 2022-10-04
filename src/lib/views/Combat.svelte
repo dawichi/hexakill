@@ -4,7 +4,6 @@
     The view of the actual game, where the user can fight enemies.
 -->
 <script lang="ts">
-    import Icon from '@iconify/svelte'
     import { styles } from '$lib/config/styles'
     import { gameData, logs } from '$lib/data/stores'
     import Entity from '$lib/components/Entity.svelte'
@@ -12,10 +11,10 @@
     import type { Character, Enemy } from '$lib/models'
     import { loggerCleaner } from '$lib/utils/loggerCleaner'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
-    import { getPowerupProp, powerups } from '$lib/config/powerups'
     import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
     import { localStorageService } from '$lib/services/localStorage.service'
+    import PowerUps from '$lib/components/PowerUps.svelte'
 
     // ╔══════════════════════════════════════════════════════
     // ║ Variables of the game
@@ -242,19 +241,6 @@
             })
         }, 8000)
     }
-
-    function handlePowerUp(type: 'health' | 'ad' | 'ap' | 'speed', value: number): void {
-        _powerUps.pending -= 1
-        _powerUps.history[type] ? (_powerUps.history[type] += 1) : (_powerUps.history[type] = 1)
-        if (!_player) return
-        _player[type] += value
-        gameData.update(n => n)
-    }
-
-    function calcTotalPowerupValue(value: number | string, quantity: number): number {
-        if (typeof value === 'string') value = parseInt(value)
-        return value * quantity
-    }
 </script>
 
 <!--╔══════════════════════════════════════════════════════
@@ -278,11 +264,11 @@
                 </div>
 
                 {#if _player}
-                    <Entity showing="character" />
+                    <Entity type="character" />
                 {/if}
 
                 {#if _enemy}
-                    <Entity showing="enemy" />
+                    <Entity type="enemy" />
                 {:else if !_powerUps.pending}
                     <section class={styles.cell + 'flex justify-center items-center'}>
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
@@ -293,43 +279,7 @@
             <!-- ROW 2 - 2 COLUMNS -->
             <div class="grid lg:grid-cols-2 col-span-3">
                 <div class={styles.cell}>
-                    <div class="grid grid-cols-4 gap-3 p-4">
-                        {#each Object.keys(_powerUps.history) as powerupKey}
-                            <div class="flex flex-col items-start p-1 rounded bg-zinc-700">
-                                <div class="flex items-center">
-                                    <span class="text-3xl mr-4">
-                                        <Icon icon={getPowerupProp(powerupKey, 'icon')} class={getPowerupProp(powerupKey, 'style')} />
-                                    </span>
-                                    {#each [...Array(_powerUps.history[powerupKey]).keys()] as _}
-                                        <span class="text-yellow-400"><Icon icon="ant-design:star-filled" /></span>
-                                    {/each}
-                                </div>
-                                <span>{'+' + calcTotalPowerupValue(getPowerupProp(powerupKey, 'value'), _powerUps.history[powerupKey])}</span>
-                            </div>
-                        {/each}
-                    </div>
-                    {#if _powerUps.pending}
-                        <span class="text-xl">Choose upgrades -> Pending: {_powerUps.pending}</span>
-                        <hr class="m-2" />
-                    {/if}
-                    {#if _powerUps.pending}
-                        <div class="grid lg:grid-cols-3 gap-1">
-                            {#each powerups as powerup}
-                                <div>
-                                    <button
-                                        on:click={() => handlePowerUp(powerup.type, powerup.value)}
-                                        class="border rounded m-2 p-4 flex items-center bg-zinc-800 hover:bg-zinc-700 w-4/5"
-                                    >
-                                        <span class="text-3xl mr-4"><Icon icon={powerup.icon} class={powerup.style} /></span>
-                                        <span>{powerup.title} </span>
-                                    </button>
-                                    <p>
-                                        Increase {powerup.title} by {powerup.value}
-                                    </p>
-                                </div>
-                            {/each}
-                        </div>
-                    {/if}
+                    <PowerUps {_powerUps} />
                     {#if _fighting}
                         <div>
                             <h4 class="text-center text-lg p-2 mt-8">What do you want to do?</h4>

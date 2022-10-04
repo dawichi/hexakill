@@ -2,7 +2,6 @@
   @component
   ## PersonalRecords
   Display a list of personal records (stored in localStorage)
-  @param image - the URL to the image
 -->
 <script lang="ts">
     import type { PersonalRecord } from '$lib/types/PersonalRecord'

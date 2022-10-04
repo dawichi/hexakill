@@ -2,7 +2,7 @@
   @component
   ## Entity
   Display the entity data
-  @param entity - The entity to display
+  @param type - The type of entity to display
 -->
 <script lang="ts">
     import Icon from '@iconify/svelte'
@@ -12,11 +12,11 @@
     import { styles } from '$lib/config/styles'
     import { Character, type Enemy } from '$lib/models'
 
-    export let showing: 'character' | 'enemy'
+    export let type: 'character' | 'enemy'
     let _entity: Character | Enemy
 
     gameData.subscribe(n => {
-        const e = n[showing]
+        const e = n[type]
         if (e) _entity = e
     })
 
