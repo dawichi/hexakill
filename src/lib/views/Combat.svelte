@@ -347,11 +347,7 @@
                         </div>
                     {/if}
                 </div>
-                <div class="bg-zinc-900 shadow p-2 m-2 rounded relative">
-                    <h4 class="text-center text-lg p-2">Info</h4>
-                    <hr />
-                    <Logger />
-                </div>
+                <Logger />
             </div>
         </section>
     </div>
