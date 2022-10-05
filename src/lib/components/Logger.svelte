@@ -28,7 +28,7 @@
                     <p class={idx < _logs.player.length - 4 ? 'opacity-25' : ''}>
                         <span class="text-green-400">{log.title}</span>
                         {log.message}
-                        {#if 'value' in log}
+                        {#if log.value !== undefined}
                             did <span class="text-red-400">{log.value}</span> damage! {log.icon}
                         {/if}
                     </p>
@@ -41,7 +41,7 @@
                     <p class={idx < _logs.enemy.length - 4 ? 'opacity-25' : ''}>
                         <span class="text-red-400">{log.title}</span>
                         {log.message}
-                        {#if 'value' in log}
+                        {#if log.value !== undefined}
                             did <span class="text-blue-400">{log.value}</span> damage! {log.icon}
                         {/if}
                     </p>
