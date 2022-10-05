@@ -10,7 +10,7 @@ A simple RPG game made with [NextJS](https://nextjs.org/) !
 
 #### Description
 
-Allows to use 3 different characters to fight +12 enemies, with each own stats and action preferences. Defeat the enemies to increase your level and power, and try to reach as much level as possible without die!
+It allows you to use 3 different characters to fight +12 enemies, each of them with their own stats and action preferences. Defeat the enemies to increase your level and power, and try to reach the highest level possible without dying!
 
 
 🎉🎉🎉 Check it on [hexakill.vercel.app](https://hexakill.vercel.app)
