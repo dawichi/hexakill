@@ -7,5 +7,5 @@ export const styles = {
         red: 'from-red-500 to-red-900 hover:from-red-700 hover:to-red-900 ',
         amber: 'from-amber-500 to-amber-900 hover:from-amber-700 hover:to-amber-900 ',
         green: 'from-green-500 to-green-900 hover:from-green-700 hover:to-green-900 ',
-    }
+    },
 }

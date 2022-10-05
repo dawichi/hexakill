@@ -6,7 +6,7 @@ export function enemyActionChoice(enemy: Enemy): 0 | 1 | 2 {
 
     // If no potions available or HP > 60%, never heals
     if (!enemy.potions || currentHP >= 0.6) return enemy_action <= 0.5 ? 0 : 1
-    
+
     // If HP < 10%, always heals
     if (currentHP <= 0.1) return 2
 

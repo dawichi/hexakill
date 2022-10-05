@@ -1,4 +1,4 @@
-import type { BaseEntity } from "$lib/models"
+import type { BaseEntity } from '$lib/models'
 
 type Icon = {
     stat: keyof BaseEntity
@@ -39,5 +39,5 @@ export const icons: Array<Icon> = [
         stat: 'potions',
         name: 'game-icons:health-potion',
         style: 'text-red-500',
-    }
+    },
 ]
