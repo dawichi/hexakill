@@ -23,17 +23,36 @@
         _player = n.character
     })
 
-    function handlePowerUp(type: 'health' | 'ad' | 'ap' | 'speed', value: number): void {
-        _powerUps.pending -= 1
-        _powerUps.history[type] ? (_powerUps.history[type] += 1) : (_powerUps.history[type] = 1)
-        if (!_player) return
-        _player[type] += value
-        gameData.update(n => n)
+    /**
+     * ## Get Bonus
+     * Increment powerup values each time
+     * @param base Base value
+     * @param quantity Quantity of powerups
+     */
+    function getBonus(base: string | number, quantity: number): number {
+        base = parseInt(base as string)
+        return base * 2 ** (quantity ?? 0)
     }
 
-    function calcTotalPowerupValue(value: number | string, quantity: number): number {
-        if (typeof value === 'string') value = parseInt(value)
-        return value * quantity
+    function getAccBonus(stat: string, quantity: number): number {
+        const base = getPowerupProp(stat, 'value')
+        if (typeof base === 'string') throw new Error('Invalid value')
+        let total = 0
+        for (let i = 0; i < quantity; i++) {
+            total += getBonus(base, i)
+        }
+        return total
+    }
+
+    function handlePowerUp(type: 'health' | 'ad' | 'ap' | 'speed', value: number): void {
+        if (!_player) return
+        _powerUps.pending -= 1
+        if (!_powerUps.history[type]) {
+            _powerUps.history[type] = 0
+        }
+        _player[type] += getBonus(value, _powerUps.history[type])
+        _powerUps.history[type] += 1
+        gameData.update(n => n)
     }
 </script>
 
@@ -49,7 +68,7 @@
                         <span class="text-yellow-400"><Icon icon="ant-design:star-filled" /></span>
                     {/each}
                 </div>
-                <span>{'+' + calcTotalPowerupValue(getPowerupProp(powerupKey, 'value'), _powerUps.history[powerupKey])}</span>
+                <span>{'+' + getAccBonus(powerupKey, _powerUps.history[powerupKey])}</span>
             </div>
         {/each}
     </div>
@@ -60,18 +79,18 @@
         <div class="grid lg:grid-cols-3 gap-4 p-2">
             {#each powerups as powerup}
                 {#if !_powerUps.history[powerup.type] || _powerUps.history[powerup.type] < 6}
-                <div>
-                    <button
-                        on:click={() => handlePowerUp(powerup.type, powerup.value)}
-                        class="w-full border rounded p-2 flex items-center bg-zinc-800 hover:bg-zinc-700"
-                    >
-                        <span class="text-3xl mr-4"><Icon icon={powerup.icon} class={powerup.style} /></span>
-                        <p class="flex flex-col">
-                            <span>{powerup.title}</span>
-                            <span class="text-sm">+{powerup.value}</span>
-                        </p>
-                    </button>
-                </div>
+                    <div>
+                        <button
+                            on:click={() => handlePowerUp(powerup.type, powerup.value)}
+                            class="w-full border rounded p-2 flex items-center bg-zinc-800 hover:bg-zinc-700"
+                        >
+                            <span class="text-3xl mr-4"><Icon icon={powerup.icon} class={powerup.style} /></span>
+                            <p class="flex flex-col">
+                                <span>{powerup.title}</span>
+                                <span class="text-sm">+{getBonus(powerup.value, _powerUps.history[powerup.type])}</span>
+                            </p>
+                        </button>
+                    </div>
                 {/if}
             {/each}
         </div>
