@@ -33,7 +33,6 @@
 
     // Helpers
     let _fighting = false
-    let _defeated = false
     let _showButtons = true
     let _actionSelected: 0 | 1 | 2
     let _powerUps: {
@@ -212,24 +211,12 @@
             })
         }, 2000)
     }
-    function retry() {
-        _defeated = false
-        logs.set({
-            player: [],
-            enemy: [],
-        })
-        gameData.update(n => {
-            n.step = 'starting'
-            return n
-        })
-    }
+
     // ╔══════════════════════════════════════════════════════
     // ║ ❌ PLAYER DEFEATED
     // ╚══════════════════════════════════════════════════════
     const playerDefeat = () => {
         _fighting = false
-        _defeated = true
-        _powerUps.history = {}
         logs.update(n => {
             loggerCleaner(n.player, {
                 title: 'Oh no!',
@@ -242,10 +229,12 @@
             name: _player?.name ?? '',
             record: _player?.level ?? 0,
         })
-        gameData.update(n => {
-            n.enemy = null
-            return n
-        })
+        setTimeout(() => {
+            gameData.update(n => {
+                n.step = 'gameover'
+                return n
+            })
+        }, 2000)
     }
 </script>
 
@@ -275,10 +264,6 @@
 
                 {#if _enemy}
                     <Entity type="enemy" />
-                {:else if _defeated}
-                    <section class={styles.cell + 'flex justify-center items-center'}>
-                        <button on:click={retry} class={styles.button.base + styles.button.red}> Try again? </button>
-                    </section>
                 {:else if !_powerUps.pending}
                     <section class={styles.cell + 'flex justify-center items-center'}>
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>

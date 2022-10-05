@@ -1,6 +1,7 @@
 <script lang="ts">
     import { gameData } from '$lib/data/stores'
     import Combat from '$lib/views/Combat.svelte'
+    import GameOver from '$lib/views/GameOver.svelte'
     import Starting from '$lib/views/Starting.svelte'
     import Welcome from '$lib/views/Welcome.svelte'
 
@@ -18,5 +19,7 @@
         <Starting />
     {:else if step === 'playing'}
         <Combat />
+    {:else if step === 'gameover'}
+        <GameOver />
     {/if}
 </div>

@@ -1,7 +1,7 @@
 import type { Character, Enemy } from '$lib/models'
 
 export type Game = {
-    step: 'welcome' | 'starting' | 'playing' | 'end'
+    step: 'welcome' | 'starting' | 'playing' | 'gameover'
     username: string
     characterIdx: number
     character: Character | null
