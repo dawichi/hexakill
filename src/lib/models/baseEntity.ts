@@ -1,9 +1,10 @@
+import { calcDmgReduction } from '$lib/utils/calcDmgReduction'
 import { numberBetween } from '$lib/utils/numberBetween'
 import { config } from '.'
 
 const base = config.base
 
-export class BaseEntity {
+export abstract class BaseEntity {
     name: string
     level: number
     size: string
@@ -37,7 +38,6 @@ export class BaseEntity {
      * @param damage damage to apply
      */
     private _getDamage(damage: number): number {
-        if (damage < 0) damage = 0
         this.dmgReceived += damage
         // If dies, HP counter shows 0 HP, not negative HP
         if (this.dmgReceived > this.health) this.dmgReceived = this.health
@@ -45,11 +45,11 @@ export class BaseEntity {
     }
 
     receiveAttack(damage: number): number {
-        return this._getDamage(damage - this.armor)
+        return this._getDamage(calcDmgReduction(damage, this.armor))
     }
 
     receiveMagic(damage: number): number {
-        return this._getDamage(damage - this.mr)
+        return this._getDamage(calcDmgReduction(damage, this.mr))
     }
 
     /**
@@ -98,8 +98,8 @@ export class BaseEntity {
     heal() {
         this.potions -= 1
         const heal = numberBetween(
-            this.dmgReceived * 0.10, // 10% of damage received
-            this.dmgReceived * 0.30, // 30% of damage received
+            this.dmgReceived * 0.1, // 10% of damage received
+            this.dmgReceived * 0.3, // 30% of damage received
         )
         this.dmgReceived -= heal
         if (this.dmgReceived < 0) this.dmgReceived = 0

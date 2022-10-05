@@ -11,6 +11,7 @@
     import { gameData } from '$lib/data/stores'
     import { styles } from '$lib/config/styles'
     import { Character, type Enemy } from '$lib/models'
+    import { calcDmgReductionPercent } from '$lib/utils/calcDmgReduction'
 
     export let type: 'character' | 'enemy'
     let _entity: Character | Enemy
@@ -25,9 +26,15 @@
         if (hpWidth > 10 && hpWidth <= 40) return 'bg-yellow-600'
         return 'bg-green-600'
     }
+
+    const statTitle = (stat: string): string => {
+        if (stat === 'armor') return `Armor - attacks reduced by ${calcDmgReductionPercent(_entity.armor)}%`
+        if (stat === 'mr') return `MR - magics reduced by ${calcDmgReductionPercent(_entity.mr)}%`
+        return stat
+    }
 </script>
 
-<section class={styles.cell + "animate__animated animate__fadeIn relative"}>
+<section class={styles.cell + 'animate__animated animate__fadeIn relative'}>
     <div class="h-full flex flex-col items-center justify-between">
         <h2 class="text-xl">
             {_entity.name} - lv {_entity.level}
@@ -57,7 +64,7 @@
     </div>
     <div class="absolute top-0 left-0 m-5 rounded ">
         {#each icons as icon}
-            <p class="flex items-center text-lg p-1" title={icon.stat}>
+            <p class="flex items-center text-lg p-1" title={statTitle(icon.stat)}>
                 <span class="text-3xl">
                     <Icon icon={icon.name} class={icon.style} />
                 </span>
