@@ -1,8 +1,9 @@
 import { writable, type Writable } from 'svelte/store'
-import type { Game } from '$lib/types/Game.dto'
+import type { GameDTO } from '$lib/types/Game.dto'
 import type { LoggerDTO } from '$lib/types/Logger.dto'
+import type { EnemyHistory } from '$lib/types/EnemyHistory.dto'
 
-export const gameData: Writable<Game> = writable({
+export const gameData: Writable<GameDTO> = writable({
     step: 'welcome',
     username: '',
     characterIdx: -1,
@@ -14,3 +15,5 @@ export const logs: Writable<LoggerDTO> = writable({
     player: [],
     enemy: [],
 })
+
+export const enemiesHistory: Writable<EnemyHistory[]> = writable([])

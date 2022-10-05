@@ -4,26 +4,24 @@
     This component is used to show the game over screen.
 -->
 <script lang="ts">
+    import type { Character } from '$lib/models'
+    import type { EnemyHistory } from '$lib/types/EnemyHistory.dto'
+    
     import Icon from '@iconify/svelte'
     import { icons } from '$lib/config/icons'
     import { styles } from '$lib/config/styles'
-    import { gameData, logs } from '$lib/data/stores'
     import BgImage from '$lib/components/BgImage.svelte'
+    import { enemiesHistory, gameData, logs } from '$lib/data/stores'
 
-    import {Adventurer,Archer,ArmoredHuntress,BringerOfDeath,Character,EvilTree,EvilWizard,FireKnight,FireWorm,Knight,Martial,Slime,WaterPriestess,WildHuntress,WitchBlue} from '$lib/models'
-    import { numberBetween } from '$lib/utils/numberBetween'
     let _entity: Character
-    const enemies_pool = [Adventurer,EvilTree,FireKnight,FireWorm,Knight,Martial,Slime,Archer,ArmoredHuntress,BringerOfDeath,EvilWizard,WaterPriestess,WildHuntress,WitchBlue]
-    let _history = enemies_pool.map((enemy) => {
-        const a = new enemy(numberBetween(5, 28), '')
-        return {
-            image: a.image,
-            level: a.level,
-        }
-    })
+    let _history: Array<EnemyHistory>
     
     gameData.subscribe(n => {
         if (n.character) _entity = n.character
+    })
+
+    enemiesHistory.subscribe(n => {
+        _history = n
     })
     
     function retry() {
@@ -38,6 +36,7 @@
             player: [],
             enemy: [],
         })
+        enemiesHistory.set([])
     }
 </script>
 
@@ -84,12 +83,12 @@
     
     <!-- ENEMIES HISTORY -->
     <section class={styles.cell + 'flex flex-col animate__animated animate__fadeIn animate__slower  animate__delay-4s'}>
-        <h2 class="text-xl">Enemies killed:</h2>
+        <h2 class="text-xl tracking-wider">Enemies killed:</h2>
         <hr/>
         <div class="flex flex-wrap">
             {#each _history as enemy}
                 <div class="flex flex-col">
-                    <div class="relative w-16 h-16">
+                    <div class="relative w-20 h-20">
                         <BgImage image={`/images/${enemy.image}/idle.gif`} />
                     </div>
                     <span>lv {enemy.level}</span>

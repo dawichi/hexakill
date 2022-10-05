@@ -1,6 +1,6 @@
 import type { Character, Enemy } from '$lib/models'
 
-export type Game = {
+export type GameDTO = {
     step: 'welcome' | 'starting' | 'playing' | 'gameover'
     username: string
     characterIdx: number

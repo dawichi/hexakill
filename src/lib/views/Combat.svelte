@@ -5,7 +5,7 @@
 -->
 <script lang="ts">
     import { styles } from '$lib/config/styles'
-    import { gameData, logs } from '$lib/data/stores'
+    import { enemiesHistory, gameData, logs } from '$lib/data/stores'
     import Entity from '$lib/components/Entity.svelte'
     import Logger from '$lib/components/Logger.svelte'
     import type { Character, Enemy } from '$lib/models'
@@ -204,6 +204,16 @@
             }
             return n
         })
+
+        enemiesHistory.update(n => {
+            if (!_enemy) return n
+            n.push({
+                image: _enemy.image,
+                level: _enemy.level,
+            })
+            return n
+        })
+
         setTimeout(() => {
             gameData.update(n => {
                 n.enemy = null
