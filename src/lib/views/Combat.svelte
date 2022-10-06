@@ -53,7 +53,7 @@
     function startCombat(): void {
         _fighting = true
         gameData.update(n => {
-            if (n.character) n.character.potions = 5
+            if (n.character) n.character.potions += 2
             n.enemy = enemyGenerator(_player?.level ?? 1)
             return n
         })
@@ -129,6 +129,19 @@
         }, 1000)
     }
 
+
+    function onKeyDown(event: any): void {
+        if (!_fighting) {
+            if (event.keyCode === 32) startCombat()
+            return
+        }
+        if (!_showButtons) return
+        
+        if (event.keyCode === 65) selectAction(0)
+        if (event.keyCode === 83) selectAction(1)
+        if (!(_player?.potions ?? 0)) return
+        if (event.keyCode === 68) selectAction(2)
+    }
     /**
      * ## Execute Actions
      * @param active - The one who deals the damage
@@ -247,6 +260,8 @@
         }, 2000)
     }
 </script>
+
+<svelte:window on:keydown|preventDefault={onKeyDown} />
 
 <!--╔══════════════════════════════════════════════════════
     ║ 💻 Game view
