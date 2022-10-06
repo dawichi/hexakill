@@ -8,6 +8,7 @@
     import { enemiesHistory, gameData, logs } from '$lib/data/stores'
     import Entity from '$lib/components/Entity.svelte'
     import Logger from '$lib/components/Logger.svelte'
+    import Items from '$lib/components/Items.svelte'
     import type { Character, Enemy } from '$lib/models'
     import { loggerCleaner } from '$lib/utils/loggerCleaner'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
@@ -32,7 +33,7 @@
     })
 
     // Helpers
-    let _fighting = false
+    let _fighting = false 
     let _showButtons = true
     let _actionSelected: 0 | 1 | 2
     let _powerUps: {
@@ -54,7 +55,8 @@
         _fighting = true
         gameData.update(n => {
             if (n.character) n.character.potions = 5
-            n.enemy = enemyGenerator(_player?.level ?? 1)
+            if ((_player?.level ?? 1) > 10) n.enemy = enemyGenerator(_player?.level ?? 1, true)
+            else n.enemy = enemyGenerator(_player?.level ?? 1)
             return n
         })
 
@@ -181,7 +183,7 @@
     const enemyDefeat = () => {
         _fighting = false
         if (!_player || !_enemy) return
-        const exp = parseInt(((_enemy.level / _player.level) * 100).toFixed(0))
+        const exp = parseInt(((_enemy.level / _player.level) * 1000).toFixed(0))
         const oldLevel = _player.level
         const leveledUp = _player.gainExp(exp)
 
@@ -264,16 +266,15 @@
             <div class="grid lg:grid-cols-3">
                 <div class={styles.cell + 'grid grid-cols-2'}>
                     <PersonalRecords />
-                    <!-- Items information -->
-                    <div />
+                    <Items/>
                 </div>
 
                 {#if _player}
-                    <Entity type="character" />
+                    <Entity type="character" move="idle"/>
                 {/if}
 
                 {#if _enemy}
-                    <Entity type="enemy" />
+                    <Entity type="enemy" move="idle"/>
                 {:else if !_powerUps.pending}
                     <section class={styles.cell + 'flex justify-center items-center'}>
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>

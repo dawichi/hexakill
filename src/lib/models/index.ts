@@ -37,3 +37,8 @@ export { default as EvilTree } from './enemies/EvilTree'
 export { default as ArmoredHuntress } from './enemies/ArmoredHuntress'
 export { default as BringerOfDeath } from './enemies/BringerOfDeath'
 export { default as FireKnight } from './enemies/FireKnight'
+
+// ╔══════════════════════════════════════════════════════
+// ║ Bosses
+// ╚══════════════════════════════════════════════════════
+export { default as IceGolem } from './enemies/IceGolem'
