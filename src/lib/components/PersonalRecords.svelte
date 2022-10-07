@@ -30,7 +30,7 @@
     <hr />
 
     {#each _personalRecords as pr}
-        <p class={'rounded flex justify-between px-2 ' + characters[pr.classIdx].bg}>
+        <p class={'rounded flex justify-between px-2 ' + characters[pr.classIdx].data.bg}>
             <span>{pr.name}</span>
             <span>lv {pr.record}</span>
         </p>

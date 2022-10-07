@@ -8,7 +8,7 @@
     import { enemiesHistory, gameData, logs } from '$lib/data/stores'
     import Entity from '$lib/components/Entity.svelte'
     import Logger from '$lib/components/Logger.svelte'
-    import type { Character, Enemy } from '$lib/models'
+    import { Character, Enemy } from '$lib/models'
     import { loggerCleaner } from '$lib/utils/loggerCleaner'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
     import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
@@ -148,9 +148,8 @@
      * @param passive - The one who receives the damage
      */
     function executeActions(active: Character | Enemy, passive: Character | Enemy): void {
-        const is_a_player: boolean = 'exp' in active
-        const entity = is_a_player ? 'player' : 'enemy'
-        const choice = is_a_player ? _actionSelected : enemyActionChoice(active)
+        const active_is_a_player: boolean = active instanceof Character
+        const choice = active instanceof Enemy ? enemyActionChoice(active) : _actionSelected
 
         let damage: number
         let dmgReceived: number
@@ -178,7 +177,7 @@
 
         gameData.update(n => n)
         logs.update(n => {
-            loggerCleaner(n[entity], {
+            loggerCleaner(n[active_is_a_player ? 'player' : 'enemy'], {
                 title: active.name,
                 message: message,
                 value: dmgReceived,
