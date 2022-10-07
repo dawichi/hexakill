@@ -7,15 +7,9 @@ export { default as BaseEntity } from './baseEntity'
 // ╔══════════════════════════════════════════════════════
 // ║ Character and Enemy base
 // ╚══════════════════════════════════════════════════════
-export { default as Character } from './characters/Character'
+export { default as Character } from './Character'
 export { default as Enemy } from './enemies/BaseEnemy'
 
-// ╔══════════════════════════════════════════════════════
-// ║ Characters
-// ╚══════════════════════════════════════════════════════
-export { default as Wizard } from './characters/Wizard'
-export { default as Samurai } from './characters/Samurai'
-export { default as Warrior } from './characters/Warrior'
 
 // ╔══════════════════════════════════════════════════════
 // ║ Enemies

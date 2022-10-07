@@ -8,11 +8,10 @@
     import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/stores'
     import { characters } from '$lib/config/characters'
-    import { Samurai, Warrior, Wizard } from '$lib/models'
+    import { Character } from '$lib/models'
 
     let _nameInput: string = ''
     let _character: number = -1
-    
 
     gameData.subscribe(n => {
         _character = n.characterIdx
@@ -26,10 +25,9 @@
     }
 
     function start() {
-        const charactersAvailable = [Wizard, Samurai, Warrior]
         gameData.update(n => {
             n.step = 'playing'
-            n.character = new charactersAvailable[_character](4, _nameInput)
+            n.character = new Character(4, _nameInput, characters[_character])
             return n
         })
     }
@@ -46,22 +44,22 @@
         <div class="container mx-auto max-w-3xl grid lg:grid-cols-3">
             {#each characters as character, idx}
                 <div
-                    class={`${character.bg} m-2 p-4 cursor-pointer rounded-lg ${idx === _character ? character.shadow : ''}`}
+                    class={`${character.data.bg} m-2 p-4 cursor-pointer rounded-lg ${idx === _character ? character.data.shadow : ''}`}
                     on:click={() => setCharacter(idx)}
                 >
                     <h4 class="text-xl">{character.name}</h4>
                     <hr class="my-2" />
-                    <p>{character.desc}</p>
-                    <p>({character.subDesc})</p>
-                    <div class={`relative m-auto mt-2 ${character.size}`}>
-                        <BgImage image={`/images/${character.imgPath}/idle.gif`} />
+                    <p>{character.data.desc}</p>
+                    <p>({character.data.subDesc})</p>
+                    <div class="relative m-auto mt-2 h-64 p-4">
+                        <BgImage image={`/images/${character.name.toLocaleLowerCase()}/idle.gif`} />
                     </div>
                 </div>
             {/each}
         </div>
 
         {#if _character > -1}
-            <button on:click={start} class={'mt-16 ' + styles.button.base + styles.button[characters[_character]?.color]}> START GAME </button>
+            <button on:click={start} class={'mt-16 ' + styles.button.base + styles.button[characters[_character]?.data.color]}> START GAME </button>
         {/if}
     {/if}
 </section>
