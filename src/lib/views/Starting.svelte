@@ -41,16 +41,16 @@
         <input placeholder="Player name" bind:value={_nameInput} class="bg-zinc-700 p-2 w-64 h-12 rounded" />
     </div>
 
-    {#if _nameInput.length >= 3}
-        <h3 class='text-xl mt-10'>Great! Now select your class.</h3>
+    {#if _nameInput.length >= 3 && _nameInput.length <= 14}
+        <h3 class="text-xl mt-10">Great! Now select your class.</h3>
         <div class="container mx-auto max-w-3xl grid lg:grid-cols-3">
             {#each characters as character, idx}
                 <div
                     class={`${character.bg} m-2 p-4 cursor-pointer rounded-lg ${idx === _character ? character.shadow : ''}`}
                     on:click={() => setCharacter(idx)}
                 >
-                    <h4 class='text-xl'>{character.name}</h4>
-                    <hr class='my-2' />
+                    <h4 class="text-xl">{character.name}</h4>
+                    <hr class="my-2" />
                     <p>{character.desc}</p>
                     <p>({character.subDesc})</p>
                     <div class={`relative m-auto mt-2 ${character.size}`}>
@@ -59,11 +59,9 @@
                 </div>
             {/each}
         </div>
-    {/if}
 
-    {#if _character > -1}
-        <button on:click={start} class={'mt-16 ' + styles.button.base + styles.button[characters[_character]?.color]}>
-            START GAME
-        </button>
+        {#if _character > -1}
+            <button on:click={start} class={'mt-16 ' + styles.button.base + styles.button[characters[_character]?.color]}> START GAME </button>
+        {/if}
     {/if}
 </section>

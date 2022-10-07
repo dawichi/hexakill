@@ -8,7 +8,6 @@
     import { enemiesHistory, gameData, logs } from '$lib/data/stores'
     import Entity from '$lib/components/Entity.svelte'
     import Logger from '$lib/components/Logger.svelte'
-    import Items from '$lib/components/Items.svelte'
     import type { Character, Enemy } from '$lib/models'
     import { loggerCleaner } from '$lib/utils/loggerCleaner'
     import { enemyGenerator } from '$lib/utils/enemyGenerator'
@@ -33,7 +32,7 @@
     })
 
     // Helpers
-    let _fighting = false 
+    let _fighting = false
     let _showButtons = true
     let _actionSelected: 0 | 1 | 2
     let _powerUps: {
@@ -54,9 +53,8 @@
     function startCombat(): void {
         _fighting = true
         gameData.update(n => {
-            if (n.character) n.character.potions = 5
-            if ((_player?.level ?? 1) > 10) n.enemy = enemyGenerator(_player?.level ?? 1, true)
-            else n.enemy = enemyGenerator(_player?.level ?? 1)
+            if (n.character) n.character.potions += 2
+            n.enemy = enemyGenerator(_player?.level ?? 1)
             return n
         })
 
@@ -131,6 +129,19 @@
         }, 1000)
     }
 
+
+    function onKeyDown(event: any): void {
+        if (!_fighting) {
+            if (event.keyCode === 32) startCombat()
+            return
+        }
+        if (!_showButtons) return
+        
+        if (event.keyCode === 65) selectAction(0)
+        if (event.keyCode === 83) selectAction(1)
+        if (!(_player?.potions ?? 0)) return
+        if (event.keyCode === 68) selectAction(2)
+    }
     /**
      * ## Execute Actions
      * @param active - The one who deals the damage
@@ -183,7 +194,7 @@
     const enemyDefeat = () => {
         _fighting = false
         if (!_player || !_enemy) return
-        const exp = parseInt(((_enemy.level / _player.level) * 1000).toFixed(0))
+        const exp = parseInt(((_enemy.level / _player.level) * 100).toFixed(0))
         const oldLevel = _player.level
         const leveledUp = _player.gainExp(exp)
 
@@ -250,6 +261,8 @@
     }
 </script>
 
+<svelte:window on:keydown|preventDefault={onKeyDown} />
+
 <!--╔══════════════════════════════════════════════════════
     ║ 💻 Game view
     ╚══════════════════════════════════════════════════════ -->
@@ -266,15 +279,16 @@
             <div class="grid lg:grid-cols-3">
                 <div class={styles.cell + 'grid grid-cols-2'}>
                     <PersonalRecords />
-                    <Items/>
+                    <!-- Items information -->
+                    <div />
                 </div>
 
                 {#if _player}
-                    <Entity type="character" move="idle"/>
+                    <Entity type="character" />
                 {/if}
 
                 {#if _enemy}
-                    <Entity type="enemy" move="idle"/>
+                    <Entity type="enemy" />
                 {:else if !_powerUps.pending}
                     <section class={styles.cell + 'flex justify-center items-center'}>
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
