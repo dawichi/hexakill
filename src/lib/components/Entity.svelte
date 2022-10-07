@@ -14,7 +14,6 @@
     import { calcDmgReductionPercent } from '$lib/utils/calcDmgReduction'
 
     export let type: 'character' | 'enemy'
-    export let move: 'attack' | 'idle'
     let _entity: Character | Enemy
 
     gameData.subscribe(n => {
@@ -48,7 +47,7 @@
         {/if}
 
         <div class={'relative ' + _entity.size}>
-            <BgImage image={`/images/${_entity.image}/${move}.gif`} />
+            <BgImage image={`/images/${_entity.image}/idle.gif`} />
         </div>
 
         <div class="w-full flex flex-col items-center mb-5">
