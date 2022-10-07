@@ -130,14 +130,13 @@
         }, 1000)
     }
 
-
     function onKeyDown(event: any): void {
         if (!_fighting) {
             if (event.keyCode === 32) startCombat()
             return
         }
         if (!_showButtons) return
-        
+
         if (event.keyCode === 65) selectAction(0)
         if (event.keyCode === 83) selectAction(1)
         if (!(_player?.potions ?? 0)) return
@@ -247,11 +246,22 @@
             })
             return n
         })
+
+        enemiesHistory.update(n => {
+            if (!_enemy) return n
+            n.push({
+                image: _enemy.image,
+                level: _enemy.level,
+            })
+            return n
+        })
+
         localStorageService.add({
             classIdx: _characterIdx,
             name: _player?.name ?? '',
             record: _player?.level ?? 0,
         })
+
         setTimeout(() => {
             gameData.update(n => {
                 n.step = 'gameover'
@@ -279,7 +289,7 @@
             <div class="grid lg:grid-cols-3">
                 <div class={styles.cell + 'grid grid-cols-2'}>
                     <PersonalRecords />
-                    <Items/>
+                    <Items />
                 </div>
 
                 {#if _player}

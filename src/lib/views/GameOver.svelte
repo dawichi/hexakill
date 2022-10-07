@@ -83,7 +83,7 @@
     
     <!-- ENEMIES HISTORY -->
     <section class={styles.cell + 'flex flex-col animate__animated animate__fadeIn animate__slower  animate__delay-4s'}>
-        <h2 class="text-xl tracking-wider">Enemies killed:</h2>
+        <h2 class="text-xl tracking-wider">Enemies:</h2>
         <hr/>
         <div class="flex flex-wrap">
             {#each _history as enemy}
