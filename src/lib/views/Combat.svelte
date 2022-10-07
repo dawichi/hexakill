@@ -15,6 +15,7 @@
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
     import { localStorageService } from '$lib/services/localStorage.service'
     import PowerUps from '$lib/components/PowerUps.svelte'
+    import Items from '$lib/components/Items.svelte'
 
     // ╔══════════════════════════════════════════════════════
     // ║ Variables of the game
@@ -278,8 +279,7 @@
             <div class="grid lg:grid-cols-3">
                 <div class={styles.cell + 'grid grid-cols-2'}>
                     <PersonalRecords />
-                    <!-- Items information -->
-                    <div />
+                    <Items/>
                 </div>
 
                 {#if _player}

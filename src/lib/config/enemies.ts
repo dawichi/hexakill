@@ -14,14 +14,14 @@ const presets: {[key: string]: Modifiers} = {
     ad: {
         ...base,
         health: 0.75,
-        ad: 1.75,
+        ad: 1.50,
         ap: 0.5,
-        speed: 1.75,
+        speed: 1.50,
     },
     ap: {
         ...base,
         ad: 0.5,
-        ap: 1.75,
+        ap: 1.50,
     },
     tank: {
         ...base,
@@ -29,13 +29,15 @@ const presets: {[key: string]: Modifiers} = {
         armor: 1.75,
         mr: 1.75,
         speed: 0.75,
+        ad: 0.5,
+        ap: 0.5,
     },
     boss: {
-        health: 2,
-        ad: 2,
-        ap: 2,
-        armor: 2,
-        mr: 2,
+        health: 1.50,
+        ad: 1.25,
+        ap: 1.25,
+        armor: 1.25,
+        mr: 1.25,
         speed: 2,
     },
 }

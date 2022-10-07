@@ -91,7 +91,7 @@ abstract class BaseEntity {
             this.ap * 0.3, // 30% ap
             this.ap * 2.0, // 200% ap
             0.6, // 40% top -> critic
-            0.3, // 30% low -> misses
+            0.25, // 30% low -> misses
         )
     }
 
