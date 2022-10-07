@@ -31,7 +31,7 @@
      */
     function getBonus(base: string | number, quantity: number): number {
         base = parseInt(base as string)
-        return base * 2 ** (quantity ?? 0)
+        return parseInt((base * 1.5 ** (quantity ?? 0)).toFixed(0))
     }
 
     function getAccBonus(stat: string, quantity: number): number {

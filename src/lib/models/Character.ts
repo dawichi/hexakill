@@ -16,7 +16,7 @@ class Character extends BaseEntity {
     }
 
     private _incrementStat(stat: Stats, preValue: number): number {
-        return base[stat] * this.modifiers[stat] + preValue + this.level
+        return base[stat] * this.modifiers[stat] + preValue
     }
 
     private _levelUp(): void {

@@ -9,3 +9,4 @@ export { default as BaseEntity } from './baseEntity'
 // ╚══════════════════════════════════════════════════════
 export { default as Character } from './Character'
 export { default as Enemy } from './Enemy'
+export { default as Item } from './Item'

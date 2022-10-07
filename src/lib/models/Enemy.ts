@@ -13,11 +13,10 @@ class Enemy extends BaseEntity {
         this.size = config.size
 
         const stats: Stats[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed']
-        stats.forEach((stat) => {
-            const value = level * base[stat] * this.modifiers[stat] + level
-            level < 10
-                ? this[stat] = level * base[stat] * 0.5
-                : this[stat] = value
+        stats.forEach(stat => {
+            if (level < 10) return (this[stat] = level * base[stat] * 0.5)
+            if (level < 20) return (this[stat] = level * base[stat] * 0.75 + level)
+            return level * base[stat] * this.modifiers[stat] + 2 * level
         })
     }
 }

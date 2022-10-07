@@ -5,10 +5,13 @@
   @param items - the list of items to show
 -->
 <script lang="ts">
-    import Item from '$lib/models/items/Item'
+    import { items } from '$lib/config/items'
+    import Item from '$lib/models/Item'
     import BgImage from './BgImage.svelte'
-    const a = new Item({attribute: 'ap', bonus: 40}, 'orb7', 2)
-    let _Items: Item[] = [a,a]
+    let _Items: Item[] = []
+    for (const item of items) {
+      _Items.push(new Item(item.name,1,item.bonus))
+    }
 </script>
 
 <div class="flex flex-col gap-2 p-2">
@@ -24,7 +27,6 @@
       </span>
       <p class="flex flex-col items-center">
         <span>{item.name} lv {item.tier}</span>
-        <span>{item.upgrade.attribute} +{item.upgrade.bonus}</span>
       </p>
     </div>
   {/each}
