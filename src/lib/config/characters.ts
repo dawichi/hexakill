@@ -1,4 +1,4 @@
-import type { CharacterConfigDto } from '$lib/types/CharacterConfig.dto'
+import type { CharacterConfigDto } from '$lib/types/Entities.dto'
 
 /**
  * Characters available for use in the game.

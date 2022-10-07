@@ -16,3 +16,9 @@ export type CharacterConfigDto = {
     }
     modifiers: Modifiers
 }
+
+export type EnemyConfigDto = {
+    name: string
+    size: string
+    modifiers: Modifiers
+}

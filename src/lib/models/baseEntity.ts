@@ -4,7 +4,7 @@ import { config } from '.'
 
 const base = config.base
 
-export abstract class BaseEntity {
+abstract class BaseEntity {
     name: string
     level: number
     size: string

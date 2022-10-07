@@ -1,4 +1,4 @@
-import type { CharacterConfigDto, Modifiers, Stats } from '$lib/types/CharacterConfig.dto'
+import type { CharacterConfigDto, Modifiers, Stats } from '$lib/types/Entities.dto'
 import { BaseEntity } from '.'
 import { config } from '.'
 
