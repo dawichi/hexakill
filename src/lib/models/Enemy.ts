@@ -1,4 +1,4 @@
-import type { EnemyConfigDto, Modifiers } from '$lib/types/Entities.dto'
+import type { EnemyConfigDto, Modifiers, Stats } from '$lib/types/Entities.dto'
 import { BaseEntity, config } from '.'
 
 const { base, names } = config
@@ -11,12 +11,14 @@ class Enemy extends BaseEntity {
         this.modifiers = config.modifiers
         this.image = config.name.replaceAll(' ', '-').toLowerCase()
         this.size = config.size
-        this.health = level * base.health * this.modifiers.health
-        this.ad = level * base.ad * this.modifiers.ad
-        this.ap = level * base.ap * this.modifiers.ap
-        this.armor = level * base.armor * this.modifiers.armor
-        this.mr = level * base.mr * this.modifiers.mr
-        this.speed = level * base.speed * this.modifiers.speed
+
+        const stats: Stats[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed']
+        stats.forEach((stat) => {
+            const value = level * base[stat] * this.modifiers[stat] + level
+            level < 10
+                ? this[stat] = level * base[stat] * 0.5
+                : this[stat] = value
+        })
     }
 }
 
