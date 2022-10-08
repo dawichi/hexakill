@@ -7,11 +7,12 @@
 <script lang="ts">
     import Icon from '@iconify/svelte'
     import BgImage from './BgImage.svelte'
-    import { icons } from '$lib/config/icons'
+    import { StatIcons } from '$lib/config/statIcons'
     import { gameData } from '$lib/data/stores'
     import { styles } from '$lib/config/styles'
     import { Character, type Enemy } from '$lib/models'
     import { calcDmgReductionPercent } from '$lib/utils/calcDmgReduction'
+    import Tooltip from './Tooltip.svelte'
 
     export let type: 'character' | 'enemy'
     let _entity: Character | Enemy
@@ -27,10 +28,10 @@
         return 'bg-green-600'
     }
 
-    const statTitle = (stat: string): string => {
-        if (stat === 'armor') return `Armor - attacks reduced by ${calcDmgReductionPercent(_entity.armor)}%`
-        if (stat === 'mr') return `MR - magics reduced by ${calcDmgReductionPercent(_entity.mr)}%`
-        return stat
+    const statTitle = (stat: string, entity: Character | Enemy): string | null => {
+        if (stat === 'armor') return `Armor - ${calcDmgReductionPercent(entity.armor)}% attacks damage reduction`
+        if (stat === 'mr') return `MR - ${calcDmgReductionPercent(entity.mr)}% magics damage reduction`
+        return null
     }
 </script>
 
@@ -63,13 +64,17 @@
         </div>
     </div>
     <div class="absolute top-0 left-0 m-5 rounded ">
-        {#each icons as icon}
-            <p class="flex items-center text-lg p-1" title={statTitle(icon.stat)}>
-                <span class="text-3xl">
-                    <Icon icon={icon.name} class={icon.style} />
-                </span>
-                <span class="pl-2">{_entity[icon.stat]}</span>
-            </p>
+        {#each StatIcons as stat}
+            <div class="relative">
+                <Tooltip text={statTitle(stat.stat, _entity) ?? stat.name}>
+                    <p class="flex items-center text-lg p-1">
+                        <span class="text-3xl">
+                            <Icon icon={stat.icon} class={stat.style} />
+                        </span>
+                        <span class="pl-2">{_entity[stat.stat]}</span>
+                    </p>
+                </Tooltip>
+            </div>
         {/each}
     </div>
 </section>

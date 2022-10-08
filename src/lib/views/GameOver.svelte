@@ -8,7 +8,7 @@
     import type { EnemyHistory } from '$lib/types/EnemyHistory.dto'
     
     import Icon from '@iconify/svelte'
-    import { icons } from '$lib/config/icons'
+    import { StatIcons } from '$lib/config/statIcons'
     import { styles } from '$lib/config/styles'
     import BgImage from '$lib/components/BgImage.svelte'
     import { enemiesHistory, gameData, logs } from '$lib/data/stores'
@@ -60,7 +60,7 @@
             </div>
         </div>
         <div>
-            {#each icons as icon}
+            {#each StatIcons as icon}
                 <p class="p-3 flex items-center text-lg p-1" title={icon.stat}>
                     <span class="text-3xl">
                         <Icon icon={icon.name} class={icon.style} />
