@@ -1,12 +1,13 @@
 <!--
-  @component
-  ## Tooltip
-  Display a tooltip when hovering over an element
-  @param text - the text to display in the tooltip
+    @component
+    ## Tooltip
+    Display a tooltip when hovering over an element
+    @param title - the title to display in the tooltip
+    @param content - the content to display in the tooltip, array of strings
 -->
 <script lang="ts">
-    export let title = ''
-    export let content = ''
+    export let title: string
+    export let content: string[] = []
 
     let isHovered = false
     let x = 0
@@ -34,7 +35,9 @@
 {#if isHovered}
     <div class="tooltip border rounded shadow bg-zinc-900 p-2 text-left">
         <p>{title}</p>
-        <p>{content}</p>
+        {#each content as p}
+            <p class="pl-4">{p}</p>
+        {/each}
     </div>
 {/if}
 

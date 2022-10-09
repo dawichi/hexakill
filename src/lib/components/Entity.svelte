@@ -11,8 +11,8 @@
     import { gameData } from '$lib/data/stores'
     import { styles } from '$lib/config/styles'
     import { Character, type Enemy } from '$lib/models'
-    import { calcDmgReductionPercent } from '$lib/utils/calcDmgReduction'
     import Tooltip from './Tooltip.svelte'
+    import { tooltipsService } from '$lib/services/tooltips.service'
 
     export let type: 'character' | 'enemy'
     let _entity: Character | Enemy
@@ -26,13 +26,6 @@
         if (hpWidth <= 10) return 'bg-red-600'
         if (hpWidth > 10 && hpWidth <= 40) return 'bg-yellow-600'
         return 'bg-green-600'
-    }
-
-    const statTitle = (stat: string, entity: Character | Enemy): string | undefined => {
-        return {
-            armor: `${calcDmgReductionPercent(entity.armor)}% attacks damage reduction`,
-            mr: `${calcDmgReductionPercent(entity.mr)}% magics damage reduction`,
-        }[stat]
     }
 </script>
 
@@ -69,7 +62,7 @@
             <div class="relative">
                 <Tooltip
                     title={stat.name}
-                    content={statTitle(stat.stat, _entity)}
+                    content={tooltipsService.getStatTooltip(stat.stat, _entity)}
                 >
                     <p class="flex items-center text-lg p-1">
                         <span class="text-3xl">

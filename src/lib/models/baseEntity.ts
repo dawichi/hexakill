@@ -17,6 +17,15 @@ abstract class BaseEntity {
     armor: number
     mr: number
     speed: number
+    readonly data: {
+        ad_critic_chance: number
+        ad_misses_chance: number
+        ad_hit_range: [number, number]
+        ap_critic_chance: number
+        ap_misses_chance: number
+        ap_hit_range: [number, number]
+        heal_range: [number, number]
+    }
 
     constructor(level: number, name: string) {
         this.name = name
@@ -31,6 +40,15 @@ abstract class BaseEntity {
         this.armor = level * base.armor
         this.mr = level * base.mr
         this.speed = level * base.speed
+        this.data = {
+            ad_critic_chance: 0.9, // 10% top -> critic
+            ad_misses_chance: 0.1, // 10% low -> misses
+            ad_hit_range: [0.8, 1.4], // 80% - 140% ad
+            ap_critic_chance: 0.6, // 40% top -> critic
+            ap_misses_chance: 0.25, // 25% low -> misses
+            ap_hit_range: [0.3, 2], // 30% - 200% ap
+            heal_range: [0.2, 0.3], // 20% - 30% of damage received
+        }
     }
 
     /**
@@ -79,27 +97,27 @@ abstract class BaseEntity {
 
     attack() {
         return this.action(
-            this.ad * 0.8, // 80% ad
-            this.ad * 1.4, // 140% ad
-            0.9, // 10% top -> critic
-            0.1, // 10% low -> misses
+            this.ad * this.data.ad_hit_range[0],
+            this.ad * this.data.ad_hit_range[1],
+            this.data.ad_critic_chance,
+            this.data.ad_misses_chance,
         )
     }
 
     magic() {
         return this.action(
-            this.ap * 0.3, // 30% ap
-            this.ap * 2.0, // 200% ap
-            0.6, // 40% top -> critic
-            0.25, // 30% low -> misses
+            this.ap * this.data.ap_hit_range[0],
+            this.ap * this.data.ap_hit_range[1],
+            this.data.ap_critic_chance,
+            this.data.ap_misses_chance,
         )
     }
 
     heal() {
         this.potions -= 1
         const heal = numberBetween(
-            this.dmgReceived * 0.1, // 10% of damage received
-            this.dmgReceived * 0.3, // 30% of damage received
+            this.dmgReceived * this.data.heal_range[0],
+            this.dmgReceived * this.data.heal_range[0],
         )
         this.dmgReceived -= heal
         if (this.dmgReceived < 0) this.dmgReceived = 0
