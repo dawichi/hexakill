@@ -5,7 +5,9 @@
   @param text - the text to display in the tooltip
 -->
 <script lang="ts">
-    export let text = ''
+    export let title = ''
+    export let content = ''
+
     let isHovered = false
     let x = 0
     let y = 0
@@ -30,7 +32,10 @@
 </div>
 
 {#if isHovered}
-    <div class="tooltip border rounded shadow bg-zinc-900 p-2">{text}</div>
+    <div class="tooltip border rounded shadow bg-zinc-900 p-2 text-left">
+        <p>{title}</p>
+        <p>{content}</p>
+    </div>
 {/if}
 
 <style>

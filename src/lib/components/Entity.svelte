@@ -28,10 +28,11 @@
         return 'bg-green-600'
     }
 
-    const statTitle = (stat: string, entity: Character | Enemy): string | null => {
-        if (stat === 'armor') return `Armor - ${calcDmgReductionPercent(entity.armor)}% attacks damage reduction`
-        if (stat === 'mr') return `MR - ${calcDmgReductionPercent(entity.mr)}% magics damage reduction`
-        return null
+    const statTitle = (stat: string, entity: Character | Enemy): string | undefined => {
+        return {
+            armor: `${calcDmgReductionPercent(entity.armor)}% attacks damage reduction`,
+            mr: `${calcDmgReductionPercent(entity.mr)}% magics damage reduction`,
+        }[stat]
     }
 </script>
 
@@ -66,7 +67,10 @@
     <div class="absolute top-0 left-0 m-5 rounded ">
         {#each StatIcons as stat}
             <div class="relative">
-                <Tooltip text={statTitle(stat.stat, _entity) ?? stat.name}>
+                <Tooltip
+                    title={stat.name}
+                    content={statTitle(stat.stat, _entity)}
+                >
                     <p class="flex items-center text-lg p-1">
                         <span class="text-3xl">
                             <Icon icon={stat.icon} class={stat.style} />
