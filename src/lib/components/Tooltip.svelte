@@ -33,7 +33,7 @@
 </div>
 
 {#if isHovered}
-    <div class="tooltip border rounded shadow bg-zinc-900 p-2 text-left">
+    <div class="tooltip border rounded shadow bg-zinc-900 p-2 text-left shadow-lg shadow-zinc-700">
         <p>{title}</p>
         {#each content as p}
             <p class="pl-4">{p}</p>
