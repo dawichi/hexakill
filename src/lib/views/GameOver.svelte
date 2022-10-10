@@ -12,6 +12,8 @@
     import { styles } from '$lib/config/styles'
     import BgImage from '$lib/components/BgImage.svelte'
     import { enemiesHistory, gameData, logs } from '$lib/data/stores'
+    import Tooltip from '$lib/components/Tooltip.svelte'
+    import { tooltipsService } from '$lib/services/tooltips.service'
 
     let _entity: Character
     let _history: Array<EnemyHistory>
@@ -69,24 +71,28 @@
             </div>
         </div>
         <div>
-            {#each StatIcons as icon}
-                <p class="p-3 flex items-center text-lg p-1" title={icon.stat}>
-                    <span class="text-3xl">
-                        <Icon icon={icon.name} class={icon.style} />
-                    </span>
-                    <span class="pl-2">{_entity[icon.stat]}</span>
-                </p>
+            {#each StatIcons as stat}
+                <div class="relative z-10">
+                    <Tooltip
+                        title={stat.name}
+                        content={tooltipsService.getStatTooltip(stat.stat, _entity)}
+                    >
+                        <p class="flex items-center text-lg p-2">
+                            <span class="text-3xl">
+                                <Icon icon={stat.icon} class={stat.style} />
+                            </span>
+                            <span class="pl-2">{_entity[stat.stat]}</span>
+                        </p>
+                    </Tooltip>
+                </div>
             {/each}
         </div>
     </section>
 
     <!-- CENTER MESSAGE AND RETRY BUTTON -->
-    <section class="animate__animated animate__fadeIn animate__slower">
-        <h1 class="text-8xl text-red-600 font-mono text-center">GAME<br />OVER</h1>
-        <button />
-        <section class={styles.cell + 'flex justify-center items-center'}>
-            <button on:click={retry} class={styles.button.base + styles.button.red}> Try again? </button>
-        </section>
+    <section class="flex flex-col items-center animate__animated animate__fadeIn animate__slower">
+        <h1 class="text-8xl text-red-600 font-mono text-center mb-4">GAME<br />OVER</h1>
+        <button on:click={retry} class={styles.button.base + styles.button.red}> Try again? </button>
     </section>
 
     <!-- ENEMIES HISTORY -->
