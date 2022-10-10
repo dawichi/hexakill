@@ -4,7 +4,7 @@
     This component is used to show the game over screen.
 -->
 <script lang="ts">
-    import type { Character } from '$lib/models'
+    import type { Character, Enemy } from '$lib/models'
     import type { EnemyHistory } from '$lib/types/EnemyHistory.dto'
 
     import Icon from '@iconify/svelte'
@@ -16,15 +16,23 @@
     import { tooltipsService } from '$lib/services/tooltips.service'
 
     let _entity: Character
+    let _enemy: Enemy
     let _history: Array<EnemyHistory>
 
     gameData.subscribe(n => {
         if (n.character) _entity = n.character
+        if (n.enemy) _enemy = n.enemy
     })
 
     enemiesHistory.subscribe(n => {
         _history = n
     })
+
+    const colorHpBar = (hpWidth: number) => {
+        if (hpWidth <= 10) return 'bg-red-600'
+        if (hpWidth > 10 && hpWidth <= 40) return 'bg-yellow-600'
+        return 'bg-green-600'
+    }
 
     function Counter(enemies: Array<EnemyHistory>) {
         const count: { [Key: string]: Array<number> } = {}
@@ -63,20 +71,15 @@
 
             <div class="w-full flex flex-col items-center mb-5">
                 <p class="flex justify-center items-center">
-                    {_entity.health} <i class="ra ra-hearts text-red-600" />
+                    0 / {_entity.health} <i class="ra ra-hearts text-red-600" />
                 </p>
-                <div class="bg-zinc-600/75 rounded-xl w-4/5 ">
-                    <div class="bg-green-600 rounded-xl h-3 transition-all duration-500 w-full" />
-                </div>
+                <div class="bg-zinc-600/75 rounded-xl w-4/5 h-3" />
             </div>
         </div>
         <div>
             {#each StatIcons as stat}
-                <div class="relative z-10">
-                    <Tooltip
-                        title={stat.name}
-                        content={tooltipsService.getStatTooltip(stat.stat, _entity)}
-                    >
+                <div class="relative">
+                    <Tooltip title={stat.name} content={tooltipsService.getStatTooltip(stat.stat, _entity)}>
                         <p class="flex items-center text-lg p-2">
                             <span class="text-3xl">
                                 <Icon icon={stat.icon} class={stat.style} />
@@ -90,24 +93,63 @@
     </section>
 
     <!-- CENTER MESSAGE AND RETRY BUTTON -->
-    <section class="flex flex-col items-center animate__animated animate__fadeIn animate__slower">
-        <h1 class="text-8xl text-red-600 font-mono text-center mb-4">GAME<br />OVER</h1>
-        <button on:click={retry} class={styles.button.base + styles.button.red}> Try again? </button>
+    <section class="flex flex-col items-center justify-around animate__animated animate__fadeIn animate__slower">
+        <div class="mb-8 flex flex-col items-center">
+            <h1 class="text-8xl text-red-600 font-mono text-center mb-8">GAME<br />OVER</h1>
+            <button on:click={retry} class={styles.button.base + styles.button.red}> Try again? </button>
+        </div>
+        <!-- ENEMIES HISTORY -->
+        <section class={styles.cell + 'flex flex-col animate__animated animate__fadeIn animate__slower  animate__delay-4s relative'}>
+            <h2 class="text-xl tracking-wider">Enemies:</h2>
+            <hr />
+            <div class="flex flex-wrap">
+                {#each Counter(_history) as enemy}
+                    <Tooltip title={enemy.key} content={[`${enemy.levels}`]}>
+                        <div class="flex flex-col">
+                            <div class="relative w-20 h-20">
+                                <BgImage image={`/images/${enemy.key}/idle.gif`} />
+                            </div>
+                            <span>x{enemy.levels.length}</span>
+                        </div>
+                    </Tooltip>
+                {/each}
+            </div>
+        </section>
     </section>
-
-    <!-- ENEMIES HISTORY -->
-    <section class={styles.cell + 'flex flex-col animate__animated animate__fadeIn animate__slower  animate__delay-4s'}>
-        <h2 class="text-xl tracking-wider">Enemies:</h2>
-        <hr />
-        <div class="flex flex-wrap">
-            {#each Counter(_history) as enemy}
-                <div class="flex flex-col">
-                    <div class="relative w-20 h-20">
-                        <BgImage image={`/images/${enemy.key}/idle.gif`} />
-                    </div>
-                    <span>x{enemy.levels.length}</span>
+    <!-- YOUR MURDERER STATS -->
+    <section class={styles.cell + 'text-center flex items-center justify-center animate__animated animate__fadeIn animate__slower animate__delay-2s'}>
+        <div>
+            {#each StatIcons as stat}
+                <div class="relative">
+                    <Tooltip title={stat.name} content={tooltipsService.getStatTooltip(stat.stat, _enemy)}>
+                        <p class="flex items-center text-lg p-2">
+                            <span class="text-3xl">
+                                <Icon icon={stat.icon} class={stat.style} />
+                            </span>
+                            <span class="pl-2">{_enemy[stat.stat]}</span>
+                        </p>
+                    </Tooltip>
                 </div>
             {/each}
+        </div>
+        <div>
+            <h2 class="text-xl p-2">{_enemy?.name}</h2>
+            <h3>lv {_enemy?.level}</h3>
+            <div class="relative w-full h-64">
+                <BgImage image={`/images/${_enemy.image}/idle.gif`} />
+            </div>
+
+            <div class="w-full flex flex-col items-center mb-5">
+                <p class="flex justify-center items-center">
+                    {_enemy.health - _enemy.dmgReceived} / {_enemy.health} <i class="ra ra-hearts text-red-600" />
+                </p>
+                <div class="bg-zinc-600/75 rounded-xl w-4/5 ">
+                    <div
+                        class={`${colorHpBar(((_enemy.health - _enemy.dmgReceived) / _enemy.health) * 100)} rounded-xl h-3 transition-all duration-500`}
+                        style={`width: ${((_enemy.health - _enemy.dmgReceived) / _enemy.health) * 100}%`}
+                    />
+                </div>
+            </div>
         </div>
     </section>
 </div>
