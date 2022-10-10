@@ -130,17 +130,18 @@
         }, 1000)
     }
 
-    function onKeyDown(event: any): void {
+    function onKeyDown(event: KeyboardEvent): void {
+        const codes: {[key:string]: () => void} ={}
         if (!_fighting) {
-            if (event.keyCode === 32) startCombat()
+            if (event.code === "Space") startCombat()
             return
         }
         if (!_showButtons) return
 
-        if (event.keyCode === 65) selectAction(0)
-        if (event.keyCode === 83) selectAction(1)
+        if (event.code === "KeyA") selectAction(0)
+        if (event.code === "KeyS") selectAction(1)
         if (!(_player?.potions ?? 0)) return
-        if (event.keyCode === 68) selectAction(2)
+        if (event.code === "KeyD") selectAction(2)
     }
     /**
      * ## Execute Actions
