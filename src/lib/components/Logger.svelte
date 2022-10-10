@@ -4,7 +4,7 @@
   Diplays the log messages
 -->
 <script lang="ts">
-    import { logs } from '$lib/data/stores'
+    import { logs } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
     import type { LoggerDTO } from '$lib/types/Logger.dto'
 

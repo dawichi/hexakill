@@ -11,7 +11,7 @@
     import { StatIcons } from '$lib/config/statIcons'
     import { styles } from '$lib/config/styles'
     import BgImage from '$lib/components/BgImage.svelte'
-    import { enemiesHistory, gameData, logs } from '$lib/data/stores'
+    import { enemiesHistory, gameData, logs } from '$lib/data/data'
     import Tooltip from '$lib/components/Tooltip.svelte'
     import { tooltipsService } from '$lib/services/tooltips.service'
 
@@ -45,7 +45,7 @@
 
     function retry() {
         gameData.set({
-            step: 'starting',
+            view: 'champSelect',
             username: '',
             characterIdx: -1,
             character: null,

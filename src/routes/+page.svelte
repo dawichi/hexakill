@@ -1,25 +1,28 @@
 <script lang="ts">
-    import { gameData } from '$lib/data/stores'
+    import { gameData } from '$lib/data/data'
     import Combat from '$lib/views/Combat.svelte'
     import GameOver from '$lib/views/GameOver.svelte'
-    import Starting from '$lib/views/Starting.svelte'
+    import ChampSelect from '$lib/views/ChampSelect.svelte'
+    import Store from '$lib/views/Store.svelte'
     import Welcome from '$lib/views/Welcome.svelte'
 
-    let step: string
+    let view: string
 
     gameData.subscribe(n => {
-        step = n.step
+        view = n.view
     })
 </script>
 
 <div>
-    {#if step === 'welcome'}
+    {#if view === 'welcome'}
         <Welcome />
-    {:else if step === 'starting'}
-        <Starting />
-    {:else if step === 'playing'}
+    {:else if view === 'champSelect'}
+        <ChampSelect />
+    {:else if view === 'combat'}
         <Combat />
-    {:else if step === 'gameover'}
+    {:else if view === 'store'}
+        <Store />
+    {:else if view === 'gameover'}
         <GameOver />
     {/if}
 </div>

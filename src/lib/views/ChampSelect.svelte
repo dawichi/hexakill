@@ -1,12 +1,12 @@
 <!--
     @component
-    ## Starting component
+    ## Champ Select component
     This component is used to enter the name of the player and select his character.
 -->
 <script lang="ts">
     import BgImage from '$lib/components/BgImage.svelte'
     import { styles } from '$lib/config/styles'
-    import { gameData } from '$lib/data/stores'
+    import { gameData } from '$lib/data/data'
     import { characters } from '$lib/config/characters'
     import { Character } from '$lib/models'
 
@@ -26,7 +26,7 @@
 
     function start() {
         gameData.update(n => {
-            n.step = 'playing'
+            n.view = 'combat'
             n.character = new Character(4, _nameInput, characters[_character])
             return n
         })

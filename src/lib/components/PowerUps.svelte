@@ -7,7 +7,7 @@
     import type { Character } from '$lib/models'
 
     import Icon from '@iconify/svelte'
-    import { gameData } from '$lib/data/stores'
+    import { gameData } from '$lib/data/data'
     import { getPowerupProp, powerups } from '$lib/config/powerups'
 
     export let _powerUps: {
@@ -54,7 +54,25 @@
         _powerUps.history[type] += 1
         gameData.update(n => n)
     }
+
+    function safe(type: 'health' | 'ad' | 'ap' | 'speed', value: number) {
+        if ((_powerUps.history[type] ?? 0) < 6) {
+            handlePowerUp(type, value)
+        }
+    }
+    function onKeyDown(event: KeyboardEvent): void {
+        if (!_powerUps.pending) return
+        const codes: { [key: string]: () => void } = {
+            1: () => safe('health', 500),
+            2: () => safe('ad', 40),
+            3: () => safe('ap', 50),
+            4: () => safe('speed', 10),
+        }
+        codes[event.key]()
+    }
 </script>
+
+<svelte:window on:keydown|preventDefault={onKeyDown} />
 
 <div>
     <div class="grid grid-cols-4 gap-3 p-4">
