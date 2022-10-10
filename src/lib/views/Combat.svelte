@@ -11,37 +11,18 @@
     import PowerUps from '$lib/components/PowerUps.svelte'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
     // others
-    import { enemiesHistory, gameData, logs } from '$lib/data/data'
+    import type { GameDTO } from '$lib/types/Game.dto'
     import { enemyService, loggerService, storageService } from '$lib/services'
     import { Character, Enemy } from '$lib/models'
+    import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
 
-    // ╔══════════════════════════════════════════════════════
-    // ║ Variables of the game
-    // ╚══════════════════════════════════════════════════════
-    // Values binded to global store
-    let _player: Character | null
-    let _enemy: Enemy | null
-    let _characterIdx: number
-
-    // Bind values
-    gameData.subscribe(n => {
-        _player = n.character
-        _enemy = n.enemy
-        _characterIdx = n.characterIdx
-    })
+    let _data: GameDTO
+    gameData.subscribe(n => (_data = n))
 
     // Helpers
-    let _fighting = false
     let _showButtons = true
     let _actionSelected: 0 | 1 | 2
-    let _powerUps: {
-        pending: number
-        history: { [key: string]: number }
-    } = {
-        pending: 0,
-        history: {},
-    }
 
     /**
      * ## Start Combat
@@ -51,27 +32,28 @@
      *   - Logs information about it
      */
     function startCombat(): void {
-        _fighting = true
         gameData.update(n => {
-            if (n.character) n.character.potions += 2
-            n.enemy = enemyService.enemyGenerator(_player?.level ?? 1)
-            return n
-        })
+            if (!n.character) return n
+            n.character.potions += 1
+            n.enemy = enemyService.enemyGenerator(n.character.level)
+            n.fighting = true
 
-        logs.update(n => {
-            const isPlayerFaster: boolean = (_player?.speed ?? 0) > (_enemy?.speed ?? 0)
-            const enemyName = _enemy?.name ?? 'Enemy'
+            const isPlayerFaster: boolean = (n.character.speed ?? 0) > (n.enemy.speed ?? 0)
 
-            loggerService.add(n.enemy, {
-                title: enemyName,
+            loggerService.add(n.logs.enemy, {
+                title: n.enemy.name,
                 message: `has appeared!`,
             })
 
             const logTo = isPlayerFaster ? 'player' : 'enemy'
-            loggerService.add(n[logTo], {
-                title: isPlayerFaster ? 'You' : enemyName,
+            loggerService.add(n.logs[logTo], {
+                title: isPlayerFaster ? 'You' : n.enemy.name,
                 message: isPlayerFaster ? `attack first!` : `attacks first!`,
             })
+            return n
+        })
+
+        gameData.update(n => {
             return n
         })
     }
@@ -81,11 +63,13 @@
      * Modify the action selected by the player
      */
     function selectAction(action: 0 | 1 | 2): void {
+        if (!_data.character) return
+        if (!_data.enemy) return
         _showButtons = false
         _actionSelected = action
 
         // Call the attack functions in order depending of who is faster
-        const isPlayerFaster: boolean = (_player?.speed ?? 0) > (_enemy?.speed ?? 0)
+        const isPlayerFaster: boolean = (_data.character.speed ?? 0) > (_data.enemy.speed ?? 0)
 
         /**
          * ## Shared Turn function
@@ -106,12 +90,10 @@
         let hasAnybodyDied: boolean = false
 
         // FIRST TURN
-        if (_player && _enemy) {
-            if (isPlayerFaster) {
-                if (turn(_player, _enemy, enemyDefeat)) hasAnybodyDied = true
-            } else {
-                if (turn(_enemy, _player, playerDefeat)) hasAnybodyDied = true
-            }
+        if (isPlayerFaster) {
+            if (turn(_data.character, _data.enemy, enemyDefeat)) hasAnybodyDied = true
+        } else {
+            if (turn(_data.enemy, _data.character, playerDefeat)) hasAnybodyDied = true
         }
 
         if (hasAnybodyDied) {
@@ -122,7 +104,8 @@
 
         // SECOND TURN
         setTimeout(() => {
-            if (_player && _enemy) isPlayerFaster ? turn(_enemy, _player, playerDefeat) : turn(_player, _enemy, enemyDefeat)
+            if (_data.character && _data.enemy)
+                isPlayerFaster ? turn(_data.enemy, _data.character, playerDefeat) : turn(_data.character, _data.enemy, enemyDefeat)
 
             _actionSelected = 0
             _showButtons = true
@@ -130,7 +113,7 @@
     }
 
     function onKeyDown(event: KeyboardEvent): void {
-        if (!_fighting && !_powerUps.pending) {
+        if (!_data.fighting && !_data.powerUps.pending) {
             if (event.code === 'Space') startCombat()
             return
         }
@@ -138,7 +121,7 @@
 
         if (event.code === 'KeyA') selectAction(0)
         if (event.code === 'KeyS') selectAction(1)
-        if (!(_player?.potions ?? 0)) return
+        if (!(_data.character?.potions ?? 0)) return
         if (event.code === 'KeyD') selectAction(2)
     }
     /**
@@ -174,9 +157,8 @@
                 break
         }
 
-        gameData.update(n => n)
-        logs.update(n => {
-            loggerService.add(n[active_is_a_player ? 'player' : 'enemy'], {
+        gameData.update(n => {
+            loggerService.add(n.logs[active_is_a_player ? 'player' : 'enemy'], {
                 title: active.name,
                 message: message,
                 value: dmgReceived,
@@ -190,80 +172,61 @@
     // ║ ✅ ENEMY DEFEATED
     // ╚══════════════════════════════════════════════════════
     const enemyDefeat = () => {
-        _fighting = false
-        if (!_player || !_enemy) return
-        const exp = parseInt(((_enemy.level / _player.level) * 100).toFixed(0))
-        const oldLevel = _player.level
-        const leveledUp = _player.gainExp(exp)
+        if (!_data.character || !_data.enemy) return
+        const exp = parseInt(((_data.enemy.level / _data.character.level) * 100).toFixed(0))
+        const oldLevel = _data.character.level
+        const leveledUp = _data.character.gainExp(exp)
 
-        logs.update(n => {
-            if (!_player || !_enemy) return n
-            loggerService.add(n.enemy, {
-                title: _enemy.name,
-                message: `lv ${_enemy.level} has been defeated! 🎉🎉`,
+        gameData.update(n => {
+            if (!n.character || !n.enemy) return n
+            n.fighting = false
+            loggerService.add(n.logs.enemy, {
+                title: n.enemy.name,
+                message: `lv ${n.enemy.level} has been defeated! 🎉🎉`,
             })
-            loggerService.add(n.player, {
+            loggerService.add(n.logs.player, {
                 title: '',
                 message: `Well done, you have gained ${exp} exp!`,
             })
 
             const maxPowerUps = 24
-            const acc_history = Object.values(_powerUps.history).reduce((acc, val) => acc + val, 0)
+            const acc_history = Object.values(n.powerUps.history).reduce((acc, val) => acc + val, 0)
             if (leveledUp && acc_history < maxPowerUps) {
-                const powerUpsToAdd = oldLevel % 2 !== 0 ? ~~((_player.level - oldLevel) / 2) : parseInt(((_player.level - oldLevel) / 2).toFixed(0))
-                _powerUps.pending = acc_history + powerUpsToAdd > maxPowerUps ? maxPowerUps - acc_history : powerUpsToAdd
+                const powerUpsToAdd = oldLevel % 2 !== 0 ? ~~((n.character.level - oldLevel) / 2) : parseInt(((n.character.level - oldLevel) / 2).toFixed(0))
+                n.powerUps.pending = acc_history + powerUpsToAdd > maxPowerUps ? maxPowerUps - acc_history : powerUpsToAdd
 
-                loggerService.add(n.player, {
+                loggerService.add(n.logs.player, {
                     title: '',
                     message: `You have leveled up! 🎉🎉`,
                 })
             }
+
+            n.enemiesHistory.push({
+                image: n.enemy.image,
+                level: n.enemy.level,
+            })
+            n.enemy = null
             return n
         })
-
-        enemiesHistory.update(n => {
-            if (!_enemy) return n
-            n.push({
-                image: _enemy.image,
-                level: _enemy.level,
-            })
-            return n
-        })
-
-        setTimeout(() => {
-            gameData.update(n => {
-                n.enemy = null
-                return n
-            })
-        }, 2000)
     }
 
     // ╔══════════════════════════════════════════════════════
     // ║ ❌ PLAYER DEFEATED
     // ╚══════════════════════════════════════════════════════
     const playerDefeat = () => {
-        _fighting = false
-        logs.update(n => {
-            loggerService.add(n.player, {
+        gameData.update(n => {
+            n.fighting = false
+            loggerService.add(n.logs.player, {
                 title: 'Oh no!',
                 message: 'You have been defeated! 😭',
             })
             return n
         })
 
-        enemiesHistory.update(n => {
-            if (!_enemy) return n
-            n.push({
-                image: _enemy.image,
-                level: _enemy.level,
-            })
-            return n
-        })
-
         storageService.add({
-            classIdx: _characterIdx,
-            name: _player?.name ?? '',
-            record: _player?.level ?? 0,
+            classIdx: _data.characterIdx,
+            name: _data.character?.name ?? '',
+            record: _data.character?.level ?? 0,
         })
 
         setTimeout(() => {
@@ -303,13 +266,13 @@
                     <Items />
                 </div>
 
-                {#if _player}
+                {#if _data.character}
                     <Entity type="character" />
                 {/if}
 
-                {#if _enemy}
+                {#if _data.enemy}
                     <Entity type="enemy" />
-                {:else if !_powerUps.pending}
+                {:else if !_data.powerUps.pending}
                     <section class={styles.cell + 'flex justify-center items-center'}>
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
                         <button on:click={openStore} class={styles.button.base + styles.button.green}> STORE </button>
@@ -320,8 +283,8 @@
             <!-- ROW 2 - 2 COLUMNS -->
             <div class="grid lg:grid-cols-2 col-span-3">
                 <div class={styles.cell}>
-                    <PowerUps {_powerUps} />
-                    {#if _fighting}
+                    <PowerUps />
+                    {#if _data.fighting}
                         <div>
                             <h4 class="text-center text-lg p-2 mt-8">What do you want to do?</h4>
                             <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_showButtons ? '' : 'opacity-20'}`}>
@@ -331,7 +294,7 @@
                                 <button disabled={!_showButtons} on:click={() => selectAction(1)} class={styles.button.base + styles.button.blue}>
                                     Magic
                                 </button>
-                                {#if (_player?.potions ?? 0) > 0}
+                                {#if (_data.character?.potions ?? 0) > 0}
                                     <button disabled={!_showButtons} on:click={() => selectAction(2)} class={styles.button.base + styles.button.green}>
                                         Potion
                                     </button>

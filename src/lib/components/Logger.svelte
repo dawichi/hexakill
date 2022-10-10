@@ -4,7 +4,7 @@
   Diplays the log messages
 -->
 <script lang="ts">
-    import { logs } from '$lib/data/data'
+    import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
     import type { LoggerDTO } from '$lib/types/Logger.dto'
 
@@ -13,8 +13,8 @@
         enemy: [],
     }
 
-    logs.subscribe(n => {
-        _logs = n
+    gameData.subscribe(n => {
+        _logs = n.logs
     })
 </script>
 

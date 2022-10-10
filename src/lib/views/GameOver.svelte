@@ -5,29 +5,24 @@
 -->
 <script lang="ts">
     import type { Character, Enemy } from '$lib/models'
-    import type { EnemyHistory } from '$lib/types/EnemyHistory.dto'
 
     // components
     import Icon from '@iconify/svelte'
     import BgImage from '$lib/components/BgImage.svelte'
     import Tooltip from '$lib/components/Tooltip.svelte'
     // others
-    import { enemiesHistory, gameData, logs } from '$lib/data/data'
+    import { gameData } from '$lib/data/data'
     import { tooltipsService } from '$lib/services'
     import { StatIcons } from '$lib/config/statIcons'
     import { styles } from '$lib/config/styles'
+    import type { GameDTO } from '$lib/types/Game.dto'
 
-    let _entity: Character
+    let _player: Character
     let _enemy: Enemy
-    let _history: Array<EnemyHistory>
+    let _data: GameDTO
 
     gameData.subscribe(n => {
-        if (n.character) _entity = n.character
-        if (n.enemy) _enemy = n.enemy
-    })
-
-    enemiesHistory.subscribe(n => {
-        _history = n
+        _data = n
     })
 
     const colorHpBar = (hpWidth: number) => {
@@ -36,7 +31,12 @@
         return 'bg-green-600'
     }
 
-    function Counter(enemies: Array<EnemyHistory>) {
+    function counter(
+        enemies: {
+            image: string
+            level: number
+        }[],
+    ) {
         const count: { [Key: string]: Array<number> } = {}
         enemies.forEach(enemy => (count[enemy.image] ? count[enemy.image].push(enemy.level) : (count[enemy.image] = [enemy.level])))
         return Object.keys(count).map(key => ({
@@ -46,18 +46,19 @@
     }
 
     function retry() {
-        gameData.set({
-            view: 'champSelect',
-            username: '',
-            characterIdx: -1,
-            character: null,
-            enemy: null,
+        gameData.update(n => {
+            n.view = 'champSelect'
+            n.username = ''
+            n.characterIdx = -1
+            n.character = null
+            n.enemy = null
+            n.logs = {
+                player: [],
+                enemy: [],
+            }
+            n.enemiesHistory = []
+            return n
         })
-        logs.set({
-            player: [],
-            enemy: [],
-        })
-        enemiesHistory.set([])
     }
 </script>
 
@@ -65,15 +66,15 @@
     <!-- YOUR STATS -->
     <section class={styles.cell + 'text-center flex items-center justify-center animate__animated animate__fadeIn animate__slower animate__delay-2s'}>
         <div>
-            <h2 class="text-xl p-2">{_entity?.name}</h2>
-            <h3>lv {_entity?.level}</h3>
+            <h2 class="text-xl p-2">{_player.name}</h2>
+            <h3>lv {_player.level}</h3>
             <div class="relative w-full h-64">
-                <BgImage image={`/images/${_entity.image}/idle.gif`} />
+                <BgImage image={`/images/${_player.image}/idle.gif`} />
             </div>
 
             <div class="w-full flex flex-col items-center mb-5">
                 <p class="flex justify-center items-center">
-                    0 / {_entity.health} <i class="ra ra-hearts text-red-600" />
+                    0 / {_player.health} <i class="ra ra-hearts text-red-600" />
                 </p>
                 <div class="bg-zinc-600/75 rounded-xl w-4/5 h-3" />
             </div>
@@ -81,12 +82,12 @@
         <div>
             {#each StatIcons as stat}
                 <div class="relative">
-                    <Tooltip title={stat.name} content={tooltipsService.getStatTooltip(stat.stat, _entity)}>
+                    <Tooltip title={stat.name} content={tooltipsService.getStatTooltip(stat.stat, _player)}>
                         <p class="flex items-center text-lg p-2">
                             <span class="text-3xl">
                                 <Icon icon={stat.icon} class={stat.style} />
                             </span>
-                            <span class="pl-2">{_entity[stat.stat]}</span>
+                            <span class="pl-2">{_player[stat.stat]}</span>
                         </p>
                     </Tooltip>
                 </div>
@@ -105,7 +106,7 @@
             <h2 class="text-xl tracking-wider">Enemies:</h2>
             <hr />
             <div class="flex flex-wrap">
-                {#each Counter(_history) as enemy}
+                {#each counter(_data.enemiesHistory) as enemy}
                     <Tooltip title={enemy.key} content={[`${enemy.levels}`]}>
                         <div class="flex flex-col">
                             <div class="relative w-20 h-20">

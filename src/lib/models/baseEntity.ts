@@ -1,5 +1,4 @@
-import { calcDmgReduction } from '$lib/utils/calcDmgReduction'
-import { numberBetween } from '$lib/utils/numberBetween'
+import utils from '$lib/services/utils.service'
 import { config } from '.'
 
 const base = config.base
@@ -63,11 +62,11 @@ abstract class BaseEntity {
     }
 
     receiveAttack(damage: number): number {
-        return this._getDamage(calcDmgReduction(damage, this.armor))
+        return this._getDamage(utils.calcDmgReduction(damage, this.armor))
     }
 
     receiveMagic(damage: number): number {
-        return this._getDamage(calcDmgReduction(damage, this.mr))
+        return this._getDamage(utils.calcDmgReduction(damage, this.mr))
     }
 
     /**
@@ -82,7 +81,7 @@ abstract class BaseEntity {
      */
     private action(min_hit: number, max_hit: number, critic_chance: number, misses_chance: number) {
         // Calc damage between the range
-        const damage = numberBetween(min_hit, max_hit)
+        const damage = utils.numberBetween(min_hit, max_hit)
 
         // Calc the chances
         const chances = Math.random()
@@ -115,7 +114,7 @@ abstract class BaseEntity {
 
     heal() {
         this.potions -= 1
-        const heal = numberBetween(
+        const heal = utils.numberBetween(
             this.dmgReceived * this.data.heal_range[0],
             this.dmgReceived * this.data.heal_range[0],
         )
