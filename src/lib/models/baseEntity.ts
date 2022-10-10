@@ -95,29 +95,16 @@ abstract class BaseEntity {
     }
 
     attack() {
-        return this.action(
-            this.ad * this.data.ad_hit_range[0],
-            this.ad * this.data.ad_hit_range[1],
-            this.data.ad_critic_chance,
-            this.data.ad_misses_chance,
-        )
+        return this.action(this.ad * this.data.ad_hit_range[0], this.ad * this.data.ad_hit_range[1], this.data.ad_critic_chance, this.data.ad_misses_chance)
     }
 
     magic() {
-        return this.action(
-            this.ap * this.data.ap_hit_range[0],
-            this.ap * this.data.ap_hit_range[1],
-            this.data.ap_critic_chance,
-            this.data.ap_misses_chance,
-        )
+        return this.action(this.ap * this.data.ap_hit_range[0], this.ap * this.data.ap_hit_range[1], this.data.ap_critic_chance, this.data.ap_misses_chance)
     }
 
     heal() {
         this.potions -= 1
-        const heal = utils.numberBetween(
-            this.dmgReceived * this.data.heal_range[0],
-            this.dmgReceived * this.data.heal_range[0],
-        )
+        const heal = utils.numberBetween(this.dmgReceived * this.data.heal_range[0], this.dmgReceived * this.data.heal_range[0])
         this.dmgReceived -= heal
         if (this.dmgReceived < 0) this.dmgReceived = 0
         return heal

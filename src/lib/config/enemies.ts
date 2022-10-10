@@ -9,19 +9,19 @@ const base: Modifiers = {
     speed: 1,
 }
 
-const presets: {[key: string]: Modifiers} = {
+const presets: { [key: string]: Modifiers } = {
     basic: base,
     ad: {
         ...base,
         health: 0.75,
-        ad: 1.50,
+        ad: 1.5,
         ap: 0.5,
-        speed: 1.50,
+        speed: 1.5,
     },
     ap: {
         ...base,
         ad: 0.5,
-        ap: 1.50,
+        ap: 1.5,
     },
     tank: {
         ...base,
@@ -33,7 +33,7 @@ const presets: {[key: string]: Modifiers} = {
         ap: 0.5,
     },
     boss: {
-        health: 1.50,
+        health: 1.5,
         ad: 1.25,
         ap: 1.25,
         armor: 1.25,
@@ -129,7 +129,7 @@ export const enemies: EnemyConfigDto[] = [
     {
         name: 'Wild Huntress',
         size: 'w-48 h-48',
-        modifiers: presets.ad, 
+        modifiers: presets.ad,
     },
     {
         name: 'Witch Blue',
