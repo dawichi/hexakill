@@ -7,13 +7,15 @@
     import type { Character, Enemy } from '$lib/models'
     import type { EnemyHistory } from '$lib/types/EnemyHistory.dto'
 
+    // components
     import Icon from '@iconify/svelte'
+    import BgImage from '$lib/components/BgImage.svelte'
+    import Tooltip from '$lib/components/Tooltip.svelte'
+    // others
+    import { enemiesHistory, gameData, logs } from '$lib/data/data'
+    import { tooltipsService } from '$lib/services'
     import { StatIcons } from '$lib/config/statIcons'
     import { styles } from '$lib/config/styles'
-    import BgImage from '$lib/components/BgImage.svelte'
-    import { enemiesHistory, gameData, logs } from '$lib/data/data'
-    import Tooltip from '$lib/components/Tooltip.svelte'
-    import { tooltipsService } from '$lib/services/tooltips.service'
 
     let _entity: Character
     let _enemy: Enemy

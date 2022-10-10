@@ -5,10 +5,12 @@
   @param items - the list of items to show
 -->
 <script lang="ts">
-    import { items } from '$lib/config/items'
-    import Item from '$lib/models/Item'
     import BgImage from './BgImage.svelte'
+    import Item from '$lib/models/Item'
+    import { items } from '$lib/config/items'
+
     let _Items: Item[] = []
+
     for (const item of items) {
       _Items.push(new Item(item.name,1,item.bonus))
     }

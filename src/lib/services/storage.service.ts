@@ -2,7 +2,7 @@ import type { PersonalRecord } from '$lib/types/PersonalRecord.dto'
 
 const key = 'hxkllPersonalRecords'
 
-export const localStorageService = {
+const storage = {
     /**
      * ## Get the personal records from localStorage
      */
@@ -25,3 +25,5 @@ export const localStorageService = {
      */
     clear: (): void => localStorage.removeItem(key),
 }
+
+export default storage

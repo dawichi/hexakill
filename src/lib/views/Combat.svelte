@@ -4,18 +4,17 @@
     The view of the actual game, where the user can fight enemies.
 -->
 <script lang="ts">
-    import { styles } from '$lib/config/styles'
-    import { enemiesHistory, gameData, logs } from '$lib/data/data'
+    // components
+    import Items from '$lib/components/Items.svelte'
     import Entity from '$lib/components/Entity.svelte'
     import Logger from '$lib/components/Logger.svelte'
-    import { Character, Enemy } from '$lib/models'
-    import { loggerCleaner } from '$lib/utils/loggerCleaner'
-    import { enemyGenerator } from '$lib/utils/enemyGenerator'
-    import { enemyActionChoice } from '$lib/utils/enemyActionChoice'
-    import PersonalRecords from '$lib/components/PersonalRecords.svelte'
-    import { localStorageService } from '$lib/services/localStorage.service'
     import PowerUps from '$lib/components/PowerUps.svelte'
-    import Items from '$lib/components/Items.svelte'
+    import PersonalRecords from '$lib/components/PersonalRecords.svelte'
+    // others
+    import { enemiesHistory, gameData, logs } from '$lib/data/data'
+    import { enemyService, loggerService, storageService } from '$lib/services'
+    import { Character, Enemy } from '$lib/models'
+    import { styles } from '$lib/config/styles'
 
     // ╔══════════════════════════════════════════════════════
     // ║ Variables of the game
@@ -55,7 +54,7 @@
         _fighting = true
         gameData.update(n => {
             if (n.character) n.character.potions += 2
-            n.enemy = enemyGenerator(_player?.level ?? 1)
+            n.enemy = enemyService.enemyGenerator(_player?.level ?? 1)
             return n
         })
 
@@ -63,13 +62,13 @@
             const isPlayerFaster: boolean = (_player?.speed ?? 0) > (_enemy?.speed ?? 0)
             const enemyName = _enemy?.name ?? 'Enemy'
 
-            loggerCleaner(n.enemy, {
+            loggerService.add(n.enemy, {
                 title: enemyName,
                 message: `has appeared!`,
             })
 
             const logTo = isPlayerFaster ? 'player' : 'enemy'
-            loggerCleaner(n[logTo], {
+            loggerService.add(n[logTo], {
                 title: isPlayerFaster ? 'You' : enemyName,
                 message: isPlayerFaster ? `attack first!` : `attacks first!`,
             })
@@ -149,7 +148,7 @@
      */
     function executeActions(active: Character | Enemy, passive: Character | Enemy): void {
         const active_is_a_player: boolean = active instanceof Character
-        const choice = active instanceof Enemy ? enemyActionChoice(active) : _actionSelected
+        const choice = active instanceof Enemy ? enemyService.enemyActionChoice(active) : _actionSelected
 
         let damage: number
         let dmgReceived: number
@@ -177,7 +176,7 @@
 
         gameData.update(n => n)
         logs.update(n => {
-            loggerCleaner(n[active_is_a_player ? 'player' : 'enemy'], {
+            loggerService.add(n[active_is_a_player ? 'player' : 'enemy'], {
                 title: active.name,
                 message: message,
                 value: dmgReceived,
@@ -199,11 +198,11 @@
 
         logs.update(n => {
             if (!_player || !_enemy) return n
-            loggerCleaner(n.enemy, {
+            loggerService.add(n.enemy, {
                 title: _enemy.name,
                 message: `lv ${_enemy.level} has been defeated! 🎉🎉`,
             })
-            loggerCleaner(n.player, {
+            loggerService.add(n.player, {
                 title: '',
                 message: `Well done, you have gained ${exp} exp!`,
             })
@@ -214,7 +213,7 @@
                 const powerUpsToAdd = oldLevel % 2 !== 0 ? ~~((_player.level - oldLevel) / 2) : parseInt(((_player.level - oldLevel) / 2).toFixed(0))
                 _powerUps.pending = acc_history + powerUpsToAdd > maxPowerUps ? maxPowerUps - acc_history : powerUpsToAdd
 
-                loggerCleaner(n.player, {
+                loggerService.add(n.player, {
                     title: '',
                     message: `You have leveled up! 🎉🎉`,
                 })
@@ -245,7 +244,7 @@
     const playerDefeat = () => {
         _fighting = false
         logs.update(n => {
-            loggerCleaner(n.player, {
+            loggerService.add(n.player, {
                 title: 'Oh no!',
                 message: 'You have been defeated! 😭',
             })
@@ -261,7 +260,7 @@
             return n
         })
 
-        localStorageService.add({
+        storageService.add({
             classIdx: _characterIdx,
             name: _player?.name ?? '',
             record: _player?.level ?? 0,

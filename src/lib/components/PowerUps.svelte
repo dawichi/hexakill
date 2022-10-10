@@ -5,7 +5,6 @@
 -->
 <script lang="ts">
     import type { Character } from '$lib/models'
-
     import Icon from '@iconify/svelte'
     import { gameData } from '$lib/data/data'
     import { getPowerupProp, powerups } from '$lib/config/powerups'

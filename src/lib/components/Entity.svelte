@@ -7,12 +7,12 @@
 <script lang="ts">
     import Icon from '@iconify/svelte'
     import BgImage from './BgImage.svelte'
-    import { StatIcons } from '$lib/config/statIcons'
+    import Tooltip from './Tooltip.svelte'
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
+    import { StatIcons } from '$lib/config/statIcons'
+    import { tooltipsService } from '$lib/services'
     import { Character, type Enemy } from '$lib/models'
-    import Tooltip from './Tooltip.svelte'
-    import { tooltipsService } from '$lib/services/tooltips.service'
 
     export let type: 'character' | 'enemy'
     let _entity: Character | Enemy

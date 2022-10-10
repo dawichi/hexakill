@@ -6,9 +6,9 @@
 <script lang="ts">
     import type { PersonalRecord } from '$lib/types/PersonalRecord.dto'
     import { characters } from '$lib/config/characters'
-    import { localStorageService } from '$lib/services/localStorage.service'
+    import { storageService } from '$lib/services'
 
-    let _personalRecords: PersonalRecord[] = localStorageService.get()
+    let _personalRecords: PersonalRecord[] = storageService.get()
 </script>
 
 <div class="flex flex-col gap-2 p-2">
@@ -18,7 +18,7 @@
             <button
                 title="Delete all records"
                 on:click={() => {
-                    localStorageService.clear()
+                    storageService.clear()
                     _personalRecords = []
                 }}
                 class="bg-red-600 px-1 rounded"

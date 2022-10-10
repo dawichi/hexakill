@@ -1,10 +1,10 @@
 import type { BaseEntity } from '$lib/models'
-import { calcDmgReductionPercent } from '$lib/utils/calcDmgReduction'
+import utils from './utils.service'
 
 /**
  * Utils for tooltips
  */
-export const tooltipsService = {
+export const tooltips = {
     /**
      * ## Get the tooltip for a given stat
      */
@@ -22,10 +22,12 @@ export const tooltipsService = {
                     `${ap_misses_chance * 100}% chance to miss`,
                     `Hit range: ${ap_hit_range[0] * 100}% - ${ap_hit_range[1] * 100}% of AP`,
                 ],
-                armor: [`${calcDmgReductionPercent(entity.armor)}% attacks damage reduction`],
-                mr: [`${calcDmgReductionPercent(entity.mr)}% magics damage reduction`],
+                armor: [`${utils.calcDmgReductionPercent(entity.armor)}% attacks damage reduction`],
+                mr: [`${utils.calcDmgReductionPercent(entity.mr)}% magics damage reduction`],
                 potions: [`Heal range: ${heal_range[0] * 100}% - ${heal_range[1] * 100}% of damage received`],
             }[stat] ?? []
         )
     },
 }
+
+export default tooltips
