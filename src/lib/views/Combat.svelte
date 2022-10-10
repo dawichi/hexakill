@@ -5,7 +5,7 @@
 -->
 <script lang="ts">
     import { styles } from '$lib/config/styles'
-    import { enemiesHistory, gameData, logs } from '$lib/data/stores'
+    import { enemiesHistory, gameData, logs } from '$lib/data/data'
     import Entity from '$lib/components/Entity.svelte'
     import Logger from '$lib/components/Logger.svelte'
     import { Character, Enemy } from '$lib/models'
@@ -131,17 +131,16 @@
     }
 
     function onKeyDown(event: KeyboardEvent): void {
-        const codes: {[key:string]: () => void} ={}
-        if (!_fighting) {
-            if (event.code === "Space") startCombat()
+        if (!_fighting && !_powerUps.pending) {
+            if (event.code === 'Space') startCombat()
             return
         }
         if (!_showButtons) return
 
-        if (event.code === "KeyA") selectAction(0)
-        if (event.code === "KeyS") selectAction(1)
+        if (event.code === 'KeyA') selectAction(0)
+        if (event.code === 'KeyS') selectAction(1)
         if (!(_player?.potions ?? 0)) return
-        if (event.code === "KeyD") selectAction(2)
+        if (event.code === 'KeyD') selectAction(2)
     }
     /**
      * ## Execute Actions
@@ -208,8 +207,13 @@
                 title: '',
                 message: `Well done, you have gained ${exp} exp!`,
             })
-            if (leveledUp) {
-                _powerUps.pending = oldLevel % 2 !== 0 ? ~~((_player.level - oldLevel) / 2) : parseInt(((_player.level - oldLevel) / 2).toFixed(0))
+
+            const maxPowerUps = 24
+            const acc_history = Object.values(_powerUps.history).reduce((acc, val) => acc + val, 0)
+            if (leveledUp && acc_history < maxPowerUps) {
+                const powerUpsToAdd = oldLevel % 2 !== 0 ? ~~((_player.level - oldLevel) / 2) : parseInt(((_player.level - oldLevel) / 2).toFixed(0))
+                _powerUps.pending = acc_history + powerUpsToAdd > maxPowerUps ? maxPowerUps - acc_history : powerUpsToAdd
+
                 loggerCleaner(n.player, {
                     title: '',
                     message: `You have leveled up! 🎉🎉`,
@@ -265,10 +269,17 @@
 
         setTimeout(() => {
             gameData.update(n => {
-                n.step = 'gameover'
+                n.view = 'gameover'
                 return n
             })
         }, 2000)
+    }
+
+    function openStore(): void {
+        gameData.update(n => {
+            n.view = 'store'
+            return n
+        })
     }
 </script>
 
@@ -302,6 +313,7 @@
                 {:else if !_powerUps.pending}
                     <section class={styles.cell + 'flex justify-center items-center'}>
                         <button on:click={startCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
+                        <button on:click={openStore} class={styles.button.base + styles.button.green}> STORE </button>
                     </section>
                 {/if}
             </div>

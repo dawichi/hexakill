@@ -5,11 +5,11 @@
 -->
 <script lang="ts">
     import { styles } from '$lib/config/styles'
-    import { gameData } from '$lib/data/stores'
+    import { gameData } from '$lib/data/data'
 
     function startPlaying() {
         gameData.update(n => {
-            n.step = 'starting'
+            n.view = 'champSelect'
             return n
         })
     }

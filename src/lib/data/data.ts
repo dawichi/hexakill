@@ -4,7 +4,7 @@ import type { LoggerDTO } from '$lib/types/Logger.dto'
 import type { EnemyHistory } from '$lib/types/EnemyHistory.dto'
 
 export const gameData: Writable<GameDTO> = writable({
-    step: 'welcome',
+    view: 'welcome',
     username: '',
     characterIdx: -1,
     character: null,

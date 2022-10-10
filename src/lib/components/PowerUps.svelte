@@ -7,7 +7,7 @@
     import type { Character } from '$lib/models'
 
     import Icon from '@iconify/svelte'
-    import { gameData } from '$lib/data/stores'
+    import { gameData } from '$lib/data/data'
     import { getPowerupProp, powerups } from '$lib/config/powerups'
 
     export let _powerUps: {

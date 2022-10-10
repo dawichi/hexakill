@@ -8,7 +8,7 @@
     import Icon from '@iconify/svelte'
     import BgImage from './BgImage.svelte'
     import { StatIcons } from '$lib/config/statIcons'
-    import { gameData } from '$lib/data/stores'
+    import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
     import { Character, type Enemy } from '$lib/models'
     import Tooltip from './Tooltip.svelte'
