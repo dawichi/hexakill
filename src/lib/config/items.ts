@@ -25,4 +25,19 @@ export const items: ItemDTO[] = [
             ap: 50,
         },
     },
+    {
+        name: 'knife',
+        bonus: {
+            ...base,
+            ad: 50,
+        },
+    },
+    {
+        name: 'wooden shield',
+        bonus: {
+            ...base,
+            health: 250,
+            armor: 20,
+        },
+    },
 ]
