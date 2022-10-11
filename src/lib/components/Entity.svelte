@@ -12,7 +12,7 @@
     import { styles } from '$lib/config/styles'
     import { StatIcons } from '$lib/config/statIcons'
     import { tooltipsService } from '$lib/services'
-    import { Character, type Enemy } from '$lib/models'
+    import { Character, Enemy } from '$lib/models'
 
     export let type: 'character' | 'enemy'
     let _entity: Character | Enemy
@@ -41,7 +41,7 @@
             </div>
         {/if}
 
-        <div class={'relative ' + _entity.size}>
+        <div class={'relative h-72 ' + _entity.size}>
             <BgImage image={`/images/${_entity.image}/idle.gif`} />
         </div>
 
