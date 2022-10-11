@@ -80,6 +80,7 @@ class Combat {
         const exp = parseInt(((data.enemy.level / data.character.level) * 100).toFixed(0))
         const oldLevel = data.character.level
         const leveledUp = data.character.gainExp(exp)
+        data.character.gainGold(data.enemy.gold)
 
         gameData.update(n => {
             if (!n.character || !n.enemy) return n

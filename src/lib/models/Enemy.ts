@@ -6,11 +6,12 @@ const { base, names } = config
 class Enemy extends BaseEntity {
     private readonly modifiers: Modifiers
 
-    constructor(level: number, name: string, config: EnemyConfigDto) {
+    constructor(level: number, name: string, config: EnemyConfigDto, gold: number) {
         super(level, name + ' ' + names[Math.floor(Math.random() * names.length)])
         this.modifiers = config.modifiers
         this.image = config.name.replaceAll(' ', '-').toLowerCase()
         this.size = config.size
+        this.gold = gold
 
         const stats: Stats[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed']
         stats.forEach(stat => {

@@ -9,9 +9,9 @@ import { gameData } from '$lib/data/data'
  */
 class EnemyService {
     private bosses: Record<number,Enemy> = {
-        10: new Enemy(15,'Gold Slime 1', enemies[14]),
-        20: new Enemy(25,'Gold Slime 2', enemies[14]),
-        30: new Enemy(35,'Gold Slime 3', enemies[14]),
+        10: new Enemy(15,'Gold Slime 1', enemies[14], 1000),
+        20: new Enemy(25,'Gold Slime 2', enemies[14], 1000),
+        30: new Enemy(35,'Gold Slime 3', enemies[14], 1000),
     }
 
     /**
@@ -39,18 +39,19 @@ class EnemyService {
     /**
      * ## Generate a new enemy
      * Depending of the player levels
-     * @param level The player's level.
+     * @param playerLevel The player's level.
      * @returns A enemy.
      */
-    private generateEnemy(level: number): Enemy {
+    private generateEnemy(playerLevel: number): Enemy {
         // range of levels
-        const min_level = Math.floor(level / 2)
-        const max_level = level * 1.75
+        const min_level = Math.floor(playerLevel / 2)
+        const max_level = playerLevel * 1.75
 
-        if (level < parseInt(Object.keys(this.bosses)[0])) {
-            const enemy_level = parseInt((Math.floor(Math.random() * (max_level - min_level + 1)) + min_level).toFixed(0))
-            const enemy = enemies[Math.floor(Math.random() * enemies.length)]
-            return new Enemy(enemy_level, enemy.name, enemy)
+        if (playerLevel < parseInt(Object.keys(this.bosses)[0])) {
+            const enemyLevel = parseInt((Math.floor(Math.random() * (max_level - min_level + 1)) + min_level).toFixed(0))
+            const enemyConfig = enemies[Math.floor(Math.random() * enemies.length)]
+            const gold = parseInt(((enemyLevel / playerLevel) * 250).toFixed(0))
+            return new Enemy(enemyLevel, enemyConfig.name, enemyConfig, gold)
         } else {
             const boss = Object.values(this.bosses)[0]
             delete this.bosses[parseInt(Object.keys(this.bosses)[0])]

@@ -4,50 +4,38 @@ import { config } from '.'
 const base = config.base
 
 abstract class BaseEntity {
+    size = 'w-full h-full'
+    image = ''
+    dmgReceived = 0
+    gold = 0
+    potions = 5
     name: string
     level: number
-    size: string
-    image: string
-    dmgReceived: number
     health: number
-    potions: number
     ad: number
     ap: number
     armor: number
     mr: number
     speed: number
-    readonly data: {
-        ad_critic_chance: number
-        ad_misses_chance: number
-        ad_hit_range: [number, number]
-        ap_critic_chance: number
-        ap_misses_chance: number
-        ap_hit_range: [number, number]
-        heal_range: [number, number]
+    readonly data = {
+        ad_critic_chance: 0.9, // 10% top -> critic
+        ad_misses_chance: 0.1, // 10% low -> misses
+        ad_hit_range: [0.8, 1.4], // 80% - 140% ad
+        ap_critic_chance: 0.6, // 40% top -> critic
+        ap_misses_chance: 0.25, // 25% low -> misses
+        ap_hit_range: [0.3, 2], // 30% - 200% ap
+        heal_range: [0.2, 0.3], // 20% - 30% of damage received
     }
 
     constructor(level: number, name: string) {
         this.name = name
         this.level = level
-        this.size = 'w-full h-full'
-        this.image = ''
-        this.dmgReceived = 0
         this.health = level * base.health
-        this.potions = 5
         this.ad = level * base.ad
         this.ap = level * base.ap
         this.armor = level * base.armor
         this.mr = level * base.mr
         this.speed = level * base.speed
-        this.data = {
-            ad_critic_chance: 0.9, // 10% top -> critic
-            ad_misses_chance: 0.1, // 10% low -> misses
-            ad_hit_range: [0.8, 1.4], // 80% - 140% ad
-            ap_critic_chance: 0.6, // 40% top -> critic
-            ap_misses_chance: 0.25, // 25% low -> misses
-            ap_hit_range: [0.3, 2], // 30% - 200% ap
-            heal_range: [0.2, 0.3], // 20% - 30% of damage received
-        }
     }
 
     /**

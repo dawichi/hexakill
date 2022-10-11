@@ -47,4 +47,10 @@ export const StatIcons: Array<StatIcon> = [
         icon: 'game-icons:health-potion',
         style: 'text-red-500',
     },
+    {
+        stat: 'gold',
+        name: 'Gold',
+        icon: 'bxs:coin',
+        style: 'text-yellow-400',
+    }
 ]

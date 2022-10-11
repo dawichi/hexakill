@@ -43,6 +43,10 @@ class Character extends BaseEntity {
             return false
         }
     }
+
+    gainGold(gold: number): void {
+        this.gold += gold
+    }
 }
 
 export default Character
