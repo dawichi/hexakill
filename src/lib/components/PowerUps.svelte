@@ -44,7 +44,7 @@
         }
         _data.character[type] += getBonus(value, _data.powerUps.history[type])
         _data.powerUps.history[type] += 1
-        gameData.update(n => n)
+        gameData.update(d => d)
     }
 
     function safe(type: 'health' | 'ad' | 'ap' | 'speed', value: number) {

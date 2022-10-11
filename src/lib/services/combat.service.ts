@@ -45,14 +45,14 @@ class Combat {
 
         choices[choice]()
 
-        gameData.update(n => {
-            loggerService.add(n.logs[active_is_a_player ? 'player' : 'enemy'], {
+        gameData.update(d => {
+            loggerService.add(d.logs[active_is_a_player ? 'player' : 'enemy'], {
                 title: active.name,
                 message: message,
                 value: dmgReceived,
                 icon: icon,
             })
-            return n
+            return d
         })
     }
 
@@ -82,41 +82,41 @@ class Combat {
         const leveledUp = data.character.gainExp(exp)
         data.character.gainGold(data.enemy.gold)
 
-        gameData.update(n => {
-            if (!n.character || !n.enemy) return n
-            n.showUI.fighting = false
-            loggerService.add(n.logs.enemy, {
-                title: n.enemy.name,
-                message: `lv ${n.enemy.level} has been defeated! 🎉🎉`,
+        gameData.update(d => {
+            if (!d.character || !d.enemy) return d
+            d.showUI.fighting = false
+            loggerService.add(d.logs.enemy, {
+                title: d.enemy.name,
+                message: `lv ${d.enemy.level} has been defeated! 🎉🎉`,
             })
-            loggerService.add(n.logs.player, {
+            loggerService.add(d.logs.player, {
                 title: '',
                 message: `Well done, you have gained ${exp} exp!`,
             })
 
             const maxPowerUps = 24
-            const acc_history = Object.values(n.powerUps.history).reduce((acc, val) => acc + val, 0)
+            const acc_history = Object.values(d.powerUps.history).reduce((acc, val) => acc + val, 0)
             if (leveledUp && acc_history < maxPowerUps) {
-                const powerUpsToAdd = oldLevel % 2 !== 0 ? ~~((n.character.level - oldLevel) / 2) : parseInt(((n.character.level - oldLevel) / 2).toFixed(0))
-                n.powerUps.pending = acc_history + powerUpsToAdd > maxPowerUps ? maxPowerUps - acc_history : powerUpsToAdd
+                const powerUpsToAdd = oldLevel % 2 !== 0 ? ~~((d.character.level - oldLevel) / 2) : parseInt(((d.character.level - oldLevel) / 2).toFixed(0))
+                d.powerUps.pending = acc_history + powerUpsToAdd > maxPowerUps ? maxPowerUps - acc_history : powerUpsToAdd
 
-                loggerService.add(n.logs.player, {
+                loggerService.add(d.logs.player, {
                     title: '',
                     message: `You have leveled up! 🎉🎉`,
                 })
             }
 
-            n.enemiesHistory.push({
-                image: n.enemy.image,
-                level: n.enemy.level,
+            d.enemiesHistory.push({
+                image: d.enemy.image,
+                level: d.enemy.level,
             })
-            return n
+            return d
         })
 
         setTimeout(() => {
-            gameData.update(n => {
-                n.enemy = null
-                return n
+            gameData.update(d => {
+                d.enemy = null
+                return d
             })
         }, 2000)
     }
@@ -125,13 +125,13 @@ class Combat {
      * ## ❌ PLAYER DEFEATED
      */
     private playerDefeat(data: GameDTO): void {
-        gameData.update(n => {
-            n.showUI.fighting = false
-            loggerService.add(n.logs.player, {
+        gameData.update(d => {
+            d.showUI.fighting = false
+            loggerService.add(d.logs.player, {
                 title: 'Oh no!',
                 message: 'You have been defeated! 😭',
             })
-            return n
+            return d
         })
 
         storageService.add({
@@ -141,9 +141,9 @@ class Combat {
         })
 
         setTimeout(() => {
-            gameData.update(n => {
-                n.view = 'gameover'
-                return n
+            gameData.update(d => {
+                d.view = 'gameover'
+                return d
             })
         }, 2000)
     }
@@ -156,9 +156,9 @@ class Combat {
         if (!data.character || !data.enemy) return
         this.playerAction = playerAction
 
-        gameData.update(n => {
-            n.showUI.actionBtns = false
-            return n
+        gameData.update(d => {
+            d.showUI.actionBtns = false
+            return d
         })
     
         // Call the attack functions in order depending of who is faster
@@ -175,9 +175,9 @@ class Combat {
         }
 
         if (hasAnybodyDied) {
-            gameData.update(n => {
-                n.showUI.actionBtns = true
-                return n
+            gameData.update(d => {
+                d.showUI.actionBtns = true
+                return d
             })
             return
         }
@@ -189,9 +189,9 @@ class Combat {
                 ? this.defineTurn(data.enemy, data.character, () => this.playerDefeat(data))
                 : this.defineTurn(data.character, data.enemy, () => this.enemyDefeat(data))
 
-            gameData.update(n => {
-                n.showUI.actionBtns = true
-                return n
+            gameData.update(d => {
+                d.showUI.actionBtns = true
+                return d
             })
         }, 1000)
     }

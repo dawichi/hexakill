@@ -61,9 +61,7 @@ class EnemyService {
 
     /**
      * ## New Enemy
-     * Spawns a new enemy in the gameData
-     * @param gameData The game data
-     * @returns The game data
+     * Spawns a new enemy
      */
     newEnemy(): void {
         gameData.update(d => {
