@@ -22,6 +22,9 @@
     let _data: GameDTO
 
     gameData.subscribe(n => {
+        if (!n.character || !n.enemy) return n
+        _player = n.character
+        _enemy = n.enemy
         _data = n
     })
 

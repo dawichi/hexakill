@@ -47,5 +47,6 @@
         left: 80px;
         position: absolute;
         white-space: nowrap;
+        z-index: 999;
     }
 </style>

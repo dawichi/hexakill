@@ -205,9 +205,15 @@
                 image: n.enemy.image,
                 level: n.enemy.level,
             })
-            n.enemy = null
             return n
         })
+
+        setTimeout(() => {
+            gameData.update(n => {
+                n.enemy = null
+                return n
+            })
+        }, 2000)
     }
 
     // ╔══════════════════════════════════════════════════════
