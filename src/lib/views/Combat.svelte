@@ -30,6 +30,7 @@
     function onKeyDown(event: KeyboardEvent): void {
         if (!_data.showUI.fighting && !_data.powerUps.pending) {
             if (event.code === 'Space') newCombat()
+            if (event.code === 'KeyP') openStore()
             return
         }
         if (!_data.showUI.fighting || !_data.showUI.actionBtns) return
