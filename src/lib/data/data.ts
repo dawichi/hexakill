@@ -7,7 +7,10 @@ export const gameData: Writable<GameDTO> = writable({
     characterIdx: -1,
     character: null,
     enemy: null,
-    fighting: false,
+    showUI: {
+        fighting: false,
+        actionBtns: true
+    },
     logs: {
         player: [],
         enemy: [],

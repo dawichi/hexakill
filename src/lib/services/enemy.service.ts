@@ -1,19 +1,26 @@
 import { enemies } from '$lib/config/enemies'
 import { Enemy } from '$lib/models'
+import { loggerService } from '.'
+import { gameData } from '$lib/data/data'
 
-const bosses: Record<number,Enemy> = {
-    10: new Enemy(15,'Gold Slime 1', enemies[14]),
-    20: new Enemy(25,'Gold Slime 2', enemies[14]),
-    30: new Enemy(35,'Gold Slime 3', enemies[14]),
-}
+
 /**
  * Enemy utils
  */
-const enemy = {
+class EnemyService {
+    private bosses: Record<number,Enemy> = {
+        10: new Enemy(15,'Gold Slime 1', enemies[14]),
+        20: new Enemy(25,'Gold Slime 2', enemies[14]),
+        30: new Enemy(35,'Gold Slime 3', enemies[14]),
+    }
+
     /**
-     * ## Generate the enemy action
+     * ## Generate an enemy action
+     * Depending of the hp, he prioritize attack or healing
+     * @param enemy The enemy.
+     * @returns The action choosen.
      */
-    enemyActionChoice(enemy: Enemy): 0 | 1 | 2 {
+    generateAction(enemy: Enemy): 0 | 1 | 2 {
         const currentHP = (enemy.health - enemy.dmgReceived) / enemy.health
         const enemy_action = Math.random()
 
@@ -27,28 +34,59 @@ const enemy = {
         if (enemy_action <= 0.33) return 0
         if (enemy_action <= 0.66) return 1
         return 2
-    },
+    }
+
     /**
-     * Return a random enemy from the enemies array.
-     * Base enemy level on the player's level.
+     * ## Generate a new enemy
+     * Depending of the player levels
      * @param level The player's level.
      * @returns A enemy.
      */
-    enemyGenerator(level: number): Enemy {
+    private generateEnemy(level: number): Enemy {
         // range of levels
         const min_level = Math.floor(level / 2)
         const max_level = level * 1.75
-        if ((level) < parseInt(Object.keys(bosses)[0])){
+
+        if (level < parseInt(Object.keys(this.bosses)[0])) {
             const enemy_level = parseInt((Math.floor(Math.random() * (max_level - min_level + 1)) + min_level).toFixed(0))
             const enemy = enemies[Math.floor(Math.random() * enemies.length)]
             return new Enemy(enemy_level, enemy.name, enemy)
-        }else{
-            const boss = Object.values(bosses)[0]
-            delete bosses[parseInt(Object.keys(bosses)[0])]
+        } else {
+            const boss = Object.values(this.bosses)[0]
+            delete this.bosses[parseInt(Object.keys(this.bosses)[0])]
             return boss
         }
-        // pick a random enemy and return it
-    },
+    }
+
+    /**
+     * ## New Enemy
+     * Spawns a new enemy in the gameData
+     * @param gameData The game data
+     * @returns The game data
+     */
+    newEnemy(): void {
+        gameData.update(d => {
+            if (!d.character) return d
+            d.character.potions += 1
+            d.enemy = this.generateEnemy(d.character.level)
+            d.showUI.fighting = true
+
+            const isPlayerFaster: boolean = (d.character.speed ?? 0) > (d.enemy.speed ?? 0)
+
+            loggerService.add(d.logs.enemy, {
+                title: d.enemy.name,
+                message: `has appeared!`,
+            })
+
+            const logTo = isPlayerFaster ? 'player' : 'enemy'
+            loggerService.add(d.logs[logTo], {
+                title: isPlayerFaster ? 'You' : d.enemy.name,
+                message: isPlayerFaster ? `attack first!` : `attacks first!`,
+            })
+            return d
+        })
+
+    }
 }
 
-export default enemy
+export default new EnemyService()

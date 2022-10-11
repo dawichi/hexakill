@@ -106,7 +106,7 @@
         </div>
         <!-- ENEMIES HISTORY -->
         <section class={styles.cell + 'flex flex-col animate__animated animate__fadeIn animate__slower  animate__delay-4s relative'}>
-            <h2 class="text-xl tracking-wider">Enemies:</h2>
+            <h2 class="text-xl tracking-wider">Enemies killed:</h2>
             <hr />
             <div class="flex flex-wrap">
                 {#each counter(_data.enemiesHistory) as enemy}
@@ -122,6 +122,7 @@
             </div>
         </section>
     </section>
+
     <!-- YOUR MURDERER STATS -->
     <section class={styles.cell + 'text-center flex items-center justify-center animate__animated animate__fadeIn animate__slower animate__delay-2s'}>
         <div>

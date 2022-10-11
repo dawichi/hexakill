@@ -11,7 +11,10 @@ export type GameDTO = {
     characterIdx: number
     character: Character | null
     enemy: Enemy | null
-    fighting: boolean
+    showUI: {
+        fighting: boolean
+        actionBtns: boolean
+    }
     logs: LoggerDTO
     powerUps: {
         pending: number

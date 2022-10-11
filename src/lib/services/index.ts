@@ -1,3 +1,4 @@
+export { default as combatService } from './combat.service'
 export { default as enemyService } from './enemy.service'
 export { default as loggerService } from './logger.service'
 export { default as storageService } from './storage.service'
