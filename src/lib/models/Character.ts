@@ -1,11 +1,11 @@
 import type { CharacterConfigDto, Modifiers, Stats } from '$lib/types/Entities.dto'
-import { BaseEntity } from '.'
-import { config } from '.'
+import { BaseEntity, config, Item } from '.'
 
 const base = config.base
 
 class Character extends BaseEntity {
     exp = 0
+    items: Item[] = []
     private readonly modifiers: Modifiers
 
     constructor(level: number, name: string, config: CharacterConfigDto) {

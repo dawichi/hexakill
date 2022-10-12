@@ -2,6 +2,7 @@ import type { Modifiers } from '$lib/types/Entities.dto'
 
 type ItemDTO = {
     name: string
+    price: number
     bonus: Modifiers
 }
 
@@ -20,24 +21,10 @@ const base: Modifiers = {
 export const items: ItemDTO[] = [
     {
         name: 'orb',
+        price: 1200,
         bonus: {
             ...base,
             ap: 50,
-        },
-    },
-    {
-        name: 'knife',
-        bonus: {
-            ...base,
-            ad: 50,
-        },
-    },
-    {
-        name: 'wooden shield',
-        bonus: {
-            ...base,
-            health: 250,
-            armor: 20,
         },
     },
 ]

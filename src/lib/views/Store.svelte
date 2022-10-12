@@ -1,81 +1,88 @@
 <script lang="ts">
-    import BgImage from '$lib/components/BgImage.svelte'
-    import Tooltip from '$lib/components/Tooltip.svelte'
-    import { StatIcons } from '$lib/config/statIcons'
-    import { styles } from '$lib/config/styles'
-    import { gameData } from '$lib/data/data'
-    import type { Character, Enemy } from '$lib/models'
-    import Icon from '@iconify/svelte'
+    import Container from '$lib/components/Container.svelte'
     import Entity from '$lib/components/Entity.svelte'
-    
+    import type { GameDTO } from '$lib/types/Game.dto'
+    import { gameData } from '$lib/data/data'
+    import { Item } from '$lib/models'
     import { items } from '$lib/config/items'
-    import Item from '$lib/models/Item'
-    import { tooltipsService } from '$lib/services'
-    let _Items: Item[] = []
-    for (const item of items) {
-        _Items.push(new Item(item.name, 1, item.bonus))
-    }
+    import { styles } from '$lib/config/styles'
+    import BgImage from '$lib/components/BgImage.svelte'
+    import Icon from '@iconify/svelte'
 
-    let _entity: Character
-    let _enemy: Enemy
+    let _data: GameDTO
+    gameData.subscribe(n => (_data = n))
 
-    gameData.subscribe(n => {
-        if (n.character) _entity = n.character
-        if (n.enemy) _enemy = n.enemy
-    })
+    let _availableItems: Item[] = [
+        new Item(items[0].name, 1, 100, items[0].bonus),
+        new Item(items[0].name, 2, 150, items[0].bonus),
+        new Item(items[0].name, 3, 200, items[0].bonus),
+        new Item(items[0].name, 1, 250, items[0].bonus),
+        new Item(items[0].name, 2, 300, items[0].bonus),
+        new Item(items[0].name, 3, 350, items[0].bonus),
+        new Item(items[0].name, 1, 400, items[0].bonus),
+        new Item(items[0].name, 2, 450, items[0].bonus),
+        new Item(items[0].name, 3, 500, items[0].bonus),
+        new Item(items[0].name, 1, 550, items[0].bonus),
+        new Item(items[0].name, 2, 600, items[0].bonus),
+        new Item(items[0].name, 3, 650, items[0].bonus),
+    ]
 
-    const colorHpBar = (hpWidth: number) => {
-        if (hpWidth <= 10) return 'bg-red-600'
-        if (hpWidth > 10 && hpWidth <= 40) return 'bg-yellow-600'
-        return 'bg-green-600'
-    }
-
-    function openCombat(): void {
+    function closeStore(): void {
         gameData.update(n => {
             n.view = 'combat'
             return n
         })
     }
+
+    function buyItem(item: Item): void {
+        console.log(item.name)
+    }
+
+    function isTooExpensive(item: Item): boolean {
+        return item.price > (_data.character?.gold ?? 0)
+    }
+
     function onKeyDown(event: KeyboardEvent): void {
-        if (event.code === 'KeyP') openCombat()
+        if (event.code === 'KeyP') closeStore()
         return
     }
 </script>
 
 <svelte:window on:keydown|preventDefault={onKeyDown} />
 
-<div class="animate__animated animate__fadeIn bg-zinc-900 lg:h-screen px-8 pt-20 pb-10 relative">
-    <button on:click={openCombat} class={styles.button.base + styles.button.red}> Arena </button>
-    <div class="h-screen flex flex-col justify-center items-center grid lg:grid-cols-3 grid-gap-20">
-        <h1 class="absolute top-0 text-3xl p-5 text-center w-full tracking-widest">HEXASTORE</h1>
-        <div>
-
-            <h1 class="flex justify-center text-2xl  text-amber-600">Character info:</h1>
+<Container>
+    <div class="bg-zinc-800 h-full grid grid-cols-2">
+        <section class="grid grid-rows-2">
             <Entity type="character" />
-        </div>
-
-        <section>
-            <button on:click={openCombat} class={styles.button.base + styles.button.red}> WIP, don't touch </button>
-            <button on:click={openCombat} class={styles.button.base + styles.button.red}> arena right now </button>
+            <section class={styles.cell}>
+                <button on:click={closeStore} class={styles.button.base + styles.button.red}> Arena </button>
+                <span>Your items</span>
+            </section>
         </section>
 
-        <section class="relative grid lg:grid-cols-2">
-            {#each _Items as item}
-                <span class="flex items-center w-20 h-20">
-                    <span>{item.name} lv {item.tier}</span>
-                    <BgImage image={`/images/items/${item.image}.png`} />
-
-                    <!-- Todo lo del tooltip inventado para probar como se veia -->
-                    <!-- <Tooltip title={item.name} content={tooltipsService.getStatTooltip(item.name, _entity)}>
-                            <p class="flex items-center text-lg p-30">
-                                <span class="text-xl">
-                                    <Icon icon={item.image} class={item.image} />
-                                </span>
-                                <span class="pl-2">{[item.name]}</span>
-                            </p>
-                        </Tooltip> -->
-                </span>
-            {/each}
+        <section class={styles.cell}>
+            <h1 class="text-2xl text-center pb-2">Items shop</h1>
+            <hr />
+            <div class="mt-2 grid grid-cols-4 gap-2">
+                {#each _availableItems as item}
+                    <article class={`${isTooExpensive(item) ? 'opacity-20' : ''} rounded hover:bg-zinc-700 hover:cursor-pointer`} on:click={() => buyItem(item)}>
+                        <div class="bg-zinc-800 rounded p-2">
+                            <h2 class="text-xl text-center">{item.name}</h2>
+                            <div class="flex justify-center">
+                                <div class="relative w-12 h-12">
+                                    <BgImage image={`/images/items/${item.image}.png`} />
+                                </div>
+                            </div>
+                        </div>
+                        <p class="relative flex items-center text-lg p-1">
+                            <span class="text-3xl">
+                                <Icon icon="bxs:coin" class="text-yellow-400" />
+                            </span>
+                            <span class={`pl-2 ${isTooExpensive(item) ? 'text-red-500' : ''}`}>{item.price}</span>
+                        </p>
+                    </article>
+                {/each}
+            </div>
         </section>
     </div>
-</div>
+</Container>

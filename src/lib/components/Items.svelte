@@ -12,7 +12,7 @@
     let _Items: Item[] = []
 
     for (const item of items) {
-      _Items.push(new Item(item.name,1,item.bonus))
+      _Items.push(new Item(item.name,1, 1000, item.bonus))
     }
 </script>
 

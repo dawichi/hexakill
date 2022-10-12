@@ -12,12 +12,14 @@ class Item {
     name: string
     image: string
     tier: 1 | 2 | 3
+    price: number
     bonus: Modifiers
 
-    constructor(name: string, tier: 1 | 2 | 3, bonus: Modifiers) {
+    constructor(name: string, tier: 1 | 2 | 3, price: number, bonus: Modifiers) {
         this.name = name
         this.image = name.replaceAll(' ', '-').toLowerCase()
         this.tier = tier
+        this.price = price
         this.bonus = calcIncrement(bonus, tier)
     }
 }
