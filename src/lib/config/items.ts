@@ -20,11 +20,38 @@ const base: Modifiers = {
  */
 export const items: ItemDTO[] = [
     {
-        name: 'orb',
-        price: 1200,
+        name: 'Orb',
+        price: 300,
         bonus: {
             ...base,
             ap: 50,
+        },
+    },
+    {
+        name: 'Orb',
+        price: 500,
+        bonus: {
+            ...base,
+            ap: 100,
+        },
+    },
+    {
+        name: 'Orb',
+        price: 800,
+        bonus: {
+            ...base,
+            ap: 200,
+            speed: 50,
+        },
+    },
+    {
+        name: 'Orb',
+        price: 1200,
+        bonus: {
+            ...base,
+            health: 2000,
+            ap: 200,
+            speed: 50,
         },
     },
 ]

@@ -1,4 +1,4 @@
-import type { Character, Enemy } from '$lib/models'
+import type { Character, Enemy, Item } from '$lib/models'
 import type { LoggerDTO } from './Logger.dto'
 
 export type EnemyHistory = {
@@ -11,6 +11,9 @@ export type GameDTO = {
     characterIdx: number
     character: Character | null
     enemy: Enemy | null
+    shop: {
+        items: Item[]
+    }
     showUI: {
         fighting: boolean
         actionBtns: boolean

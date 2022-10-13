@@ -64,7 +64,7 @@
 
 <svelte:window on:keydown|preventDefault={onKeyDown} />
 
-<div>
+<div class="text-center">
     <div class="grid grid-cols-4 gap-3 p-4">
         {#each Object.keys(_data.powerUps.history) as powerupKey}
             <div class="flex flex-col items-start p-1 rounded bg-zinc-700">
