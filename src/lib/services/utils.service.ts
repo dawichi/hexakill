@@ -1,3 +1,6 @@
+import type { Item } from '$lib/models'
+import type { Modifiers } from '$lib/types/Entities.dto'
+
 /**
  * Small utils
  */
@@ -29,6 +32,31 @@ const utils = {
      */
     calcDmgReductionPercent(resistance: number): number {
         return (1000 - this.calcDmgReduction(1000, resistance)) / 10
+    },
+
+    /**
+     * ## Calculate total bonus
+     */
+    calcTotalBonus(items: Item[]): Modifiers {
+        const totalBonus: Modifiers = {
+            health: 0,
+            ad: 0,
+            ap: 0,
+            armor: 0,
+            mr: 0,
+            speed: 0,
+        }
+
+        items.forEach(item => {
+            totalBonus.health += item.bonus.health
+            totalBonus.ad += item.bonus.ad
+            totalBonus.ap += item.bonus.ap
+            totalBonus.armor += item.bonus.armor
+            totalBonus.mr += item.bonus.mr
+            totalBonus.speed += item.bonus.speed
+        })
+
+        return totalBonus
     },
 }
 

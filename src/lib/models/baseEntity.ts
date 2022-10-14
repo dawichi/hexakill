@@ -1,5 +1,6 @@
 import utils from '$lib/services/utils.service'
-import { config } from '.'
+import type { Modifiers } from '$lib/types/Entities.dto'
+import { config, Item } from '.'
 
 const base = config.base
 
@@ -17,6 +18,20 @@ abstract class BaseEntity {
     armor: number
     mr: number
     speed: number
+    inventory: {
+        items: Item[]
+        totalBonus: Modifiers
+    } = {
+        items: [],
+        totalBonus: {
+            health: 0,
+            ad: 0,
+            ap: 0,
+            armor: 0,
+            mr: 0,
+            speed: 0,
+        },
+    }
     readonly data = {
         ad_critic_chance: 0.9, // 10% top -> critic
         ad_misses_chance: 0.1, // 10% low -> misses
@@ -96,6 +111,14 @@ abstract class BaseEntity {
         this.dmgReceived -= heal
         if (this.dmgReceived < 0) this.dmgReceived = 0
         return heal
+    }
+
+    /**
+     * Add items to the inventory
+     */
+    addItem(item: Item) {
+        this.inventory.items.push(item)
+        this.inventory.totalBonus = utils.calcTotalBonus(this.inventory.items)
     }
 }
 

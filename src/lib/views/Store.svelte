@@ -4,6 +4,7 @@
     import BgImage from '$lib/components/BgImage.svelte'
     import Tooltip from '$lib/components/Tooltip.svelte'
     import Entity from '$lib/components/Entity.svelte'
+    import Items from '$lib/components/Items.svelte'
     import type { GameDTO } from '$lib/types/Game.dto'
     import type { Item } from '$lib/models'
     import { gameData } from '$lib/data/data'
@@ -31,7 +32,8 @@
         gameData.update(n => {
             if (!n.character) return n
             n.character.gold -= item.price
-
+            n.character.addItem(item)
+            // delete item from store
             const idx = n.shop.items.indexOf(item)
             n.shop.items.splice(idx, 1)
             return n
@@ -52,7 +54,7 @@
             <Entity type="character" />
             <section class={styles.cell}>
                 <button on:click={closeStore} class={styles.button.base + styles.button.red}>Arena</button>
-                <span>Your items</span>
+                <Items />
             </section>
         </section>
 

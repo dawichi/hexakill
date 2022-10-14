@@ -1,11 +1,10 @@
 import type { CharacterConfigDto, Modifiers, Stats } from '$lib/types/Entities.dto'
-import { BaseEntity, config, Item } from '.'
+import { BaseEntity, config } from '.'
 
 const base = config.base
 
 class Character extends BaseEntity {
     exp = 0
-    items: Item[] = []
     private readonly modifiers: Modifiers
 
     constructor(level: number, name: string, config: CharacterConfigDto) {
@@ -29,6 +28,11 @@ class Character extends BaseEntity {
         this.speed = this._incrementStat('speed', this.speed)
     }
 
+    /**
+     * ## Gain Experience
+     * @param exp Experience to gain
+     * @returns true if leveled up
+     */
     gainExp(exp: number): boolean {
         let exp_total = this.exp + exp
         if (exp_total >= 100) {
