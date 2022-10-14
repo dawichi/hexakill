@@ -24,7 +24,18 @@
     }
 
     function handleClick(item: Item): void {
-        isTooExpensive(item) ? console.log('too expensive') : console.log('BUY')
+        isTooExpensive(item) ? console.log('too expensive') : buyItem(item)
+    }
+
+    function buyItem(item: Item): void {
+        gameData.update(n => {
+            if (!n.character) return n
+            n.character.gold -= item.price
+
+            const idx = n.shop.items.indexOf(item)
+            n.shop.items.splice(idx, 1)
+            return n
+        })
     }
 
     function onKeyDown(event: KeyboardEvent): void {

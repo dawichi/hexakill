@@ -10,11 +10,11 @@ export const gameData: Writable<GameDTO> = writable({
     character: null,
     enemy: null,
     shop: {
-        items: items.map(item => new Item(item.name, item.price, item.bonus)),
+        items: items.map(item => new Item(item.id, item.name, item.price, item.bonus)),
     },
     showUI: {
         fighting: false,
-        actionBtns: true
+        actionBtns: true,
     },
     logs: {
         player: [],

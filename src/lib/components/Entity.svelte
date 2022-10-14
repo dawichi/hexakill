@@ -41,7 +41,7 @@
             </div>
         {/if}
 
-        <div class={'relative h-72 ' + _entity.size}>
+        <div class={'relative ' + _entity.size}>
             <BgImage image={`/images/${_entity.image}/idle.gif`} />
         </div>
 

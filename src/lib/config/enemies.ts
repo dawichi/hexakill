@@ -103,22 +103,22 @@ export const enemies: EnemyConfigDto[] = [
     },
     {
         name: 'Slime Red',
-        size: 'w-36 h-36',
+        size: 'w-36 h-56',
         modifiers: presets.basic,
     },
     {
         name: 'Slime Green',
-        size: 'w-36 h-36',
+        size: 'w-36 h-56',
         modifiers: presets.basic,
     },
     {
         name: 'Slime Purple',
-        size: 'w-36 h-36',
+        size: 'w-36 h-56',
         modifiers: presets.ap,
     },
     {
         name: 'Slime Gold',
-        size: 'w-36 h-36',
+        size: 'w-36 h-56',
         modifiers: presets.boss,
     },
     {
@@ -133,7 +133,7 @@ export const enemies: EnemyConfigDto[] = [
     },
     {
         name: 'Witch Blue',
-        size: 'w-36 h-36',
+        size: 'w-36 h-56',
         modifiers: presets.ap,
     },
 ]
