@@ -1,6 +1,5 @@
 <script lang="ts">
     import Icon from '@iconify/svelte'
-    import Container from '$lib/components/Container.svelte'
     import BgImage from '$lib/components/BgImage.svelte'
     import Tooltip from '$lib/components/Tooltip.svelte'
     import Entity from '$lib/components/Entity.svelte'
@@ -48,44 +47,42 @@
 
 <svelte:window on:keydown|preventDefault={onKeyDown} />
 
-<Container>
-    <div class="grid h-full grid-cols-2 bg-zinc-800">
-        <section class="grid grid-rows-2">
-            <Entity type="character" />
-            <section class={styles.cell}>
-                <button on:click={closeStore} class={styles.button.base + styles.button.red}>Arena</button>
-                <Items />
-            </section>
-        </section>
-
+<div class="grid h-full grid-cols-2 bg-zinc-800">
+    <section class="grid grid-rows-2">
+        <Entity type="character" />
         <section class={styles.cell}>
-            <h1 class="pb-2 text-center text-2xl">Items shop</h1>
-            <hr />
-            <div class="mt-2 grid grid-cols-4 gap-2">
-                {#each _data.shop.items as item}
-                    <Tooltip title={item.name} type="itemDescription" bonus={Object.entries(item.bonus).filter(([_, value]) => value !== 0)}>
-                        <article
-                            class={`${isTooExpensive(item) ? 'opacity-20' : 'hover:bg-zinc-700 hover:cursor-pointer'} rounded`}
-                            on:click={() => handleClick(item)}
-                        >
-                            <div class="rounded bg-zinc-800 p-2">
-                                <h2 class="text-center text-xl">{item.name}</h2>
-                                <div class="flex justify-center">
-                                    <div class="relative h-12 w-12">
-                                        <BgImage image={`/images/items/${item.image}.png`} />
-                                    </div>
+            <button on:click={closeStore} class={styles.button.base + styles.button.red}>Arena</button>
+            <Items />
+        </section>
+    </section>
+
+    <section class={styles.cell}>
+        <h1 class="pb-2 text-center text-2xl">Items shop</h1>
+        <hr />
+        <div class="mt-2 grid grid-cols-4 gap-2">
+            {#each _data.shop.items as item}
+                <Tooltip title={item.name} type="itemDescription" bonus={Object.entries(item.bonus).filter(([_, value]) => value !== 0)}>
+                    <article
+                        class={`${isTooExpensive(item) ? 'opacity-20' : 'hover:bg-zinc-700 hover:cursor-pointer'} rounded`}
+                        on:click={() => handleClick(item)}
+                    >
+                        <div class="rounded bg-zinc-800 p-2">
+                            <h2 class="text-center text-xl">{item.name}</h2>
+                            <div class="flex justify-center">
+                                <div class="relative h-12 w-12">
+                                    <BgImage image={`/images/items/${item.image}.png`} />
                                 </div>
                             </div>
-                            <p class="relative flex items-center p-1 text-lg">
-                                <span class="text-3xl">
-                                    <Icon icon="bxs:coin" class="text-yellow-400" />
-                                </span>
-                                <span class={`pl-2 ${isTooExpensive(item) ? 'text-red-500' : ''}`}>{item.price}</span>
-                            </p>
-                        </article>
-                    </Tooltip>
-                {/each}
-            </div>
-        </section>
-    </div>
-</Container>
+                        </div>
+                        <p class="relative flex items-center p-1 text-lg">
+                            <span class="text-3xl">
+                                <Icon icon="bxs:coin" class="text-yellow-400" />
+                            </span>
+                            <span class={`pl-2 ${isTooExpensive(item) ? 'text-red-500' : ''}`}>{item.price}</span>
+                        </p>
+                    </article>
+                </Tooltip>
+            {/each}
+        </div>
+    </section>
+</div>

@@ -13,16 +13,14 @@
     })
 </script>
 
-<div>
-    {#if view === 'welcome'}
-        <Welcome />
-    {:else if view === 'champSelect'}
-        <ChampSelect />
-    {:else if view === 'combat'}
-        <Combat />
-    {:else if view === 'store'}
-        <Store />
-    {:else if view === 'gameover'}
-        <GameOver />
-    {/if}
-</div>
+{#if view === 'welcome'}
+    <Welcome />
+{:else if view === 'champSelect'}
+    <ChampSelect />
+{:else if view === 'combat'}
+    <Combat />
+{:else if view === 'store'}
+    <Store />
+{:else if view === 'gameover'}
+    <GameOver />
+{/if}

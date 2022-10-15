@@ -33,7 +33,7 @@
     }
 </script>
 
-<section class="container mx-auto pt-20 text-center">
+<section class="container mx-auto pt-8 text-center">
     <div>
         <h2 class="pb-4 text-xl">Enter your name:</h2>
         <input placeholder="Player name" bind:value={_nameInput} class="h-12 w-64 rounded bg-zinc-700 p-2" />
