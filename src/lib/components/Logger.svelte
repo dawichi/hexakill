@@ -19,9 +19,9 @@
 </script>
 
 <div class={styles.cell}>
-    <h4 class="text-center text-lg p-2">Info</h4>
+    <h4 class="p-2 text-center text-lg">Info</h4>
     <hr />
-    <article class="p-4 h-4/5 overflow-y-hidden grid grid-cols-2 gap-4">
+    <article class="grid h-4/5 grid-cols-2 gap-4 overflow-y-hidden p-4">
         <div>
             {#each _logs.player as log, idx}
                 <div class="animate__animated animate__fadeIn mt-2">

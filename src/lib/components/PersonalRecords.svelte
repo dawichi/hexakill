@@ -21,7 +21,7 @@
                     storageService.clear()
                     _personalRecords = []
                 }}
-                class="bg-red-600 px-1 rounded"
+                class="rounded bg-red-600 px-1"
             >
                 <i class="bi bi-x" />
             </button>

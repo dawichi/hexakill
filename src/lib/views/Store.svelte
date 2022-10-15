@@ -49,7 +49,7 @@
 <svelte:window on:keydown|preventDefault={onKeyDown} />
 
 <Container>
-    <div class="bg-zinc-800 h-full grid grid-cols-2">
+    <div class="grid h-full grid-cols-2 bg-zinc-800">
         <section class="grid grid-rows-2">
             <Entity type="character" />
             <section class={styles.cell}>
@@ -59,7 +59,7 @@
         </section>
 
         <section class={styles.cell}>
-            <h1 class="text-2xl text-center pb-2">Items shop</h1>
+            <h1 class="pb-2 text-center text-2xl">Items shop</h1>
             <hr />
             <div class="mt-2 grid grid-cols-4 gap-2">
                 {#each _data.shop.items as item}
@@ -68,15 +68,15 @@
                             class={`${isTooExpensive(item) ? 'opacity-20' : 'hover:bg-zinc-700 hover:cursor-pointer'} rounded`}
                             on:click={() => handleClick(item)}
                         >
-                            <div class="bg-zinc-800 rounded p-2">
-                                <h2 class="text-xl text-center">{item.name}</h2>
+                            <div class="rounded bg-zinc-800 p-2">
+                                <h2 class="text-center text-xl">{item.name}</h2>
                                 <div class="flex justify-center">
-                                    <div class="relative w-12 h-12">
+                                    <div class="relative h-12 w-12">
                                         <BgImage image={`/images/items/${item.image}.png`} />
                                     </div>
                                 </div>
                             </div>
-                            <p class="relative flex items-center text-lg p-1">
+                            <p class="relative flex items-center p-1 text-lg">
                                 <span class="text-3xl">
                                     <Icon icon="bxs:coin" class="text-yellow-400" />
                                 </span>

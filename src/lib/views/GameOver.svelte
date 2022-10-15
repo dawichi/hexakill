@@ -55,16 +55,16 @@
     }
 </script>
 
-<div class="h-screen flex flex-col justify-center items-center grid lg:grid-cols-3">
+<div class="flex grid h-screen flex-col items-center justify-center lg:grid-cols-3">
     <!-- YOUR STATS -->
-    <section class="entity mx-auto animate__animated animate__fadeIn animate__slower animate__delay-2s">
+    <section class="entity animate__animated animate__fadeIn animate__slower animate__delay-2s mx-auto">
         <Entity type="character" />
     </section>
 
     <!-- CENTER MESSAGE AND RETRY BUTTON -->
-    <section class="flex flex-col items-center justify-around animate__animated animate__fadeIn animate__slower">
+    <section class="animate__animated animate__fadeIn animate__slower flex flex-col items-center justify-around">
         <div class="mb-8 flex flex-col items-center">
-            <h1 class="text-8xl text-red-600 font-mono text-center mb-8">GAME<br />OVER</h1>
+            <h1 class="mb-8 text-center font-mono text-8xl text-red-600">GAME<br />OVER</h1>
             <button on:click={retry} class={styles.button.base + styles.button.red}> Try again? </button>
         </div>
         <!-- ENEMIES HISTORY -->
@@ -75,7 +75,7 @@
                 {#each counter(_data.enemiesHistory) as enemy}
                     <Tooltip title={enemy.key} content={[`${enemy.levels}`]}>
                         <div class="flex flex-col">
-                            <div class="relative w-20 h-20">
+                            <div class="relative h-20 w-20">
                                 <BgImage image={`/images/${enemy.key}/idle.gif`} />
                             </div>
                             <span>x{enemy.levels.length}</span>
@@ -87,7 +87,7 @@
     </section>
 
     <!-- ENEMY STATS -->
-    <section class="entity mx-auto animate__animated animate__fadeIn animate__slower animate__delay-2s">
+    <section class="entity animate__animated animate__fadeIn animate__slower animate__delay-2s mx-auto">
         <Entity type="enemy" />
     </section>
 </div>

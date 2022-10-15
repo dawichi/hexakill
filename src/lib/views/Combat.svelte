@@ -53,7 +53,7 @@
 <svelte:window on:keydown|preventDefault={onKeyDown} />
 
 <Container>
-    <section class="bg-zinc-800 h-full grid grid-rows-2 grid-cols-1">
+    <section class="grid h-full grid-cols-1 grid-rows-2 bg-zinc-800">
         <!-- ROW 1 - 3 COLUMNS -->
         <div class="grid lg:grid-cols-3">
             <div class={styles.cell + 'grid grid-cols-2'}>
@@ -76,12 +76,12 @@
         </div>
 
         <!-- ROW 2 - 2 COLUMNS -->
-        <div class="grid lg:grid-cols-2 col-span-3">
+        <div class="col-span-3 grid lg:grid-cols-2">
             <div class={styles.cell}>
                 <PowerUps />
                 {#if _data.showUI.fighting}
                     <div>
-                        <h4 class="text-center text-lg p-2 mt-8">What do you want to do?</h4>
+                        <h4 class="mt-8 p-2 text-center text-lg">What do you want to do?</h4>
                         <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_data.showUI.actionBtns ? '' : 'opacity-20'}`}>
                             <button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(0)} class={styles.button.base + styles.button.red}>
                                 Attack
