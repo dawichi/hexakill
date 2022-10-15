@@ -11,9 +11,8 @@
     let _personalRecords: PersonalRecord[] = storageService.get()
 </script>
 
-
 <div class="flex flex-col gap-2 rounded bg-zinc-800 p-4">
-    <p class="flex justify-between">
+    <p class="mb-2 flex justify-between">
         <span>Personal Records</span>
         {#if _personalRecords.length}
             <button
@@ -28,12 +27,15 @@
             </button>
         {/if}
     </p>
-    <hr />
 
-    {#each _personalRecords as pr}
-        <p class={'rounded flex justify-between px-2 ' + characters[pr.classIdx].data.bg}>
-            <span>{pr.name}</span>
-            <span>lv {pr.record}</span>
-        </p>
-    {/each}
+    {#if _personalRecords.length}
+        {#each _personalRecords as pr}
+            <p class={'rounded flex justify-between px-2 ' + characters[pr.classIdx].data.bg}>
+                <span>{pr.name}</span>
+                <span>lv {pr.record}</span>
+            </p>
+        {/each}
+    {:else}
+        <p class="text-center">No records yet :c</p>
+    {/if}
 </div>
