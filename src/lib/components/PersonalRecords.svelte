@@ -11,9 +11,10 @@
     let _personalRecords: PersonalRecord[] = storageService.get()
 </script>
 
-<div class="flex flex-col gap-2 p-2">
+
+<div class="flex flex-col gap-2 rounded bg-zinc-800 p-4">
     <p class="flex justify-between">
-        <span>Personal Record</span>
+        <span>Personal Records</span>
         {#if _personalRecords.length}
             <button
                 title="Delete all records"

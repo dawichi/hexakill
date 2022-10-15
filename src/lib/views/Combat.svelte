@@ -56,8 +56,7 @@
     <section class="grid h-full grid-cols-1 grid-rows-2 bg-zinc-800">
         <!-- ROW 1 - 3 COLUMNS -->
         <div class="grid lg:grid-cols-3">
-            <div class={styles.cell + 'grid grid-cols-2'}>
-                <PersonalRecords />
+            <div class={styles.cell}>
                 <Items />
             </div>
 

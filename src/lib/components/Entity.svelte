@@ -23,9 +23,9 @@
     })
 
     const colorHpBar = (hpWidth: number) => {
-        if (hpWidth <= 10) return 'bg-red-600'
-        if (hpWidth > 10 && hpWidth <= 40) return 'bg-yellow-600'
-        return 'bg-green-600'
+        if (hpWidth <= 10) return 'bg-red-500'
+        if (hpWidth > 10 && hpWidth <= 40) return 'bg-yellow-500'
+        return 'bg-green-500'
     }
 </script>
 
@@ -36,8 +36,8 @@
         </h2>
 
         {#if _entity instanceof Character}
-            <div class="w-2/5 rounded-xl bg-zinc-600/75">
-                <div class="h-1 rounded-xl bg-cyan-500 transition-all duration-1000" style={`width: ${_entity['exp']}%`} />
+            <div class="w-2/5 rounded-xl bg-zinc-500/75">
+                <div class="h-1 rounded-xl bg-cyan-400 transition-all duration-1000" style={`width: ${_entity['exp']}%`} />
             </div>
         {/if}
 
@@ -47,9 +47,9 @@
 
         <div class="mb-5 flex w-full flex-col items-center">
             <p class="flex items-center justify-center">
-                {_entity.health - _entity.dmgReceived} / {_entity.health} <i class="ra ra-hearts text-red-600" />
+                {_entity.health - _entity.dmgReceived} / {_entity.health} <i class="ra ra-hearts text-red-500" />
             </p>
-            <div class="w-4/5 rounded-xl bg-zinc-600/75 ">
+            <div class="w-4/5 rounded-xl bg-zinc-500/75 ">
                 <div
                     class={`${colorHpBar(((_entity.health - _entity.dmgReceived) / _entity.health) * 100)} rounded-xl h-3 transition-all duration-500`}
                     style={`width: ${((_entity.health - _entity.dmgReceived) / _entity.health) * 100}%`}

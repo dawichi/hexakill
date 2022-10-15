@@ -3,12 +3,34 @@
   ## Container
   Display the content in a centered container
 -->
-<div class="container mx-auto">
-    <div class="relative bg-zinc-900 pt-20 pb-10 lg:h-screen">
-        <h1 class="absolute top-0 w-full p-5 text-center text-3xl tracking-widest">HEXAKILL</h1>
-        <!-- <nav class='absolute top-0 right-10 text-white'>
-            <MusicToggle color={colorTheme} />
-        </nav> -->
-        <slot />
+<script lang="ts">
+    import { styles } from '$lib/config/styles'
+    import { Drawer, Button, CloseButton } from 'flowbite-svelte'
+    import { sineIn } from 'svelte/easing'
+    import PersonalRecords from './PersonalRecords.svelte'
+    let hideDrawer = true
+    let transitionParams = {
+        x: -320,
+        duration: 200,
+        easing: sineIn,
+    }
+</script>
+
+<div class="container mx-auto pt-20 pb-10 lg:h-screen">
+    <h1 class="absolute top-0 w-full p-5 text-center text-3xl tracking-widest">HEXAKILL</h1>
+    <div class="absolute top-5 left-5">
+        <button class={styles.button.base + styles.button.blue} style="z-index: 999;" on:click={() => (hideDrawer = false)}>
+            <i class="bi bi-sliders" />
+        </button>
     </div>
+    <slot />
 </div>
+
+<Drawer transitionType="fly" divClass="overflow-y-auto z-50 p-4 bg-zinc-900" {transitionParams} bind:hidden={hideDrawer} id="sidebar1">
+    <div class="mb-2 flex items-center justify-between">
+        <h5 class="text-xl"><i class="bi bi-info-circle-fill" /> Menu</h5>
+        <button class="hover: text-xl transition" on:click={() => (hideDrawer = true)}><i class="bi bi-x-lg" /></button>
+    </div>
+    <hr class="mb-4" />
+    <PersonalRecords />
+</Drawer>
