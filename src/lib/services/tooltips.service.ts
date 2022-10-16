@@ -24,7 +24,9 @@ export const tooltips = {
                 ],
                 armor: [`${utils.calcDmgReductionPercent(entity.armor)}% attacks damage reduction`],
                 mr: [`${utils.calcDmgReductionPercent(entity.mr)}% magics damage reduction`],
+                speed: ['Decides the order of the turns'],
                 potions: [`Heal range: ${heal_range[0] * 100}% - ${heal_range[1] * 100}% of damage received`],
+                gold: ['When you defeat an enemy, you get its gold', 'Can be used to buy potions and items'],
             }[stat] ?? []
         )
     },

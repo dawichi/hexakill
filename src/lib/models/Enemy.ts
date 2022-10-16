@@ -5,6 +5,7 @@ const { base, names } = config
 
 class Enemy extends BaseEntity {
     private readonly modifiers: Modifiers
+    potions = 3
 
     constructor(level: number, name: string, config: EnemyConfigDto, gold: number) {
         super(level, name + ' ' + names[Math.floor(Math.random() * names.length)])

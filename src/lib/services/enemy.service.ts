@@ -65,7 +65,6 @@ class EnemyService {
     newEnemy(): void {
         gameData.update(d => {
             if (!d.character) return d
-            d.character.potions += 1
             d.enemy = this.generateEnemy(d.character.level)
             d.showUI.fighting = true
 

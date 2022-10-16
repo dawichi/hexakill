@@ -51,7 +51,7 @@
 
 <svelte:window on:keydown|preventDefault={onKeyDown} />
 
-<section class="grid h-full grid-cols-1 grid-rows-2 bg-zinc-800">
+<section class="grid h-full grid-cols-1 grid-rows-2 bg-zinc-800 animate__animated animate__fadeIn">
     <!-- ROW 1 - 3 COLUMNS -->
     <div class="grid lg:grid-cols-3">
         <div class={styles.cell}>
