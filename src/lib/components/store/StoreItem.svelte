@@ -5,11 +5,10 @@
 -->
 <script lang="ts">
     import Icon from '@iconify/svelte'
-    import BgImage from '../BgImage.svelte'
-    import Tooltip from '../Tooltip.svelte'
     import { Item } from '$lib/models'
     import type { GameDTO, PotionDto } from '$lib/types/Game.dto'
     import { gameData } from '$lib/data/data'
+    import { Image, Tooltip } from '..'
 
     export let item: Item | PotionDto
 
@@ -54,20 +53,24 @@
         })
     }
 
-    const tooltip = {
-        content: item instanceof Item ? [] : ['Add potions to your inventory'],
-        bonus: item instanceof Item ? Object.entries(item.bonus).filter(([_, value]) => value !== 0) : [],
+    const tooltip = item instanceof Item ? {
+        title: item.name,
+        bonus: Object.entries(item.bonus).filter(([_, value]) => value !== 0),
+    } : {
+        title: item.name,
+        content: ['Add potions to your inventory'],
     }
 </script>
 
-<Tooltip title={item.name} content={tooltip.content} type={item instanceof Item ? 'item' : ''} styleLeftPx={200} bonus={tooltip.bonus}>
+
+<Tooltip data={tooltip} styleLeftPx={200}>
     <article class={`${isTooExpensive(item.price) ? 'opacity-20' : 'hover:bg-zinc-700 hover:cursor-pointer'} rounded`} on:click={handleClick}>
         <div class="rounded bg-zinc-800 p-2">
             <h2 class="text-center text-xl">{item.name}</h2>
             <div class="flex justify-center">
                 <div class="relative flex h-12 w-24 items-center justify-center">
                     {#if item instanceof Item}
-                        <BgImage image={`/images/items/${item.image}.png`} />
+                        <Image image={`/images/items/${item.image}.png`} />
                     {:else if item.price === 100}
                         <Icon icon="game-icons:health-potion" class="text-3xl text-red-500" />
                     {:else}

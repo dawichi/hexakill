@@ -6,8 +6,7 @@
 -->
 <script lang="ts">
     import Icon from '@iconify/svelte'
-    import BgImage from './BgImage.svelte'
-    import Tooltip from './Tooltip.svelte'
+    import { Image, Tooltip } from '$lib/components'
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
     import { StatIcons } from '$lib/config/statIcons'
@@ -42,7 +41,7 @@
         {/if}
 
         <div class={'relative ' + _entity.size}>
-            <BgImage image={`/images/${_entity.image}/idle.gif`} />
+            <Image image={`/images/${_entity.image}/idle.gif`} />
         </div>
 
         <div class="mb-5 flex w-full flex-col items-center">
@@ -60,7 +59,12 @@
     <div class="absolute top-0 left-0 m-5 rounded ">
         {#each StatIcons as stat}
             <div class="relative">
-                <Tooltip title={stat.name} content={tooltipsService.getStatTooltip(stat.stat, _entity)}>
+                <Tooltip
+                    data={{
+                        title: stat.name,
+                        content: tooltipsService.getStatTooltip(stat.stat, _entity),
+                    }}
+                >
                     <p class="flex items-center p-1 text-lg">
                         <span class="text-3xl">
                             <Icon icon={stat.icon} class={stat.style} />

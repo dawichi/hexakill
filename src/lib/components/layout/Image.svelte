@@ -1,6 +1,6 @@
 <!--
   @component
-  ## BgImage
+  ## Image
   Display an image using `background-image` instead of `<img/>`
   @param image - the URL to the image
 -->

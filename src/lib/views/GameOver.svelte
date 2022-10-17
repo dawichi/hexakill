@@ -4,10 +4,7 @@
     This component is used to show the game over screen.
 -->
 <script lang="ts">
-    // components
-    import BgImage from '$lib/components/BgImage.svelte'
-    import Tooltip from '$lib/components/Tooltip.svelte'
-    // others
+    import { Image, Tooltip } from '$lib/components'
     import type { GameDTO } from '$lib/types/Game.dto'
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
@@ -73,10 +70,15 @@
             <hr />
             <div class="flex flex-wrap">
                 {#each counter(_data.enemiesHistory) as enemy}
-                    <Tooltip title={enemy.key} content={[`${enemy.levels}`]}>
+                    <Tooltip
+                        data={{
+                            title: enemy.key,
+                            content: [String(enemy.levels)],
+                        }}
+                    >
                         <div class="flex flex-col">
                             <div class="relative h-20 w-20">
-                                <BgImage image={`/images/${enemy.key}/idle.gif`} />
+                                <Image image={`/images/${enemy.key}/idle.gif`} />
                             </div>
                             <span>x{enemy.levels.length}</span>
                         </div>

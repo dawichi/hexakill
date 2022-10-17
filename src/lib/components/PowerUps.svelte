@@ -1,7 +1,7 @@
 <!--
-  @component
-  ## BgImage
-  Display an image using `background-image` instead of `<img/>`
+    @component
+    ## PowerUps
+    Display the power ups available to the player.
 -->
 <script lang="ts">
     import Icon from '@iconify/svelte'

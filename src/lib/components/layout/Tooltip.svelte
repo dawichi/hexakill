@@ -2,7 +2,7 @@
     @component
     ## Tooltip
     Display a tooltip when hovering over an element
-    @param title - the title to display in the tooltip
+    @param data - the data to display in the tooltip
     @param content - the content to display in the tooltip, array of strings (only used in normal tooltip)
     @param type - type of tooltip: normal | item
     @param styleLeftPx - left position of the tooltip
@@ -13,11 +13,19 @@
     import { getPowerupProp } from '$lib/config/powerups'
     import Icon from '@iconify/svelte'
 
-    export let title: string
-    export let content: string[] = []
-    export let type: '' | 'item' = ''
-    export let styleLeftPx: number = 0
-    export let bonus: [string, number][] = []
+
+    type TooltipNormal = {
+        title: string
+        content: string[]
+    }
+
+    type TooltipItem = {
+        title: string
+        bonus: [string, number][]
+    }
+
+    export let data: TooltipNormal | TooltipItem
+    export let styleLeftPx: number = 80
 
     let isHovered = false
     let x = 0
@@ -45,20 +53,20 @@
 
     {#if isHovered}
         <div class="tooltip rounded border bg-zinc-900 p-2 text-left shadow shadow-lg shadow-zinc-700" style={`left: ${styleLeftPx}px`}>
-            <p>{title}</p>
+            <p>{data.title}</p>
             <!-- Normal tooltip -->
-            {#if !type}
-                {#each content as p}
+            {#if 'content' in data}
+                {#each data.content as p}
                     <p class="pl-4">{p}</p>
                 {/each}
             {/if}
 
             <!-- Item tooltip -->
-            {#if type === 'item'}
-                {#each bonus as b}
+            {#if 'bonus' in data}
+                {#each data.bonus as bonus}
                     <p class="flex items-center pl-4 text-lg">
-                        <Icon icon={getPowerupProp(b[0], 'icon')} class={getPowerupProp(b[0], 'style')} />
-                        <span class="pl-2">+{b[1]}</span>
+                        <Icon icon={getPowerupProp(bonus[0], 'icon')} class={getPowerupProp(bonus[0], 'style')} />
+                        <span class="pl-2">+{bonus[1]}</span>
                     </p>
                 {/each}
             {/if}

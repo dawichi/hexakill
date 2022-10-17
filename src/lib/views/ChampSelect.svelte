@@ -4,7 +4,7 @@
     This component is used to enter the name of the player and select his character.
 -->
 <script lang="ts">
-    import BgImage from '$lib/components/BgImage.svelte'
+    import { Image } from '$lib/components'
     import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/data'
     import { characters } from '$lib/config/characters'
@@ -52,7 +52,7 @@
                     <p>{character.data.desc}</p>
                     <p>({character.data.subDesc})</p>
                     <div class="relative m-auto mt-2 h-64 p-4">
-                        <BgImage image={`/images/${character.name.toLocaleLowerCase()}/idle.gif`} />
+                        <Image image={`/images/${character.name.toLocaleLowerCase()}/idle.gif`} />
                     </div>
                 </div>
             {/each}
