@@ -6,6 +6,7 @@
 <script lang="ts">
     import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/data'
+	import { Alert } from 'flowbite-svelte'
 
     function startPlaying() {
         gameData.update(n => {
@@ -15,11 +16,11 @@
     }
 </script>
 
-<div class="text-center container mx-auto">
-    <h1 class="text-4xl py-10">Welcome to the hexakill game!</h1>
-    <hr class="w-4/5 mx-auto" />
+<div class="container mx-auto text-center">
+    <h1 class="py-10 text-4xl">Welcome to the hexakill game!</h1>
+    <hr class="mx-auto w-4/5" />
 
-    <p class="text-green-400 text-xl">HOW TO PLAY</p>
+    <p class="text-xl text-green-400">HOW TO PLAY</p>
     <p>
         Win combats to <span class="text-cyan-400">level up</span> your character and improve its stats 💪🏻.
     </p>

@@ -160,11 +160,11 @@ class Combat {
             d.showUI.actionBtns = false
             return d
         })
-    
+
         // Call the attack functions in order depending of who is faster
         const isPlayerFaster: boolean = data.character.speed > data.enemy.speed
         let hasAnybodyDied = false
-    
+
         // FIRST TURN
         if (isPlayerFaster) {
             // Execute: player -> enemy

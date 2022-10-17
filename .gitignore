@@ -8,5 +8,8 @@ node_modules
 !.env.example
 .vercel
 .output
-old
+
+# Ignore lock files for NPM, PNPM and YARN
+package-lock.json
 pnpm-lock.yaml
+yarn.lock

@@ -6,8 +6,8 @@
     @param content - the content to display in the tooltip, array of strings
 -->
 <script lang="ts">
-    import { getPowerupProp } from "$lib/config/powerups"
-    import Icon from "@iconify/svelte"
+    import { getPowerupProp } from '$lib/config/powerups'
+    import Icon from '@iconify/svelte'
 
     export let title: string
     export let content: string[] = []
@@ -39,7 +39,7 @@
     </div>
 
     {#if isHovered}
-        <div class="tooltip border rounded shadow bg-zinc-900 p-2 text-left shadow-lg shadow-zinc-700" style={`left: ${!type ? 80 : 180}px`}>
+        <div class="tooltip rounded border bg-zinc-900 p-2 text-left shadow shadow-lg shadow-zinc-700" style={`left: ${!type ? 80 : 180}px`}>
             <p>{title}</p>
             <!-- Normal tooltip -->
             {#if !type}
@@ -47,11 +47,11 @@
                     <p class="pl-4">{p}</p>
                 {/each}
             {/if}
-            
+
             <!-- Item tooltip -->
             {#if type === 'itemDescription'}
                 {#each bonus as b}
-                    <p class="pl-4 flex items-center text-lg">
+                    <p class="flex items-center pl-4 text-lg">
                         <Icon icon={getPowerupProp(b[0], 'icon')} class={getPowerupProp(b[0], 'style')} />
                         <span class="pl-2">+{b[1]}</span>
                     </p>

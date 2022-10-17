@@ -23,21 +23,21 @@
     })
 
     const colorHpBar = (hpWidth: number) => {
-        if (hpWidth <= 10) return 'bg-red-600'
-        if (hpWidth > 10 && hpWidth <= 40) return 'bg-yellow-600'
-        return 'bg-green-600'
+        if (hpWidth <= 10) return 'bg-red-500'
+        if (hpWidth > 10 && hpWidth <= 40) return 'bg-yellow-500'
+        return 'bg-green-500'
     }
 </script>
 
 <section class={styles.cell + 'animate__animated animate__fadeIn relative'}>
-    <div class="h-full flex flex-col items-center justify-between">
+    <div class="flex h-full flex-col items-center justify-between">
         <h2 class="text-xl">
             {_entity.name} - lv {_entity.level}
         </h2>
 
         {#if _entity instanceof Character}
-            <div class="bg-zinc-600/75 rounded-xl w-2/5">
-                <div class="rounded-xl bg-cyan-500 h-1 transition-all duration-1000" style={`width: ${_entity['exp']}%`} />
+            <div class="w-2/5 rounded-xl bg-zinc-500/75">
+                <div class="h-1 rounded-xl bg-cyan-400 transition-all duration-1000" style={`width: ${_entity['exp']}%`} />
             </div>
         {/if}
 
@@ -45,11 +45,11 @@
             <BgImage image={`/images/${_entity.image}/idle.gif`} />
         </div>
 
-        <div class="w-full flex flex-col items-center mb-5">
-            <p class="flex justify-center items-center">
-                {_entity.health - _entity.dmgReceived} / {_entity.health} <i class="ra ra-hearts text-red-600" />
+        <div class="mb-5 flex w-full flex-col items-center">
+            <p class="flex items-center justify-center">
+                {_entity.health - _entity.dmgReceived} / {_entity.health} <i class="ra ra-hearts text-red-500" />
             </p>
-            <div class="bg-zinc-600/75 rounded-xl w-4/5 ">
+            <div class="w-4/5 rounded-xl bg-zinc-500/75 ">
                 <div
                     class={`${colorHpBar(((_entity.health - _entity.dmgReceived) / _entity.health) * 100)} rounded-xl h-3 transition-all duration-500`}
                     style={`width: ${((_entity.health - _entity.dmgReceived) / _entity.health) * 100}%`}
@@ -60,11 +60,8 @@
     <div class="absolute top-0 left-0 m-5 rounded ">
         {#each StatIcons as stat}
             <div class="relative">
-                <Tooltip
-                    title={stat.name}
-                    content={tooltipsService.getStatTooltip(stat.stat, _entity)}
-                >
-                    <p class="flex items-center text-lg p-1">
+                <Tooltip title={stat.name} content={tooltipsService.getStatTooltip(stat.stat, _entity)}>
+                    <p class="flex items-center p-1 text-lg">
                         <span class="text-3xl">
                             <Icon icon={stat.icon} class={stat.style} />
                         </span>

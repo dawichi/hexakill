@@ -64,4 +64,3 @@ export const items: Item[] = Object.entries(itemsDefinition).map(([id, item]) =>
     id: Number(id),
     ...item,
 }))
-

@@ -52,5 +52,5 @@ export const StatIcons: Array<StatIcon> = [
         name: 'Gold',
         icon: 'bxs:coin',
         style: 'text-yellow-400',
-    }
+    },
 ]

@@ -67,9 +67,9 @@
 <div class="text-center">
     <div class="grid grid-cols-4 gap-3 p-4">
         {#each Object.keys(_data.powerUps.history) as powerupKey}
-            <div class="flex flex-col items-start p-1 rounded bg-zinc-700">
+            <div class="flex flex-col items-start rounded bg-zinc-700 p-1">
                 <div class="flex items-center">
-                    <span class="text-3xl mr-4">
+                    <span class="mr-4 text-3xl">
                         <Icon icon={getPowerupProp(powerupKey, 'icon')} class={getPowerupProp(powerupKey, 'style')} />
                     </span>
                     {#each [...Array(_data.powerUps.history[powerupKey]).keys()] as _}
@@ -84,15 +84,15 @@
         <h3 class="text-xl">Choose an upgrade!</h3>
         <h4>Pending: {_data.powerUps.pending}</h4>
         <hr class="m-2" />
-        <div class="grid lg:grid-cols-3 gap-4 p-2">
+        <div class="grid gap-4 p-2 lg:grid-cols-3">
             {#each powerups as powerup}
                 {#if !_data.powerUps.history[powerup.type] || _data.powerUps.history[powerup.type] < 6}
                     <div>
                         <button
                             on:click={() => handlePowerUp(powerup.type, powerup.value)}
-                            class="w-full border rounded p-2 flex items-center bg-zinc-800 hover:bg-zinc-700"
+                            class="flex w-full items-center rounded border bg-zinc-800 p-2 hover:bg-zinc-700"
                         >
-                            <span class="text-3xl mr-4"><Icon icon={powerup.icon} class={powerup.style} /></span>
+                            <span class="mr-4 text-3xl"><Icon icon={powerup.icon} class={powerup.style} /></span>
                             <p class="flex flex-col">
                                 <span>{powerup.title}</span>
                                 <span class="text-sm">+{getBonus(powerup.value, _data.powerUps.history[powerup.type])}</span>

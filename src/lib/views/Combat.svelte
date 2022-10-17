@@ -15,7 +15,6 @@
     import { combatService, enemyService } from '$lib/services'
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
-    import Container from '$lib/components/Container.svelte'
 
     let _data: GameDTO
     gameData.subscribe(n => (_data = n))
@@ -52,53 +51,50 @@
 
 <svelte:window on:keydown|preventDefault={onKeyDown} />
 
-<Container>
-    <section class="bg-zinc-800 h-full grid grid-rows-2 grid-cols-1">
-        <!-- ROW 1 - 3 COLUMNS -->
-        <div class="grid lg:grid-cols-3">
-            <div class={styles.cell + 'grid grid-cols-2'}>
-                <PersonalRecords />
-                <Items />
-            </div>
-
-            {#if _data.character}
-                <Entity type="character" />
-            {/if}
-
-            {#if _data.enemy}
-                <Entity type="enemy" />
-            {:else if !_data.powerUps.pending}
-                <section class={styles.cell + 'flex justify-center items-center'}>
-                    <button on:click={newCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
-                    <button on:click={openStore} class={styles.button.base + styles.button.green}> STORE </button>
-                </section>
-            {/if}
+<section class="grid h-full grid-cols-1 grid-rows-2 bg-zinc-800 animate__animated animate__fadeIn">
+    <!-- ROW 1 - 3 COLUMNS -->
+    <div class="grid lg:grid-cols-3">
+        <div class={styles.cell}>
+            <Items />
         </div>
 
-        <!-- ROW 2 - 2 COLUMNS -->
-        <div class="grid lg:grid-cols-2 col-span-3">
-            <div class={styles.cell}>
-                <PowerUps />
-                {#if _data.showUI.fighting}
-                    <div>
-                        <h4 class="text-center text-lg p-2 mt-8">What do you want to do?</h4>
-                        <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_data.showUI.actionBtns ? '' : 'opacity-20'}`}>
-                            <button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(0)} class={styles.button.base + styles.button.red}>
-                                Attack
+        {#if _data.character}
+            <Entity type="character" />
+        {/if}
+
+        {#if _data.enemy}
+            <Entity type="enemy" />
+        {:else if !_data.powerUps.pending}
+            <section class={styles.cell + 'flex justify-center items-center'}>
+                <button on:click={newCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
+                <button on:click={openStore} class={styles.button.base + styles.button.green}> STORE </button>
+            </section>
+        {/if}
+    </div>
+
+    <!-- ROW 2 - 2 COLUMNS -->
+    <div class="col-span-3 grid lg:grid-cols-2">
+        <div class={styles.cell}>
+            <PowerUps />
+            {#if _data.showUI.fighting}
+                <div>
+                    <h4 class="mt-8 p-2 text-center text-lg">What do you want to do?</h4>
+                    <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_data.showUI.actionBtns ? '' : 'opacity-20'}`}>
+                        <button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(0)} class={styles.button.base + styles.button.red}>
+                            Attack
+                        </button>
+                        <button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(1)} class={styles.button.base + styles.button.blue}>
+                            Magic
+                        </button>
+                        {#if (_data.character?.potions ?? 0) > 0}
+                            <button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(2)} class={styles.button.base + styles.button.green}>
+                                Potion
                             </button>
-                            <button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(1)} class={styles.button.base + styles.button.blue}>
-                                Magic
-                            </button>
-                            {#if (_data.character?.potions ?? 0) > 0}
-                                <button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(2)} class={styles.button.base + styles.button.green}>
-                                    Potion
-                                </button>
-                            {/if}
-                        </div>
+                        {/if}
                     </div>
-                {/if}
-            </div>
-            <Logger />
+                </div>
+            {/if}
         </div>
-    </section>
-</Container>
+        <Logger />
+    </div>
+</section>

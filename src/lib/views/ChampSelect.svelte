@@ -33,15 +33,15 @@
     }
 </script>
 
-<section class="container mx-auto text-center pt-20">
+<section class="container mx-auto pt-8 text-center">
     <div>
-        <h2 class="text-xl pb-4">Enter your name:</h2>
-        <input placeholder="Player name" bind:value={_nameInput} class="bg-zinc-700 p-2 w-64 h-12 rounded" />
+        <h2 class="pb-4 text-xl">Enter your name:</h2>
+        <input placeholder="Player name" bind:value={_nameInput} class="h-12 w-64 rounded bg-zinc-700 p-2" />
     </div>
 
     {#if _nameInput.length >= 3 && _nameInput.length <= 14}
-        <h3 class="text-xl mt-10">Great! Now select your class.</h3>
-        <div class="container mx-auto max-w-3xl grid lg:grid-cols-3">
+        <h3 class="mt-10 text-xl">Great! Now select your class.</h3>
+        <div class="container mx-auto grid max-w-3xl lg:grid-cols-3">
             {#each characters as character, idx}
                 <div
                     class={`${character.data.bg} m-2 p-4 cursor-pointer rounded-lg ${idx === _character ? character.data.shadow : ''}`}

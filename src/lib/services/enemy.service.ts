@@ -3,15 +3,14 @@ import { Enemy } from '$lib/models'
 import { loggerService } from '.'
 import { gameData } from '$lib/data/data'
 
-
 /**
  * Enemy utils
  */
 class EnemyService {
-    private bosses: Record<number,Enemy> = {
-        10: new Enemy(15,'Gold Slime 1', enemies[14], 1000),
-        20: new Enemy(25,'Gold Slime 2', enemies[14], 1000),
-        30: new Enemy(35,'Gold Slime 3', enemies[14], 1000),
+    private bosses: Record<number, Enemy> = {
+        10: new Enemy(15, 'Gold Slime 1', enemies[14], 1000),
+        20: new Enemy(25, 'Gold Slime 2', enemies[14], 1000),
+        30: new Enemy(35, 'Gold Slime 3', enemies[14], 1000),
     }
 
     /**
@@ -66,7 +65,6 @@ class EnemyService {
     newEnemy(): void {
         gameData.update(d => {
             if (!d.character) return d
-            d.character.potions += 1
             d.enemy = this.generateEnemy(d.character.level)
             d.showUI.fighting = true
 
@@ -84,7 +82,6 @@ class EnemyService {
             })
             return d
         })
-
     }
 }
 

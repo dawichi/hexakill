@@ -5,6 +5,7 @@ const { base, names } = config
 
 class Enemy extends BaseEntity {
     private readonly modifiers: Modifiers
+    potions = 3
 
     constructor(level: number, name: string, config: EnemyConfigDto, gold: number) {
         super(level, name + ' ' + names[Math.floor(Math.random() * names.length)])
@@ -15,9 +16,9 @@ class Enemy extends BaseEntity {
 
         const stats: Stats[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed']
         stats.forEach(stat => {
-            if (level < 10) return (this[stat] = level * base[stat] * 0.5)
+            if (level < 10) return (this[stat] = level * base[stat] * 0.75)
             if (level < 20) return (this[stat] = level * base[stat] * 0.75 + level)
-            return level * base[stat] * this.modifiers[stat] + 2 * level
+            return level * base[stat] * this.modifiers[stat] + 4 * level
         })
     }
 }
