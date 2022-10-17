@@ -38,7 +38,9 @@
             <h1 class="pb-2 text-center text-2xl">Potions</h1>
             <hr />
             <div class="mt-2 grid grid-cols-4 gap-2">
-                
+                {#each _data.shop.potions as item}
+                    <StoreItem {item} />
+                {/each}
             </div>
         </div>
         <!-- Items -->

@@ -1,6 +1,6 @@
 import type { Modifiers } from '$lib/types/Entities.dto'
 
-type ItemDef = {
+type Item = {
     name: string
     price: number
     bonus: Modifiers
@@ -18,49 +18,30 @@ const base: Modifiers = {
 /**
  * Items available for use in the game.
  */
-const itemsDefinition: Record<number, ItemDef> = {
-    1: {
+export const items: Item[] = [
+    {
         name: 'Orb',
-        price: 300,
-        bonus: {
-            ...base,
-            ap: 50,
-        },
-    },
-    2: {
-        name: 'Sword',
         price: 500,
         bonus: {
             ...base,
-            ad: 40,
-            speed: 20,
+            health: 1000,
         },
     },
-    3: {
+    {
+        name: 'Sword',
+        price: 900,
+        bonus: {
+            ...base,
+            ad: 200,
+            speed: 50,
+        },
+    },
+    {
         name: 'Wand',
-        price: 800,
+        price: 2000,
         bonus: {
             ...base,
-            ap: 200,
-            speed: 50,
+            ap: 500,
         },
     },
-    4: {
-        name: 'Orb',
-        price: 1200,
-        bonus: {
-            ...base,
-            health: 2000,
-            ap: 200,
-            speed: 50,
-        },
-    },
-}
-
-interface Item extends ItemDef {
-    id: number
-}
-export const items: Item[] = Object.entries(itemsDefinition).map(([id, item]) => ({
-    id: Number(id),
-    ...item,
-}))
+]

@@ -3,7 +3,11 @@
     ## Tooltip
     Display a tooltip when hovering over an element
     @param title - the title to display in the tooltip
-    @param content - the content to display in the tooltip, array of strings
+    @param content - the content to display in the tooltip, array of strings (only used in normal tooltip)
+    @param type - type of tooltip: normal | item
+    @param styleLeftPx - left position of the tooltip
+    @param bonus - bonus to display in the tooltip (only used in item tooltip)
+
 -->
 <script lang="ts">
     import { getPowerupProp } from '$lib/config/powerups'
@@ -11,7 +15,8 @@
 
     export let title: string
     export let content: string[] = []
-    export let type: '' | 'itemDescription' = ''
+    export let type: '' | 'item' = ''
+    export let styleLeftPx: number = 0
     export let bonus: [string, number][] = []
 
     let isHovered = false
@@ -39,7 +44,7 @@
     </div>
 
     {#if isHovered}
-        <div class="tooltip rounded border bg-zinc-900 p-2 text-left shadow shadow-lg shadow-zinc-700" style={`left: ${!type ? 80 : 180}px`}>
+        <div class="tooltip rounded border bg-zinc-900 p-2 text-left shadow shadow-lg shadow-zinc-700" style={`left: ${styleLeftPx}px`}>
             <p>{title}</p>
             <!-- Normal tooltip -->
             {#if !type}
@@ -49,7 +54,7 @@
             {/if}
 
             <!-- Item tooltip -->
-            {#if type === 'itemDescription'}
+            {#if type === 'item'}
                 {#each bonus as b}
                     <p class="flex items-center pl-4 text-lg">
                         <Icon icon={getPowerupProp(b[0], 'icon')} class={getPowerupProp(b[0], 'style')} />

@@ -10,7 +10,19 @@ export const gameData: Writable<GameDTO> = writable({
     character: null,
     enemy: null,
     shop: {
-        items: items.map(item => new Item(item.id, item.name, item.price, item.bonus)),
+        potions: [
+            {
+                name: 'Potion',
+                quantity: 1,
+                price: 100,
+            },
+            {
+                name: '5 Potions pack',
+                quantity: 5,
+                price: 400,
+            },
+        ],
+        items: items.map(item => new Item(item.name, item.price, item.bonus)),
     },
     showUI: {
         fighting: false,

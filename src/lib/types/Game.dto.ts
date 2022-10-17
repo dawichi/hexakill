@@ -5,6 +5,13 @@ export type EnemyHistory = {
     image: string
     level: number
 }
+
+export type PotionDto = {
+    name: string
+    quantity: number
+    price: number
+}
+
 export type GameDTO = {
     view: 'welcome' | 'champSelect' | 'combat' | 'store' | 'gameover'
     username: string
@@ -12,6 +19,7 @@ export type GameDTO = {
     character: Character | null
     enemy: Enemy | null
     shop: {
+        potions: PotionDto[]
         items: Item[]
     }
     showUI: {
