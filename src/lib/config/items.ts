@@ -28,15 +28,16 @@ const itemsDefinition: Record<number, ItemDef> = {
         },
     },
     2: {
-        name: 'Orb',
+        name: 'Sword',
         price: 500,
         bonus: {
             ...base,
-            ap: 100,
+            ad: 40,
+            speed: 20,
         },
     },
     3: {
-        name: 'Orb',
+        name: 'Wand',
         price: 800,
         bonus: {
             ...base,
