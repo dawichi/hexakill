@@ -4,6 +4,7 @@
     import { sineIn } from 'svelte/easing'
     import { styles } from '$lib/config/styles'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
+    import Audio, { handlePlay, isPlaying } from '$lib/components/Audio.svelte'
 
     let hideDrawer = true
     let transitionParams = {
@@ -34,6 +35,14 @@
         <button class="hover: text-xl transition" on:click={() => (hideDrawer = true)}><i class="bi bi-x-lg" /></button>
     </div>
     <hr class="mb-4" />
+
+    <Audio song="welcome" />
+
+    <div class="mb-2 flex gap-2">
+        <button class={styles.button.base + styles.button.blue} on:click={handlePlay}>
+            <i class={isPlaying ? 'bi bi-volume-up-fill' : 'bi bi-volume-mute-fill'} />
+        </button>
+    </div>
 
     <PersonalRecords />
 </Drawer>
