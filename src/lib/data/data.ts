@@ -1,7 +1,7 @@
 import { writable, type Writable } from 'svelte/store'
 import type { GameDTO } from '$lib/types/Game.dto'
 import { items } from '$lib/config/items'
-import { Item } from '$lib/models'
+import { ItemModel } from '$lib/models'
 
 export const gameData: Writable<GameDTO> = writable({
     view: 'welcome',
@@ -22,7 +22,7 @@ export const gameData: Writable<GameDTO> = writable({
                 price: 400,
             },
         ],
-        items: items.map(item => new Item(item.name, item.price, item.bonus)),
+        items: items.map(item => new ItemModel(item.name, item.price, item.bonus)),
     },
     showUI: {
         fighting: false,

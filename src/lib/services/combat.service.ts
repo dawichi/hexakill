@@ -1,5 +1,5 @@
 import { gameData } from '$lib/data/data'
-import { Character, Enemy } from '$lib/models'
+import { CharacterModel, EnemyModel } from '$lib/models'
 import type { GameDTO } from '$lib/types/Game.dto'
 import { loggerService, storageService } from '.'
 import enemyService from './enemy.service'
@@ -15,9 +15,9 @@ class Combat {
      * @param active - The active entity (attacks)
      * @param passive - The passive entity (gets the damage)
      */
-    private executeTurn(active: Character | Enemy, passive: Character | Enemy): void {
-        const active_is_a_player: boolean = active instanceof Character
-        const choice = active instanceof Enemy ? enemyService.generateAction(active) : this.playerAction
+    private executeTurn(active: CharacterModel | EnemyModel, passive: CharacterModel | EnemyModel): void {
+        const active_is_a_player: boolean = active instanceof CharacterModel
+        const choice = active instanceof EnemyModel ? enemyService.generateAction(active) : this.playerAction
 
         let damage: number
         let dmgReceived: number
@@ -63,7 +63,7 @@ class Combat {
      * @param defeatFn The function to call if the passive dies
      * @returns If the passive has died
      */
-    private defineTurn(active: Character | Enemy, passive: Character | Enemy, defeatFn: () => void): boolean {
+    private defineTurn(active: CharacterModel | EnemyModel, passive: CharacterModel | EnemyModel, defeatFn: () => void): boolean {
         this.executeTurn(active, passive)
         if (passive.dmgReceived === passive.health) {
             defeatFn()

@@ -1,9 +1,8 @@
 import type { EnemyConfigDto, Modifiers, Stats } from '$lib/types/Entities.dto'
-import { BaseEntity, config } from '.'
+import { base, names } from './config'
+import { BaseEntityModel } from '.'
 
-const { base, names } = config
-
-class Enemy extends BaseEntity {
+export class EnemyModel extends BaseEntityModel {
     private readonly modifiers: Modifiers
     potions = 3
 
@@ -22,5 +21,3 @@ class Enemy extends BaseEntity {
         })
     }
 }
-
-export default Enemy

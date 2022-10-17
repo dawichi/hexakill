@@ -5,12 +5,12 @@
 -->
 <script lang="ts">
     import Icon from '@iconify/svelte'
-    import { Item } from '$lib/models'
     import type { GameDTO, PotionDto } from '$lib/types/Game.dto'
+    import { ItemModel } from '$lib/models'
     import { gameData } from '$lib/data/data'
     import { Image, Tooltip } from '..'
 
-    export let item: Item | PotionDto
+    export let item: ItemModel | PotionDto
 
     let _data: GameDTO
     gameData.subscribe(n => (_data = n))
@@ -21,11 +21,11 @@
 
     function handleClick(): void {
         if (isTooExpensive(item.price)) return
-        item instanceof Item ? buyItem() : buyPotion()
+        item instanceof ItemModel ? buyItem() : buyPotion()
     }
 
     function buyItem(): void {
-        if (item instanceof Item) {
+        if (item instanceof ItemModel) {
             const newItem = {
                 name: item.name,
                 price: item.price,
@@ -37,8 +37,7 @@
                 n.character.gold -= item.price
                 n.character.addItem(newItem)
                 // delete item from store
-                const idx = n.shop.items.indexOf(newItem)
-                n.shop.items.splice(idx, 1)
+                n.shop.items = n.shop.items.filter(i => i.name !== item.name)
                 return n
             })
         }
@@ -53,7 +52,7 @@
         })
     }
 
-    const tooltip = item instanceof Item ? {
+    const tooltip = item instanceof ItemModel ? {
         title: item.name,
         bonus: Object.entries(item.bonus).filter(([_, value]) => value !== 0),
     } : {
@@ -69,7 +68,7 @@
             <h2 class="text-center text-xl">{item.name}</h2>
             <div class="flex justify-center">
                 <div class="relative flex h-12 w-24 items-center justify-center">
-                    {#if item instanceof Item}
+                    {#if item instanceof ItemModel}
                         <Image image={`/images/items/${item.image}.png`} />
                     {:else if item.price === 100}
                         <Icon icon="game-icons:health-potion" class="text-3xl text-red-500" />

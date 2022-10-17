@@ -8,7 +8,7 @@
     import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/data'
     import { characters } from '$lib/config/characters'
-    import { Character } from '$lib/models'
+    import { CharacterModel } from '$lib/models'
 
     let _nameInput: string = ''
     let _character: number = -1
@@ -27,7 +27,7 @@
     function start() {
         gameData.update(n => {
             n.view = 'combat'
-            n.character = new Character(4, _nameInput, characters[_character])
+            n.character = new CharacterModel(4, _nameInput, characters[_character])
             return n
         })
     }
@@ -36,7 +36,8 @@
 <section class="container mx-auto pt-8 text-center">
     <div>
         <h2 class="pb-4 text-xl">Enter your name:</h2>
-        <input placeholder="Player name" bind:value={_nameInput} class="h-12 w-64 rounded bg-zinc-700 p-2" />
+        <!-- svelte-ignore a11y-autofocus -->
+        <input placeholder="Player name" bind:value={_nameInput} class="h-12 w-64 rounded bg-zinc-700 p-2" autofocus />
     </div>
 
     {#if _nameInput.length >= 3 && _nameInput.length <= 14}

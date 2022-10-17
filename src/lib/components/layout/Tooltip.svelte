@@ -10,9 +10,8 @@
 
 -->
 <script lang="ts">
-    import { getPowerupProp } from '$lib/config/powerups'
     import Icon from '@iconify/svelte'
-
+    import { getPowerupProp } from '$lib/config/powerups'
 
     type TooltipNormal = {
         title: string

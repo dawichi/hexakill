@@ -1,4 +1,4 @@
-import type { Character, Enemy, Item } from '$lib/models'
+import type { CharacterModel, EnemyModel, ItemModel } from '$lib/models'
 import type { LoggerDTO } from './Logger.dto'
 
 export type EnemyHistory = {
@@ -16,11 +16,11 @@ export type GameDTO = {
     view: 'welcome' | 'champSelect' | 'combat' | 'store' | 'gameover'
     username: string
     characterIdx: number
-    character: Character | null
-    enemy: Enemy | null
+    character: CharacterModel | null
+    enemy: EnemyModel | null
     shop: {
         potions: PotionDto[]
-        items: Item[]
+        items: ItemModel[]
     }
     showUI: {
         fighting: boolean

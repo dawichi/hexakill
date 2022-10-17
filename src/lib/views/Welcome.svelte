@@ -6,7 +6,6 @@
 <script lang="ts">
     import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/data'
-	import { Alert } from 'flowbite-svelte'
 
     function startPlaying() {
         gameData.update(n => {

@@ -1,5 +1,5 @@
 import { enemies } from '$lib/config/enemies'
-import { Enemy } from '$lib/models'
+import { EnemyModel } from '$lib/models'
 import { loggerService } from '.'
 import { gameData } from '$lib/data/data'
 
@@ -7,10 +7,10 @@ import { gameData } from '$lib/data/data'
  * Enemy utils
  */
 class EnemyService {
-    private bosses: Record<number, Enemy> = {
-        10: new Enemy(15, 'Gold Slime 1', enemies[14], 1000),
-        20: new Enemy(25, 'Gold Slime 2', enemies[14], 1000),
-        30: new Enemy(35, 'Gold Slime 3', enemies[14], 1000),
+    private bosses: Record<number, EnemyModel> = {
+        10: new EnemyModel(15, 'Gold Slime 1', enemies[14], 1000),
+        20: new EnemyModel(25, 'Gold Slime 2', enemies[14], 1000),
+        30: new EnemyModel(35, 'Gold Slime 3', enemies[14], 1000),
     }
 
     /**
@@ -19,7 +19,7 @@ class EnemyService {
      * @param enemy The enemy.
      * @returns The action choosen.
      */
-    generateAction(enemy: Enemy): 0 | 1 | 2 {
+    generateAction(enemy: EnemyModel): 0 | 1 | 2 {
         const currentHP = (enemy.health - enemy.dmgReceived) / enemy.health
         const enemy_action = Math.random()
 
@@ -41,7 +41,7 @@ class EnemyService {
      * @param playerLevel The player's level.
      * @returns A enemy.
      */
-    private generateEnemy(playerLevel: number): Enemy {
+    private generateEnemy(playerLevel: number): EnemyModel {
         // range of levels
         const min_level = Math.floor(playerLevel / 2)
         const max_level = playerLevel * 1.75
@@ -50,7 +50,7 @@ class EnemyService {
             const enemyLevel = parseInt((Math.floor(Math.random() * (max_level - min_level + 1)) + min_level).toFixed(0))
             const enemyConfig = enemies[Math.floor(Math.random() * enemies.length)]
             const gold = parseInt(((enemyLevel / playerLevel) * 250).toFixed(0))
-            return new Enemy(enemyLevel, enemyConfig.name, enemyConfig, gold)
+            return new EnemyModel(enemyLevel, enemyConfig.name, enemyConfig, gold)
         } else {
             const boss = Object.values(this.bosses)[0]
             delete this.bosses[parseInt(Object.keys(this.bosses)[0])]

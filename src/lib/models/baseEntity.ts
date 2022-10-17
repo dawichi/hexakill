@@ -1,46 +1,21 @@
 import utils from '$lib/services/utils.service'
-import type { Modifiers } from '$lib/types/Entities.dto'
-import { config, Item } from '.'
+import { base, info } from './config'
 
-const base = config.base
-
-abstract class BaseEntity {
-    size = 'w-full h-full'
-    image = ''
-    dmgReceived = 0
-    gold = 0
-    potions = 5
+export abstract class BaseEntityModel {
     name: string
+    image = ''
+    size = 'w-64 h-64'
     level: number
+    exp = 0
     health: number
+    dmgReceived = 0
     ad: number
     ap: number
     armor: number
     mr: number
     speed: number
-    inventory: {
-        items: Item[]
-        totalBonus: Modifiers
-    } = {
-        items: [],
-        totalBonus: {
-            health: 0,
-            ad: 0,
-            ap: 0,
-            armor: 0,
-            mr: 0,
-            speed: 0,
-        },
-    }
-    readonly data = {
-        ad_critic_chance: 0.9, // 10% top -> critic
-        ad_misses_chance: 0.1, // 10% low -> misses
-        ad_hit_range: [0.8, 1.4], // 80% - 140% ad
-        ap_critic_chance: 0.6, // 40% top -> critic
-        ap_misses_chance: 0.25, // 25% low -> misses
-        ap_hit_range: [0.3, 2], // 30% - 200% ap
-        heal_range: [0.2, 0.3], // 20% - 30% of damage received
-    }
+    potions = 5
+    gold = 0
 
     constructor(level: number, name: string) {
         this.name = name
@@ -54,7 +29,7 @@ abstract class BaseEntity {
     }
 
     /**
-     * Apply the damage to the entity, not showing negative health
+     * ## Apply the damage to the entity, not showing negative health
      * @param damage damage to apply
      */
     private _getDamage(damage: number): number {
@@ -73,7 +48,7 @@ abstract class BaseEntity {
     }
 
     /**
-     * Action logic
+     * ## Calculate damage
      * 1. Gets a random damage between a range
      * 2. Calcs if the action is a critic or a miss
      * @param min_hit min hit
@@ -82,7 +57,7 @@ abstract class BaseEntity {
      * @param misses_chance misses chance
      * @returns damage done
      */
-    private action(min_hit: number, max_hit: number, critic_chance: number, misses_chance: number) {
+    private _calculateDamage(min_hit: number, max_hit: number, critic_chance: number, misses_chance: number) {
         // Calc damage between the range
         const damage = utils.numberBetween(min_hit, max_hit)
 
@@ -97,29 +72,31 @@ abstract class BaseEntity {
         return damage
     }
 
-    attack() {
-        return this.action(this.ad * this.data.ad_hit_range[0], this.ad * this.data.ad_hit_range[1], this.data.ad_critic_chance, this.data.ad_misses_chance)
+    /**
+     * ## Executes a physic attack
+     * @returns damage that the attack does
+     */
+    attack(): number {
+        return this._calculateDamage(this.ad * info.ad_hit_range[0], this.ad * info.ad_hit_range[1], info.ad_critic_chance, info.ad_misses_chance)
     }
 
-    magic() {
-        return this.action(this.ap * this.data.ap_hit_range[0], this.ap * this.data.ap_hit_range[1], this.data.ap_critic_chance, this.data.ap_misses_chance)
+    /**
+     * ## Executes a magic hit
+     * @returns damage that the magic does
+     */
+    magic(): number {
+        return this._calculateDamage(this.ap * info.ap_hit_range[0], this.ap * info.ap_hit_range[1], info.ap_critic_chance, info.ap_misses_chance)
     }
 
-    heal() {
+    /**
+     * ## Use a potion to heal
+     * @returns the health healed
+     */
+    heal(): number {
         this.potions -= 1
-        const heal = utils.numberBetween(this.dmgReceived * this.data.heal_range[0], this.dmgReceived * this.data.heal_range[0])
+        const heal = utils.numberBetween(this.dmgReceived * info.heal_range[0], this.dmgReceived * info.heal_range[0])
         this.dmgReceived -= heal
         if (this.dmgReceived < 0) this.dmgReceived = 0
         return heal
     }
-
-    /**
-     * Add items to the inventory
-     */
-    addItem(item: Item) {
-        this.inventory.items.push(item)
-        this.inventory.totalBonus = utils.calcTotalBonus(this.inventory.items)
-    }
 }
-
-export default BaseEntity

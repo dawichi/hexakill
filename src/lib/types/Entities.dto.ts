@@ -9,7 +9,6 @@ export type CharacterConfigDto = {
     data: {
         desc: string
         subDesc: string
-        size: string
         shadow: string
         color: 'indigo' | 'red' | 'amber'
         bg: string

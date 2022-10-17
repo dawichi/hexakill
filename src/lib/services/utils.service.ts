@@ -1,4 +1,4 @@
-import type { Item } from '$lib/models'
+import type { ItemModel } from '$lib/models'
 import type { Modifiers } from '$lib/types/Entities.dto'
 
 /**
@@ -37,7 +37,7 @@ const utils = {
     /**
      * ## Calculate total bonus
      */
-    calcTotalBonus(items: Item[]): Modifiers {
+    calcTotalBonus(items: ItemModel[]): Modifiers {
         const totalBonus: Modifiers = {
             health: 0,
             ad: 0,

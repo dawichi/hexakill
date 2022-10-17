@@ -9,7 +9,6 @@
     import Entity from '$lib/components/Entity.svelte'
     import Logger from '$lib/components/Logger.svelte'
     import PowerUps from '$lib/components/PowerUps.svelte'
-    import PersonalRecords from '$lib/components/PersonalRecords.svelte'
     // others
     import type { GameDTO } from '$lib/types/Game.dto'
     import { combatService, enemyService } from '$lib/services'

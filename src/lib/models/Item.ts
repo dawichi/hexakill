@@ -1,6 +1,6 @@
 import type { Modifiers } from '$lib/types/Entities.dto'
 
-class Item {
+export class ItemModel {
     name: string
     image: string
     price: number
@@ -13,5 +13,3 @@ class Item {
         this.bonus = bonus
     }
 }
-
-export default Item

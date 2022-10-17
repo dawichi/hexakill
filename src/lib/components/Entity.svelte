@@ -6,15 +6,15 @@
 -->
 <script lang="ts">
     import Icon from '@iconify/svelte'
+    import { CharacterModel, EnemyModel } from '$lib/models'
     import { Image, Tooltip } from '$lib/components'
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
     import { StatIcons } from '$lib/config/statIcons'
     import { tooltipsService } from '$lib/services'
-    import { Character, Enemy } from '$lib/models'
 
     export let type: 'character' | 'enemy'
-    let _entity: Character | Enemy
+    let _entity: CharacterModel | EnemyModel
 
     gameData.subscribe(n => {
         const e = n[type]
@@ -34,7 +34,7 @@
             {_entity.name} - lv {_entity.level}
         </h2>
 
-        {#if _entity instanceof Character}
+        {#if _entity instanceof CharacterModel}
             <div class="w-2/5 rounded-xl bg-zinc-500/75">
                 <div class="h-1 rounded-xl bg-cyan-400 transition-all duration-1000" style={`width: ${_entity['exp']}%`} />
             </div>
@@ -62,7 +62,7 @@
                 <Tooltip
                     data={{
                         title: stat.name,
-                        content: tooltipsService.getStatTooltip(stat.stat, _entity),
+                        content: tooltipsService.getStatTooltip(String(stat.stat), _entity),
                     }}
                 >
                     <p class="flex items-center p-1 text-lg">

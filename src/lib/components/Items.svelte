@@ -18,9 +18,10 @@
     {#if _data.character}
         {#each _data.character.inventory.items as item}
             <p>{item.name}</p>
-            {#each Object.entries(_data.character.inventory.totalBonus) as bonus}
-                <span>{bonus[0]}: {bonus[1]}</span>
-            {/each}
+        {/each}
+        
+        {#each Object.entries(_data.character.inventory.totalBonus) as bonus}
+            <span>{bonus[0]}: {bonus[1]}</span>
         {/each}
     {/if}
 </div>

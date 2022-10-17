@@ -1,4 +1,5 @@
-import type { BaseEntity } from '$lib/models'
+import type { BaseEntityModel } from '$lib/models'
+import { info } from '$lib/models/config'
 import utils from './utils.service'
 
 /**
@@ -8,8 +9,8 @@ export const tooltips = {
     /**
      * ## Get the tooltip for a given stat
      */
-    getStatTooltip: (stat: string, entity: BaseEntity): Array<string> => {
-        const { ad_critic_chance, ad_misses_chance, ad_hit_range, ap_critic_chance, ap_misses_chance, ap_hit_range, heal_range } = entity.data
+    getStatTooltip: (stat: string, entity: BaseEntityModel): Array<string> => {
+        const { ad_critic_chance, ad_misses_chance, ad_hit_range, ap_critic_chance, ap_misses_chance, ap_hit_range, heal_range } = info
         return (
             {
                 ad: [

@@ -9,7 +9,6 @@ export const characters: CharacterConfigDto[] = [
         data: {
             desc: 'Destroy with explosions',
             subDesc: 'weak in close combat',
-            size: 'w-36 h-56',
             shadow: 'shadow-lg shadow-indigo-400',
             color: 'indigo',
             bg: 'bg-indigo-700/50',
@@ -28,7 +27,6 @@ export const characters: CharacterConfigDto[] = [
         data: {
             desc: 'The master of the sword',
             subDesc: 'weak against magic',
-            size: 'w-64 h-64',
             shadow: 'shadow-lg shadow-red-400',
             color: 'red',
             bg: 'bg-red-700/50',
@@ -47,7 +45,6 @@ export const characters: CharacterConfigDto[] = [
         data: {
             desc: 'Strongest man in the world',
             subDesc: 'slow and low damage',
-            size: 'w-64 h-52',
             shadow: 'shadow-lg shadow-amber-400',
             color: 'amber',
             bg: 'bg-amber-700/50',
