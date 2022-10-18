@@ -1,14 +1,15 @@
 <script lang="ts">
     import '../app.css'
-    import { Drawer } from 'flowbite-svelte'
+    import { Drawer, Range } from 'flowbite-svelte'
     import { sineIn } from 'svelte/easing'
     import { styles } from '$lib/config/styles'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
-    import Audio, { handlePlay } from '$lib/components/Audio.svelte'
+    import Audio, { handlePlay, handleVolume } from '$lib/components/Audio.svelte'
     import type { GameDTO } from '$lib/types/Game.dto'
     import { gameData } from '$lib/data/data'
 
     let hideDrawer = true
+    let musicVolume = 0.5
     let transitionParams = {
         x: -320,
         duration: 200,
@@ -23,13 +24,18 @@
 <div class="container mx-auto pt-20 pb-10 lg:h-screen">
     <!-- Some UI elements such as title, menu, etc... -->
     <h1 class="absolute top-0 left-0 w-full p-5 text-center text-3xl tracking-widest">HEXAKILL</h1>
-    <div class="absolute top-5 left-5 flex gap-4">
+    <div class="absolute top-5 left-5 flex gap-2">
         <button class={styles.button.base + styles.button.blue} on:click={() => (hideDrawer = false)}>
             <i class="bi bi-list" />
         </button>
         <button class={styles.button.base + styles.button.blue} on:click={handlePlay}>
-            <i class={_data.showUI.music ? 'bi bi-volume-up-fill' : 'bi bi-volume-mute-fill'} />
+            <i class={_data.showUI.musicActive ? 'bi bi-volume-up-fill' : 'bi bi-volume-mute-fill'} />
         </button>
+        {#if _data.showUI.musicActive}
+            <button class={`${styles.button.base} ${styles.button.blue} flex justify-center items-center w-24`}>
+                <Range min={0} max={0.5} step={0.01} size="sm" bind:value={musicVolume} on:change={() => handleVolume(musicVolume)} />
+            </button>
+        {/if}
     </div>
     <Audio song="welcome" />
     <main class="h-full">

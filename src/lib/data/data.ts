@@ -27,7 +27,8 @@ export const gameData: Writable<GameDTO> = writable({
     showUI: {
         fighting: false,
         actionBtns: true,
-        music: false,
+        musicActive: false,
+        musicVolume: 5,
     },
     logs: {
         player: [],

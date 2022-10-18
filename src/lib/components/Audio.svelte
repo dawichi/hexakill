@@ -13,12 +13,17 @@
     gameData.subscribe(n => (_data = n))
 
     export function handlePlay() {
-        if (_data.showUI.music) {
+        if (_data.showUI.musicActive) {
             musics.forEach(p => p.pause())
         } else {
             musics.forEach(p => p.play())
         }
-        gameData.update(n => ({ ...n, showUI: { ...n.showUI, music: !n.showUI.music } }))
+        gameData.update(n => ({ ...n, showUI: { ...n.showUI, musicActive: !n.showUI.musicActive } }))
+    }
+
+    export function handleVolume(volume: number) {
+        musics.forEach(p => (p.volume = volume))
+        gameData.update(n => ({ ...n, showUI: { ...n.showUI, musicVolume: volume } }))
     }
 </script>
 
