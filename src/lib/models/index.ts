@@ -1,7 +1,7 @@
 // ╔══════════════════════════════════════════════════════
 // ║ Config and Base class
 // ╚══════════════════════════════════════════════════════
-export { BaseEntityModel } from './BaseEntity'
+export { BaseEntityModel } from './Entity'
 
 // ╔══════════════════════════════════════════════════════
 // ║ Character and Enemy base
