@@ -10,7 +10,7 @@
     import { characters } from '$lib/config/characters'
     import { CharacterModel } from '$lib/models'
 
-    let _nameInput: string = 'NoName'
+    let _nameInput: string = ''
     let _character: number = -1
 
     gameData.subscribe(n => {

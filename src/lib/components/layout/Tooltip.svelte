@@ -16,14 +16,24 @@
     type TooltipNormal = {
         title: string
         content: string[]
+        bonus: null
     }
 
     type TooltipItem = {
         title: string
+        content: null
         bonus: [string, number][]
     }
 
-    export let data: TooltipNormal | TooltipItem
+    type TooltipTypes = TooltipNormal | TooltipItem
+
+    // Type guards
+    const isType = {
+        normal: (x: TooltipTypes): x is TooltipNormal => (x as TooltipNormal).content !== undefined,
+        item: (x: TooltipTypes): x is TooltipItem => (x as TooltipItem).bonus !== undefined,
+    }
+
+    export let data: TooltipTypes
     export let styleLeftPx: number = 80
 
     let isHovered = false
@@ -54,14 +64,14 @@
         <div class="tooltip rounded border bg-zinc-900 p-2 text-left shadow shadow-lg shadow-zinc-700" style={`left: ${styleLeftPx}px`}>
             <p>{data.title}</p>
             <!-- Normal tooltip -->
-            {#if 'content' in data}
+            {#if isType.normal(data)}
                 {#each data.content as p}
                     <p class="pl-4">{p}</p>
                 {/each}
             {/if}
 
             <!-- Item tooltip -->
-            {#if 'bonus' in data}
+            {#if isType.item(data)}
                 {#each data.bonus as bonus}
                     <p class="flex items-center pl-4 text-lg">
                         <Icon icon={getPowerupProp(bonus[0], 'icon')} class={getPowerupProp(bonus[0], 'style')} />

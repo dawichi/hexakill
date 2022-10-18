@@ -4,21 +4,21 @@
   Display the music
 -->
 <script lang="ts" context="module">
+    import { gameData } from '$lib/data/data'
+    import type { GameDTO } from '$lib/types/Game.dto'
+
     const musics = new Set<HTMLAudioElement>()
-    export let isPlaying = false
 
-    function stopAll() {
-        isPlaying = false
-        musics.forEach(p => p.pause())
-    }
-
-    function startAll() {
-        isPlaying = true
-        musics.forEach(p => p.play())
-    }
+    let _data: GameDTO
+    gameData.subscribe(n => (_data = n))
 
     export function handlePlay() {
-        isPlaying ? stopAll() : startAll()
+        if (_data.showUI.music) {
+            musics.forEach(p => p.pause())
+        } else {
+            musics.forEach(p => p.play())
+        }
+        gameData.update(n => ({ ...n, showUI: { ...n.showUI, music: !n.showUI.music } }))
     }
 </script>
 
@@ -26,8 +26,8 @@
     import { onMount } from 'svelte'
     type SongType = 'combat' | 'welcome'
     const songs: Record<SongType, string> = {
+        welcome: '/music/welcome.mp3',
         combat: 'https://sveltejs.github.io/assets/music/satie.mp3',
-        welcome: 'https://sveltejs.github.io/assets/music/satie.mp3',
     }
     export let song: SongType
 
