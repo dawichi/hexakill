@@ -58,21 +58,28 @@
     </div>
     <div class="absolute top-0 left-0 m-5 rounded ">
         {#each StatIcons as stat}
-            <div class="relative">
-                <Tooltip
-                    data={{
-                        title: stat.name,
-                        content: tooltipsService.getStatTooltip(String(stat.stat), _entity),
-                    }}
-                >
-                    <p class="flex items-center p-1 text-lg">
-                        <span class="text-3xl">
-                            <Icon icon={stat.icon} class={stat.style} />
-                        </span>
-                        <span class="pl-2">{_entity[stat.stat]}</span>
+            <Tooltip
+                data={{
+                    title: stat.name,
+                    content: tooltipsService.getStatTooltip(String(stat.stat), _entity),
+                }}
+            >
+                <div class="flex items-center p-1 text-lg">
+                    <p class="text-3xl">
+                        <Icon icon={stat.icon} class={stat.style} />
                     </p>
-                </Tooltip>
-            </div>
+                    <p class="pl-2">
+                        <span>{_entity[stat.stat]}</span>
+                        {#if _entity instanceof CharacterModel}
+                            {#if stat.stat !== 'potions' && stat.stat !== 'gold'}
+                                {#if _entity.inventory.totalBonus[stat.stat] > 0}
+                                    <span class="text-green-400">+{_entity.inventory.totalBonus[stat.stat]}</span>
+                                {/if}
+                            {/if}
+                        {/if}
+                    </p>
+                </div>
+            </Tooltip>
         {/each}
     </div>
 </section>
