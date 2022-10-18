@@ -5,25 +5,14 @@
 -->
 <script lang="ts" context="module">
     import { gameData } from '$lib/data/data'
-    import type { GameDTO } from '$lib/types/Game.dto'
 
     const musics = new Set<HTMLAudioElement>()
 
-    let _data: GameDTO
-    gameData.subscribe(n => (_data = n))
-
-    export function handlePlay() {
-        if (_data.music.active) {
-            musics.forEach(p => p.pause())
-        } else {
-            musics.forEach(p => p.play())
-        }
-        gameData.update(n => ({ ...n, music: { ...n.music, active: !n.music.active } }))
-    }
-
     export function handleVolume(volume: number) {
-        musics.forEach(p => (p.volume = volume))
-        gameData.update(n => ({ ...n, music: { ...n.music, volume: volume } }))
+        musics.forEach(p => {
+            p.volume = volume
+            p.play()
+        })
     }
 </script>
 
@@ -40,7 +29,6 @@
 
     onMount(() => {
         musics.add(music)
-        musics.forEach(p => (p.volume = _data.music.volume))
     })
 </script>
 

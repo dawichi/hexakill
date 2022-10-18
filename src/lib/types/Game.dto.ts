@@ -26,10 +26,6 @@ export type GameDTO = {
         fighting: boolean
         actionBtns: boolean
     }
-    music: {
-        active: boolean
-        volume: number
-    }
     logs: LoggerDTO
     powerUps: {
         pending: number

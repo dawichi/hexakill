@@ -4,20 +4,15 @@
     import { sineIn } from 'svelte/easing'
     import { styles } from '$lib/config/styles'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
-    import Audio, { handlePlay, handleVolume } from '$lib/components/Audio.svelte'
-    import type { GameDTO } from '$lib/types/Game.dto'
-    import { gameData } from '$lib/data/data'
+    import Audio, { handleVolume } from '$lib/components/Audio.svelte'
 
-    let _data: GameDTO
-    gameData.subscribe(n => (_data = n))
-
+    let volume = 0
     let hideDrawer = true
     let transitionParams = {
         x: -320,
         duration: 200,
         easing: sineIn,
     }
-
 </script>
 
 <!-- Displays everything in a centered block -->
@@ -28,14 +23,6 @@
         <button class={styles.button.base + styles.button.blue} on:click={() => (hideDrawer = false)}>
             <i class="bi bi-list" />
         </button>
-        <button class={styles.button.base + styles.button.blue} on:click={handlePlay}>
-            <i class={_data.music.active ? 'bi bi-volume-up-fill' : 'bi bi-volume-mute-fill'} />
-        </button>
-        {#if _data.music.active}
-            <button class={`${styles.button.base} ${styles.button.blue} flex justify-center items-center w-24`}>
-                <Range min={0} max={0.5} step={0.01} size="sm" bind:value={_data.music.volume} on:change={() => handleVolume(_data.music.volume)} />
-            </button>
-        {/if}
     </div>
     <Audio song="welcome" />
     <main class="h-full">
@@ -50,6 +37,15 @@
         <button class="hover: text-xl transition" on:click={() => (hideDrawer = true)}><i class="bi bi-x-lg" /></button>
     </div>
     <hr class="mb-4" />
+
+    <div class="flex items-center justify-center gap-4 p-2">
+        <h6>Music</h6>
+        <i class="bi bi-volume-mute-fill" />
+        <Range min={0} max={0.5} step={0.01} size="sm" bind:value={volume} on:change={() => handleVolume(volume)} />
+        <i class="bi bi-volume-up-fill" />
+    </div>
+
+    <div class="my-8" />
 
     <PersonalRecords />
 </Drawer>
