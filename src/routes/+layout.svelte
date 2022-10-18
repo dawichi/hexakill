@@ -8,16 +8,16 @@
     import type { GameDTO } from '$lib/types/Game.dto'
     import { gameData } from '$lib/data/data'
 
+    let _data: GameDTO
+    gameData.subscribe(n => (_data = n))
+
     let hideDrawer = true
-    let musicVolume = 0.5
     let transitionParams = {
         x: -320,
         duration: 200,
         easing: sineIn,
     }
 
-    let _data: GameDTO
-    gameData.subscribe(n => (_data = n))
 </script>
 
 <!-- Displays everything in a centered block -->
@@ -29,11 +29,11 @@
             <i class="bi bi-list" />
         </button>
         <button class={styles.button.base + styles.button.blue} on:click={handlePlay}>
-            <i class={_data.showUI.musicActive ? 'bi bi-volume-up-fill' : 'bi bi-volume-mute-fill'} />
+            <i class={_data.music.active ? 'bi bi-volume-up-fill' : 'bi bi-volume-mute-fill'} />
         </button>
-        {#if _data.showUI.musicActive}
+        {#if _data.music.active}
             <button class={`${styles.button.base} ${styles.button.blue} flex justify-center items-center w-24`}>
-                <Range min={0} max={0.5} step={0.01} size="sm" bind:value={musicVolume} on:change={() => handleVolume(musicVolume)} />
+                <Range min={0} max={0.5} step={0.01} size="sm" bind:value={_data.music.volume} on:change={() => handleVolume(_data.music.volume)} />
             </button>
         {/if}
     </div>

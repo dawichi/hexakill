@@ -25,8 +25,10 @@ export type GameDTO = {
     showUI: {
         fighting: boolean
         actionBtns: boolean
-        musicActive: boolean
-        musicVolume: number
+    }
+    music: {
+        active: boolean
+        volume: number
     }
     logs: LoggerDTO
     powerUps: {
