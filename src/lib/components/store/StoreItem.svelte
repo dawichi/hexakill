@@ -15,12 +15,15 @@
     let _data: GameDTO
     gameData.subscribe(n => (_data = n))
 
+    const audio = new Audio('/music/coin.mp3')
+
     function isTooExpensive(price: number): boolean {
         return price > (_data.character?.gold ?? 0)
     }
 
     function handleClick(): void {
         if (isTooExpensive(item.price)) return
+        audio.play()
         item instanceof ItemModel ? buyItem() : buyPotion()
     }
 
