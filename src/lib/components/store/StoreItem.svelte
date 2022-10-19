@@ -55,12 +55,13 @@
     const tooltip = item instanceof ItemModel ? {
         title: item.name,
         bonus: Object.entries(item.bonus).filter(([_, value]) => value !== 0),
+        content: null,
     } : {
         title: item.name,
+        bonus: null,
         content: ['Add potions to your inventory'],
     }
 </script>
-
 
 <Tooltip data={tooltip} styleLeftPx={200}>
     <article class={`${isTooExpensive(item.price) ? 'opacity-20' : 'hover:bg-zinc-700 hover:cursor-pointer'} rounded`} on:click={handleClick}>

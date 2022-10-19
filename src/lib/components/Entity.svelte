@@ -61,6 +61,7 @@
             <Tooltip
                 data={{
                     title: stat.name,
+                    bonus: null,
                     content: tooltipsService.getStatTooltip(String(stat.stat), _entity),
                 }}
             >
