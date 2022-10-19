@@ -65,14 +65,14 @@
             <p>{data.title}</p>
             <!-- Normal tooltip -->
             {#if isType.normal(data)}
-                {#each data.content as p}
+                {#each data.content ?? [] as p}
                     <p class="pl-4">{p}</p>
                 {/each}
             {/if}
 
             <!-- Item tooltip -->
             {#if isType.item(data)}
-                {#each data.bonus as bonus}
+                {#each data.bonus ?? [] as bonus}
                     <p class="flex items-center pl-4 text-lg">
                         <Icon icon={getPowerupProp(bonus[0], 'icon')} class={getPowerupProp(bonus[0], 'style')} />
                         <span class="pl-2">+{bonus[1]}</span>

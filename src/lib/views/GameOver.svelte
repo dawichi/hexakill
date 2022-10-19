@@ -73,6 +73,7 @@
                     <Tooltip
                         data={{
                             title: enemy.key,
+                            bonus: null,
                             content: [String(enemy.levels)],
                         }}
                     >
