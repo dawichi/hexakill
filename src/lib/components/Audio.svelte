@@ -4,16 +4,17 @@
   Display the music
 -->
 <script lang="ts" context="module">
-    import { gameData } from '$lib/data/data'
-
     const musics = new Set<HTMLAudioElement>()
 
-    export function handleVolume(volume: number) {
-        musics.forEach(p => {
-            p.volume = volume
-            p.play()
-        })
-    }
+    /**
+     * Handle the volume of the music
+     * @param volume The volume to set
+     */
+    export const handleVolume = (volume: number) => musics.forEach(p => {
+        if (volume === 0) p.pause()
+        if (volume > 0) p.play()
+        p.volume = volume
+    })
 </script>
 
 <script lang="ts">

@@ -13,6 +13,12 @@
         duration: 200,
         easing: sineIn,
     }
+
+    function handleClickVolume(newVolume: number) {
+        volume = newVolume
+        handleVolume(newVolume)
+    }
+
 </script>
 
 <!-- Displays everything in a centered block -->
@@ -40,9 +46,9 @@
 
     <div class="flex items-center justify-center gap-4 p-2">
         <h6>Music</h6>
-        <i class="bi bi-volume-mute-fill" />
+        <i class="bi bi-volume-mute-fill cursor-pointer p-1" on:click={() => handleClickVolume(0)} />
         <Range min={0} max={0.5} step={0.01} size="sm" bind:value={volume} on:change={() => handleVolume(volume)} />
-        <i class="bi bi-volume-up-fill" />
+        <i class="bi bi-volume-up-fill cursor-pointer p-1" on:click={() => handleClickVolume(0.5)} />
     </div>
 
     <div class="my-8" />

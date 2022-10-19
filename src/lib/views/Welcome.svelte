@@ -4,10 +4,12 @@
     This component is used to welcome the user to the game.
 -->
 <script lang="ts">
+    import { handleVolume } from '$lib/components/Audio.svelte'
     import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/data'
 
     function startPlaying() {
+        handleVolume(0.1)
         gameData.update(n => {
             n.view = 'champSelect'
             return n
