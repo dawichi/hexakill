@@ -23,6 +23,11 @@ class Combat {
         let dmgReceived: number
         let message: string
         let icon: string
+        let sound: HTMLAudioElement
+
+        const sound_attack = new Audio('/music/attack.mp3')
+        const sound_heal = new Audio('/music/potion.wav')
+        const sound_magic = new Audio('/music/magic.mp3')
 
         const choices: Record<0 | 1 | 2, () => void> = {
             0: () => {
@@ -30,22 +35,26 @@ class Combat {
                 dmgReceived = passive.receiveAttack(damage)
                 message = ''
                 icon = '🔪'
+                sound = sound_attack
             },
             1: () => {
                 damage = active.magic()
                 dmgReceived = passive.receiveMagic(damage)
                 message = ''
                 icon = '☄'
+                sound = sound_magic
             },
             2: () => {
                 const healed = active.heal()
                 message = `healed ${healed} HP! ❤`
+                sound = sound_heal
             },
         }
 
         choices[choice]()
 
         gameData.update(d => {
+            sound.play()
             loggerService.add(d.logs[active_is_a_player ? 'player' : 'enemy'], {
                 title: active.name,
                 message: message,
@@ -66,7 +75,9 @@ class Combat {
     private defineTurn(active: CharacterModel | EnemyModel, passive: CharacterModel | EnemyModel, defeatFn: () => void): boolean {
         this.executeTurn(active, passive)
         if (passive.dmgReceived === passive.health) {
-            defeatFn()
+            setTimeout(() => {
+                defeatFn()
+            }, 1000)
             return true
         }
         return false
@@ -81,6 +92,11 @@ class Combat {
         const oldLevel = data.character.level
         const leveledUp = data.character.gainExp(exp)
         data.character.gainGold(data.enemy.gold)
+
+        const sound_levelup = new Audio('/music/levelup.mp3')
+        const sound_enemy_killed = new Audio('/music/enemy_killed.mp3')
+
+        leveledUp ? sound_levelup.play() : sound_enemy_killed.play()
 
         gameData.update(d => {
             if (!d.character || !d.enemy) return d
@@ -193,7 +209,7 @@ class Combat {
                 d.showUI.actionBtns = true
                 return d
             })
-        }, 1000)
+        }, 2000)
     }
 }
 
