@@ -15,7 +15,7 @@ export abstract class BaseEntityModel {
     mr: number
     speed: number
     potions = 5
-    gold = 0
+    gold = 2000
 
     constructor(level: number, name: string) {
         this.name = name

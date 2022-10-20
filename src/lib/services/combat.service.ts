@@ -1,8 +1,7 @@
 import { gameData } from '$lib/data/data'
 import { CharacterModel, EnemyModel } from '$lib/models'
 import type { GameDTO } from '$lib/types/Game.dto'
-import { loggerService, storageService } from '.'
-import enemyService from './enemy.service'
+import { enemyService, loggerService, soundsService, storageService } from '.'
 
 /**
  * Functions used during the combat.
@@ -23,11 +22,6 @@ class Combat {
         let dmgReceived: number
         let message: string
         let icon: string
-        let sound: HTMLAudioElement
-
-        const sound_attack = new Audio('/music/attack.mp3')
-        const sound_heal = new Audio('/music/potion.wav')
-        const sound_magic = new Audio('/music/magic.mp3')
 
         const choices: Record<0 | 1 | 2, () => void> = {
             0: () => {
@@ -35,26 +29,26 @@ class Combat {
                 dmgReceived = passive.receiveAttack(damage)
                 message = ''
                 icon = '🔪'
-                sound = sound_attack
             },
             1: () => {
                 damage = active.magic()
                 dmgReceived = passive.receiveMagic(damage)
                 message = ''
                 icon = '☄'
-                sound = sound_magic
             },
             2: () => {
                 const healed = active.heal()
                 message = `healed ${healed} HP! ❤`
-                sound = sound_heal
             },
         }
 
         choices[choice]()
 
+        if (choice === 0) soundsService.play('attack')
+        if (choice === 1) soundsService.play('magic')
+        if (choice === 2) soundsService.play('potion')
+
         gameData.update(d => {
-            sound.play()
             loggerService.add(d.logs[active_is_a_player ? 'player' : 'enemy'], {
                 title: active.name,
                 message: message,
@@ -93,10 +87,9 @@ class Combat {
         const leveledUp = data.character.gainExp(exp)
         data.character.gainGold(data.enemy.gold)
 
-        const sound_levelup = new Audio('/music/levelup.mp3')
-        const sound_enemy_killed = new Audio('/music/enemy_killed.mp3')
-
-        leveledUp ? sound_levelup.play() : sound_enemy_killed.play()
+        leveledUp
+            ? soundsService.play('levelup')
+            : soundsService.play('enemyKilled')
 
         gameData.update(d => {
             if (!d.character || !d.enemy) return d

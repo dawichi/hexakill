@@ -9,22 +9,23 @@
     import { ItemModel } from '$lib/models'
     import { gameData } from '$lib/data/data'
     import { Image, Tooltip } from '..'
+    import { soundsService } from '$lib/services'
 
     export let item: ItemModel | PotionDto
 
     let _data: GameDTO
     gameData.subscribe(n => (_data = n))
 
-    const coin = new Audio('/music/coin.mp3')
-    const punch = new Audio('/music/punch.mp3')
-
     function isTooExpensive(price: number): boolean {
         return price > (_data.character?.gold ?? 0)
     }
 
     function handleClick(): void {
-        if (isTooExpensive(item.price)){punch.play(); return}
-        coin.play()
+        if (isTooExpensive(item.price)) {
+            soundsService.play('error')
+            return
+        }
+        soundsService.play('coin')
         item instanceof ItemModel ? buyItem() : buyPotion()
     }
 
@@ -56,15 +57,18 @@
         })
     }
 
-    const tooltip = item instanceof ItemModel ? {
-        title: item.name,
-        bonus: Object.entries(item.bonus).filter(([_, value]) => value !== 0),
-        content: null,
-    } : {
-        title: item.name,
-        bonus: null,
-        content: ['Add potions to your inventory'],
-    }
+    const tooltip =
+        item instanceof ItemModel
+            ? {
+                  title: item.name,
+                  bonus: Object.entries(item.bonus).filter(([_, value]) => value !== 0),
+                  content: null,
+              }
+            : {
+                  title: item.name,
+                  bonus: null,
+                  content: ['Add potions to your inventory'],
+              }
 </script>
 
 <Tooltip data={tooltip} styleLeftPx={200}>
