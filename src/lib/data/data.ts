@@ -28,6 +28,10 @@ export const gameData: Writable<GameDTO> = writable({
         fighting: false,
         actionBtns: true,
     },
+    sound: {
+        musicVolume: 0.1,
+        effectsVolume: 0.4,
+    },
     logs: {
         player: [],
         enemy: [],

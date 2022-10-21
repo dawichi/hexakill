@@ -4,7 +4,7 @@
     This component is used to welcome the user to the game.
 -->
 <script lang="ts">
-    import { handleVolume } from '$lib/components/Audio.svelte'
+    import { handleVolume } from '$lib/components/music/Audio.svelte'
     import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/data'
 

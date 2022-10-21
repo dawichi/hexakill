@@ -1,24 +1,18 @@
 <script lang="ts">
     import '../app.css'
-    import { Drawer, Range } from 'flowbite-svelte'
+    import { Drawer } from 'flowbite-svelte'
     import { sineIn } from 'svelte/easing'
     import { styles } from '$lib/config/styles'
+    import Audio from '$lib/components/music/Audio.svelte'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
-    import Audio, { handleVolume } from '$lib/components/Audio.svelte'
+    import VolumeSlider from '$lib/components/music/VolumeSlider.svelte'
 
-    let volume = 0
     let hideDrawer = true
     let transitionParams = {
         x: -320,
         duration: 200,
         easing: sineIn,
     }
-
-    function handleClickVolume(newVolume: number) {
-        volume = newVolume
-        handleVolume(newVolume)
-    }
-
 </script>
 
 <!-- Displays everything in a centered block -->
@@ -44,14 +38,10 @@
     </div>
     <hr class="mb-4" />
 
-    <div class="flex items-center justify-center gap-4 p-2">
-        <h6>Music</h6>
-        <i class="bi bi-volume-mute-fill cursor-pointer p-1" on:click={() => handleClickVolume(0)} />
-        <Range min={0} max={0.5} step={0.01} size="sm" bind:value={volume} on:change={() => handleVolume(volume)} />
-        <i class="bi bi-volume-up-fill cursor-pointer p-1" on:click={() => handleClickVolume(0.5)} />
-    </div>
+    <VolumeSlider title="Music" />
+    <VolumeSlider title="Effects" />
 
     <div class="my-8" />
 
-    <PersonalRecords />
+    <PersonalRecords  />
 </Drawer>

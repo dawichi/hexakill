@@ -1,4 +1,10 @@
+import { gameData } from "$lib/data/data"
+import type { GameDTO } from "$lib/types/Game.dto"
+
 type AvailableSounds = 'coin' | 'error' | 'attack' | 'magic' | 'potion' | 'levelup' | 'enemyKilled'
+
+let _data: GameDTO
+gameData.subscribe(n => (_data = n))
 
 /**
  * Sounds used in the game.
@@ -18,7 +24,7 @@ class Sounds {
     */
     public play(soundKey: AvailableSounds): void {
         const sound = new Audio(this[soundKey])
-        sound.volume = 0.5
+        sound.volume = _data.sound.effectsVolume
         sound.play()
    }
 }
