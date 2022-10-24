@@ -14,6 +14,8 @@
     import { combatService, enemyService } from '$lib/services'
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
+    import { Button } from 'flowbite-svelte'
+    import Icon from '@iconify/svelte'
 
     let _data: GameDTO
     gameData.subscribe(n => (_data = n))
@@ -64,9 +66,13 @@
         {#if _data.enemy}
             <Entity type="enemy" />
         {:else if !_data.powerUps.pending}
-            <section class={styles.cell + 'flex justify-center items-center'}>
-                <button on:click={newCombat} class={styles.button.base + styles.button.red}> FIGHT </button>
-                <button on:click={openStore} class={styles.button.base + styles.button.green}> STORE </button>
+            <section class={styles.cell + 'flex justify-center items-center gap-4'}>
+                <Button gradient color="red" on:click={newCombat}>
+                    <span class="font-bold tracking-wider text-xl flex items-center gap-2"><Icon icon="game-icons:sword-clash"/> FIGHT</span>
+                </Button>
+                <Button gradient color="green" on:click={openStore}>
+                    <span class="font-bold tracking-wider text-xl flex items-center gap-2"><i class="bi bi-shop"></i> STORE</span>
+                </Button>
             </section>
         {/if}
     </div>
