@@ -5,6 +5,9 @@
     import type { GameDTO } from '$lib/types/Game.dto'
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
+    import { Button } from 'flowbite-svelte'
+
+    let defaultModal = false
 
     let _data: GameDTO
     gameData.subscribe(n => (_data = n))
@@ -24,7 +27,7 @@
 
 <svelte:window on:keydown|preventDefault={onKeyDown} />
 
-<div class="grid h-full grid-cols-3 bg-zinc-800 animate__animated animate__fadeIn">
+<div class="animate__animated animate__fadeIn grid h-full grid-cols-3 bg-zinc-800">
     <section class="grid grid-rows-2">
         <Entity type="character" />
         <div class={styles.cell}>
@@ -53,6 +56,8 @@
                 {/each}
             </div>
         </div>
-        <button on:click={closeStore} class={styles.button.base + styles.button.red}>Close</button>
+        <Button gradient color="red" on:click={closeStore}>
+            <span class="flex items-center gap-2 text-xl font-bold tracking-wider">Close</span>
+        </Button>
     </section>
 </div>

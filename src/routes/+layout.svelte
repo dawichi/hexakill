@@ -1,8 +1,7 @@
 <script lang="ts">
     import '../app.css'
-    import { Drawer } from 'flowbite-svelte'
+    import { Button, Drawer } from 'flowbite-svelte'
     import { sineIn } from 'svelte/easing'
-    import { styles } from '$lib/config/styles'
     import Audio from '$lib/components/music/Audio.svelte'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
     import VolumeSlider from '$lib/components/music/VolumeSlider.svelte'
@@ -21,9 +20,9 @@
     <!-- Some UI elements such as title, menu, etc... -->
     <h1 class="absolute top-0 left-0 w-full p-5 text-center text-3xl tracking-widest">HEXAKILL</h1>
     <div class="absolute top-5 left-5 flex gap-2">
-        <button class={styles.button.base + styles.button.blue} on:click={() => (hideDrawer = false)}>
-            <i class="bi bi-list" />
-        </button>
+        <Button gradient color="blue" on:click={() => (hideDrawer = false)}>
+            <span class="flex items-center gap-2 text-xl font-bold tracking-wider"><i class="bi bi-list" /></span>
+        </Button>
     </div>
     <Audio song="welcome" />
     <main class="h-full">
@@ -45,6 +44,6 @@
     <div class="my-8" />
 
     <PersonalRecords />
-    
+
     <Info />
 </Drawer>

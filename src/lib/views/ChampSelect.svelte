@@ -5,10 +5,10 @@
 -->
 <script lang="ts">
     import { Image } from '$lib/components'
-    import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/data'
     import { characters } from '$lib/config/characters'
     import { CharacterModel } from '$lib/models'
+    import { Button } from 'flowbite-svelte'
 
     let _nameInput: string = ''
     let _character: number = -1
@@ -60,7 +60,9 @@
         </div>
 
         {#if _character > -1}
-            <button on:click={start} class={'mt-16 ' + styles.button.base + styles.button[characters[_character]?.data.color]}> START GAME </button>
+            <Button class="my-16" gradient color={characters[_character]?.data.color} on:click={start}>
+                <span class="flex items-center gap-2 text-xl font-bold tracking-wider">START GAME</span>
+            </Button>
         {/if}
     {/if}
 </section>

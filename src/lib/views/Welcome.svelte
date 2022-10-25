@@ -5,8 +5,8 @@
 -->
 <script lang="ts">
     import { handleVolume } from '$lib/components/music/Audio.svelte'
-    import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/data'
+    import { Button } from 'flowbite-svelte'
 
     function startPlaying() {
         handleVolume(0.1)
@@ -50,7 +50,9 @@
     <br />
     <br />
 
-    <button on:click={startPlaying} class={styles.button.base + styles.button.indigo}> START </button>
+    <Button gradient color="blue" on:click={startPlaying}>
+        <span class="font-bold tracking-wider text-xl flex items-center gap-2">START</span>
+    </Button>
 </div>
 
 <style>

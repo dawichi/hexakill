@@ -85,16 +85,16 @@
                 <div>
                     <h4 class="mt-8 p-2 text-center text-lg">What do you want to do?</h4>
                     <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_data.showUI.actionBtns ? '' : 'opacity-20'}`}>
-                        <button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(0)} class={styles.button.base + styles.button.red}>
-                            Attack
-                        </button>
-                        <button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(1)} class={styles.button.base + styles.button.blue}>
-                            Magic
-                        </button>
+                        <Button  disabled={!_data.showUI.actionBtns} on:click={() => newTurn(0)} gradient color="red">
+                            <span class="font-bold tracking-wider text-xl flex items-center gap-2">Attack</span>
+                        </Button>
+                        <Button  disabled={!_data.showUI.actionBtns} on:click={() => newTurn(1)} gradient color="blue">
+                            <span class="font-bold tracking-wider text-xl flex items-center gap-2">Magic</span>
+                        </Button>
                         {#if (_data.character?.potions ?? 0) > 0}
-                            <button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(2)} class={styles.button.base + styles.button.green}>
-                                Potion
-                            </button>
+                        <Button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(2)} gradient color="green">
+                            <span class="font-bold tracking-wider text-xl flex items-center gap-2"> Potion</span>
+                        </Button>
                         {/if}
                     </div>
                 </div>

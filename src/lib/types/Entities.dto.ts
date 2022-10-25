@@ -10,7 +10,7 @@ export type CharacterConfigDto = {
         desc: string
         subDesc: string
         shadow: string
-        color: 'indigo' | 'red' | 'amber'
+        color: 'blue' | 'red' | 'lime'
         bg: string
     }
     modifiers: Modifiers
