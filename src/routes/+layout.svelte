@@ -6,6 +6,7 @@
     import Audio from '$lib/components/music/Audio.svelte'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
     import VolumeSlider from '$lib/components/music/VolumeSlider.svelte'
+    import { Info } from '$lib/components'
 
     let hideDrawer = true
     let transitionParams = {
@@ -43,5 +44,7 @@
 
     <div class="my-8" />
 
-    <PersonalRecords  />
+    <PersonalRecords />
+    
+    <Info />
 </Drawer>
