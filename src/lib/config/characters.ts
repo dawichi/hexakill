@@ -10,7 +10,7 @@ export const characters: CharacterConfigDto[] = [
             desc: 'Destroy with explosions',
             subDesc: 'weak in close combat',
             shadow: 'shadow-lg shadow-indigo-400',
-            color: 'indigo',
+            color: 'blue',
             bg: 'bg-indigo-700/50',
         },
         modifiers: {
@@ -46,7 +46,7 @@ export const characters: CharacterConfigDto[] = [
             desc: 'Strongest man in the world',
             subDesc: 'slow and low damage',
             shadow: 'shadow-lg shadow-amber-400',
-            color: 'amber',
+            color: 'lime',
             bg: 'bg-amber-700/50',
         },
         modifiers: {

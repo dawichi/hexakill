@@ -9,6 +9,7 @@
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
     import Entity from '$lib/components/Entity.svelte'
+    import { Button } from 'flowbite-svelte'
 
     let _data: GameDTO
     gameData.subscribe(n => (_data = n))
@@ -62,7 +63,9 @@
     <section class="animate__animated animate__fadeIn animate__slower flex flex-col items-center justify-around">
         <div class="mb-8 flex flex-col items-center">
             <h1 class="mb-8 text-center font-mono text-8xl text-red-600">GAME<br />OVER</h1>
-            <button on:click={retry} class={styles.button.base + styles.button.red}> Try again? </button>
+            <Button gradient color="red" on:click={retry}>
+                <span class="flex items-center gap-2 text-xl font-bold tracking-wider">Try again?</span>
+            </Button>
         </div>
         <!-- ENEMIES HISTORY -->
         <section class={styles.cell + 'flex flex-col animate__animated animate__fadeIn animate__slower  animate__delay-4s relative'}>
