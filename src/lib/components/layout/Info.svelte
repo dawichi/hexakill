@@ -11,7 +11,7 @@
 
 <div class="absolute bottom-5 left-0 right-0 flex justify-center">
     <Button gradient color="blue" on:click={() => (showModal = true)}>
-        <span class="flex items-center gap-2 text-xl font-bold tracking-wider">HOW TO PLAY</span>
+        <span class="flex items-center gap-2 text-xl font-bold">HOW TO PLAY</span>
     </Button>
 </div>
 

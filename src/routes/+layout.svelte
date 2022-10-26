@@ -13,6 +13,23 @@
         duration: 200,
         easing: sineIn,
     }
+
+    const timer = {
+        seconds: 0,
+        text: '',
+        increment: (): void => {
+            timer.seconds += 1
+            if (timer.seconds >= 60 * 60) {
+                timer.text = `${Math.floor(timer.seconds / 60 / 60)}h ${Math.floor(timer.seconds / 60) % 60}m ${timer.seconds % 60}s`
+            } else if (timer.seconds >= 60) {
+                timer.text = `${Math.floor(timer.seconds / 60)}m ${timer.seconds % 60}s`
+            } else {
+                timer.text = `${timer.seconds}s`
+            }
+        },
+    }
+
+    setInterval(timer.increment, 1000)
 </script>
 
 <!-- Displays everything in a centered block -->
@@ -20,9 +37,12 @@
     <!-- Some UI elements such as title, menu, etc... -->
     <h1 class="absolute top-0 left-0 w-full p-5 text-center text-3xl tracking-widest">HEXAKILL</h1>
     <div class="absolute top-5 left-5 flex gap-2">
-        <Button gradient color="blue" on:click={() => (hideDrawer = false)}>
-            <span class="flex items-center gap-2 text-xl font-bold tracking-wider"><i class="bi bi-list" /></span>
+        <Button class="!px-4 !py-3" gradient color="blue" on:click={() => (hideDrawer = false)}>
+            <span class="text-xl font-bold"><i class="bi bi-list" /></span>
         </Button>
+    </div>
+    <div class="absolute top-5 right-5">
+        {timer.text}
     </div>
     <Audio song="welcome" />
     <main class="h-full">

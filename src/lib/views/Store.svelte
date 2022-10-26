@@ -57,7 +57,7 @@
             </div>
         </div>
         <Button gradient color="red" on:click={closeStore}>
-            <span class="flex items-center gap-2 text-xl font-bold tracking-wider">Close</span>
+            <span class="text-xl font-bold tracking-wider">Close</span>
         </Button>
     </section>
 </div>

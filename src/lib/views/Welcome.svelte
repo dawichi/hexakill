@@ -51,7 +51,7 @@
     <br />
 
     <Button gradient color="blue" on:click={startPlaying}>
-        <span class="font-bold tracking-wider text-xl flex items-center gap-2">START</span>
+        <span class="text-xl font-bold tracking-wider">START</span>
     </Button>
 </div>
 
