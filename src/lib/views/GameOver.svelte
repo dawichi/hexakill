@@ -64,7 +64,7 @@
         <div class="mb-8 flex flex-col items-center">
             <h1 class="mb-8 text-center font-mono text-8xl text-red-600">GAME<br />OVER</h1>
             <Button gradient color="red" on:click={retry}>
-                <span class="flex items-center gap-2 text-xl font-bold tracking-wider">Try again?</span>
+                <span class="text-xl font-bold tracking-wider">Try again?</span>
             </Button>
         </div>
         <!-- ENEMIES HISTORY -->

@@ -61,7 +61,7 @@
 
         {#if _character > -1}
             <Button class="my-16" gradient color={characters[_character]?.data.color} on:click={start}>
-                <span class="flex items-center gap-2 text-xl font-bold tracking-wider">START GAME</span>
+                <span class="gap-2 text-xl font-bold tracking-wider">START GAME</span>
             </Button>
         {/if}
     {/if}

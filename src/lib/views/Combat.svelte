@@ -52,7 +52,7 @@
 
 <svelte:window on:keydown|preventDefault={onKeyDown} />
 
-<section class="grid h-full grid-cols-1 grid-rows-2 bg-zinc-800 animate__animated animate__fadeIn">
+<section class="animate__animated animate__fadeIn grid h-full grid-cols-1 grid-rows-2 bg-zinc-800">
     <!-- ROW 1 - 3 COLUMNS -->
     <div class="grid lg:grid-cols-3">
         <div class={styles.cell}>
@@ -68,10 +68,10 @@
         {:else if !_data.powerUps.pending}
             <section class={styles.cell + 'flex justify-center items-center gap-4'}>
                 <Button gradient color="red" on:click={newCombat}>
-                    <span class="font-bold tracking-wider text-xl flex items-center gap-2"><Icon icon="game-icons:sword-clash"/> FIGHT</span>
+                    <span class="flex items-center gap-2 text-xl font-bold tracking-wider"><Icon icon="game-icons:sword-clash" /> FIGHT</span>
                 </Button>
                 <Button gradient color="green" on:click={openStore}>
-                    <span class="font-bold tracking-wider text-xl flex items-center gap-2"><i class="bi bi-shop"></i> STORE</span>
+                    <span class="flex items-center gap-2 text-xl font-bold tracking-wider"><i class="bi bi-shop" /> STORE</span>
                 </Button>
             </section>
         {/if}
@@ -85,16 +85,16 @@
                 <div>
                     <h4 class="mt-8 p-2 text-center text-lg">What do you want to do?</h4>
                     <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_data.showUI.actionBtns ? '' : 'opacity-20'}`}>
-                        <Button  disabled={!_data.showUI.actionBtns} on:click={() => newTurn(0)} gradient color="red">
-                            <span class="font-bold tracking-wider text-xl flex items-center gap-2">Attack</span>
+                        <Button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(0)} gradient color="red">
+                            <span class="text-xl font-bold tracking-wider">Attack</span>
                         </Button>
-                        <Button  disabled={!_data.showUI.actionBtns} on:click={() => newTurn(1)} gradient color="blue">
-                            <span class="font-bold tracking-wider text-xl flex items-center gap-2">Magic</span>
+                        <Button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(1)} gradient color="blue">
+                            <span class="text-xl font-bold tracking-wider">Magic</span>
                         </Button>
                         {#if (_data.character?.potions ?? 0) > 0}
-                        <Button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(2)} gradient color="green">
-                            <span class="font-bold tracking-wider text-xl flex items-center gap-2"> Potion</span>
-                        </Button>
+                            <Button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(2)} gradient color="green">
+                                <span class="text-xl font-bold tracking-wider"> Potion</span>
+                            </Button>
                         {/if}
                     </div>
                 </div>
