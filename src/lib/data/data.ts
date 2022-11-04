@@ -30,7 +30,7 @@ export const gameData: Writable<GameDTO> = writable({
     },
     sound: {
         musicVolume: 0.1,
-        effectsVolume: 0.4,
+        effectsVolume: 0.2,
     },
     logs: {
         player: [],

@@ -10,19 +10,23 @@
      * Handle the volume of the music
      * @param volume The volume to set
      */
-    export const handleVolume = (volume: number) => musics.forEach(p => {
-        if (volume === 0) p.pause()
-        if (volume > 0) p.play()
-        p.volume = volume
-    })
+    export const handleVolume = (volume: number) =>
+        musics.forEach(p => {
+            if (volume === 0) p.pause()
+            if (volume > 0) p.play()
+            p.volume = volume
+        })
 </script>
 
 <script lang="ts">
     import { onMount } from 'svelte'
-    type SongType = 'combat' | 'welcome'
+    type SongType = 'combat' | 'welcome' | 'store' | 'champSelect' | 'gameover'
     const songs: Record<SongType, string> = {
         welcome: '/music/welcome.mp3',
-        combat: 'https://sveltejs.github.io/assets/music/satie.mp3',
+        combat: '/music/dungeon.mp3',
+        store: '/music/store.mp3',
+        champSelect: '/music/dungeon.mp3',
+        gameover: '/music/welcome.mp3',
     }
     export let song: SongType
 

@@ -5,7 +5,7 @@
     import Audio from '$lib/components/music/Audio.svelte'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
     import VolumeSlider from '$lib/components/music/VolumeSlider.svelte'
-    import { Info } from '$lib/components'
+    import { Info, Timer } from '$lib/components'
 
     let hideDrawer = true
     let transitionParams = {
@@ -13,23 +13,6 @@
         duration: 200,
         easing: sineIn,
     }
-
-    const timer = {
-        seconds: 0,
-        text: '',
-        increment: (): void => {
-            timer.seconds += 1
-            if (timer.seconds >= 60 * 60) {
-                timer.text = `${Math.floor(timer.seconds / 60 / 60)}h ${Math.floor(timer.seconds / 60) % 60}m ${timer.seconds % 60}s`
-            } else if (timer.seconds >= 60) {
-                timer.text = `${Math.floor(timer.seconds / 60)}m ${timer.seconds % 60}s`
-            } else {
-                timer.text = `${timer.seconds}s`
-            }
-        },
-    }
-
-    setInterval(timer.increment, 1000)
 </script>
 
 <!-- Displays everything in a centered block -->
@@ -42,7 +25,7 @@
         </Button>
     </div>
     <div class="absolute top-5 right-5">
-        {timer.text}
+        <Timer />
     </div>
     <Audio song="welcome" />
     <main class="h-full">
