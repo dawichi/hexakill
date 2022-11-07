@@ -38,7 +38,7 @@
 </script>
 
 <div>
-    <audio bind:this={music} src={songs[song]} loop>
+    <audio bind:this={music} src={songs[song]} loop autoplay>
         <track kind="captions" />
     </audio>
 </div>

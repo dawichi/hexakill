@@ -2,10 +2,12 @@
     import '../app.css'
     import { Button, Drawer } from 'flowbite-svelte'
     import { sineIn } from 'svelte/easing'
-    import Audio from '$lib/components/music/Audio.svelte'
+    import Audio, { handleVolume } from '$lib/components/music/Audio.svelte'
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
     import VolumeSlider from '$lib/components/music/VolumeSlider.svelte'
     import { Info, Timer } from '$lib/components'
+    import type { GameDTO } from '$lib/types/Game.dto'
+    import { gameData } from '$lib/data/data'
 
     let hideDrawer = true
     let transitionParams = {
@@ -13,6 +15,9 @@
         duration: 200,
         easing: sineIn,
     }
+
+    let _data: GameDTO
+    gameData.subscribe(n => (_data = n))
 </script>
 
 <!-- Displays everything in a centered block -->
@@ -27,7 +32,7 @@
     <div class="absolute top-5 right-5">
         <Timer />
     </div>
-    <Audio song="welcome" />
+    <Audio song={_data.view} />
     <main class="h-full">
         <slot />
     </main>
