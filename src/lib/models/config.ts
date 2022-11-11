@@ -19,4 +19,4 @@ export const info = {
     heal_range: [0.2, 0.3], // 20% - 30% of damage received
 } as const
 
-export const names = ['Pablo', 'Miguel', 'Paco', 'Jose', 'Berto', 'Juan', 'Ricardo', 'Manolo', 'Pepe', '']
+export const names = ['Pablo', 'Miguel', 'Paco', 'Jose', 'Berto', 'Juan', 'Ricardo', 'Manolo', 'Pepe', '', 'Juana', 'Dolores', 'Increible']
