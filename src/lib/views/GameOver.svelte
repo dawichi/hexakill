@@ -51,7 +51,14 @@
             return n
         })
     }
+
+    function onKeyDown(event: KeyboardEvent): void {
+        if (event.code === 'Space') retry()
+        return
+    }
 </script>
+
+<svelte:window on:keydown|preventDefault={onKeyDown} />
 
 <div class="flex grid h-screen flex-col items-center justify-center lg:grid-cols-3">
     <!-- YOUR STATS -->
