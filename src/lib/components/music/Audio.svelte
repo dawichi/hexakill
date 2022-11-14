@@ -20,12 +20,12 @@
 
 <script lang="ts">
     import { onMount } from 'svelte'
-    type SongType = 'combat' | 'welcome' | 'store' | 'champSelect' | 'gameover'
+    type SongType = 'combat' | 'welcome' | 'store' | 'champSelect' | 'gameover' | 'champSelect'
     const songs: Record<SongType, string> = {
-        welcome: '/music/welcome.mp3',
+        welcome: '',
         combat: '/music/dungeon.mp3',
         store: '/music/store.mp3',
-        champSelect: '/music/dungeon.mp3',
+        champSelect: '/music/champSelect.mp3',
         gameover: '/music/welcome.mp3',
     }
     export let song: SongType
