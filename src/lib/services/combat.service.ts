@@ -184,10 +184,6 @@ class Combat {
         }
 
         if (hasAnybodyDied) {
-            gameData.update(d => {
-                d.showUI.actionBtns = true
-                return d
-            })
             return
         }
 
