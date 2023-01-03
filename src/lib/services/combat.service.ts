@@ -87,9 +87,7 @@ class Combat {
         const leveledUp = data.character.gainExp(exp)
         data.character.gainGold(data.enemy.gold)
 
-        leveledUp
-            ? soundsService.play('levelup')
-            : soundsService.play('enemyKilled')
+        leveledUp ? soundsService.play('levelup') : soundsService.play('enemyKilled')
 
         gameData.update(d => {
             if (!d.character || !d.enemy) return d
