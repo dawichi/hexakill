@@ -6,21 +6,16 @@
     import Store from '$lib/views/Store.svelte'
     import Welcome from '$lib/views/Welcome.svelte'
 
-    let view: string
-
-    gameData.subscribe(n => {
-        view = n.view
-    })
 </script>
 
-{#if view === 'welcome'}
+{#if $gameData.view === 'welcome'}
     <Welcome />
-{:else if view === 'champSelect'}
+{:else if $gameData.view === 'champSelect'}
     <ChampSelect />
-{:else if view === 'combat'}
+{:else if $gameData.view === 'combat'}
     <Combat />
-{:else if view === 'store'}
+{:else if $gameData.view === 'store'}
     <Store />
-{:else if view === 'gameover'}
+{:else if $gameData.view === 'gameover'}
     <GameOver />
 {/if}

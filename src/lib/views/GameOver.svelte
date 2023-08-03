@@ -11,9 +11,6 @@
     import Entity from '$lib/components/Entity.svelte'
     import { Button } from 'flowbite-svelte'
 
-    let _data: GameDTO
-    gameData.subscribe(n => (_data = n))
-
     function counter(
         enemies: {
             image: string
@@ -79,7 +76,7 @@
             <h2 class="text-xl tracking-wider">Enemies killed:</h2>
             <hr />
             <div class="flex flex-wrap">
-                {#each counter(_data.enemiesHistory) as enemy}
+                {#each counter($gameData.enemiesHistory) as enemy}
                     <Tooltip
                         data={{
                             title: enemy.key,
