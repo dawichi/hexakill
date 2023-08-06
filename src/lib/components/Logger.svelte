@@ -12,10 +12,9 @@
         player: [],
         enemy: [],
     }
+    
+    $: _logs = $gameData.logs
 
-    gameData.subscribe(n => {
-        _logs = n.logs
-    })
 </script>
 
 <div class={styles.cell}>

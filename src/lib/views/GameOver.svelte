@@ -5,14 +5,12 @@
 -->
 <script lang="ts">
     import { Image, Tooltip } from '$lib/components'
-    import type { GameDTO } from '$lib/types/Game.dto'
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
     import Entity from '$lib/components/Entity.svelte'
     import { Button } from 'flowbite-svelte'
-
-    let _data: GameDTO
-    gameData.subscribe(n => (_data = n))
+    import { items } from '$lib/config/items'
+    import { ItemModel } from '$lib/models'
 
     function counter(
         enemies: {
@@ -48,6 +46,7 @@
                 history: {},
             }
             n.enemiesHistory = []
+            n.shop.items = items.map(item => new ItemModel(item.name, item.price, item.bonus))
             return n
         })
     }
@@ -79,7 +78,7 @@
             <h2 class="text-xl tracking-wider">Enemies killed:</h2>
             <hr />
             <div class="flex flex-wrap">
-                {#each counter(_data.enemiesHistory) as enemy}
+                {#each counter($gameData.enemiesHistory) as enemy}
                     <Tooltip
                         data={{
                             title: enemy.key,

@@ -6,7 +6,6 @@
     import PersonalRecords from '$lib/components/PersonalRecords.svelte'
     import VolumeSlider from '$lib/components/music/VolumeSlider.svelte'
     import { Info, Timer } from '$lib/components'
-    import type { GameDTO } from '$lib/types/Game.dto'
     import { gameData } from '$lib/data/data'
 
     let hideDrawer = true
@@ -16,8 +15,6 @@
         easing: sineIn,
     }
 
-    let _data: GameDTO
-    gameData.subscribe(n => (_data = n))
 </script>
 
 <!-- Displays everything in a centered block -->
@@ -29,10 +26,12 @@
             <span class="text-xl font-bold"><i class="bi bi-list" /></span>
         </Button>
     </div>
-    <div class="absolute top-5 right-5">
-        <Timer />
-    </div>
-    <Audio song={_data.view} />
+    {#if $gameData.view !== 'welcome' && $gameData.view !== 'champSelect'}
+        <div class="absolute top-5 right-5">
+            <Timer />
+        </div>
+    {/if}
+    <Audio song={$gameData.view} />
     <main class="h-full">
         <slot />
     </main>

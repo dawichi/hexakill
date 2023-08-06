@@ -2,15 +2,9 @@
     import Entity from '$lib/components/Entity.svelte'
     import Items from '$lib/components/Items.svelte'
     import StoreItem from '$lib/components/store/StoreItem.svelte'
-    import type { GameDTO } from '$lib/types/Game.dto'
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
     import { Button } from 'flowbite-svelte'
-
-    let defaultModal = false
-
-    let _data: GameDTO
-    gameData.subscribe(n => (_data = n))
 
     function closeStore(): void {
         gameData.update(n => {
@@ -41,7 +35,7 @@
             <h1 class="pb-2 text-center text-2xl">Potions</h1>
             <hr />
             <div class="mt-2 grid grid-cols-4 gap-2">
-                {#each _data.shop.potions as item}
+                {#each $gameData.shop.potions as item}
                     <StoreItem {item} />
                 {/each}
             </div>
@@ -51,7 +45,7 @@
             <h1 class="pb-2 text-center text-2xl">Items</h1>
             <hr />
             <div class="mt-2 grid grid-cols-4 gap-2">
-                {#each _data.shop.items as item}
+                {#each $gameData.shop.items as item}
                     <StoreItem {item} />
                 {/each}
             </div>

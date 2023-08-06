@@ -10,22 +10,19 @@
     import Logger from '$lib/components/Logger.svelte'
     import PowerUps from '$lib/components/PowerUps.svelte'
     // others
-    import type { GameDTO } from '$lib/types/Game.dto'
     import { combatService, enemyService } from '$lib/services'
     import { gameData } from '$lib/data/data'
     import { styles } from '$lib/config/styles'
     import { Button } from 'flowbite-svelte'
     import Icon from '@iconify/svelte'
 
-    let _data: GameDTO
-    gameData.subscribe(n => (_data = n))
-
     function newCombat(): void {
+        $gameData.showUI.actionBtns = true
         enemyService.newEnemy()
     }
 
     function newTurn(action: 0 | 1 | 2): void {
-        combatService.newTurn(_data, action)
+        combatService.newTurn($gameData, action)
     }
 
     function openStore(): void {
@@ -36,16 +33,16 @@
     }
 
     function onKeyDown(event: KeyboardEvent): void {
-        if (!_data.showUI.fighting && !_data.powerUps.pending) {
+        if (!$gameData.showUI.fighting && !$gameData.powerUps.pending) {
             if (event.code === 'Space') newCombat()
             if (event.code === 'KeyP') openStore()
             return
         }
-        if (!_data.showUI.fighting || !_data.showUI.actionBtns) return
+        if (!$gameData.showUI.fighting || !$gameData.showUI.actionBtns) return
 
         if (event.code === 'KeyA') newTurn(0)
         if (event.code === 'KeyS') newTurn(1)
-        if (!(_data.character?.potions ?? 0)) return
+        if (!($gameData.character?.potions ?? 0)) return
         if (event.code === 'KeyD') newTurn(2)
     }
 </script>
@@ -59,13 +56,13 @@
             <Items />
         </div>
 
-        {#if _data.character}
+        {#if $gameData.character}
             <Entity type="character" />
         {/if}
 
-        {#if _data.enemy}
+        {#if $gameData.enemy}
             <Entity type="enemy" />
-        {:else if !_data.powerUps.pending}
+        {:else if !$gameData.powerUps.pending}
             <section class={styles.cell + 'flex justify-center items-center gap-4'}>
                 <Button gradient color="red" on:click={newCombat}>
                     <span class="flex items-center gap-2 text-xl font-bold tracking-wider"><Icon icon="game-icons:sword-clash" /> FIGHT</span>
@@ -81,18 +78,18 @@
     <div class="col-span-3 grid lg:grid-cols-2">
         <div class={styles.cell}>
             <PowerUps />
-            {#if _data.showUI.fighting}
+            {#if $gameData.showUI.fighting}
                 <div>
                     <h4 class="mt-8 p-2 text-center text-lg">What do you want to do?</h4>
-                    <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${_data.showUI.actionBtns ? '' : 'opacity-20'}`}>
-                        <Button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(0)} gradient color="red">
+                    <div class={`flex gap-4 justify-center items-center p-4 transition-opacity ${$gameData.showUI.actionBtns ? '' : 'opacity-20'}`}>
+                        <Button disabled={!$gameData.showUI.actionBtns} on:click={() => newTurn(0)} gradient color="red">
                             <span class="text-xl font-bold tracking-wider">Attack</span>
                         </Button>
-                        <Button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(1)} gradient color="blue">
+                        <Button disabled={!$gameData.showUI.actionBtns} on:click={() => newTurn(1)} gradient color="blue">
                             <span class="text-xl font-bold tracking-wider">Magic</span>
                         </Button>
-                        {#if (_data.character?.potions ?? 0) > 0}
-                            <Button disabled={!_data.showUI.actionBtns} on:click={() => newTurn(2)} gradient color="green">
+                        {#if ($gameData.character?.potions ?? 0) > 0}
+                            <Button disabled={!$gameData.showUI.actionBtns} on:click={() => newTurn(2)} gradient color="green">
                                 <span class="text-xl font-bold tracking-wider"> Potion</span>
                             </Button>
                         {/if}
