@@ -6,7 +6,6 @@
 -->
 <script lang="ts">
     import { gameData } from '$lib/data/data'
-    import type { GameDTO } from '$lib/types/Game.dto'
 </script>
 
 <div class="flex flex-col gap-2 p-2">

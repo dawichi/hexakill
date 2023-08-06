@@ -17,6 +17,7 @@
     import Icon from '@iconify/svelte'
 
     function newCombat(): void {
+        $gameData.showUI.actionBtns = true
         enemyService.newEnemy()
     }
 
