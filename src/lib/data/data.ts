@@ -6,7 +6,6 @@ import { ItemModel } from '$lib/models'
 export const gameData: Writable<GameDTO> = writable({
     view: 'welcome',
     username: '',
-    characterIdx: -1,
     character: null,
     enemy: null,
     shop: {

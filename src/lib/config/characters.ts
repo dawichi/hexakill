@@ -46,7 +46,7 @@ export const characters: CharacterConfigDto[] = [
             desc: 'Strongest man in the world',
             subDesc: 'slow and low damage',
             shadow: 'shadow-lg shadow-amber-400',
-            color: 'lime',
+            color: 'amber',
             bg: 'bg-amber-700/50',
         },
         modifiers: {

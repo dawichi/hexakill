@@ -4,30 +4,18 @@
     This component is used to enter the name of the player and select his character.
 -->
 <script lang="ts">
-    import { Image } from '$lib/components'
+    import { Button, Image } from '$lib/components'
     import { gameData } from '$lib/data/data'
     import { characters } from '$lib/config/characters'
     import { CharacterModel } from '$lib/models'
-    import { Button } from 'flowbite-svelte'
 
     let _nameInput: string = ''
-    let _character: number = -1
-
-    gameData.subscribe(n => {
-        _character = n.characterIdx
-    })
-
-    function setCharacter(idx: number) {
-        gameData.update(n => {
-            n.characterIdx = idx
-            return n
-        })
-    }
+    let character_idx: number = -1
 
     function start() {
         gameData.update(n => {
             n.view = 'combat'
-            n.character = new CharacterModel(4, _nameInput, characters[_character])
+            n.character = new CharacterModel(4, _nameInput, characters[character_idx])
             return n
         })
     }
@@ -44,9 +32,9 @@
         <h3 class="mt-10 text-xl">Great! Now select your class.</h3>
         <div class="container mx-auto grid max-w-3xl lg:grid-cols-3">
             {#each characters as character, idx}
-                <div
-                    class={`${character.data.bg} m-2 p-4 cursor-pointer rounded-lg ${idx === _character ? character.data.shadow : ''}`}
-                    on:click={() => setCharacter(idx)}
+                <button
+                    class={`${character.data.bg} m-2 p-4 cursor-pointer rounded-lg ${idx === character_idx ? character.data.shadow : ''}`}
+                    on:click={() => character_idx = idx}
                 >
                     <h4 class="text-xl">{character.name}</h4>
                     <hr class="my-2" />
@@ -55,12 +43,12 @@
                     <div class="relative m-auto mt-2 h-64 p-4">
                         <Image image={`/images/${character.name.toLocaleLowerCase()}/idle.gif`} />
                     </div>
-                </div>
+                </button>
             {/each}
         </div>
 
-        {#if _character > -1}
-            <Button class="my-16" gradient color={characters[_character]?.data.color} on:click={start}>
+        {#if character_idx > -1}
+            <Button color={characters[character_idx]?.data.color} onClick={start} style="my-16">
                 <span class="gap-2 text-xl font-bold tracking-wider">START GAME</span>
             </Button>
         {/if}

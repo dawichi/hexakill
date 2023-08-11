@@ -7,3 +7,7 @@ export { default as Image } from './layout/Image.svelte'
 export { default as Info } from './layout/Info.svelte'
 export { default as Tooltip } from './layout/Tooltip.svelte'
 export { default as Timer } from './layout/Timer.svelte'
+
+// Others
+export { default as PersonalRecords } from './PersonalRecords.svelte'
+export { default as VolumeSlider } from './music/VolumeSlider.svelte'

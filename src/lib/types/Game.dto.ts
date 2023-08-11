@@ -15,7 +15,6 @@ export type PotionDto = {
 export type GameDTO = {
     view: 'welcome' | 'champSelect' | 'combat' | 'store' | 'gameover'
     username: string
-    characterIdx: number
     character: CharacterModel | null
     enemy: EnemyModel | null
     shop: {

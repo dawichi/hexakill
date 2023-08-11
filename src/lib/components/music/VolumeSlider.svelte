@@ -15,6 +15,8 @@
     let displayVolume = type === 'Music' ? $volumeContext.musicVolume : $volumeContext.effectsVolume
 
     function setVolume(newVolume: number): void {
+        displayVolume = newVolume
+
         if (type === 'Music') {
             volumeContext.update(n => ({
                 ...n,

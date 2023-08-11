@@ -1,11 +1,9 @@
 <script lang="ts">
     import '../app.css'
-    import { Button, Drawer } from 'flowbite-svelte'
+    import { Drawer } from 'flowbite-svelte'
     import { sineIn } from 'svelte/easing'
     import Audio, { handleVolume } from '$lib/components/music/Audio.svelte'
-    import PersonalRecords from '$lib/components/PersonalRecords.svelte'
-    import VolumeSlider from '$lib/components/music/VolumeSlider.svelte'
-    import { Info, Timer } from '$lib/components'
+    import { Button, Info, PersonalRecords, Timer, VolumeSlider } from '$lib/components'
     import { gameData } from '$lib/data/data'
 
     let hideDrawer = true
@@ -22,15 +20,17 @@
     <!-- Some UI elements such as title, menu, etc... -->
     <h1 class="absolute top-0 left-0 w-full p-5 text-center text-3xl tracking-widest">HEXAKILL</h1>
     <div class="absolute top-5 left-5 flex gap-2">
-        <Button class="!px-4 !py-3" gradient color="blue" on:click={() => (hideDrawer = false)}>
+        <Button onClick={() => (hideDrawer = false)}>
             <span class="text-xl font-bold"><i class="bi bi-list" /></span>
         </Button>
     </div>
+
     {#if $gameData.view !== 'welcome' && $gameData.view !== 'champSelect'}
         <div class="absolute top-5 right-5">
             <Timer />
         </div>
     {/if}
+
     <Audio song={$gameData.view} />
     <main class="h-full">
         <slot />
