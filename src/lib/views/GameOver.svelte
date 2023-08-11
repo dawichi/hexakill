@@ -30,7 +30,6 @@
         gameData.update(n => {
             n.view = 'champSelect'
             n.username = ''
-            n.characterIdx = -1
             n.character = null
             n.enemy = null
             n.showUI = {
