@@ -45,8 +45,8 @@
     </div>
     <hr class="mb-4" />
 
-    <VolumeSlider title="Music" />
-    <VolumeSlider title="Effects" />
+    <VolumeSlider type="Music" />
+    <VolumeSlider type="Effects" />
 
     <div class="my-8" />
 

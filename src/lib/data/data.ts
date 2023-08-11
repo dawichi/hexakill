@@ -28,10 +28,6 @@ export const gameData: Writable<GameDTO> = writable({
         fighting: false,
         actionBtns: true,
     },
-    sound: {
-        musicVolume: 0.1,
-        effectsVolume: 0.2,
-    },
     logs: {
         player: [],
         enemy: [],
@@ -41,4 +37,9 @@ export const gameData: Writable<GameDTO> = writable({
         history: {},
     },
     enemiesHistory: [],
+})
+
+export const volumeContext = writable({
+    musicVolume: 0.1,
+    effectsVolume: 0.2,
 })
