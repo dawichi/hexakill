@@ -1,7 +1,7 @@
 <!--
   @component
   ## Audio
-  Display the music
+  Plays the music
 -->
 <script lang="ts" context="module">
     const musics = new Set<HTMLAudioElement>()
@@ -20,15 +20,16 @@
 
 <script lang="ts">
     import { onMount } from 'svelte'
-    type SongType = 'combat' | 'welcome' | 'store' | 'champSelect' | 'gameover' | 'champSelect'
-    const songs: Record<SongType, string> = {
+
+    const songs = {
         welcome: '',
         combat: '/music/dungeon.mp3',
         store: '/music/store.mp3',
         champSelect: '/music/champSelect.mp3',
         gameover: '/music/welcome.mp3',
     }
-    export let song: SongType
+
+    export let song: keyof typeof songs
 
     let music: HTMLAudioElement
 
