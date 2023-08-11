@@ -9,6 +9,7 @@
     import { storageService } from '$lib/services'
 
     let _personalRecords: PersonalRecord[] = storageService.get()
+    console.log(_personalRecords)
 </script>
 
 <div class="flex flex-col gap-2 rounded bg-zinc-800 p-4">

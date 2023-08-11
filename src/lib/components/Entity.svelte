@@ -31,7 +31,11 @@
 <section class={styles.cell + 'animate__animated animate__fadeIn relative'}>
     <div class="flex h-full flex-col items-center justify-between">
         <h2 class="text-xl">
-            {_entity.name} - lv {_entity.level}
+            {#if _entity instanceof CharacterModel}
+                {_entity.name} ({_entity.type}) - lv {_entity.level}
+            {:else}
+                {_entity.name} {_entity.type} - lv {_entity.level}
+            {/if}
         </h2>
 
         {#if _entity instanceof CharacterModel}
@@ -48,7 +52,7 @@
             <p class="flex items-center justify-center">
                 {_entity.health - _entity.dmgReceived} / {_entity.health} <i class="ra ra-hearts text-red-500" />
             </p>
-            <div class="w-4/5 rounded-xl bg-zinc-500/75 ">
+            <div class="w-4/5 rounded-xl bg-zinc-500/75">
                 <div
                     class={`${colorHpBar(((_entity.health - _entity.dmgReceived) / _entity.health) * 100)} rounded-xl h-3 transition-all duration-500`}
                     style={`width: ${((_entity.health - _entity.dmgReceived) / _entity.health) * 100}%`}
@@ -56,7 +60,7 @@
             </div>
         </div>
     </div>
-    <div class="absolute top-0 left-0 m-5 rounded ">
+    <div class="absolute top-0 left-0 m-5 rounded">
         {#each StatIcons as stat}
             <Tooltip
                 data={{

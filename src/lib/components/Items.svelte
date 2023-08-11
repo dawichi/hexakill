@@ -5,10 +5,11 @@
   @param items - the list of items to show
 -->
 <script lang="ts">
+    import { styles } from '$lib/config/styles'
     import { gameData } from '$lib/data/data'
 </script>
 
-<div class="flex flex-col gap-2 p-2">
+<div class="{styles.cell} flex flex-col gap-2">
     <p>Items</p>
     <hr />
     {#if $gameData.character}

@@ -2,7 +2,8 @@ import utils from '$lib/services/utils.service'
 import { base, info } from './config'
 
 export abstract class BaseEntityModel {
-    name: string
+    name: string // Ex: 'David'
+    type: string // Ex: Wizard | Samurai | ...
     image = ''
     size = 'w-64 h-64'
     level: number
@@ -17,7 +18,7 @@ export abstract class BaseEntityModel {
     potions = 5
     gold = 2000
 
-    constructor(level: number, name: string) {
+    constructor(level: number, name: string, type: string) {
         this.name = name
         this.level = level
         this.health = level * base.health
@@ -26,6 +27,7 @@ export abstract class BaseEntityModel {
         this.armor = level * base.armor
         this.mr = level * base.mr
         this.speed = level * base.speed
+        this.type = type
     }
 
     /**

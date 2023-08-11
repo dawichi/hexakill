@@ -1,3 +1,4 @@
+import { characters } from '$lib/config/characters'
 import { gameData } from '$lib/data/data'
 import { CharacterModel, EnemyModel } from '$lib/models'
 import type { GameDTO } from '$lib/types/Game.dto'
@@ -142,7 +143,7 @@ class Combat {
         })
 
         storageService.add({
-            classIdx: data.characterIdx,
+            classIdx: characters.findIndex(c => c.name === data.character?.type),
             name: data.character?.name ?? '',
             record: data.character?.level ?? 0,
         })

@@ -21,7 +21,7 @@ export class CharacterModel extends BaseEntityModel {
     }
 
     constructor(level: number, name: string, config: CharacterConfigDto) {
-        super(level, `${name} (${config.name})`)
+        super(level, name, config.name)
         this.modifiers = config.modifiers
         this.image = config.name.toLowerCase()
     }
