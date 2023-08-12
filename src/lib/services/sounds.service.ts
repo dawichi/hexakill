@@ -1,8 +1,8 @@
-import { volumeContext } from '$lib/data/data'
+import { volume } from '$lib/data/data'
 
 // The volume of the sound effects
 let effectsVolume: number
-volumeContext.subscribe(n => (effectsVolume = n.effectsVolume))
+volume.subscribe(n => (effectsVolume = n.effectsVolume))
 
 /**
  * Sounds used in the game.
