@@ -5,11 +5,19 @@
 -->
 <script lang="ts">
     import { handleVolume } from '$lib/components/music/Audio.svelte'
-    import { gameData } from '$lib/data/data'
+    import { gameData, volume } from '$lib/data/data'
     import { Button } from 'flowbite-svelte'
 
     function startPlaying() {
-        handleVolume(0.1)
+        const musicVolume = localStorage.getItem('musicVolume')
+        handleVolume(musicVolume ? Number(musicVolume) : 0.05)
+
+        const effectsVolume = localStorage.getItem('effectsVolume')
+        volume.update(n => ({
+            musicVolume: musicVolume ? Number(musicVolume) : 0.05,
+            effectsVolume: effectsVolume ? Number(effectsVolume) : 0.2,
+        }))
+
         gameData.update(n => {
             n.view = 'champSelect'
             return n

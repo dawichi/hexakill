@@ -9,6 +9,7 @@
     import { volume } from '$lib/data/data'
     import { Range } from 'flowbite-svelte'
     import { handleVolume } from './Audio.svelte'
+    import { onMount } from 'svelte'
 
     export let type: 'Music' | 'Effects'
 
@@ -16,6 +17,9 @@
 
     function setVolume(newVolume: number): void {
         displayVolume = newVolume
+
+        // Cache volume in localStorage
+        localStorage.setItem(type === 'Music' ? 'musicVolume' : 'effectsVolume', String(newVolume))
 
         if (type === 'Music') {
             volume.update(n => ({
@@ -32,6 +36,14 @@
             effectsVolume: newVolume,
         }))
     }
+
+    onMount(() => {
+        // Set volume from localStorage
+        const cachedVolume = localStorage.getItem(type === 'Music' ? 'musicVolume' : 'effectsVolume')
+        if (cachedVolume) {
+            setVolume(Number(cachedVolume))
+        }
+    })
 </script>
 
 <div class="flex items-center justify-center gap-4 p-1">

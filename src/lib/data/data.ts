@@ -12,7 +12,7 @@ import { ItemModel } from '$lib/models'
  * The contexts are divided in multiple `writable` stores, so if only one of them is updated, it do not trigger updates to the others.
  */
 export const volume = writable({
-    musicVolume: 0.1,
+    musicVolume: 0.05,
     effectsVolume: 0.2,
 })
 
