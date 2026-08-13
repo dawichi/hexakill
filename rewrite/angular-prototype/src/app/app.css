@@ -1,0 +1,422 @@
+:host {
+  display: block;
+}
+
+.shell {
+  width: min(100% - 2rem, 70rem);
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.topbar h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.topbar h1 {
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  letter-spacing: 0.35em;
+}
+
+.eyebrow,
+.status,
+.prototype-note,
+.weakness {
+  color: #a1a1aa;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.status {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.panel {
+  border: 1px solid #3f3f46;
+  border-radius: 1rem;
+  background: rgb(24 24 27 / 90%);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 25%);
+  padding: clamp(1.25rem, 4vw, 3rem);
+}
+
+.welcome {
+  min-height: 28rem;
+  display: grid;
+  align-content: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.welcome .lead {
+  max-width: 35rem;
+  margin: 0 auto;
+  color: #d4d4d8;
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  line-height: 1.6;
+}
+
+h2 {
+  margin-top: 0.35rem;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+h3 {
+  margin: 0.45rem 0;
+  font-size: 1.4rem;
+}
+
+.primary-button,
+.quiet-button,
+.character-card {
+  cursor: pointer;
+  border: 0;
+}
+
+.primary-button {
+  justify-self: start;
+  border-radius: 0.6rem;
+  background: #0891b2;
+  color: white;
+  padding: 0.8rem 1.2rem;
+  font-weight: 700;
+  transition:
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.welcome .primary-button {
+  justify-self: center;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #06b6d4;
+  transform: translateY(-1px);
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.quiet-button {
+  border: 1px solid #52525b;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #d4d4d8;
+  padding: 0.55rem 0.8rem;
+}
+
+.quiet-button:hover {
+  background: #27272a;
+}
+
+.section-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #e4e4e7;
+  font-weight: 700;
+}
+
+.name-input {
+  width: 100%;
+  border: 1px solid #52525b;
+  border-radius: 0.5rem;
+  background: #09090b;
+  color: #fafafa;
+  padding: 0.8rem 0.9rem;
+}
+
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.character-card {
+  display: grid;
+  min-height: 13rem;
+  align-content: start;
+  gap: 0.7rem;
+  border: 1px solid #3f3f46;
+  border-radius: 0.75rem;
+  background: #27272a;
+  color: #f4f4f5;
+  padding: 1rem;
+  text-align: left;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.character-card:hover,
+.character-card.selected {
+  background: #3f3f46;
+  transform: translateY(-2px);
+}
+
+.character-card.selected.blue,
+.player-card.blue {
+  border-color: #38bdf8;
+}
+
+.character-card.selected.red,
+.player-card.red {
+  border-color: #fb7185;
+}
+
+.character-card.selected.amber,
+.player-card.amber {
+  border-color: #fbbf24;
+}
+
+.character-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.character-icon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #18181b;
+  color: #67e8f9;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.character-icon.large {
+  width: 5rem;
+  height: 5rem;
+  font-size: 2.5rem;
+}
+
+.entity-sprite {
+  display: block;
+  width: 5rem;
+  height: 5rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.combat-sprite {
+  height: 4.5rem;
+  margin: 0.8rem 0;
+}
+
+.validation {
+  min-height: 1.5rem;
+  margin-bottom: 1rem;
+  color: #fbbf24;
+}
+
+.player-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid #52525b;
+  border-radius: 0.75rem;
+  background: #27272a;
+  padding: 1.25rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.stats-grid div {
+  border-radius: 0.5rem;
+  background: #27272a;
+  padding: 0.8rem;
+}
+
+.stats-grid dt {
+  color: #a1a1aa;
+  font-size: 0.75rem;
+}
+
+.stats-grid dd {
+  margin: 0.35rem 0 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.next-step {
+  border-left: 3px solid #06b6d4;
+  background: #164e63;
+  padding: 1rem;
+}
+
+.next-step p:last-child {
+  margin-top: 0.4rem;
+  color: #cffafe;
+}
+
+.next-step .primary-button {
+  margin-top: 1rem;
+}
+
+.combat-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.combatant-card {
+  min-height: 11rem;
+  border: 1px solid #52525b;
+  border-radius: 0.75rem;
+  background: #27272a;
+  padding: 1.25rem;
+}
+
+.enemy-combatant {
+  border-color: #fb7185;
+}
+
+.combatant-card p:last-child {
+  color: #d4d4d8;
+  line-height: 1.5;
+}
+
+.versus {
+  color: #fbbf24;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.health-bar {
+  height: 0.7rem;
+  margin-top: 1.25rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #52525b;
+}
+
+.health-bar span {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background: #fb7185;
+  transition: width 200ms ease;
+}
+
+.health-label {
+  margin-top: 0.4rem;
+  text-align: right;
+  font-size: 0.8rem;
+}
+
+.combat-message {
+  min-height: 1.5rem;
+  margin: 1.5rem 0 1rem;
+  color: #cffafe;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.action-button {
+  display: grid;
+  gap: 0.35rem;
+  cursor: pointer;
+  border: 1px solid #52525b;
+  border-radius: 0.6rem;
+  background: #27272a;
+  color: #fafafa;
+  padding: 0.9rem 1rem;
+  text-align: left;
+  font-weight: 800;
+}
+
+.action-button span {
+  color: #a1a1aa;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.action-button:hover:not(:disabled) {
+  background: #3f3f46;
+}
+
+.action-button.attack:hover:not(:disabled) {
+  border-color: #fbbf24;
+}
+
+.action-button.magic:hover:not(:disabled) {
+  border-color: #38bdf8;
+}
+
+.action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+@media (max-width: 700px) {
+  .topbar,
+  .section-heading,
+  .player-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .character-grid,
+  .stats-grid,
+  .combat-grid,
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .versus {
+    text-align: center;
+  }
+
+  .stats-grid div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

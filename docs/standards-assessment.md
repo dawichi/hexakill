@@ -1,0 +1,156 @@
+# Standards Assessment
+
+**Snapshot:** 2026-08-13, `main` at `d441a661f8381feb48996746f2f284a6d0a51b56`.
+
+Statuses use the shared definitions: `Compliant`, `Partial`, `Gap`, `Deferred`, `Exception`, `Not applicable`, and `Unknown`. The YAML contract contains a compact machine-readable summary; this document contains the reasoning and evidence.
+
+## Documentation — selected and applicable
+
+| Rule    | Status    | Evidence / consequence                                                                                           | Priority / next action                             |
+| ------- | --------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| DOC-001 | Compliant | `docs/AGENTS.md` now defines the local agent contract, source map, standards, safe boundaries, and verification. | High — keep current.                               |
+| DOC-002 | Compliant | `docs/README.md` indexes maintained documents.                                                                   | High — update on moves.                            |
+| DOC-003 | Compliant | Current state, rewrite proposal, operations, asset inventory, standards, and TODO topics have distinct owners.   | High — avoid duplicate rules.                      |
+| DOC-004 | Compliant | Local links were resolved against the created docs tree during review.                                           | High — recheck every docs change.                  |
+| DOC-005 | Deferred  | Current-state documentation exists, but no automated mechanism ensures future code changes update it.            | Medium — include docs review in PR/agent workflow. |
+| DOC-006 | Compliant | Permanent docs label current facts, proposals, decisions, and backlog separately.                                | Medium — promote durable findings only.            |
+| DOC-007 | Compliant | Project facts remain in this repository; shared standards are referenced, not copied wholesale.                  | High — preserve boundary.                          |
+| DOC-008 | Compliant | No exceptions are currently accepted; unresolved items are visible as gaps/deferred/unknown.                     | High — add explicit exception before deviating.    |
+| DOC-009 | Compliant | Root README now includes purpose, setup/command guidance, structure, and docs link.                              | High — keep concise.                               |
+| DOC-010 | Compliant | Detailed agent/developer guidance is under `docs/`; root README remains human-facing.                            | Medium — preserve audience boundary.               |
+
+## Testing
+
+| Rule     | Status         | Evidence / consequence                                                                        | Priority / next action                                                        |
+| -------- | -------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| TEST-001 | Gap            | No unit, integration, or browser test directories/configuration exist.                        | High — add rules-engine, application, and critical-journey layers in rewrite. |
+| TEST-002 | Not applicable | No bug fix is being implemented in this documentation session.                                | Reassess for every future defect fix.                                         |
+| TEST-003 | Unknown        | No tests exist to establish determinism; current randomness and timers are uncontrolled.      | High — inject random source and clock before tests.                           |
+| TEST-004 | Deferred       | No assertions exist; behavior-focused tests are a rewrite prerequisite.                       | High — test outcomes/contracts, not component internals.                      |
+| TEST-005 | Gap            | Combat, progression, store, and persistence are critical user-visible rules without coverage. | High — define risk-based matrix.                                              |
+| TEST-006 | Gap            | No test command or CI exists.                                                                 | High — add a documented CI-runnable command.                                  |
+| TEST-007 | Not applicable | No external service is called by current source.                                              | Reassess if backend/CDN adapters become test scope.                           |
+| TEST-008 | Gap            | No meaningful automated validation suite exists.                                              | High — first rewrite foundation slice.                                        |
+
+## TypeScript
+
+| Rule   | Status   | Evidence / consequence                                                                                                                     | Priority / next action                                     |
+| ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| TS-001 | Partial  | `tsconfig.json` has `strict: true`, but the supported check script references missing `jsconfig.json`; direct checking still finds errors. | High — repair command and compiler baseline.               |
+| TS-002 | Partial  | `as any` appears in `Modal.svelte`; ESLint reports both uses.                                                                              | Medium — replace with a typed dialog capability.           |
+| TS-003 | Partial  | Some DTOs/unions are explicit, but services and mutable models expose broad or implicit contracts.                                         | High — define domain/application contracts in rewrite.     |
+| TS-004 | Partial  | `GameDTO.view` is a union, but invalid combinations remain possible in mutable nested state.                                               | High — use explicit state transitions.                     |
+| TS-005 | Gap      | `JSON.parse` values from local storage are used without runtime validation.                                                                | High — version and validate storage boundary.              |
+| TS-006 | Unknown  | No runtime schema library is selected or used.                                                                                             | Medium — choose a validator with the rewrite architecture. |
+| TS-007 | Partial  | Compiler, formatter, and linter configs are committed, but scripts/tool compatibility is broken.                                           | High — make clean checkout commands work.                  |
+| TS-008 | Partial  | Prettier and ESLint both exist, but the effective formatter/parser setup and scripts are inconsistent.                                     | Medium — select one coherent lint/format contract.         |
+| TS-009 | Deferred | Checked indexed access is not enabled.                                                                                                     | Medium — enable after baseline errors are controlled.      |
+| TS-010 | Deferred | Teamwide compiler quality flags are not enabled.                                                                                           | Medium — adopt with the new domain boundary.               |
+| TS-011 | Unknown  | Optional-property semantics have not been reviewed against the future domain model.                                                        | Low — decide with serialized state design.                 |
+
+## Styling
+
+| Rule      | Status         | Evidence / consequence                                                                                 | Priority / next action                             |
+| --------- | -------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| STYLE-001 | Partial        | Tailwind, Flowbite-Svelte, component CSS, and CDN styles coexist; ownership is not documented.         | Medium — define one primary system for rewrite.    |
+| STYLE-002 | Compliant      | Tailwind is the existing primary utility system; this optional default is intentionally in use.        | Low — keep or replace deliberately.                |
+| STYLE-003 | Partial        | Custom CSS is small but animation/third-party ownership is undocumented.                               | Low — document specialized exceptions.             |
+| STYLE-004 | Gap            | Bootstrap Icons, Iconify, Flowbite, Animate.css, and Tailwind create overlapping presentation systems. | Medium — consolidate during UI rewrite.            |
+| STYLE-005 | Not applicable | The project already has an existing icon mix; Lucide is not a required migration.                      | Reassess in design-system decision.                |
+| STYLE-006 | Unknown        | Local styling exceptions are not catalogued.                                                           | Low — document when shared primitives are rebuilt. |
+
+## Security
+
+| Rule    | Status         | Evidence / consequence                                                                                                                | Priority / next action                                              |
+| ------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| SEC-001 | Partial        | Browser trust boundaries and external CDN/asset actors are now documented; no formal threat review exists.                            | Medium — create a lightweight threat model before accounts/backend. |
+| SEC-002 | Not applicable | No credentials, tokens, or runtime secrets were found in the checked-out project; deployment secrets are outside repository evidence. | Reassess after hosting/backend decisions.                           |
+| SEC-003 | Not applicable | No user accounts, protected resources, or privileged operations exist in current source.                                              | Reassess before adding accounts or remote records.                  |
+| SEC-004 | Partial        | Svelte text rendering is generally encoded, but local-storage JSON and external runtime inputs are not validated.                     | High — validate runtime boundaries.                                 |
+| SEC-005 | Not applicable | No personal, financial, confidential, or credential data is intentionally processed.                                                  | Reassess if accounts/analytics are added.                           |
+| SEC-006 | Partial        | There is a `console.log` of personal records and no documented error/log policy.                                                      | Low — remove diagnostic logging and define policy in rewrite.       |
+| SEC-007 | Not applicable | No service identities or privileged integrations exist in current source.                                                             | Reassess with external services.                                    |
+| SEC-008 | Not applicable | No authentication, authorization, or security-sensitive remote workflow exists.                                                       | Reassess with backend scope.                                        |
+| SEC-009 | Deferred       | There is no repeatable vulnerability response process for this maintained dependency graph.                                           | High — establish audit ownership with dependency baseline.          |
+
+## Dependencies and supply chain
+
+| Rule    | Status         | Evidence / consequence                                                                                                                                              | Priority / next action                                                                  |
+| ------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| DEP-001 | Gap            | The legacy root package has no committed lockfile and root lockfiles are ignored in `.gitignore`; the isolated Angular prototype has a separate lockfile by design. | High — select the root package baseline or retire it in favor of the rewrite workspace. |
+| DEP-002 | Gap            | No CI/deployment install mode exists.                                                                                                                               | High — use frozen/reproducible install after lockfile.                                  |
+| DEP-003 | Gap            | No Node or package-manager version is pinned.                                                                                                                       | High — pin toolchain.                                                                   |
+| DEP-004 | Unknown        | `.npmrc` sets `engine-strict`, but install/build script trust has not been documented.                                                                              | Medium — review lifecycle scripts before enabling installs.                             |
+| DEP-005 | Partial        | Direct dependencies have not been reconciled with source usage; several legacy packages may be unused or overlapping.                                               | Medium — produce dependency inventory before upgrade.                                   |
+| DEP-006 | Gap            | No lockfile means `npm audit` cannot run in the supported state.                                                                                                    | High — make audit repeatable.                                                           |
+| DEP-007 | Not applicable | This is an existing project, not a new package-manager selection.                                                                                                   | Reassess when rewrite scaffolding chooses a manager.                                    |
+
+## CI/CD
+
+| Rule   | Status         | Evidence / consequence                                                                | Priority / next action                               |
+| ------ | -------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| CI-001 | Gap            | No workflow or pipeline files found.                                                  | High — add validation pipeline after command repair. |
+| CI-002 | Gap            | No automated format, lint, type, test, build, or dependency gates.                    | High — define all applicable gates.                  |
+| CI-003 | Gap            | Runtime, lockfile, and install are not reproducible.                                  | High — pin and freeze installation.                  |
+| CI-004 | Unknown        | Repository protection settings are outside checked-out source and were not inspected. | Medium — verify branch/deployment protection.        |
+| CI-005 | Not applicable | No CI workflow currently handles secrets or write permissions.                        | Reassess when CI is added.                           |
+| CI-006 | Unknown        | No pipeline exists to assess cost/resource behavior.                                  | Low — decide with CI design.                         |
+| CI-007 | Gap            | No retained validation results or build metadata.                                     | Medium — expose reports in CI.                       |
+
+## Operations and data
+
+| Rule     | Status         | Evidence / consequence                                                                                                     | Priority / next action                         |
+| -------- | -------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| OPS-001  | Not applicable | No runtime configuration or server process is present.                                                                     | Reassess for a backend/SSR deployment.         |
+| OPS-002  | Gap            | Deployment environment and static/server output are not explicit.                                                          | High — decide hosting/output for rewrite.      |
+| OPS-003  | Not applicable | No network/database/queue/filesystem operation is owned by the app.                                                        | Reassess with integrations.                    |
+| OPS-004  | Not applicable | Current code has no external-operation retry loop.                                                                         | Reassess with network services.                |
+| OPS-005  | Not applicable | No long-running service is managed by a platform.                                                                          | Reassess with server deployment.               |
+| OPS-006  | Not applicable | No server worker or long-running service exists.                                                                           | Reassess with server deployment.               |
+| OPS-007  | Not applicable | No deployed service logging pipeline exists; browser console logging is tracked under SEC-006.                             | Reassess with backend.                         |
+| OPS-008  | Not applicable | No production service or meaningful operator-owned availability signal is evidenced.                                       | Reassess if product becomes service-backed.    |
+| OPS-009  | Gap            | The README claims a deployment, but build failure behavior, hosting ownership, and recovery expectations are undocumented. | Medium — verify hosting and document recovery. |
+| DATA-001 | Partial        | Local records/preferences have TypeScript shapes and named keys, but ownership/lifecycle/versioning are not explicit.      | High — define persistence contract.            |
+| DATA-002 | Gap            | Stored JSON has no schema version or migration process.                                                                    | High — add versioned storage migrations.       |
+| DATA-003 | Partial        | Application logic caps/sorts records, but runtime input is not validated before use.                                       | High — validate and test invariants.           |
+| DATA-004 | Not applicable | No multiple stores or asynchronous data boundary exists.                                                                   | Reassess with remote persistence.              |
+| DATA-005 | Not applicable | No queryable persistent collection is owned by the application.                                                            | Reassess with backend data.                    |
+| DATA-006 | Not applicable | `localStorage` is used as persistence, not a cache with a remote source of truth.                                          | Reassess if a cache is introduced.             |
+| DATA-007 | Not applicable | Stored data is user-local and reconstructable; no provider-owned durable dataset is evidenced.                             | Reassess before remote saves.                  |
+
+## Web accessibility and frontend quality
+
+| Rule     | Status  | Evidence / consequence                                                                                                     | Priority / next action                         |
+| -------- | ------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| A11Y-001 | Partial | Headings and buttons exist, but semantic structure is mixed with clickable non-controls and source review is incomplete.   | High — audit rendered critical journeys.       |
+| A11Y-002 | Gap     | `Tooltip.svelte` is mouse-oriented and `StoreItem.svelte` uses clickable `article`; svelte-check reports related warnings. | High — define keyboard/focus contract.         |
+| A11Y-003 | Partial | Controls have some visible text, but the name input lacks a label and status/error semantics are not documented.           | High — fix in UI rewrite.                      |
+| A11Y-004 | Partial | Visual assets are rendered through CSS backgrounds without alt-equivalent semantics; audio has an empty captions track.    | Medium — classify decorative/meaningful media. |
+| A11Y-005 | Unknown | Tailwind responsive classes exist, but viewport/zoom/contrast/reduced-motion review was not performed.                     | High — run manual matrix.                      |
+| A11Y-006 | Gap     | No manual accessibility review record exists.                                                                              | High — review the critical run journey.        |
+| WEB-001  | Unknown | README claims an external deployment, but no rendered-page audit or verified URL run exists.                               | Medium — verify target and run Lighthouse.     |
+| WEB-002  | Gap     | No release or recurring audit workflow exists.                                                                             | Medium — add after deployment is verified.     |
+| WEB-003  | Unknown | One route contains multiple stateful views; no representative route/journey audit configuration exists.                    | Medium — define critical journey coverage.     |
+| WEB-004  | Gap     | No retained audit results or remediation history exists.                                                                   | Low — retain reports with CI.                  |
+
+## Angular application profile — rewrite prototype
+
+These findings apply to `rewrite/angular-prototype/`, not to the legacy Svelte implementation. They are intentionally tracked separately from the shared-standard snapshot above.
+
+| Rule        | Status         | Evidence / consequence                                                                                                                                       | Priority / next action                                                       |
+| ----------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| ANGULAR-001 | Partial        | The prototype has separate domain and application directories, but it is still a single initial feature rather than a complete feature-oriented application. | Medium — preserve feature boundaries as combat/store slices are added.       |
+| ANGULAR-002 | Compliant      | The root component orchestrates session state; combat calculations live outside Angular components.                                                          | High — keep domain logic out of templates/components.                        |
+| ANGULAR-003 | Compliant      | Strict TypeScript and Angular template/injection compiler checks are enabled in `tsconfig.json`; the prototype builds successfully.                          | High — keep strictness enabled.                                              |
+| ANGULAR-004 | Not applicable | The current prototype only has a simple name field and character selection, not a complex multi-step form.                                                   | Reassess when persistence/account workflows exist.                           |
+| ANGULAR-005 | Not applicable | The prototype has not adopted the optional Tailwind/Lucide defaults; no competing default is being claimed.                                                  | Low — choose a coherent design system before expanding UI.                   |
+| ANGULAR-006 | Partial        | The player-name boundary has length validation; no API boundary exists yet.                                                                                  | High — validate future persistence/network inputs at ingestion.              |
+| ANGULAR-007 | Compliant      | `GameSessionService` owns the prototype session state as an application-scoped service using signals.                                                        | High — document ownership when state is split by feature.                    |
+| ANGULAR-008 | Compliant      | `combat-rules.ts`, `enemies.ts`, and `combat-state.ts` are framework-independent and covered by deterministic tests.                                         | High — extend coverage before implementing more rules.                       |
+| ANGULAR-009 | Not applicable | No guarded routes, interceptors, effects, or authorization exist in this prototype.                                                                          | Reassess if accounts/backend capabilities are added.                         |
+| ANGULAR-010 | Not applicable | The prototype uses signals without subscriptions or long-lived effects.                                                                                      | Reassess when timers/audio/network streams are introduced.                   |
+| ANGULAR-011 | Gap            | There are component tests but no end-to-end critical-journey test.                                                                                           | High — add browser coverage for the full run journey.                        |
+| ANGULAR-012 | Compliant      | Angular strict compiler settings, including strict templates, injection parameters, and input access modifiers, are enabled.                                 | High — preserve in all generated projects.                                   |
+| ANGULAR-013 | Not applicable | No authenticated or protected capability exists.                                                                                                             | Reassess before adding remote records or accounts.                           |
+| ANGULAR-014 | Deferred       | The prototype has no asynchronous external workflow yet.                                                                                                     | Medium — model loading/empty/success/failure states when adapters are added. |
+| ANGULAR-015 | Partial        | Session state has explicit ownership and reset behavior, but persistence/synchronization policy is not implemented.                                          | Medium — define state scope before adding local persistence.                 |

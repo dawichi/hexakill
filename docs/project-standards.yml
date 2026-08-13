@@ -1,0 +1,109 @@
+contract_version: 0.2.0
+standards_version: 0.3.0
+
+standards_source:
+  repository: /Users/dawichi/Documents/GitHub/engineering-standards
+  revision: a0d00b162674234f09d095607d276c121417b796
+  pinned_on: 2026-08-13
+
+project:
+  name: hexakill
+  lifecycle: existing
+  maturity: legacy unfinished browser game; rewrite preparation
+  current_branch: main
+  current_revision: d441a661f8381feb48996746f2f284a6d0a51b56
+
+standards:
+  - documentation
+  - testing
+  - typescript
+  - styling
+  - security
+  - dependencies
+  - ci-cd
+  - operations
+  - data
+  - web
+
+profiles:
+  current:
+    - id: none
+      status: not_applicable
+      rationale: The shared profile catalog has no Svelte/SvelteKit profile. Current SvelteKit facts are documented locally.
+  rewrite:
+    - id: angular-application
+      status: adopted
+      scope: rewrite/angular-prototype/
+      rationale: Accepted by ADR-0001 and used by the isolated Angular prototype.
+    - id: astro-website
+      status: rejected_for_core
+      rationale: Astro's static-first/islands model is a poor primary fit for the continuously interactive game core; it may still be considered for a separate shell or landing pages.
+
+compliance:
+  summary_document: standards-assessment.md
+  status_counts:
+    compliant: 10
+    partial: 17
+    gap: 21
+    deferred: 5
+    exception: 0
+    not_applicable: 21
+    unknown: 10
+  rules:
+    - id: DOC-001
+      status: compliant
+      evidence: docs/AGENTS.md
+      priority: high
+      next_action: Keep instructions current as implementation changes.
+    - id: DOC-002
+      status: compliant
+      evidence: docs/README.md
+      priority: high
+      next_action: Maintain the index when documents move.
+    - id: DOC-004
+      status: compliant
+      evidence: Local links reviewed against the docs tree on 2026-08-13.
+      priority: high
+      next_action: Recheck links in documentation changes.
+    - id: DOC-009
+      status: compliant
+      evidence: README.md
+      priority: high
+      next_action: Keep root README concise and link to docs.
+    - id: TEST-008
+      status: gap
+      evidence: No automated test or validation suite is defined for the legacy root package; the isolated rewrite prototype has an initial suite but not full journey coverage.
+      priority: high
+      next_action: Add a deterministic rules-engine baseline in the rewrite foundation.
+    - id: TS-001
+      status: partial
+      evidence: tsconfig.json enables strict, but the supported check script fails before checking because jsconfig.json is missing.
+      priority: high
+      next_action: Repair the check command and make the effective compiler baseline reproducible.
+    - id: DEP-001
+      status: gap
+      evidence: The legacy root package has no tracked lockfile and root lockfiles are ignored in .gitignore; the isolated rewrite prototype intentionally has its own lockfile.
+      priority: high
+      next_action: Select the legacy root baseline or retire it in favor of the isolated rewrite workspace.
+    - id: CI-001
+      status: gap
+      evidence: No CI workflow or other pipeline configuration was found.
+      priority: high
+      next_action: Add CI after the local validation commands are made reliable.
+    - id: A11Y-002
+      status: gap
+      evidence: svelte-check and source review identify non-keyboard tooltip/store interactions.
+      priority: high
+      next_action: Define keyboard-accessible critical journeys for the rewrite and cover them in browser tests.
+
+exceptions: []
+
+deferred_work:
+  - TODO-007
+  - TODO-010
+  - TODO-014
+
+notes:
+  - The status summary is an audit snapshot, not a claim that the current application is production-ready.
+  - "`Partial`, `Gap`, `Deferred`, and `Unknown` findings are expanded in standards-assessment.md and TODO.md."
+  - The Angular rewrite direction is accepted by ADR-0001; deployment, persistence, and backend scope remain open.

@@ -1,0 +1,220 @@
+<main class="shell">
+  <header class="topbar">
+    <p class="eyebrow">Angular rewrite prototype</p>
+    <h1>HEXAKILL</h1>
+    <p class="status">First vertical slice · typed combat prototype</p>
+  </header>
+
+  @switch (session.screen()) {
+    @case ('welcome') {
+      <section class="panel welcome" aria-labelledby="welcome-title">
+        <p class="eyebrow">A new run begins here</p>
+        <h2 id="welcome-title">Survive the dungeon.</h2>
+        <p class="lead">
+          Choose a champion, learn the combat rules, and build a run one decision at a time.
+        </p>
+        <button class="primary-button" type="button" (click)="session.beginCharacterSelection()">
+          Choose your champion
+        </button>
+        <p class="prototype-note">
+          Prototype scope: no persistence, store, audio, enemy turns, or progression yet.
+        </p>
+      </section>
+    }
+
+    @case ('character-select') {
+      <section class="panel" aria-labelledby="select-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Step 1 · your run</p>
+            <h2 id="select-title">Choose a champion</h2>
+          </div>
+          <button class="quiet-button" type="button" (click)="session.reset()">Start over</button>
+        </div>
+
+        <label class="field-label" for="player-name">Player name</label>
+        <input
+          id="player-name"
+          class="name-input"
+          type="text"
+          maxlength="14"
+          autocomplete="nickname"
+          placeholder="3–14 characters"
+          [value]="session.playerName()"
+          (input)="onNameInput($event)"
+        />
+
+        <div class="character-grid" aria-label="Available champions">
+          @for (character of session.characters; track character.id) {
+            <button
+              class="character-card"
+              [class.selected]="session.selectedCharacter()?.id === character.id"
+              [class.blue]="character.accent === 'blue'"
+              [class.red]="character.accent === 'red'"
+              [class.amber]="character.accent === 'amber'"
+              type="button"
+              [attr.aria-pressed]="session.selectedCharacter()?.id === character.id"
+              (click)="selectCharacter(character)"
+            >
+              <span class="character-icon" aria-hidden="true">{{
+                character.name.slice(0, 1)
+              }}</span>
+              <span class="character-name">{{ character.name }}</span>
+              <span>{{ character.description }}</span>
+              <span class="weakness">{{ character.weakness }}</span>
+            </button>
+          }
+        </div>
+
+        @if (session.validationMessage(); as validationMessage) {
+          <p class="validation" role="status">{{ validationMessage }}</p>
+        }
+
+        <button
+          class="primary-button"
+          type="button"
+          [disabled]="!session.canStartRun()"
+          (click)="session.startRun()"
+        >
+          Start game
+        </button>
+      </section>
+    }
+
+    @case ('combat-ready') {
+      @if (session.player(); as player) {
+        <section class="panel" aria-labelledby="combat-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Step 2 · run ready</p>
+              <h2 id="combat-title">Welcome, {{ player.name }}.</h2>
+            </div>
+            <button class="quiet-button" type="button" (click)="session.reset()">New run</button>
+          </div>
+
+          <div
+            class="player-card"
+            [class.blue]="player.character.accent === 'blue'"
+            [class.red]="player.character.accent === 'red'"
+            [class.amber]="player.character.accent === 'amber'"
+          >
+            <div>
+              <p class="eyebrow">Level {{ player.level }} {{ player.character.name }}</p>
+              <h3>Ready for the first enemy.</h3>
+              <p>{{ player.character.description }} {{ player.character.weakness }}</p>
+            </div>
+            <img
+              class="entity-sprite"
+              [src]="player.character.idleAsset"
+              [alt]="player.character.name"
+            />
+          </div>
+
+          <dl class="stats-grid">
+            @for (stat of statLabels; track stat[0]) {
+              <div>
+                <dt>{{ stat[1] }}</dt>
+                <dd>{{ player.stats[stat[0]] }}</dd>
+              </div>
+            }
+          </dl>
+
+          <div class="next-step">
+            <p class="eyebrow">Next action</p>
+            <p>Generate a typed enemy and test the first combat decision.</p>
+            <button class="primary-button" type="button" (click)="session.findEnemy()">
+              Find an enemy
+            </button>
+          </div>
+        </section>
+      }
+    }
+
+    @case ('combat') {
+      @if (session.player(); as player) {
+        @if (session.enemy(); as enemy) {
+          <section class="panel" aria-labelledby="combat-screen-title">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Step 3 · combat</p>
+                <h2 id="combat-screen-title">{{ enemy.definition.name }} appears.</h2>
+              </div>
+              <button class="quiet-button" type="button" (click)="session.reset()">New run</button>
+            </div>
+
+            <div class="combat-grid">
+              <article class="combatant-card player-combatant">
+                <p class="eyebrow">You · level {{ player.level }}</p>
+                <h3>{{ player.name }} the {{ player.character.name }}</h3>
+                <img
+                  class="entity-sprite combat-sprite"
+                  [src]="player.character.idleAsset"
+                  [alt]="player.character.name"
+                />
+                <p>
+                  {{ player.stats.health }} health · {{ player.stats.ad }} attack ·
+                  {{ player.stats.ap }} magic
+                </p>
+              </article>
+
+              <p class="versus" aria-hidden="true">VS</p>
+
+              <article class="combatant-card enemy-combatant">
+                <p class="eyebrow">
+                  {{ enemy.definition.archetype }} enemy · level {{ enemy.level }}
+                </p>
+                <h3>{{ enemy.definition.name }}</h3>
+                <img
+                  class="entity-sprite combat-sprite"
+                  [src]="enemy.definition.idleAsset"
+                  [alt]="enemy.definition.name"
+                />
+                <p>
+                  {{ enemy.stats.ad }} attack · {{ enemy.stats.ap }} magic ·
+                  {{ enemy.stats.speed }} speed
+                </p>
+                <div class="health-bar" aria-label="Enemy health">
+                  <span
+                    [style.width.%]="100 - (enemy.damageTaken / enemy.stats.health) * 100"
+                  ></span>
+                </div>
+                <p class="health-label">
+                  {{ enemy.stats.health - enemy.damageTaken }} / {{ enemy.stats.health }} health
+                </p>
+              </article>
+            </div>
+
+            <p class="combat-message" role="status">{{ session.combatMessage() }}</p>
+
+            <div class="action-grid" aria-label="Combat actions">
+              <button
+                class="action-button attack"
+                type="button"
+                [disabled]="session.combatStatus() === 'defeated'"
+                (click)="session.attack('attack')"
+              >
+                Attack
+                <span>Physical damage · 80–140%</span>
+              </button>
+              <button
+                class="action-button magic"
+                type="button"
+                [disabled]="session.combatStatus() === 'defeated'"
+                (click)="session.attack('magic')"
+              >
+                Magic
+                <span>Magic damage · 30–200%</span>
+              </button>
+            </div>
+
+            @if (session.combatStatus() === 'defeated') {
+              <button class="primary-button" type="button" (click)="session.findEnemy()">
+                Find another enemy
+              </button>
+            }
+          </section>
+        }
+      }
+    }
+  }
+</main>
