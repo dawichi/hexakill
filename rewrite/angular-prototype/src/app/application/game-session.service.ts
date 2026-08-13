@@ -1,5 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { BROWSER_CLOCK, CLOCK, Clock } from './clock';
+import { chooseEnemyAction, CombatAction, resolveAction } from '../domain/combat-actions';
 import { generateEnemy } from '../domain/enemies';
 import { DamageKind, resolveDamage } from '../domain/combat-rules';
 import { INITIAL_COMBAT_STATE, CombatState, transitionCombat } from '../domain/combat-state';
@@ -20,8 +21,15 @@ export class GameSessionService {
   readonly combatState = signal<CombatState>(INITIAL_COMBAT_STATE);
   readonly enemy = computed(() => this.combatState().enemy);
   readonly combatStatus = computed<'ready' | 'defeated'>(() =>
-    this.combatState().phase === 'victory' ? 'defeated' : 'ready',
+    this.combatState().phase === 'victory' || this.combatState().phase === 'defeat'
+      ? 'defeated'
+      : 'ready',
   );
+  readonly playerRemainingHealth = computed(() => {
+    const player = this.player();
+    return player ? Math.max(0, player.stats.health - this.combatState().playerDamageTaken) : 0;
+  });
+  readonly canAct = computed(() => this.combatState().phase === 'awaiting-player-action');
   readonly lastActionAt = signal<number | null>(null);
   readonly combatMessage = signal('');
   readonly validationMessage = computed(() => {
@@ -116,6 +124,11 @@ export class GameSessionService {
         }`,
       );
     }
+
+    if (this.combatState().phase === 'enemy-turn') {
+      this.combatMessage.set(`${this.combatMessage()} The enemy is preparing its turn.`);
+      this.clock.schedule(() => this.resolveEnemyTurn(), 300);
+    }
   }
 
   reset(): void {
@@ -137,6 +150,52 @@ export class GameSessionService {
 
     this.combatState.set(transition.state);
     return true;
+  }
+
+  private resolveEnemyTurn(): void {
+    const player = this.player();
+    const enemy = this.enemy();
+
+    if (!player || !enemy || this.combatState().phase !== 'enemy-turn') {
+      return;
+    }
+
+    const action: CombatAction = chooseEnemyAction(enemy, this.random());
+    const result = resolveAction(
+      { stats: enemy.stats },
+      enemy.damageTaken,
+      { stats: player.stats, damageTaken: this.combatState().playerDamageTaken },
+      action,
+      { damageRoll: this.random(), chanceRoll: this.random() },
+    );
+
+    if ('action' in result) {
+      this.combatState.update((state) => ({
+        ...state,
+        enemy: state.enemy
+          ? {
+              ...state.enemy,
+              damageTaken: result.damageTaken,
+              potions: Math.max(0, state.enemy.potions - 1),
+            }
+          : null,
+      }));
+      this.combatMessage.set(`${enemy.definition.name} healed ${result.healed} HP.`);
+    } else {
+      this.combatMessage.set(
+        result.missed
+          ? `${enemy.definition.name}'s ${action} missed.`
+          : `${enemy.definition.name}'s ${action} dealt ${result.damageAfterResistance} damage.`,
+      );
+    }
+
+    const playerDamageTaken =
+      'action' in result ? this.combatState().playerDamageTaken : result.damageTaken;
+    this.applyCombatEvent({
+      type: 'enemy-action-resolved',
+      playerDamageTaken,
+      playerHealth: player.stats.health,
+    });
   }
 
   get characters(): readonly CharacterDefinition[] {

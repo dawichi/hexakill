@@ -17,7 +17,7 @@
           Choose your champion
         </button>
         <p class="prototype-note">
-          Prototype scope: no persistence, store, audio, enemy turns, or progression yet.
+          Prototype scope: no persistence, store, audio, rewards, or progression yet.
         </p>
       </section>
     }
@@ -152,8 +152,8 @@
                   [alt]="player.character.name"
                 />
                 <p>
-                  {{ player.stats.health }} health · {{ player.stats.ad }} attack ·
-                  {{ player.stats.ap }} magic
+                  {{ session.playerRemainingHealth() }} / {{ player.stats.health }} health ·
+                  {{ player.stats.ad }} attack · {{ player.stats.ap }} magic
                 </p>
               </article>
 
@@ -190,7 +190,7 @@
               <button
                 class="action-button attack"
                 type="button"
-                [disabled]="session.combatStatus() === 'defeated'"
+                [disabled]="!session.canAct()"
                 (click)="session.attack('attack')"
               >
                 Attack
@@ -199,7 +199,7 @@
               <button
                 class="action-button magic"
                 type="button"
-                [disabled]="session.combatStatus() === 'defeated'"
+                [disabled]="!session.canAct()"
                 (click)="session.attack('magic')"
               >
                 Magic
@@ -208,9 +208,16 @@
             </div>
 
             @if (session.combatStatus() === 'defeated') {
-              <button class="primary-button" type="button" (click)="session.findEnemy()">
-                Find another enemy
-              </button>
+              @if (session.combatState().phase === 'victory') {
+                <button class="primary-button" type="button" (click)="session.findEnemy()">
+                  Find another enemy
+                </button>
+              } @else {
+                <p class="validation" role="alert">You have been defeated.</p>
+                <button class="primary-button" type="button" (click)="session.reset()">
+                  Start a new run
+                </button>
+              }
             }
           </section>
         }

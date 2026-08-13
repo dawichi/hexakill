@@ -19,15 +19,17 @@ The current vertical slice is:
 4. Typed enemy generation for four provisional definitions: Slime Blue, Archer, Evil Wizard, and Knight.
 5. Combat screen with Attack and Magic actions.
 6. Pure damage resolution for ranges, misses, critical hits, resistance, integer damage, and health caps.
-7. Pure combat state transitions for `idle`, `awaiting-player-action`, `resolving-player-action`, and `victory`.
+7. Pure combat state transitions for `idle`, `awaiting-player-action`, `resolving-player-action`, `enemy-turn`, `victory`, and `defeat`.
 
-The Angular application service coordinates signals and random input. Domain rules do not import Angular. The `Clock` port exists and is injected at the application boundary, but delayed turns are not implemented yet.
+The Angular application service coordinates signals and random input. Domain rules do not import Angular. The `Clock` port exists and is injected at the application boundary; the provisional enemy turn uses it for a short presentation delay.
+
+The combat slice also characterizes legacy speed ordering, enemy attack/magic/heal selection, fixed 20% healing, player damage, and defeat. It remains provisional because full progression and product balancing are not yet accepted.
 
 The prototype now consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields and copies the legacy `static/` tree into its Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is intentionally not implemented yet.
 
 ## Deliberate non-goals
 
-Enemy turns, player damage, timers, potions, victory rewards, experience, leveling, store behavior, power-ups, persistence, audio, asset migration, CI, browser E2E tests, and deployment remain unresolved. Do not infer their rules from the prototype UI.
+Timers, potions, victory rewards, experience, leveling, store behavior, power-ups, persistence, audio playback, full asset mapping, CI, browser E2E tests, and deployment remain unresolved. Do not infer final balance from the provisional combat slice.
 
 ## Known characterization points
 
@@ -39,11 +41,10 @@ Enemy turns, player damage, timers, potions, victory rewards, experience, leveli
 
 ## Next recommended session
 
-1. Characterize enemy turn ordering, enemy action selection, player damage, healing, defeat, and reset with fixtures from the legacy services.
-2. Decide whether the rewrite keeps synchronous turns or uses delayed presentation transitions; if delayed, use the injected `Clock` rather than global timers.
-3. Extend the state machine with enemy-turn and defeat phases only after those rules are accepted.
-4. Create a separate ADR for store/progression before implementing purchases or rewards.
-5. Add browser critical-journey coverage after the state transitions stabilize.
+1. Characterize victory rewards, experience, leveling, and power-up allocation.
+2. Decide whether the rewrite keeps the current provisional turn delay or changes it; keep delayed behavior on the injected `Clock`.
+3. Create a separate ADR for store/progression before implementing purchases or rewards.
+4. Add browser critical-journey coverage after the state transitions stabilize.
 
 ## Validation at handoff
 
@@ -56,4 +57,4 @@ npm run build
 npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'
 ```
 
-The current verified result is a clean install, 5 test files with 18 passing tests, a passing production build, and passing formatting checks. Browser smoke should be repeated after the next UI-affecting change.
+The current verified result is a clean install, 6 test files with 25 passing tests, a passing production build, copied asset output, and passing formatting checks. Browser smoke should be repeated after the current combat UI changes.

@@ -8,9 +8,13 @@ import { RANDOM_SOURCE } from './random';
 describe('GameSessionService', () => {
   let service: GameSessionService;
   let rolls: number[];
+  let scheduledTask: (() => void) | undefined;
   const testClock: Clock = {
     now: () => 1234,
-    schedule: () => ({ cancel: () => undefined }),
+    schedule: (task) => {
+      scheduledTask = task;
+      return { cancel: () => undefined };
+    },
   };
 
   beforeEach(() => {
@@ -38,8 +42,13 @@ describe('GameSessionService', () => {
     service.attack('attack');
 
     expect(service.enemy()?.damageTaken).toBe(17);
-    expect(service.combatStatus()).toBe('ready');
+    expect(service.combatState().phase).toBe('enemy-turn');
     expect(service.combatMessage()).toContain('dealt 17 damage');
     expect(service.lastActionAt()).toBe(1234);
+
+    scheduledTask?.();
+
+    expect(service.combatState().phase).toBe('awaiting-player-action');
+    expect(service.playerRemainingHealth()).toBeLessThan(200);
   });
 });

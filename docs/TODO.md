@@ -39,9 +39,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 -   **Status:** Planned
 -   **Affected area:** `src/lib/models/`, `src/lib/services/combat.service.ts`, `enemy.service.ts`, `utils.service.ts`, config files
--   **Evidence:** Randomness, mutable class instances, timers, and global stores are mixed with combat logic in the legacy app. The Angular prototype now has pure preliminary combat and enemy-generation modules, but they do not yet establish full legacy parity.
+-   **Evidence:** Randomness, mutable class instances, timers, and global stores are mixed with combat logic in the legacy app. The Angular prototype now has pure combat, enemy-generation, action-policy, and transition modules, but they do not yet establish full legacy parity.
 -   **Risk:** A rewrite can accidentally rebalance or change gameplay while appearing structurally cleaner.
--   **Next action:** Extend fixtures for healing, speed order, progression, bosses, power-ups, and defeat/reset behavior; mark each rule intentional, suspicious, or obsolete before implementing those rewrite slices.
+-   **Next action:** Extend fixtures for progression, bosses, power-ups, and defeat/reset behavior; mark each rule intentional, suspicious, or obsolete before implementing those rewrite slices.
 -   **Dependencies:** Product review of current gameplay and TODO-005
 -   **Owner:** Tech Lead / gameplay owner
 -   **Target:** First rewrite design session
@@ -61,9 +61,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 -   **Status:** Partially resolved
 -   **Affected area:** Future rewrite domain/application layers
--   **Evidence:** Current `GameDTO` allows mutable nested combinations and view transitions are distributed across legacy components/services. The Angular prototype now has a pure combat reducer for idle, player action, resolution, and victory, but it does not cover enemy turns, defeat, progression, or the full run state.
+-   **Evidence:** Current `GameDTO` allows mutable nested combinations and view transitions are distributed across legacy components/services. The Angular prototype now has a pure combat reducer for idle, player action, enemy turn, resolution, victory, and defeat, but it does not cover progression or the full run state.
 -   **Risk:** Invalid transitions, duplicate delayed callbacks, and stale UI actions can corrupt a run.
--   **Next action:** Characterize enemy turns, defeat, progression, cancellation behavior, and terminal-state rules, then extend the pure state machine without coupling it to Angular.
+-   **Next action:** Characterize progression, cancellation behavior, and terminal-state rules, then extend the pure state machine without coupling it to Angular.
 -   **Dependencies:** TODO-004 and TODO-005
 -   **Owner:** Future rewrite agent
 -   **Target:** Rewrite foundation
@@ -83,9 +83,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 -   **Status:** Partially resolved
 -   **Affected area:** New rewrite workspace and CI
--   **Evidence:** The legacy app has no tests or test runner. The Angular prototype has deterministic unit/component tests and an injectable random source, but no browser journey suite or clock abstraction yet.
+-   **Evidence:** The legacy app has no tests or test runner. The Angular prototype has deterministic unit/component tests, injectable random and clock ports, and application transition coverage, but no browser journey suite.
 -   **Risk:** Combat and store regressions will be detected only by manual play.
--   **Next action:** Add browser critical-journey tests and use the injected clock before adding delayed enemy turns, audio, or persistence.
+-   **Next action:** Add browser critical-journey tests before adding audio or persistence; keep delayed behavior on the injected clock.
 -   **Dependencies:** TODO-004 and TODO-006
 -   **Owner:** Future rewrite agent
 -   **Target:** Before feature expansion

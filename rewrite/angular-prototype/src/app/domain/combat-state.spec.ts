@@ -51,8 +51,46 @@ describe('combat state transitions', () => {
     });
 
     expect(resolved.accepted).toBe(true);
-    expect(resolved.state.phase).toBe('awaiting-player-action');
+    expect(resolved.state.phase).toBe('enemy-turn');
     expect(resolved.state.enemy?.damageTaken).toBe(16);
+  });
+
+  it('returns to the player turn after the enemy acts', () => {
+    const started = transitionCombat(activeState(), {
+      type: 'player-action-started',
+      kind: 'attack',
+    }).state;
+    const enemyTurn = transitionCombat(started, {
+      type: 'player-action-resolved',
+      result,
+    }).state;
+    const resolved = transitionCombat(enemyTurn, {
+      type: 'enemy-action-resolved',
+      playerDamageTaken: 12,
+      playerHealth: 200,
+    });
+
+    expect(resolved.accepted).toBe(true);
+    expect(resolved.state.phase).toBe('awaiting-player-action');
+    expect(resolved.state.playerDamageTaken).toBe(12);
+  });
+
+  it('enters defeat when the enemy reduces player health to zero', () => {
+    const started = transitionCombat(activeState(), {
+      type: 'player-action-started',
+      kind: 'attack',
+    }).state;
+    const enemyTurn = transitionCombat(started, {
+      type: 'player-action-resolved',
+      result,
+    }).state;
+    const resolved = transitionCombat(enemyTurn, {
+      type: 'enemy-action-resolved',
+      playerDamageTaken: 200,
+      playerHealth: 200,
+    });
+
+    expect(resolved.state.phase).toBe('defeat');
   });
 
   it('rejects actions outside the player-action phase', () => {
