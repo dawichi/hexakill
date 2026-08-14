@@ -1,0 +1,44 @@
+name: Angular rewrite validation
+
+on:
+  push:
+    paths:
+      - 'rewrite/angular-prototype/**'
+      - 'docs/**'
+      - '.github/workflows/angular-rewrite.yml'
+  pull_request:
+    paths:
+      - 'rewrite/angular-prototype/**'
+      - 'docs/**'
+      - '.github/workflows/angular-rewrite.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rewrite/angular-prototype
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.19.0
+          cache: npm
+          cache-dependency-path: rewrite/angular-prototype/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Check formatting
+        run: npm run format:check
+      - name: Run tests
+        run: npm test -- --watch=false --no-progress
+      - name: Build production bundle
+        run: npm run build
+      - name: Verify representative migrated assets
+        run: |
+          test -f dist/angular-prototype/browser/images/wizard/idle.gif
+          test -f dist/angular-prototype/browser/sounds/attack.mp3

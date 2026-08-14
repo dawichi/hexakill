@@ -38,6 +38,7 @@ The isolated rewrite is the currently validated implementation surface. Run thes
 | Unit/component tests | `npm test -- --watch=false --no-progress`                       | Passes: 10 files, 33 tests.                                                     |
 | Production build     | `npm run build`                                                 | Passes; the Angular production budget is clean.                                |
 | Formatting           | `npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'` | Passes.                                                                        |
+| CI validation        | `.github/workflows/angular-rewrite.yml`                         | Added; runs install, formatting, tests, build, and representative asset checks on rewrite/docs changes. |
 | Browser smoke        | `npm start`                                                     | Previously verified welcome → character selection → ready run → combat → Attack; repeat after current combat UI changes. |
 
 This prototype is not a production deployment. It has provisional combat, progression, power-up, store, versioned local-session persistence, and non-fatal sound playback; music controls, CI, browser E2E, and deployment remain unresolved.

@@ -83,9 +83,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 -   **Status:** Partially resolved
 -   **Affected area:** New rewrite workspace and CI
--   **Evidence:** The legacy app has no tests or test runner. The Angular prototype has deterministic unit/component tests, injectable random and clock ports, and application transition coverage, but no browser journey suite.
+-   **Evidence:** The legacy app has no tests or test runner. The Angular prototype has 10 deterministic unit/component test files, injectable random/clock/storage/audio ports, and application transition coverage, but no browser journey suite.
 -   **Risk:** Combat and store regressions will be detected only by manual play.
--   **Next action:** Add browser critical-journey tests before adding audio or persistence; keep delayed behavior on the injected clock.
+-   **Next action:** Add browser critical-journey tests for restore, combat, defeat, rewards, and store; keep delayed behavior on the injected clock.
 -   **Dependencies:** TODO-004 and TODO-006
 -   **Owner:** Future rewrite agent
 -   **Target:** Before feature expansion
