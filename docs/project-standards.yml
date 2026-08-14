@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: legacy unfinished browser game; rewrite preparation
   current_branch: main
-  current_revision: d441a661f8381feb48996746f2f284a6d0a51b56
+  current_revision: 84ba64a5f94a4ec2b4c8215dffab9c83f50e402b
 
 standards:
   - documentation
@@ -101,7 +101,6 @@ exceptions: []
 deferred_work:
   - TODO-007
   - TODO-010
-  - TODO-014
 
 notes:
   - The status summary is an audit snapshot, not a claim that the current application is production-ready.
