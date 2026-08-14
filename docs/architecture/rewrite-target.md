@@ -1,16 +1,16 @@
 # Proposed Rewrite Architecture
 
-**Status:** Proposed design, not current implementation and not an accepted framework decision.
+**Status:** Proposed target architecture for the accepted Angular direction. Root Angular implementation exists; final product contracts and deployment acceptance remain open.
 
 ## Design goals
 
--   Preserve intentional gameplay rules and assets while making them reviewable and testable.
--   Make invalid state transitions difficult to represent.
--   Keep random outcomes, clocks, audio, persistence, and browser APIs behind explicit adapters.
--   Allow the rules engine to run in unit tests without Svelte, Angular, a browser, timers, or local storage.
--   Make the store a first-class feature with an explicit product contract.
--   Make accessibility and critical journeys testable at the rendered UI boundary.
--   Leave room for a future backend without pretending that accounts or network play are requirements today.
+- Preserve intentional gameplay rules and assets while making them reviewable and testable.
+- Make invalid state transitions difficult to represent.
+- Keep random outcomes, clocks, audio, persistence, and browser APIs behind explicit adapters.
+- Allow the rules engine to run in unit tests without Svelte, Angular, a browser, timers, or local storage.
+- Make the store a first-class feature with an explicit product contract.
+- Make accessibility and critical journeys testable at the rendered UI boundary.
+- Leave room for a future backend without pretending that accounts or network play are requirements today.
 
 ## Proposed boundaries
 
@@ -42,22 +42,22 @@ Render view models and dispatch commands. Components should not mutate domain ob
 
 ### Infrastructure adapters
 
--   `RandomSource` for seeded/random outcomes.
--   `Clock` or `Scheduler` for delayed combat transitions and run timers.
--   `AudioPlayer` for music/effects with browser lifecycle ownership.
--   `RunStorage` for versioned, validated local persistence.
--   `AssetManifest` for character/enemy/item media paths and metadata.
--   Optional future `RemoteRecords` or account adapters only after a product decision.
+- `RandomSource` for seeded/random outcomes.
+- `Clock` or `Scheduler` for delayed combat transitions and run timers.
+- `AudioPlayer` for music/effects with browser lifecycle ownership.
+- `RunStorage` for versioned, validated local persistence.
+- `AssetManifest` for character/enemy/item media paths and metadata.
+- Optional future `RemoteRecords` or account adapters only after a product decision.
 
 ## Proposed state model
 
 Replace the current mutable `GameDTO` class graph with explicit serializable state. A possible shape is:
 
--   `screen`: `welcome | character-select | combat-ready | combat-resolving | store | power-up | game-over`.
--   `run`: player, enemy, inventory, progression, shop, logs, defeated-enemy history.
--   `interaction`: selected action, pending command, scheduler token, focus target.
--   `preferences`: music/effects volume.
--   `persistence`: version, last-save status, migration result.
+- `screen`: `welcome | character-select | combat-ready | combat-resolving | store | power-up | game-over`.
+- `run`: player, enemy, inventory, progression, shop, logs, defeated-enemy history.
+- `interaction`: selected action, pending command, scheduler token, focus target.
+- `preferences`: music/effects volume.
+- `persistence`: version, last-save status, migration result.
 
 This is a design direction, not a claim about required field names. The exact model should be derived from characterization tests and accepted product rules.
 
@@ -67,10 +67,10 @@ This is a design direction, not a claim about required field names. The exact mo
 2. Define the run and store contracts; decide whether item bonuses alter combat stats and how shop restocking works.
 3. Implement the domain state machine with injected randomness and time.
 4. Add versioned local-storage persistence with invalid-data recovery.
-5. Build the welcome/character-select/combat-ready/combat vertical slice in Angular. The current prototype covers this slice with typed enemy generation and first actions.
-6. Add victory rewards, progression, store, power-ups, game-over, persistence, audio playback, and complete asset mapping as separate slices; the prototype contains provisional implementations for all except full music lifecycle and asset mapping.
+5. Build the welcome/character-select/combat-ready/combat vertical slice in Angular. The root application now covers this slice with typed enemy generation and actions.
+6. Add victory rewards, progression, store, power-ups, game-over, persistence, audio playback, and complete asset mapping as separate slices; the root application contains provisional implementations for all except final product balance and provenance acceptance.
 7. Add application transition tests, browser critical-journey tests, accessibility checks, production build validation, and deployment configuration.
-8. Retire the legacy Svelte implementation only after behavior and assets have an explicit migration/replacement record.
+8. Remove the archived Svelte implementation only after behavior and assets have an explicit migration/replacement record; it is currently retained under `legacy/svelte/` for auditability.
 
 ## Non-goals for the first rewrite slice
 

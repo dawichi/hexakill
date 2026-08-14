@@ -1,48 +1,41 @@
 # Operations and Development Commands
 
-**Status:** Current repository evidence, reviewed 2026-08-13.
+**Status:** Current repository evidence, reviewed 2026-08-15.
 
 ## Local setup
 
-The legacy root package declares npm-compatible JavaScript dependencies but does not commit a lockfile. `.npmrc` enables `engine-strict=true`, but the legacy root has no Node.js or package-manager version pinned. A normal root `npm install` currently fails with a peer dependency conflict between Vite 4.5.1 and the SvelteKit Vite plugin peer. The diagnostic install used for this review was:
+The archived Svelte package under `legacy/svelte/` has no committed lockfile and is retained only for historical reference. The active root package pins Angular, Node.js 24.19.0, npm 11.17.0, and a committed lockfile.
 
-```sh
-npm install --legacy-peer-deps --ignore-scripts --no-package-lock --no-audit --no-fund
-npx svelte-kit sync
-```
-
-This is a temporary diagnostic workaround, not the desired reproducible setup. See [TODO-001](TODO.md#todo-001-high-dependency-toolchain-baseline) and [TODO-002](TODO.md#todo-002-high-repair-validation-commands).
+The archived Svelte commands below are historical evidence only. They are not part of the active root workflow. See [TODO-001](TODO.md#todo-001-high-dependency-toolchain-baseline) and [TODO-002](TODO.md#todo-002-high-repair-validation-commands).
 
 ## Commands and observed results
 
-| Purpose                   | Command                                       | Current result                                                                                                            |
-| ------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Development server        | `npm run dev`                                 | Not re-verified in this session; build/tooling blockers remain.                                                           |
-| Prepare generated types   | `npx svelte-kit sync`                         | Passed during review.                                                                                                     |
-| Type check                | `npx svelte-check --tsconfig ./tsconfig.json` | Reached source and reported 4 errors and 3 warnings in 3 files.                                                           |
-| Project type-check script | `npm run check`                               | Fails because `jsconfig.json` does not exist.                                                                             |
-| Formatting check          | `npm run lint`                                | Fails because Prettier cannot resolve the configured `svelte` parser; also reports an obsolete `pluginSearchDirs` option. |
-| Build                     | `npm run build`                               | Fails because `@sveltejs/vite-plugin-svelte` cannot be resolved and the Vite/SvelteKit peer setup is inconsistent.        |
-| Tests                     | No script                                     | No automated tests are present.                                                                                           |
-| Dependency audit          | `npm audit`                                   | Cannot run reproducibly without a lockfile.                                                                               |
+| Purpose                   | Command                                   | Current result                                                         |
+| ------------------------- | ----------------------------------------- | ---------------------------------------------------------------------- |
+| Archived Svelte build     | `legacy/svelte/`                          | Not a supported active command; historical failures remain documented. |
+| Active development server | `npm start`                               | Passes for the Angular root.                                           |
+| Active tests              | `npm test -- --watch=false --no-progress` | Passes: 10 files, 36 tests.                                            |
+| Active browser journeys   | `npm run test:e2e`                        | Passes locally: 3 Chromium journeys.                                   |
+| Active build              | `npm run build`                           | Passes; output is `dist/hexakill/browser/`.                            |
+| Dependency audit          | `npm audit`                               | Not yet added to the supported CI gate.                                |
 
-The direct `svelte-check` findings are recorded in [TODO-003](TODO.md#todo-003-high-clear-current-type-and-accessibility-errors); they are not fixed by this documentation session.
+The archived Svelte findings are recorded in [TODO-003](TODO.md#todo-003-high-clear-current-type-and-accessibility-errors); they are not active root blockers.
 
-## Angular rewrite prototype
+## Active Angular application
 
-The isolated rewrite is the currently validated implementation surface. Run these commands from `rewrite/angular-prototype/` with Node.js 24.19.0 and npm 11.17.0:
+The root Angular application is the currently validated implementation surface. Run these commands from the repository root with Node.js 24.19.0 and npm 11.17.0:
 
-| Purpose              | Command                                                         | Current result                                                                 |
-| -------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Clean install        | `npm ci`                                                        | Passes with the committed `package-lock.json`.                                 |
-| Unit/component tests | `npm test -- --watch=false --no-progress`                       | Passes: 10 files, 36 tests.                                                     |
-| Production build     | `npm run build`                                                 | Passes; the Angular production budget is clean.                                |
-| Formatting           | `npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'` | Passes.                                                                        |
+| Purpose              | Command                                                         | Current result                                                                                                                      |
+| -------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Clean install        | `npm ci`                                                        | Passes with the committed root `package-lock.json`.                                                                                 |
+| Unit/component tests | `npm test -- --watch=false --no-progress`                       | Passes: 10 files, 36 tests.                                                                                                         |
+| Production build     | `npm run build`                                                 | Passes; output is `dist/hexakill/browser/` and the Angular production budget is clean.                                              |
+| Formatting           | `npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'` | Passes.                                                                                                                             |
 | CI validation        | `.github/workflows/angular-rewrite.yml`                         | Added; runs install, formatting, tests, browser journeys, build, and representative/full idle-asset checks on rewrite/docs changes. |
-| Browser journeys     | `npm run test:e2e`                                               | Passes locally: 2 Chromium journeys cover start → store purchase → combat and local-session restore; CI installs Chromium. |
-| Browser smoke        | `npm start`                                                     | Verified welcome → character selection → ready run → store purchase → combat → Attack with migrated sprites. |
+| Browser journeys     | `npm run test:e2e`                                              | Passes locally: 3 Chromium journeys cover store/combat, local-session restore, and potion-driven defeat; CI installs Chromium.      |
+| Browser smoke        | `npm start`                                                     | Verified welcome → character selection → ready run → store purchase → combat → Attack with migrated sprites.                        |
 
-This prototype is not a production deployment. It has provisional combat, progression, power-up, store, versioned local-session persistence, non-fatal sound playback, and CI/browser journey gates; music controls and deployment remain unresolved.
+The Angular application is not a production deployment. It has provisional combat, progression, power-up, store, versioned local-session persistence, sound/music lifecycle, and CI/browser journey gates; hosting acceptance and final gameplay balance remain unresolved.
 
 ## Runtime configuration
 
@@ -52,7 +45,7 @@ No `.env.example`, runtime environment schema, server endpoint, API key, databas
 
 The root README links to `https://hexakill.vercel.app`, and `.gitignore` contains `.vercel`, but there is no Vercel project configuration, adapter selection, deployment script, headers/redirects policy, or verified deployment record in the repository. The rewrite has a scoped CI workflow, but hosting remains unknown until checked outside the repository.
 
-`@sveltejs/adapter-auto` is configured, so deployment output is intentionally not pinned to a concrete platform in source. A future deployment decision must select the adapter/output mode, document static versus server behavior, and verify the production-like build.
+The Angular output mode is now documented as static in [the deployment contract](architecture/rewrite-deployment.md), but no provider is accepted or externally verified yet.
 
 ## Troubleshooting order
 

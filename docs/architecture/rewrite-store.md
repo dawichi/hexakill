@@ -2,21 +2,21 @@
 
 **Status:** Characterization only; product acceptance pending.
 
-The legacy application exposes a store, but its completion and gameplay effects were not reliable enough to treat as an approved specification. This document records observed values and the narrower contract currently implemented in the Angular prototype so future agents can distinguish evidence from decisions.
+The legacy application exposes a store, but its completion and gameplay effects were not reliable enough to treat as an approved specification. This document records observed values and the narrower contract currently implemented in the active Angular app so future agents can distinguish evidence from decisions.
 
 ## Observed legacy offers
 
-| Offer | Price | Observed effect |
-| --- | ---: | --- |
-| Potion | 100 | +1 potion |
-| Potion pack | 400 | +5 potions |
-| Orb | 500 | +1000 health bonus |
-| Sword | 900 | +200 attack, +50 speed |
-| Wand | 2000 | +500 ability power |
+| Offer       | Price | Observed effect        |
+| ----------- | ----: | ---------------------- |
+| Potion      |   100 | +1 potion              |
+| Potion pack |   400 | +5 potions             |
+| Orb         |   500 | +1000 health bonus     |
+| Sword       |   900 | +200 attack, +50 speed |
+| Wand        |  2000 | +500 ability power     |
 
 The legacy code displays and adds items, but the complete interaction between inventory bonuses, current/max health, combat calculations, restocking, and persistence is not established. Those are open product questions.
 
-## Current prototype behavior
+## Current Angular behavior
 
 - The store is reachable from a ready run or between enemy turns.
 - Potion offers are repeatable while the player has enough gold.

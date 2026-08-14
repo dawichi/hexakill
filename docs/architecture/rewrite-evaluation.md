@@ -13,7 +13,7 @@ The core workload is not a content website. It is a continuously interactive, si
 | Option           | Fit for the game core              | Strengths                                                                                                                                                                                                    | Costs and risks                                                                                                                                                                                                       | Recommendation                                                                     |
 | ---------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | Modern SvelteKit | High                               | Lowest conceptual migration from the existing UI; Svelte is already understood by the codebase; can retain a thin UI around a new pure rules engine; supports static deployment when configured deliberately | Requires a controlled upgrade/rebuild and disciplined state boundaries; does not fix domain coupling automatically                                                                                                    | Rejected for the rewrite by project-owner decision; remains historical reference   |
-| Angular          | High                               | Full application framework with first-party routing, forms, dependency injection, signals, and strong conventions for feature boundaries; aligns with the shared Angular application profile                 | Highest migration and team learning cost; more framework surface than this small game needs; still requires a new rules engine and accessibility/test discipline                                                      | Accepted in ADR-0001; prototype first                                              |
+| Angular          | High                               | Full application framework with first-party routing, forms, dependency injection, signals, and strong conventions for feature boundaries; aligns with the shared Angular application profile                 | Highest migration and team learning cost; more framework surface than this small game needs; still requires a new rules engine and accessibility/test discipline                                                      | Accepted in ADR-0001; promoted to root                                             |
 | Astro            | Low as the core; medium as a shell | Excellent static-first output, content/landing pages, selective hydration, and the ability to host a client island                                                                                           | The game would be one large client island; Astro would not remove the need for a client application runtime and could add a boundary between shell and game; Astro website profile is not a fit for the core workflow | Do not use as the primary game framework; consider only for a marketing/docs shell |
 
 Astro's official documentation describes components as static HTML by default and client-side JavaScript as explicit islands. That is valuable for a mostly static site, but Hexakill's main screen is itself the interactive application. Angular's official documentation describes it as a framework for applications with routing, forms, dependency injection, signals, and SSR/SSG options, which matches the application profile more closely. Neither choice substitutes for extracting and testing the game domain.
@@ -34,9 +34,9 @@ The framework decision is accepted. The critical unresolved constraints are expe
 
 ## References
 
--   [Astro islands architecture](https://docs.astro.build/en/concepts/islands/)
--   [Astro rendering modes](https://docs.astro.build/en/basics/rendering-modes/)
--   [Angular overview](https://angular.dev/overview)
--   [Angular signals](https://angular.dev/guide/signals)
--   [Angular routing](https://angular.dev/guide/routing)
--   [Angular forms](https://angular.dev/guide/forms)
+- [Astro islands architecture](https://docs.astro.build/en/concepts/islands/)
+- [Astro rendering modes](https://docs.astro.build/en/basics/rendering-modes/)
+- [Angular overview](https://angular.dev/overview)
+- [Angular signals](https://angular.dev/guide/signals)
+- [Angular routing](https://angular.dev/guide/routing)
+- [Angular forms](https://angular.dev/guide/forms)

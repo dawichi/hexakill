@@ -3,12 +3,22 @@ name: Angular rewrite validation
 on:
   push:
     paths:
-      - 'rewrite/angular-prototype/**'
+      - 'src/**'
+      - 'e2e/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'angular.json'
+      - 'static/**'
       - 'docs/**'
       - '.github/workflows/angular-rewrite.yml'
   pull_request:
     paths:
-      - 'rewrite/angular-prototype/**'
+      - 'src/**'
+      - 'e2e/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'angular.json'
+      - 'static/**'
       - 'docs/**'
       - '.github/workflows/angular-rewrite.yml'
 
@@ -18,9 +28,6 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: rewrite/angular-prototype
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -29,7 +36,7 @@ jobs:
         with:
           node-version: 24.19.0
           cache: npm
-          cache-dependency-path: rewrite/angular-prototype/package-lock.json
+          cache-dependency-path: package-lock.json
       - name: Install dependencies
         run: npm ci
       - name: Check formatting
@@ -44,6 +51,6 @@ jobs:
         run: npm run build
       - name: Verify representative migrated assets
         run: |
-          test -f dist/angular-prototype/browser/images/wizard/idle.gif
-          test -f dist/angular-prototype/browser/sounds/attack.mp3
-          test "$(find dist/angular-prototype/browser/images -name idle.gif | wc -l | tr -d ' ')" -ge 21
+          test -f dist/hexakill/browser/images/wizard/idle.gif
+          test -f dist/hexakill/browser/sounds/attack.mp3
+          test "$(find dist/hexakill/browser/images -name idle.gif | wc -l | tr -d ' ')" -ge 21

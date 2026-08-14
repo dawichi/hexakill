@@ -1,6 +1,6 @@
 # Standards Assessment
 
-**Snapshot:** 2026-08-13, `main` at `d441a661f8381feb48996746f2f284a6d0a51b56`.
+**Snapshot:** 2026-08-15, active Angular application promoted to repository root; final commit recorded after validation.
 
 Statuses use the shared definitions: `Compliant`, `Partial`, `Gap`, `Deferred`, `Exception`, `Not applicable`, and `Unknown`. The YAML contract contains a compact machine-readable summary; this document contains the reasoning and evidence.
 
@@ -21,16 +21,16 @@ Statuses use the shared definitions: `Compliant`, `Partial`, `Gap`, `Deferred`, 
 
 ## Testing
 
-| Rule     | Status         | Evidence / consequence                                                                        | Priority / next action                                                        |
-| -------- | -------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| TEST-001 | Partial        | The legacy root has no tests; the Angular rewrite has deterministic unit/component tests and Playwright journeys. | High — extend journeys to defeat, rewards, bosses, and game-over. |
-| TEST-002 | Not applicable | No bug fix is being implemented in this documentation session.                                | Reassess for every future defect fix.                                         |
-| TEST-003 | Partial        | The Angular rewrite injects random, clock, storage, and audio ports and tests deterministic outcomes; the legacy root remains uncontrolled. | High — preserve ports and characterize remaining legacy rules. |
-| TEST-004 | Partial        | Rewrite assertions cover combat, progression, store, persistence boundaries, and browser journeys; legacy behavior still lacks assertions. | High — test outcomes/contracts, not component internals. |
-| TEST-005 | Partial        | Combat, progression, store, and persistence have deterministic rewrite coverage, but defeat/reward/boss browser paths remain incomplete. | High — complete the risk-based matrix. |
-| TEST-006 | Partial        | The rewrite has documented npm commands and a CI workflow; the legacy root still has no supported validation command. | High — keep rewrite gates reproducible and add audit reporting. |
-| TEST-007 | Not applicable | No external service is called by current source.                                              | Reassess if backend/CDN adapters become test scope.                           |
-| TEST-008 | Partial        | The rewrite has 10 test files, 36 passing tests, and two Chromium journeys; this does not validate the legacy root or complete gameplay. | High — extend critical journeys before promotion. |
+| Rule     | Status         | Evidence / consequence                                                                                                                        | Priority / next action                                               |
+| -------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| TEST-001 | Partial        | The archived Svelte root has no tests; the active Angular root has deterministic unit/component tests and Playwright journeys.                | High — extend journeys to rewards, power-ups, bosses, and game-over. |
+| TEST-002 | Not applicable | No bug fix is being implemented in this documentation session.                                                                                | Reassess for every future defect fix.                                |
+| TEST-003 | Partial        | The Angular app injects random, clock, storage, and audio ports and tests deterministic outcomes; the archived root remains uncontrolled.     | High — preserve ports and characterize remaining legacy rules.       |
+| TEST-004 | Partial        | Rewrite assertions cover combat, progression, store, persistence boundaries, and browser journeys; legacy behavior still lacks assertions.    | High — test outcomes/contracts, not component internals.             |
+| TEST-005 | Partial        | Combat, progression, store, and persistence have deterministic rewrite coverage, but defeat/reward/boss browser paths remain incomplete.      | High — complete the risk-based matrix.                               |
+| TEST-006 | Partial        | The active root has documented npm commands and a CI workflow; the archived root has no supported validation command.                         | High — keep root gates reproducible and add audit reporting.         |
+| TEST-007 | Not applicable | No external service is called by current source.                                                                                              | Reassess if backend/CDN adapters become test scope.                  |
+| TEST-008 | Partial        | The active root has 10 test files, 36 passing tests, and three Chromium journeys; rewards, power-ups, and bosses still lack browser coverage. | High — extend critical journeys before production acceptance.        |
 
 ## TypeScript
 
@@ -75,48 +75,48 @@ Statuses use the shared definitions: `Compliant`, `Partial`, `Gap`, `Deferred`, 
 
 ## Dependencies and supply chain
 
-| Rule    | Status         | Evidence / consequence                                                                                                                                              | Priority / next action                                                                  |
-| ------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| DEP-001 | Gap            | The legacy root package has no committed lockfile and root lockfiles are ignored in `.gitignore`; the isolated Angular prototype has a separate lockfile by design. | High — select the root package baseline or retire it in favor of the rewrite workspace. |
-| DEP-002 | Partial        | The Angular rewrite uses `npm ci` in local commands and CI; deployment provider/install behavior remains unresolved.                                                   | High — retain frozen install in the accepted deployment pipeline.                       |
-| DEP-003 | Partial        | The Angular rewrite pins Node.js 24.19.0 and npm 11.17.0; the legacy root remains unpinned.                                                                          | High — use the rewrite baseline for promotion.                                          |
-| DEP-004 | Unknown        | `.npmrc` sets `engine-strict`, but install/build script trust has not been documented.                                                                              | Medium — review lifecycle scripts before enabling installs.                             |
-| DEP-005 | Partial        | Direct dependencies have not been reconciled with source usage; several legacy packages may be unused or overlapping.                                               | Medium — produce dependency inventory before upgrade.                                   |
-| DEP-006 | Gap            | No lockfile means `npm audit` cannot run in the supported state.                                                                                                    | High — make audit repeatable.                                                           |
-| DEP-007 | Not applicable | This is an existing project, not a new package-manager selection.                                                                                                   | Reassess when rewrite scaffolding chooses a manager.                                    |
+| Rule    | Status         | Evidence / consequence                                                                                                                     | Priority / next action                                                                                        |
+| ------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| DEP-001 | Partial        | The archived Svelte package has no committed lockfile, while the active Angular root has a committed lockfile and frozen-install baseline. | High — retain the root baseline and remove/archive legacy package metadata when historical audit is complete. |
+| DEP-002 | Partial        | The Angular rewrite uses `npm ci` in local commands and CI; deployment provider/install behavior remains unresolved.                       | High — retain frozen install in the accepted deployment pipeline.                                             |
+| DEP-003 | Partial        | The active Angular root pins Node.js 24.19.0 and npm 11.17.0; the archived package remains unpinned.                                       | High — retain the root baseline.                                                                              |
+| DEP-004 | Unknown        | `.npmrc` sets `engine-strict`, but install/build script trust has not been documented.                                                     | Medium — review lifecycle scripts before enabling installs.                                                   |
+| DEP-005 | Partial        | Direct dependencies have not been reconciled with source usage; several legacy packages may be unused or overlapping.                      | Medium — produce dependency inventory before upgrade.                                                         |
+| DEP-006 | Gap            | No lockfile means `npm audit` cannot run in the supported state.                                                                           | High — make audit repeatable.                                                                                 |
+| DEP-007 | Not applicable | This is an existing project, not a new package-manager selection.                                                                          | Reassess when rewrite scaffolding chooses a manager.                                                          |
 
 ## CI/CD
 
-| Rule   | Status         | Evidence / consequence                                                                | Priority / next action                               |
-| ------ | -------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| CI-001 | Partial        | `.github/workflows/angular-rewrite.yml` validates rewrite/docs changes; no equivalent legacy-root pipeline exists. | High — retain scoped rewrite workflow until promotion. |
-| CI-002 | Partial        | The rewrite workflow runs frozen install, formatting, tests, browser journeys, build, and asset checks; lint/type/audit gates remain separate work. | High — add applicable security/report gates. |
-| CI-003 | Partial        | Rewrite runtime, lockfile, and `npm ci` are reproducible; legacy root remains unreproducible. | High — promote only the rewrite baseline. |
-| CI-004 | Unknown        | Repository protection settings are outside checked-out source and were not inspected. | Medium — verify branch/deployment protection.        |
-| CI-005 | Not applicable | No CI workflow currently handles secrets or write permissions.                        | Reassess when CI is added.                           |
-| CI-006 | Unknown        | No pipeline exists to assess cost/resource behavior.                                  | Low — decide with CI design.                         |
-| CI-007 | Partial        | Local validation results and Playwright traces-on-retry are configured; CI artifact retention and audit reports are not yet configured. | Medium — retain reports in CI. |
+| Rule   | Status         | Evidence / consequence                                                                                                                              | Priority / next action                                      |
+| ------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| CI-001 | Partial        | `.github/workflows/angular-rewrite.yml` validates active root/docs changes; no equivalent archived-Svelte pipeline exists.                          | High — retain the root workflow and add audit/report gates. |
+| CI-002 | Partial        | The rewrite workflow runs frozen install, formatting, tests, browser journeys, build, and asset checks; lint/type/audit gates remain separate work. | High — add applicable security/report gates.                |
+| CI-003 | Partial        | Root runtime, lockfile, and `npm ci` are reproducible; archived Svelte remains unreproducible.                                                      | High — retain the root baseline.                            |
+| CI-004 | Unknown        | Repository protection settings are outside checked-out source and were not inspected.                                                               | Medium — verify branch/deployment protection.               |
+| CI-005 | Not applicable | No CI workflow currently handles secrets or write permissions.                                                                                      | Reassess when CI is added.                                  |
+| CI-006 | Unknown        | No pipeline exists to assess cost/resource behavior.                                                                                                | Low — decide with CI design.                                |
+| CI-007 | Partial        | Local validation results and Playwright traces-on-retry are configured; CI artifact retention and audit reports are not yet configured.             | Medium — retain reports in CI.                              |
 
 ## Operations and data
 
-| Rule     | Status         | Evidence / consequence                                                                                                     | Priority / next action                         |
-| -------- | -------------- | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| OPS-001  | Not applicable | No runtime configuration or server process is present.                                                                     | Reassess for a backend/SSR deployment.         |
-| OPS-002  | Partial        | The rewrite deployment contract specifies a static browser artifact and release checks, but the provider and verified preview remain unknown. | High — accept provider/output ADR. |
-| OPS-003  | Not applicable | No network/database/queue/filesystem operation is owned by the app.                                                        | Reassess with integrations.                    |
-| OPS-004  | Not applicable | Current code has no external-operation retry loop.                                                                         | Reassess with network services.                |
-| OPS-005  | Not applicable | No long-running service is managed by a platform.                                                                          | Reassess with server deployment.               |
-| OPS-006  | Not applicable | No server worker or long-running service exists.                                                                           | Reassess with server deployment.               |
-| OPS-007  | Not applicable | No deployed service logging pipeline exists; browser console logging is tracked under SEC-006.                             | Reassess with backend.                         |
-| OPS-008  | Not applicable | No production service or meaningful operator-owned availability signal is evidenced.                                       | Reassess if product becomes service-backed.    |
-| OPS-009  | Gap            | The README claims a deployment, but build failure behavior, hosting ownership, and recovery expectations are undocumented. | Medium — verify hosting and document recovery. |
-| DATA-001 | Partial        | Local records/preferences have TypeScript shapes and named keys, but ownership/lifecycle/versioning are not explicit.      | High — define persistence contract.            |
-| DATA-002 | Gap            | Stored JSON has no schema version or migration process.                                                                    | High — add versioned storage migrations.       |
-| DATA-003 | Partial        | Application logic caps/sorts records, but runtime input is not validated before use.                                       | High — validate and test invariants.           |
-| DATA-004 | Not applicable | No multiple stores or asynchronous data boundary exists.                                                                   | Reassess with remote persistence.              |
-| DATA-005 | Not applicable | No queryable persistent collection is owned by the application.                                                            | Reassess with backend data.                    |
-| DATA-006 | Not applicable | `localStorage` is used as persistence, not a cache with a remote source of truth.                                          | Reassess if a cache is introduced.             |
-| DATA-007 | Not applicable | Stored data is user-local and reconstructable; no provider-owned durable dataset is evidenced.                             | Reassess before remote saves.                  |
+| Rule     | Status         | Evidence / consequence                                                                                                                        | Priority / next action                         |
+| -------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| OPS-001  | Not applicable | No runtime configuration or server process is present.                                                                                        | Reassess for a backend/SSR deployment.         |
+| OPS-002  | Partial        | The rewrite deployment contract specifies a static browser artifact and release checks, but the provider and verified preview remain unknown. | High — accept provider/output ADR.             |
+| OPS-003  | Not applicable | No network/database/queue/filesystem operation is owned by the app.                                                                           | Reassess with integrations.                    |
+| OPS-004  | Not applicable | Current code has no external-operation retry loop.                                                                                            | Reassess with network services.                |
+| OPS-005  | Not applicable | No long-running service is managed by a platform.                                                                                             | Reassess with server deployment.               |
+| OPS-006  | Not applicable | No server worker or long-running service exists.                                                                                              | Reassess with server deployment.               |
+| OPS-007  | Not applicable | No deployed service logging pipeline exists; browser console logging is tracked under SEC-006.                                                | Reassess with backend.                         |
+| OPS-008  | Not applicable | No production service or meaningful operator-owned availability signal is evidenced.                                                          | Reassess if product becomes service-backed.    |
+| OPS-009  | Gap            | The README claims a deployment, but build failure behavior, hosting ownership, and recovery expectations are undocumented.                    | Medium — verify hosting and document recovery. |
+| DATA-001 | Partial        | Local records/preferences have TypeScript shapes and named keys, but ownership/lifecycle/versioning are not explicit.                         | High — define persistence contract.            |
+| DATA-002 | Gap            | Stored JSON has no schema version or migration process.                                                                                       | High — add versioned storage migrations.       |
+| DATA-003 | Partial        | Application logic caps/sorts records, but runtime input is not validated before use.                                                          | High — validate and test invariants.           |
+| DATA-004 | Not applicable | No multiple stores or asynchronous data boundary exists.                                                                                      | Reassess with remote persistence.              |
+| DATA-005 | Not applicable | No queryable persistent collection is owned by the application.                                                                               | Reassess with backend data.                    |
+| DATA-006 | Not applicable | `localStorage` is used as persistence, not a cache with a remote source of truth.                                                             | Reassess if a cache is introduced.             |
+| DATA-007 | Not applicable | Stored data is user-local and reconstructable; no provider-owned durable dataset is evidenced.                                                | Reassess before remote saves.                  |
 
 ## Web accessibility and frontend quality
 
@@ -133,24 +133,24 @@ Statuses use the shared definitions: `Compliant`, `Partial`, `Gap`, `Deferred`, 
 | WEB-003  | Unknown | One route contains multiple stateful views; no representative route/journey audit configuration exists.                    | Medium — define critical journey coverage.     |
 | WEB-004  | Gap     | No retained audit results or remediation history exists.                                                                   | Low — retain reports with CI.                  |
 
-## Angular application profile — rewrite prototype
+## Angular application profile — active root
 
-These findings apply to `rewrite/angular-prototype/`, not to the legacy Svelte implementation. They are intentionally tracked separately from the shared-standard snapshot above.
+These findings apply to the active root Angular application. The Svelte implementation is archived under `legacy/svelte/` and remains historical evidence only.
 
-| Rule        | Status         | Evidence / consequence                                                                                                                                       | Priority / next action                                                       |
-| ----------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| ANGULAR-001 | Partial        | The prototype has separate domain and application directories, but it is still a single initial feature rather than a complete feature-oriented application. | Medium — preserve feature boundaries as combat/store slices are added.       |
-| ANGULAR-002 | Compliant      | The root component orchestrates session state; combat calculations live outside Angular components.                                                          | High — keep domain logic out of templates/components.                        |
-| ANGULAR-003 | Compliant      | Strict TypeScript and Angular template/injection compiler checks are enabled in `tsconfig.json`; the prototype builds successfully.                          | High — keep strictness enabled.                                              |
-| ANGULAR-004 | Not applicable | The current prototype only has a simple name field and character selection, not a complex multi-step form.                                                   | Reassess when persistence/account workflows exist.                           |
-| ANGULAR-005 | Not applicable | The prototype has not adopted the optional Tailwind/Lucide defaults; no competing default is being claimed.                                                  | Low — choose a coherent design system before expanding UI.                   |
-| ANGULAR-006 | Partial        | The player-name boundary has length validation; no API boundary exists yet.                                                                                  | High — validate future persistence/network inputs at ingestion.              |
-| ANGULAR-007 | Compliant      | `GameSessionService` owns the prototype session state as an application-scoped service using signals.                                                        | High — document ownership when state is split by feature.                    |
-| ANGULAR-008 | Compliant      | `combat-rules.ts`, `enemies.ts`, and `combat-state.ts` are framework-independent and covered by deterministic tests.                                         | High — extend coverage before implementing more rules.                       |
-| ANGULAR-009 | Not applicable | No guarded routes, interceptors, effects, or authorization exist in this prototype.                                                                          | Reassess if accounts/backend capabilities are added.                         |
-| ANGULAR-010 | Not applicable | The prototype uses signals without subscriptions or long-lived effects.                                                                                      | Reassess when timers/audio/network streams are introduced.                   |
-| ANGULAR-011 | Partial        | Two Playwright journeys cover start/store/combat and reload restore; defeat, rewards, bosses, and game-over are not yet covered.                              | High — complete browser coverage for the full run journey.                   |
-| ANGULAR-012 | Compliant      | Angular strict compiler settings, including strict templates, injection parameters, and input access modifiers, are enabled.                                 | High — preserve in all generated projects.                                   |
-| ANGULAR-013 | Not applicable | No authenticated or protected capability exists.                                                                                                             | Reassess before adding remote records or accounts.                           |
-| ANGULAR-014 | Deferred       | The prototype has no asynchronous external workflow yet.                                                                                                     | Medium — model loading/empty/success/failure states when adapters are added. |
-| ANGULAR-015 | Partial        | Session state has explicit ownership, reset behavior, and a versioned local-storage adapter; migration, synchronization, and final schema acceptance remain open. | Medium — finalize persistence contract. |
+| Rule        | Status         | Evidence / consequence                                                                                                                                                 | Priority / next action                                                       |
+| ----------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| ANGULAR-001 | Partial        | The root app has separate domain and application directories, but it is still a single initial feature rather than a complete feature-oriented application.            | Medium — preserve feature boundaries as combat/store slices are added.       |
+| ANGULAR-002 | Compliant      | The root component orchestrates session state; combat calculations live outside Angular components.                                                                    | High — keep domain logic out of templates/components.                        |
+| ANGULAR-003 | Compliant      | Strict TypeScript and Angular template/injection compiler checks are enabled in `tsconfig.json`; the root builds successfully.                                         | High — keep strictness enabled.                                              |
+| ANGULAR-004 | Not applicable | The current prototype only has a simple name field and character selection, not a complex multi-step form.                                                             | Reassess when persistence/account workflows exist.                           |
+| ANGULAR-005 | Not applicable | The prototype has not adopted the optional Tailwind/Lucide defaults; no competing default is being claimed.                                                            | Low — choose a coherent design system before expanding UI.                   |
+| ANGULAR-006 | Partial        | The player-name boundary has length validation; no API boundary exists yet.                                                                                            | High — validate future persistence/network inputs at ingestion.              |
+| ANGULAR-007 | Compliant      | `GameSessionService` owns the root session state as an application-scoped service using signals.                                                                       | High — document ownership when state is split by feature.                    |
+| ANGULAR-008 | Compliant      | `combat-rules.ts`, `enemies.ts`, and `combat-state.ts` are framework-independent and covered by deterministic tests.                                                   | High — extend coverage before implementing more rules.                       |
+| ANGULAR-009 | Not applicable | No guarded routes, interceptors, effects, or authorization exist in this prototype.                                                                                    | Reassess if accounts/backend capabilities are added.                         |
+| ANGULAR-010 | Not applicable | The prototype uses signals without subscriptions or long-lived effects.                                                                                                | Reassess when timers/audio/network streams are introduced.                   |
+| ANGULAR-011 | Partial        | Three Playwright journeys cover start/store/combat, reload restore, and potion-driven defeat/game-over; rewards, power-ups, and bosses are not yet covered in-browser. | High — complete browser coverage for the full run journey.                   |
+| ANGULAR-012 | Compliant      | Angular strict compiler settings, including strict templates, injection parameters, and input access modifiers, are enabled.                                           | High — preserve in all generated projects.                                   |
+| ANGULAR-013 | Not applicable | No authenticated or protected capability exists.                                                                                                                       | Reassess before adding remote records or accounts.                           |
+| ANGULAR-014 | Deferred       | The prototype has no asynchronous external workflow yet.                                                                                                               | Medium — model loading/empty/success/failure states when adapters are added. |
+| ANGULAR-015 | Partial        | Session state has explicit ownership, reset behavior, and a versioned local-storage adapter; migration, synchronization, and final schema acceptance remain open.      | Medium — finalize persistence contract.                                      |

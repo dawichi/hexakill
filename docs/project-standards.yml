@@ -4,7 +4,7 @@ standards_version: 0.3.0
 standards_source:
   repository: /Users/dawichi/Documents/GitHub/engineering-standards
   revision: a0d00b162674234f09d095607d276c121417b796
-  pinned_on: 2026-08-13
+  pinned_on: 2026-08-15
 
 project:
   name: hexakill
@@ -33,8 +33,8 @@ profiles:
   rewrite:
     - id: angular-application
       status: adopted
-      scope: rewrite/angular-prototype/
-      rationale: Accepted by ADR-0001 and used by the isolated Angular prototype.
+      scope: root Angular application (`src/`, `e2e/`, `angular.json`)
+      rationale: Accepted by ADR-0001 and promoted from the isolated prototype to the root application.
     - id: astro-website
       status: rejected_for_core
       rationale: Astro's static-first/islands model is a poor primary fit for the continuously interactive game core; it may still be considered for a separate shell or landing pages.
@@ -62,7 +62,7 @@ compliance:
       next_action: Maintain the index when documents move.
     - id: DOC-004
       status: compliant
-      evidence: Local links reviewed against the docs tree on 2026-08-13.
+      evidence: Local links reviewed against the docs tree on 2026-08-15.
       priority: high
       next_action: Recheck links in documentation changes.
     - id: DOC-009
@@ -71,23 +71,23 @@ compliance:
       priority: high
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
-      status: gap
-      evidence: The legacy root has no suite; the Angular rewrite has 10 test files, 36 passing tests, and Playwright journeys, but not complete gameplay coverage.
+      status: partial
+      evidence: The archived Svelte root has no suite; the active Angular root has 10 test files, 36 passing tests, and three Playwright journeys, but not complete gameplay coverage.
       priority: high
-      next_action: Extend rewrite journeys to defeat, rewards, bosses, and game-over before promotion.
+      next_action: Extend root journeys to rewards, power-ups, and bosses before production acceptance.
     - id: TS-001
       status: partial
       evidence: tsconfig.json enables strict, but the supported check script fails before checking because jsconfig.json is missing.
       priority: high
       next_action: Repair the check command and make the effective compiler baseline reproducible.
     - id: DEP-001
-      status: gap
-      evidence: The legacy root package has no tracked lockfile and root lockfiles are ignored in .gitignore; the isolated rewrite prototype intentionally has its own lockfile.
+      status: partial
+      evidence: The archived Svelte package has no tracked lockfile; the active Angular root has a committed package-lock.json and frozen-install baseline.
       priority: high
-      next_action: Select the legacy root baseline or retire it in favor of the isolated rewrite workspace.
+      next_action: Retain the root Angular baseline and remove/archive legacy package metadata when the historical audit is complete.
     - id: CI-001
       status: gap
-      evidence: .github/workflows/angular-rewrite.yml validates rewrite/docs changes with frozen install, formatting, tests, browser journeys, build, and asset checks; the legacy root is intentionally out of scope.
+      evidence: .github/workflows/angular-rewrite.yml validates active root/docs changes with frozen install, formatting, tests, browser journeys, build, and asset checks; archived Svelte is intentionally out of scope.
       priority: high
       next_action: Add audit/report retention and keep the workflow aligned with top-level promotion.
     - id: A11Y-002
@@ -104,5 +104,5 @@ deferred_work:
 
 notes:
   - The status summary is an audit snapshot, not a claim that the current application is production-ready.
-  - "`Partial`, `Gap`, `Deferred`, and `Unknown` findings are expanded in standards-assessment.md and TODO.md."
+  - '`Partial`, `Gap`, `Deferred`, and `Unknown` findings are expanded in standards-assessment.md and TODO.md.'
   - The Angular rewrite direction is accepted by ADR-0001; deployment, persistence, and backend scope remain open.

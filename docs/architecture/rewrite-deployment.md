@@ -4,14 +4,14 @@
 
 ## Current output
 
-The Angular prototype is a browser-only application with no server routes, API, database, accounts, or secrets. A production build is generated from `rewrite/angular-prototype/` with Node.js `24.19.0` and npm `11.17.0`:
+The active Angular application is a browser-only application with no server routes, API, database, accounts, or secrets. A production build is generated from the repository root with Node.js `24.19.0` and npm `11.17.0`:
 
 ```sh
 npm ci
 npm run build
 ```
 
-The publishable artifact is `dist/angular-prototype/browser/`. It includes the application bundle, hashed styles/scripts, and the copied legacy asset tree under `images/`, `music/`, and `sounds/`.
+The publishable artifact is `dist/hexakill/browser/`. It includes the application bundle, hashed styles/scripts, and the retained asset tree under `images/`, `music/`, and `sounds/`.
 
 ## Required hosting behavior
 
