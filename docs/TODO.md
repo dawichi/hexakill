@@ -83,9 +83,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 -   **Status:** Partially resolved
 -   **Affected area:** New rewrite workspace and CI
--   **Evidence:** The legacy app has no tests or test runner. The Angular prototype has 10 deterministic unit/component test files, injectable random/clock/storage/audio ports, and application transition coverage, but no browser journey suite.
+-   **Evidence:** The legacy app has no tests or test runner. The Angular prototype has 10 deterministic unit/component test files, injectable random/clock/storage/audio ports, application transition coverage, and Playwright journeys for start/store/combat and reload restore.
 -   **Risk:** Combat and store regressions will be detected only by manual play.
--   **Next action:** Add browser critical-journey tests for restore, combat, defeat, rewards, and store; keep delayed behavior on the injected clock.
+-   **Next action:** Extend browser journeys to defeat/rewards/power-ups and keep delayed behavior on the injected clock.
 -   **Dependencies:** TODO-004 and TODO-006
 -   **Owner:** Future rewrite agent
 -   **Target:** Before feature expansion
@@ -94,9 +94,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 -   **Status:** Partially resolved
 -   **Affected area:** Rewrite workspace, hosting configuration, framework profile
--   **Evidence:** Angular is accepted for the rewrite in [ADR-0001](adr/0001-angular-rewrite.md); current deployment/output remains unresolved.
+-   **Evidence:** Angular is accepted for the rewrite in [ADR-0001](adr/0001-angular-rewrite.md). The proposed [deployment contract](architecture/rewrite-deployment.md) defines static output, asset behavior, and release gates, but provider and owner acceptance remain unresolved.
 -   **Risk:** Framework churn can consume the rewrite without improving domain quality.
--   **Next action:** Select and document Angular rendering/output mode, hosting target, build preview, rollback, 404, headers, and asset behavior in a separate ADR.
+-   **Next action:** Select the hosting provider and promote the proposed contract into a separate accepted ADR after a production-like preview.
 -   **Dependencies:** TODO-001, TODO-004, TODO-008, hosting constraints
 -   **Owner:** Tech Lead / project owner
 -   **Target:** Before the first production-like rewrite deployment
@@ -138,9 +138,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 -   **Status:** Planned
 -   **Affected area:** Vercel claim, adapter-auto, build output, static assets, 404/headers
--   **Evidence:** README links to Vercel but repository has no deployment workflow/configuration and current build fails.
+-   **Evidence:** README links to Vercel but repository has no provider configuration or verified deployment record. The Angular prototype now has a passing production build and documented static output, but hosting behavior is not externally verified.
 -   **Risk:** Agents may assume a deployment target or claim production readiness without evidence.
--   **Next action:** Verify URL ownership/availability, identify deployment project/config, choose static/server output, and document build, preview, rollback, 404, headers, and asset behavior.
+-   **Next action:** Verify URL ownership/availability, identify the deployment project, run a production-like preview, and document rollback, 404, headers, and asset behavior.
 -   **Dependencies:** TODO-001 and TODO-009
 -   **Owner:** Project owner / future operations agent
 -   **Target:** Before release work

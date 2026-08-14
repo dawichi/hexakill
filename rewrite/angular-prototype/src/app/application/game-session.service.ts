@@ -15,6 +15,66 @@ import { SESSION_STORAGE, SessionStoragePort } from './storage';
 
 export type GameScreen = 'welcome' | 'character-select' | 'combat-ready' | 'combat' | 'store';
 
+interface StoredSessionSnapshot {
+  readonly version: 1;
+  readonly screen: GameScreen;
+  readonly playerName: string;
+  readonly selectedCharacterId: string | null;
+  readonly player: PlayerState | null;
+  readonly combatState: CombatState;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function hasNumberFields(value: unknown, fields: readonly string[]): boolean {
+  return (
+    isRecord(value) &&
+    fields.every((field) => typeof value[field] === 'number' && Number.isFinite(value[field]))
+  );
+}
+
+function isRestorablePlayer(value: unknown): value is PlayerState {
+  if (!isRecord(value) || typeof value['name'] !== 'string' || typeof value['level'] !== 'number') {
+    return false;
+  }
+
+  const character = value['character'];
+  const powerUps = value['powerUps'];
+  return (
+    isRecord(character) &&
+    typeof character['id'] === 'string' &&
+    hasNumberFields(value['stats'], ['health', 'ad', 'ap', 'armor', 'mr', 'speed']) &&
+    typeof value['experience'] === 'number' &&
+    typeof value['potions'] === 'number' &&
+    typeof value['gold'] === 'number' &&
+    Array.isArray(value['inventory']) &&
+    isRecord(powerUps) &&
+    typeof powerUps['pending'] === 'number' &&
+    isRecord(powerUps['history'])
+  );
+}
+
+function isRestorableCombatState(value: unknown): value is CombatState {
+  if (!isRecord(value)) return false;
+
+  const phases = [
+    'idle',
+    'awaiting-player-action',
+    'resolving-player-action',
+    'enemy-turn',
+    'victory',
+    'defeat',
+  ];
+  return (
+    typeof value['phase'] === 'string' &&
+    phases.includes(value['phase']) &&
+    (value['enemy'] === null || isRecord(value['enemy'])) &&
+    typeof value['playerDamageTaken'] === 'number'
+  );
+}
+
 @Injectable({ providedIn: 'root' })
 export class GameSessionService {
   private readonly random: RandomSource = inject(RANDOM_SOURCE, { optional: true }) ?? Math.random;
@@ -298,15 +358,13 @@ export class GameSessionService {
     if (!raw) return;
 
     try {
-      const snapshot = JSON.parse(raw) as {
-        version?: unknown;
-        screen?: unknown;
-        playerName?: unknown;
-        selectedCharacterId?: unknown;
-        player?: PlayerState | null;
-        combatState?: CombatState;
-      };
-      if (snapshot.version !== 1 || typeof snapshot.playerName !== 'string') {
+      const snapshot = JSON.parse(raw) as Partial<StoredSessionSnapshot>;
+      if (
+        snapshot.version !== 1 ||
+        typeof snapshot.playerName !== 'string' ||
+        !isRestorableCombatState(snapshot.combatState) ||
+        (snapshot.player !== null && !isRestorablePlayer(snapshot.player))
+      ) {
         this.storage?.clear();
         return;
       }
@@ -316,7 +374,7 @@ export class GameSessionService {
       );
       if (character) this.selectedCharacter.set(character);
       this.playerName.set(snapshot.playerName.slice(0, 14));
-      if (snapshot.player && snapshot.combatState) {
+      if (snapshot.player) {
         this.player.set(snapshot.player);
         this.combatState.set(snapshot.combatState);
         this.screen.set(snapshot.screen === 'combat' ? 'combat' : 'combat-ready');

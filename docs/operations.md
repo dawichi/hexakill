@@ -39,9 +39,10 @@ The isolated rewrite is the currently validated implementation surface. Run thes
 | Production build     | `npm run build`                                                 | Passes; the Angular production budget is clean.                                |
 | Formatting           | `npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'` | Passes.                                                                        |
 | CI validation        | `.github/workflows/angular-rewrite.yml`                         | Added; runs install, formatting, tests, build, and representative asset checks on rewrite/docs changes. |
-| Browser smoke        | `npm start`                                                     | Previously verified welcome → character selection → ready run → combat → Attack; repeat after current combat UI changes. |
+| Browser journeys     | `npm run test:e2e`                                               | Passes locally: 2 Chromium journeys cover start → store purchase → combat and local-session restore; CI installs Chromium. |
+| Browser smoke        | `npm start`                                                     | Verified welcome → character selection → ready run → store purchase → combat → Attack with migrated sprites. |
 
-This prototype is not a production deployment. It has provisional combat, progression, power-up, store, versioned local-session persistence, and non-fatal sound playback; music controls, CI, browser E2E, and deployment remain unresolved.
+This prototype is not a production deployment. It has provisional combat, progression, power-up, store, versioned local-session persistence, non-fatal sound playback, and CI/browser journey gates; music controls and deployment remain unresolved.
 
 ## Runtime configuration
 

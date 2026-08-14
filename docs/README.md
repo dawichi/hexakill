@@ -14,6 +14,7 @@ This directory is the local operating manual for Hexakill and future AI develope
 -   [Current architecture](architecture/current-state.md) — verified runtime, source boundaries, state, persistence, integrations, and risks.
 -   [Gameplay loop](features/game-loop.md) — current user journey and implemented game rules, with known inconsistencies called out.
 -   [Operations](operations.md) — setup, commands, build/deployment evidence, and troubleshooting.
+-   [Deployment contract](architecture/rewrite-deployment.md) — proposed static output, hosting requirements, and release gate.
 -   [Asset inventory](assets.md) — retained assets, current prototype usage, and migration rules.
 -   [Standards assessment](standards-assessment.md) — rule-level evidence and compliance states.
 
