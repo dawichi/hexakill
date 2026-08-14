@@ -20,6 +20,7 @@ export interface CombatState {
 export type CombatEvent =
   | { readonly type: 'enemy-spawned'; readonly enemy: EnemyState }
   | { readonly type: 'player-action-started'; readonly kind: DamageKind }
+  | { readonly type: 'player-potion-used' }
   | { readonly type: 'player-action-resolved'; readonly result: DamageResult }
   | { readonly type: 'enemy-turn-started' }
   | {
@@ -89,6 +90,17 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
     }
 
     return { accepted: true, state };
+  }
+
+  if (event.type === 'player-potion-used') {
+    if (state.phase !== 'awaiting-player-action' || !state.enemy) {
+      return rejected(state, 'A potion cannot be used in the current combat phase.');
+    }
+
+    return {
+      accepted: true,
+      state: { ...state, phase: 'enemy-turn', pendingAction: null, lastResult: null },
+    };
   }
 
   if (event.type === 'enemy-action-resolved') {

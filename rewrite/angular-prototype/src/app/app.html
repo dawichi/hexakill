@@ -218,6 +218,15 @@
                 Magic
                 <span>Magic damage · 30–200%</span>
               </button>
+              <button
+                class="action-button potion"
+                type="button"
+                [disabled]="!session.canAct() || !player.potions"
+                (click)="session.usePotion()"
+              >
+                Potion
+                <span>Heal 20% of damage received · {{ player.potions }} left</span>
+              </button>
             </div>
 
             @if (session.combatStatus() === 'defeated') {
@@ -330,6 +339,23 @@
               </button>
             }
           </div>
+        </section>
+      }
+    }
+
+    @case ('game-over') {
+      @if (session.player(); as player) {
+        <section class="panel game-over" aria-labelledby="game-over-title">
+          <p class="eyebrow">Run ended</p>
+          <h2 id="game-over-title">Game over.</h2>
+          <p class="lead">
+            {{ player.name }} reached level {{ player.level }} with {{ player.bossesDefeated }} boss
+            {{ player.bossesDefeated === 1 ? 'defeat' : 'defeats' }}.
+          </p>
+          <p class="validation" role="alert">{{ session.combatMessage() }}</p>
+          <button class="primary-button" type="button" (click)="session.reset()">
+            Start a new run
+          </button>
         </section>
       }
     }

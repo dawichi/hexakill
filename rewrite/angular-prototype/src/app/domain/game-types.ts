@@ -32,7 +32,7 @@ export interface CharacterDefinition {
 export interface EnemyDefinition {
   readonly id: string;
   readonly name: string;
-  readonly archetype: 'basic' | 'ad' | 'ap' | 'tank';
+  readonly archetype: 'basic' | 'ad' | 'ap' | 'tank' | 'boss';
   readonly modifiers: Stats;
   readonly idleAsset: string;
 }
@@ -47,6 +47,7 @@ export interface PlayerState {
   readonly gold: number;
   readonly inventory: readonly ItemState[];
   readonly powerUps: PowerUpState;
+  readonly bossesDefeated: number;
 }
 
 export interface EnemyState {

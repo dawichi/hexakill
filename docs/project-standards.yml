@@ -72,9 +72,9 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: gap
-      evidence: No automated test or validation suite is defined for the legacy root package; the isolated rewrite prototype has an initial suite but not full journey coverage.
+      evidence: The legacy root has no suite; the Angular rewrite has 10 test files, 36 passing tests, and Playwright journeys, but not complete gameplay coverage.
       priority: high
-      next_action: Add a deterministic rules-engine baseline in the rewrite foundation.
+      next_action: Extend rewrite journeys to defeat, rewards, bosses, and game-over before promotion.
     - id: TS-001
       status: partial
       evidence: tsconfig.json enables strict, but the supported check script fails before checking because jsconfig.json is missing.
@@ -87,9 +87,9 @@ compliance:
       next_action: Select the legacy root baseline or retire it in favor of the isolated rewrite workspace.
     - id: CI-001
       status: gap
-      evidence: No CI workflow or other pipeline configuration was found.
+      evidence: .github/workflows/angular-rewrite.yml validates rewrite/docs changes with frozen install, formatting, tests, browser journeys, build, and asset checks; the legacy root is intentionally out of scope.
       priority: high
-      next_action: Add CI after the local validation commands are made reliable.
+      next_action: Add audit/report retention and keep the workflow aligned with top-level promotion.
     - id: A11Y-002
       status: gap
       evidence: svelte-check and source review identify non-keyboard tooltip/store interactions.

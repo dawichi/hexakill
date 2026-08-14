@@ -36,7 +36,7 @@ describe('GameSessionService', () => {
     service.findEnemy();
 
     expect(service.screen()).toBe('combat');
-    expect(service.enemy()?.definition.name).toBe('Slime Blue');
+    expect(service.enemy()?.definition.name).toBe('Adventurer');
     expect(service.enemy()?.level).toBe(2);
 
     service.attack('attack');
@@ -50,5 +50,9 @@ describe('GameSessionService', () => {
 
     expect(service.combatState().phase).toBe('awaiting-player-action');
     expect(service.playerRemainingHealth()).toBeLessThan(200);
+
+    service.usePotion();
+    expect(service.player()?.potions).toBe(4);
+    expect(service.combatState().phase).toBe('enemy-turn');
   });
 });

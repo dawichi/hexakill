@@ -13,7 +13,8 @@ import { CharacterDefinition, PlayerState } from '../domain/game-types';
 import { RANDOM_SOURCE, RandomSource } from './random';
 import { SESSION_STORAGE, SessionStoragePort } from './storage';
 
-export type GameScreen = 'welcome' | 'character-select' | 'combat-ready' | 'combat' | 'store';
+export type GameScreen =
+  'welcome' | 'character-select' | 'combat-ready' | 'combat' | 'store' | 'game-over';
 
 interface StoredSessionSnapshot {
   readonly version: 1;
@@ -49,6 +50,7 @@ function isRestorablePlayer(value: unknown): value is PlayerState {
     typeof value['experience'] === 'number' &&
     typeof value['potions'] === 'number' &&
     typeof value['gold'] === 'number' &&
+    typeof value['bossesDefeated'] === 'number' &&
     Array.isArray(value['inventory']) &&
     isRecord(powerUps) &&
     typeof powerUps['pending'] === 'number' &&
@@ -161,7 +163,7 @@ export class GameSessionService {
 
     this.applyCombatEvent({
       type: 'enemy-spawned',
-      enemy: generateEnemy(player.level, this.random(), this.random()),
+      enemy: generateEnemy(player.level, this.random(), this.random(), player.bossesDefeated),
     });
     this.combatMessage.set('The enemy has appeared. Choose an action.');
     this.screen.set('combat');
@@ -250,6 +252,24 @@ export class GameSessionService {
     }
   }
 
+  usePotion(): void {
+    const player = this.player();
+    const enemy = this.enemy();
+    if (!player || !enemy || !this.canAct() || player.potions <= 0) return;
+
+    const healed = Math.trunc(this.combatState().playerDamageTaken * 0.2);
+    if (!this.applyCombatEvent({ type: 'player-potion-used' })) return;
+
+    this.player.set({ ...player, potions: player.potions - 1 });
+    this.combatState.update((state) => ({
+      ...state,
+      playerDamageTaken: Math.max(0, state.playerDamageTaken - healed),
+    }));
+    this.combatMessage.set(`You used a potion and healed ${healed} HP.`);
+    this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
+    this.clock.schedule(() => this.resolveEnemyTurn(), 300);
+  }
+
   choosePowerUp(type: Parameters<typeof applyPowerUp>[1]): void {
     const player = this.player();
     if (!player) return;
@@ -323,6 +343,10 @@ export class GameSessionService {
       playerDamageTaken,
       playerHealth: player.stats.health,
     });
+    if (this.combatState().phase === 'defeat') {
+      this.screen.set('game-over');
+      this.combatMessage.set('You have been defeated. Start a new run to try again.');
+    }
   }
 
   get characters(): readonly CharacterDefinition[] {
@@ -377,7 +401,13 @@ export class GameSessionService {
       if (snapshot.player) {
         this.player.set(snapshot.player);
         this.combatState.set(snapshot.combatState);
-        this.screen.set(snapshot.screen === 'combat' ? 'combat' : 'combat-ready');
+        this.screen.set(
+          snapshot.screen === 'combat'
+            ? 'combat'
+            : snapshot.screen === 'game-over'
+              ? 'game-over'
+              : 'combat-ready',
+        );
         this.combatMessage.set('Your saved run was restored.');
       }
     } catch {

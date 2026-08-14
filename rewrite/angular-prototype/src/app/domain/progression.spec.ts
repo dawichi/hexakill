@@ -42,4 +42,12 @@ describe('progression rules', () => {
     expect(poweredPlayer.powerUps.pending).toBe(0);
     expect(poweredPlayer.powerUps.history.health).toBe(1);
   });
+
+  it('records sequential boss progress in the player run', () => {
+    const boss = generateEnemy(10, 0, 0, 0);
+    const bossPlayer = { ...player, level: 10 };
+    const rewardedPlayer = applyVictoryReward(bossPlayer, boss);
+
+    expect(rewardedPlayer.bossesDefeated).toBe(1);
+  });
 });

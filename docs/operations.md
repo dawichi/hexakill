@@ -35,10 +35,10 @@ The isolated rewrite is the currently validated implementation surface. Run thes
 | Purpose              | Command                                                         | Current result                                                                 |
 | -------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | Clean install        | `npm ci`                                                        | Passes with the committed `package-lock.json`.                                 |
-| Unit/component tests | `npm test -- --watch=false --no-progress`                       | Passes: 10 files, 33 tests.                                                     |
+| Unit/component tests | `npm test -- --watch=false --no-progress`                       | Passes: 10 files, 36 tests.                                                     |
 | Production build     | `npm run build`                                                 | Passes; the Angular production budget is clean.                                |
 | Formatting           | `npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'` | Passes.                                                                        |
-| CI validation        | `.github/workflows/angular-rewrite.yml`                         | Added; runs install, formatting, tests, build, and representative asset checks on rewrite/docs changes. |
+| CI validation        | `.github/workflows/angular-rewrite.yml`                         | Added; runs install, formatting, tests, browser journeys, build, and representative/full idle-asset checks on rewrite/docs changes. |
 | Browser journeys     | `npm run test:e2e`                                               | Passes locally: 2 Chromium journeys cover start → store purchase → combat and local-session restore; CI installs Chromium. |
 | Browser smoke        | `npm start`                                                     | Verified welcome → character selection → ready run → store purchase → combat → Attack with migrated sprites. |
 
@@ -50,7 +50,7 @@ No `.env.example`, runtime environment schema, server endpoint, API key, databas
 
 ## Deployment evidence
 
-The root README links to `https://hexakill.vercel.app`, and `.gitignore` contains `.vercel`, but there is no Vercel project configuration, adapter selection, CI workflow, deployment script, headers/redirects policy, or verified deployment record in the repository. Treat the hosting target and current availability as unknown until checked outside the repository.
+The root README links to `https://hexakill.vercel.app`, and `.gitignore` contains `.vercel`, but there is no Vercel project configuration, adapter selection, deployment script, headers/redirects policy, or verified deployment record in the repository. The rewrite has a scoped CI workflow, but hosting remains unknown until checked outside the repository.
 
 `@sveltejs/adapter-auto` is configured, so deployment output is intentionally not pinned to a concrete platform in source. A future deployment decision must select the adapter/output mode, document static versus server behavior, and verify the production-like build.
 
@@ -61,4 +61,4 @@ The root README links to `https://hexakill.vercel.app`, and `.gitignore` contain
 3. Run `npx svelte-kit sync`, then the direct type check.
 4. Repair the package scripts and formatter/build dependency graph.
 5. Add deterministic domain tests before changing gameplay behavior.
-6. Add CI only after the local commands are stable.
+6. Run the rewrite CI-equivalent gates, then add audit/report retention before accepting a deployment provider.

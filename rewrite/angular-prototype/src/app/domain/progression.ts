@@ -61,6 +61,7 @@ export function applyVictoryReward(player: PlayerState, enemy: EnemyState): Play
       ...player.powerUps,
       pending: player.powerUps.pending + reward.powerUpsGranted,
     },
+    bossesDefeated: player.bossesDefeated + (enemy.definition.archetype === 'boss' ? 1 : 0),
   };
 }
 

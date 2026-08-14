@@ -7,14 +7,14 @@ The current prototype contains:
 - an accessible welcome screen;
 - typed character selection for Wizard, Samurai, and Warrior;
 - an in-memory session service using Angular signals;
-- a typed enemy catalog and deterministic level/gold generator;
+- a complete typed legacy enemy roster with deterministic level/gold generation and sequential Gold Slime bosses;
 - a combat rules module independent from Angular components;
 - an explicit pure combat state machine and injectable clock boundary;
-- the first Attack/Magic combat actions; and
+- Attack, Magic, and Potion combat actions; and
 - enemy turns, defeat handling, provisional victory rewards, power-ups, and an in-memory store; and
 - deterministic Vitest coverage for enemy generation, damage, resistance, critical hits, misses, health caps, combat transitions, progression, and purchases.
 
-Persistence and sound playback now exist behind provisional injectable boundaries; music controls, browser end-to-end tests, CI, and production deployment remain unresolved. Enemy stat scaling, rewards, power-up limits, store effects, persistence schema, and audio lifecycle are characterization decisions, not final product behavior. See the parent project's [development handoff](../../docs/handoff.md) for the exact continuation boundary.
+Persistence and sound playback now exist behind provisional injectable boundaries; music controls and production deployment remain unresolved. Enemy stat scaling, rewards, power-up limits, store effects, persistence schema, and audio lifecycle are characterization decisions, not final product behavior. See the parent project's [development handoff](../../docs/handoff.md) for the exact continuation boundary.
 
 ## Development server
 

@@ -26,7 +26,15 @@ describe('combat state transitions', () => {
 
     expect(transition.accepted).toBe(true);
     expect(transition.state.phase).toBe('awaiting-player-action');
-    expect(transition.state.enemy?.definition.name).toBe('Slime Blue');
+    expect(transition.state.enemy?.definition.name).toBe('Adventurer');
+  });
+
+  it('moves to the enemy turn after a player potion', () => {
+    const spawned = transitionCombat(INITIAL_COMBAT_STATE, { type: 'enemy-spawned', enemy });
+    const potion = transitionCombat(spawned.state, { type: 'player-potion-used' });
+
+    expect(potion.accepted).toBe(true);
+    expect(potion.state.phase).toBe('enemy-turn');
   });
 
   it('requires resolution after an action starts', () => {

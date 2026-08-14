@@ -46,3 +46,4 @@ jobs:
         run: |
           test -f dist/angular-prototype/browser/images/wizard/idle.gif
           test -f dist/angular-prototype/browser/sounds/attack.mp3
+          test "$(find dist/angular-prototype/browser/images -name idle.gif | wc -l | tr -d ' ')" -ge 21
