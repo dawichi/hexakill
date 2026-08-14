@@ -70,11 +70,11 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 ### TODO-007 [High] Version and validate browser persistence
 
--   **Status:** Deferred
+-   **Status:** Partially resolved
 -   **Affected area:** `src/lib/services/storage.service.ts`, volume preference handling
--   **Evidence:** `JSON.parse` is used without a schema/version check; no migration or invalid-data recovery exists.
+-   **Evidence:** The Angular prototype has a versioned `hexakill.angular.session.v1` envelope, injectable storage boundary, invalid-JSON clearing, and non-fatal browser storage failure handling. Full runtime schema validation and migration coverage remain missing.
 -   **Risk:** Old/corrupt local storage can crash or create invalid records and preferences.
--   **Next action:** Define a versioned storage envelope, runtime validation, migration policy, reset behavior, and tests with malformed values.
+-   **Next action:** Add runtime schema validation, migration policy, browser restore tests, and malformed-record fixtures.
 -   **Dependencies:** TODO-006
 -   **Owner:** Future rewrite agent
 -   **Target:** Before persistence is retained

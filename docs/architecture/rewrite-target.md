@@ -68,7 +68,7 @@ This is a design direction, not a claim about required field names. The exact mo
 3. Implement the domain state machine with injected randomness and time.
 4. Add versioned local-storage persistence with invalid-data recovery.
 5. Build the welcome/character-select/combat-ready/combat vertical slice in Angular. The current prototype covers this slice with typed enemy generation and first actions.
-6. Add victory rewards, progression, store, power-ups, game-over, audio playback, and complete asset mapping as separate slices; the prototype already contains provisional enemy turns and player defeat transitions.
+6. Add victory rewards, progression, store, power-ups, game-over, persistence, audio playback, and complete asset mapping as separate slices; the prototype contains provisional implementations for all except full music lifecycle and asset mapping.
 7. Add application transition tests, browser critical-journey tests, accessibility checks, production build validation, and deployment configuration.
 8. Retire the legacy Svelte implementation only after behavior and assets have an explicit migration/replacement record.
 

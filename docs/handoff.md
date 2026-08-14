@@ -25,11 +25,11 @@ The Angular application service coordinates signals and random input. Domain rul
 
 The combat slice also characterizes legacy speed ordering, enemy attack/magic/heal selection, fixed 20% healing, player damage, and defeat. The prototype now has provisional victory rewards, leveling, power-up allocation, and an in-memory store; these are characterization slices rather than accepted product balance.
 
-The prototype now consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields and copies the legacy `static/` tree into its Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is intentionally not implemented yet.
+The prototype now consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields and copies the legacy `static/` tree into its Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; sound playback is behind an injectable audio port, while music controls remain unresolved.
 
 ## Deliberate non-goals
 
-Persistence, audio playback, full asset mapping, CI, browser E2E tests, deployment, and final gameplay balancing remain unresolved. Do not infer final balance from the provisional combat, progression, or store slices.
+Full persistence validation, music controls, full asset mapping, CI, browser E2E tests, deployment, and final gameplay balancing remain unresolved. The prototype has a versioned local-session envelope and non-fatal audio playback, but these are still provisional.
 
 ## Known characterization points
 
@@ -41,10 +41,10 @@ Persistence, audio playback, full asset mapping, CI, browser E2E tests, deployme
 
 ## Next recommended session
 
-1. Characterize victory rewards, experience, leveling, and power-up allocation.
-2. Decide whether the rewrite keeps the current provisional turn delay or changes it; keep delayed behavior on the injected `Clock`.
-3. Review and accept/revise the provisional [store contract](architecture/rewrite-store.md) and progression formulas.
-4. Add browser critical-journey coverage for combat, defeat, rewards, and store purchases.
+1. Review and accept/revise the provisional [store contract](architecture/rewrite-store.md) and progression formulas.
+2. Add browser critical-journey coverage for persistence, combat, defeat, rewards, and store purchases.
+3. Decide music lifecycle/volume behavior and complete the asset provenance map.
+4. Add CI and deployment validation before the top-level migration.
 
 ## Validation at handoff
 
@@ -57,4 +57,4 @@ npm run build
 npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'
 ```
 
-The current verified result is a clean install, 8 test files with 31 passing tests, a passing production build, copied asset output, and passing formatting checks. Browser smoke should be repeated after the current progression/store UI changes.
+The current verified result is a clean install, 10 test files with 33 passing tests, a passing production build, copied asset output, and passing formatting checks. Browser smoke has covered the progression/store path; persistence and audio should receive dedicated browser coverage.

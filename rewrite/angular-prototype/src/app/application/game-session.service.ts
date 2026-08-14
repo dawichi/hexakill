@@ -1,4 +1,5 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { AUDIO, AudioPort } from './audio';
 import { BROWSER_CLOCK, CLOCK, Clock } from './clock';
 import { chooseEnemyAction, CombatAction, resolveAction } from '../domain/combat-actions';
 import { applyPowerUp, applyVictoryReward, calculateVictoryReward } from '../domain/progression';
@@ -7,8 +8,10 @@ import { generateEnemy } from '../domain/enemies';
 import { DamageKind, resolveDamage } from '../domain/combat-rules';
 import { INITIAL_COMBAT_STATE, CombatState, transitionCombat } from '../domain/combat-state';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
+import { ASSET_MANIFEST } from '../domain/assets';
 import { CharacterDefinition, PlayerState } from '../domain/game-types';
 import { RANDOM_SOURCE, RandomSource } from './random';
+import { SESSION_STORAGE, SessionStoragePort } from './storage';
 
 export type GameScreen = 'welcome' | 'character-select' | 'combat-ready' | 'combat' | 'store';
 
@@ -16,6 +19,8 @@ export type GameScreen = 'welcome' | 'character-select' | 'combat-ready' | 'comb
 export class GameSessionService {
   private readonly random: RandomSource = inject(RANDOM_SOURCE, { optional: true }) ?? Math.random;
   private readonly clock: Clock = inject(CLOCK, { optional: true }) ?? BROWSER_CLOCK;
+  private readonly storage: SessionStoragePort | null = inject(SESSION_STORAGE, { optional: true });
+  private readonly audio: AudioPort | null = inject(AUDIO, { optional: true });
   readonly screen = signal<GameScreen>('welcome');
   readonly playerName = signal('');
   readonly selectedCharacter = signal<CharacterDefinition | null>(null);
@@ -36,6 +41,11 @@ export class GameSessionService {
   readonly storePotions = STORE_POTIONS;
   readonly lastActionAt = signal<number | null>(null);
   readonly combatMessage = signal('');
+
+  constructor() {
+    this.restore();
+    effect(() => this.persist());
+  }
   readonly validationMessage = computed(() => {
     const name = this.playerName().trim();
 
@@ -113,6 +123,9 @@ export class GameSessionService {
     const result = purchaseItem(player, itemId);
     this.player.set(result.player);
     this.combatMessage.set(result.purchased ? result.message : result.reason);
+    this.audio?.playSound(
+      result.purchased ? ASSET_MANIFEST.sounds.coin : ASSET_MANIFEST.sounds.error,
+    );
   }
 
   buyPotions(offerId: string): void {
@@ -121,6 +134,9 @@ export class GameSessionService {
     const result = purchasePotions(player, offerId);
     this.player.set(result.player);
     this.combatMessage.set(result.purchased ? result.message : result.reason);
+    this.audio?.playSound(
+      result.purchased ? ASSET_MANIFEST.sounds.potion : ASSET_MANIFEST.sounds.error,
+    );
   }
 
   attack(kind: DamageKind): void {
@@ -135,6 +151,9 @@ export class GameSessionService {
       return;
     }
     this.lastActionAt.set(this.clock.now());
+    this.audio?.playSound(
+      kind === 'attack' ? ASSET_MANIFEST.sounds.attack : ASSET_MANIFEST.sounds.magic,
+    );
 
     const result = resolveDamage({ stats: player.stats }, enemy, kind, {
       damageRoll: this.random(),
@@ -150,6 +169,7 @@ export class GameSessionService {
       this.combatMessage.set(
         `The ${enemy.definition.name} was defeated. You gained ${reward.experience} exp and ${reward.gold} gold.`,
       );
+      this.audio?.playSound(ASSET_MANIFEST.sounds.enemyKilled);
       return;
     }
 
@@ -184,6 +204,7 @@ export class GameSessionService {
     this.applyCombatEvent({ type: 'reset' });
     this.lastActionAt.set(null);
     this.combatMessage.set('');
+    this.storage?.clear();
   }
 
   private applyCombatEvent(event: Parameters<typeof transitionCombat>[1]): boolean {
@@ -226,6 +247,7 @@ export class GameSessionService {
           : null,
       }));
       this.combatMessage.set(`${enemy.definition.name} healed ${result.healed} HP.`);
+      this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
     } else {
       this.combatMessage.set(
         result.missed
@@ -245,5 +267,63 @@ export class GameSessionService {
 
   get characters(): readonly CharacterDefinition[] {
     return CHARACTER_DEFINITIONS;
+  }
+
+  private persist(): void {
+    if (!this.storage) return;
+
+    const phase = this.combatState().phase;
+    if (phase === 'resolving-player-action' || phase === 'enemy-turn') return;
+
+    if (this.screen() === 'welcome' && !this.player() && !this.playerName()) {
+      this.storage.clear();
+      return;
+    }
+
+    this.storage.write(
+      JSON.stringify({
+        version: 1,
+        screen:
+          this.screen() === 'store' ? (this.enemy() ? 'combat' : 'combat-ready') : this.screen(),
+        playerName: this.playerName(),
+        selectedCharacterId: this.selectedCharacter()?.id ?? null,
+        player: this.player(),
+        combatState: this.combatState(),
+      }),
+    );
+  }
+
+  private restore(): void {
+    const raw = this.storage?.read();
+    if (!raw) return;
+
+    try {
+      const snapshot = JSON.parse(raw) as {
+        version?: unknown;
+        screen?: unknown;
+        playerName?: unknown;
+        selectedCharacterId?: unknown;
+        player?: PlayerState | null;
+        combatState?: CombatState;
+      };
+      if (snapshot.version !== 1 || typeof snapshot.playerName !== 'string') {
+        this.storage?.clear();
+        return;
+      }
+
+      const character = CHARACTER_DEFINITIONS.find(
+        (item) => item.id === snapshot.selectedCharacterId,
+      );
+      if (character) this.selectedCharacter.set(character);
+      this.playerName.set(snapshot.playerName.slice(0, 14));
+      if (snapshot.player && snapshot.combatState) {
+        this.player.set(snapshot.player);
+        this.combatState.set(snapshot.combatState);
+        this.screen.set(snapshot.screen === 'combat' ? 'combat' : 'combat-ready');
+        this.combatMessage.set('Your saved run was restored.');
+      }
+    } catch {
+      this.storage?.clear();
+    }
   }
 }

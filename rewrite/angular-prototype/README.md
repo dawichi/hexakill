@@ -14,7 +14,7 @@ The current prototype contains:
 - enemy turns, defeat handling, provisional victory rewards, power-ups, and an in-memory store; and
 - deterministic Vitest coverage for enemy generation, damage, resistance, critical hits, misses, health caps, combat transitions, progression, and purchases.
 
-Persistence, audio playback, browser end-to-end tests, CI, and production deployment remain unresolved. Enemy stat scaling, rewards, power-up limits, and store effects are provisional characterization decisions, not final product balance. See the parent project's [development handoff](../../docs/handoff.md) for the exact continuation boundary.
+Persistence and sound playback now exist behind provisional injectable boundaries; music controls, browser end-to-end tests, CI, and production deployment remain unresolved. Enemy stat scaling, rewards, power-up limits, store effects, persistence schema, and audio lifecycle are characterization decisions, not final product behavior. See the parent project's [development handoff](../../docs/handoff.md) for the exact continuation boundary.
 
 ## Development server
 

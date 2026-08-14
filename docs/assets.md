@@ -13,7 +13,7 @@ The Angular prototype now carries a copy of the legacy asset tree under `rewrite
 -   Character definitions reference typed idle assets for Wizard, Samurai, and Warrior.
 -   The provisional enemy catalog references idle assets for Slime Blue, Archer, Evil Wizard, and Knight.
 -   `src/app/domain/assets.ts` centralizes music, sound, and item paths for future adapters.
--   The current UI uses idle character/enemy sprites. It does not yet play audio or render action/death animations.
+-   The current UI uses idle character/enemy sprites and the application port triggers bundled attack, magic, coin, potion, error, and enemy-killed sounds. Music playback, mute/volume controls, and action/death animations remain unresolved.
 
 ## Migration rules
 
