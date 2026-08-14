@@ -2,7 +2,7 @@
 
 This is the isolated Angular prototype for the Hexakill rewrite. It deliberately lives beside, rather than inside, the legacy SvelteKit application.
 
-The first slice contains:
+The current prototype contains:
 
 - an accessible welcome screen;
 - typed character selection for Wizard, Samurai, and Warrior;
@@ -11,9 +11,10 @@ The first slice contains:
 - a combat rules module independent from Angular components;
 - an explicit pure combat state machine and injectable clock boundary;
 - the first Attack/Magic combat actions; and
-- deterministic Vitest coverage for enemy generation, damage, resistance, critical hits, misses, and health caps.
+- enemy turns, defeat handling, provisional victory rewards, power-ups, and an in-memory store; and
+- deterministic Vitest coverage for enemy generation, damage, resistance, critical hits, misses, health caps, combat transitions, progression, and purchases.
 
-It does not yet implement enemy turns, victory rewards, the store, power-ups, persistence, audio, browser end-to-end tests, or production deployment. Enemy stat scaling intentionally preserves the legacy pre-boss formula while the rewrite rules are still being characterized. See the parent project's [development handoff](../../docs/handoff.md) for the exact continuation boundary.
+Persistence, audio playback, browser end-to-end tests, CI, and production deployment remain unresolved. Enemy stat scaling, rewards, power-up limits, and store effects are provisional characterization decisions, not final product balance. See the parent project's [development handoff](../../docs/handoff.md) for the exact continuation boundary.
 
 ## Development server
 

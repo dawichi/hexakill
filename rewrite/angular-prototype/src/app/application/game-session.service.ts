@@ -1,6 +1,8 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { BROWSER_CLOCK, CLOCK, Clock } from './clock';
 import { chooseEnemyAction, CombatAction, resolveAction } from '../domain/combat-actions';
+import { applyPowerUp, applyVictoryReward, calculateVictoryReward } from '../domain/progression';
+import { purchaseItem, purchasePotions, STORE_ITEMS, STORE_POTIONS } from '../domain/store';
 import { generateEnemy } from '../domain/enemies';
 import { DamageKind, resolveDamage } from '../domain/combat-rules';
 import { INITIAL_COMBAT_STATE, CombatState, transitionCombat } from '../domain/combat-state';
@@ -8,7 +10,7 @@ import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters
 import { CharacterDefinition, PlayerState } from '../domain/game-types';
 import { RANDOM_SOURCE, RandomSource } from './random';
 
-export type GameScreen = 'welcome' | 'character-select' | 'combat-ready' | 'combat';
+export type GameScreen = 'welcome' | 'character-select' | 'combat-ready' | 'combat' | 'store';
 
 @Injectable({ providedIn: 'root' })
 export class GameSessionService {
@@ -30,6 +32,8 @@ export class GameSessionService {
     return player ? Math.max(0, player.stats.health - this.combatState().playerDamageTaken) : 0;
   });
   readonly canAct = computed(() => this.combatState().phase === 'awaiting-player-action');
+  readonly storeItems = STORE_ITEMS;
+  readonly storePotions = STORE_POTIONS;
   readonly lastActionAt = signal<number | null>(null);
   readonly combatMessage = signal('');
   readonly validationMessage = computed(() => {
@@ -93,6 +97,32 @@ export class GameSessionService {
     this.screen.set('combat');
   }
 
+  openStore(): void {
+    if (!this.player() || (this.screen() === 'combat' && !this.canAct())) return;
+    this.screen.set('store');
+    this.combatMessage.set('');
+  }
+
+  closeStore(): void {
+    this.screen.set(this.enemy() ? 'combat' : 'combat-ready');
+  }
+
+  buyItem(itemId: string): void {
+    const player = this.player();
+    if (!player) return;
+    const result = purchaseItem(player, itemId);
+    this.player.set(result.player);
+    this.combatMessage.set(result.purchased ? result.message : result.reason);
+  }
+
+  buyPotions(offerId: string): void {
+    const player = this.player();
+    if (!player) return;
+    const result = purchasePotions(player, offerId);
+    this.player.set(result.player);
+    this.combatMessage.set(result.purchased ? result.message : result.reason);
+  }
+
   attack(kind: DamageKind): void {
     const player = this.player();
     const enemy = this.enemy();
@@ -114,6 +144,15 @@ export class GameSessionService {
 
     this.applyCombatEvent({ type: 'player-action-resolved', result });
 
+    if (defeated) {
+      const reward = calculateVictoryReward(player, enemy);
+      this.player.set(applyVictoryReward(player, enemy));
+      this.combatMessage.set(
+        `The ${enemy.definition.name} was defeated. You gained ${reward.experience} exp and ${reward.gold} gold.`,
+      );
+      return;
+    }
+
     if (result.missed) {
       this.combatMessage.set(`Your ${kind} missed.`);
     } else {
@@ -129,6 +168,12 @@ export class GameSessionService {
       this.combatMessage.set(`${this.combatMessage()} The enemy is preparing its turn.`);
       this.clock.schedule(() => this.resolveEnemyTurn(), 300);
     }
+  }
+
+  choosePowerUp(type: Parameters<typeof applyPowerUp>[1]): void {
+    const player = this.player();
+    if (!player) return;
+    this.player.set(applyPowerUp(player, type));
   }
 
   reset(): void {

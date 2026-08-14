@@ -21,6 +21,7 @@ This directory is the local operating manual for Hexakill and future AI develope
 
 -   [Framework evaluation](architecture/rewrite-evaluation.md) — Astro, Angular, and modern SvelteKit comparison for this game.
 -   [Target architecture proposal](architecture/rewrite-target.md) — proposed domain/application/UI boundaries and staged migration plan.
+-   [Provisional store contract](architecture/rewrite-store.md) — observed legacy offers and the current rewrite behavior awaiting product acceptance.
 -   [ADR index](adr/README.md) — durable decisions and decision candidates.
 
 ## Documentation rules

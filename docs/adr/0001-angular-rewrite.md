@@ -44,4 +44,4 @@ The future rewrite SHOULD follow the shared Angular application profile and MUST
 -   Keep the legacy app untouched while the Angular prototype grows.
 -   Characterize current gameplay before claiming behavioral parity.
 -   Decide deployment output/hosting separately; this ADR does not select a hosting platform.
--   Add an ADR for the store/progression contract before implementing the store.
+-   Review the provisional store/progression contract and add a durable ADR before production migration.

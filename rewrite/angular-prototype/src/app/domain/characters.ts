@@ -54,8 +54,11 @@ export function createInitialPlayer(name: string, character: CharacterDefinition
     name,
     character,
     level: 4,
+    experience: 0,
     stats: { ...BASE_STATS },
     potions: 5,
     gold: 2000,
+    inventory: [],
+    powerUps: { pending: 0, history: { health: 0, ad: 0, ap: 0, speed: 0 } },
   };
 }

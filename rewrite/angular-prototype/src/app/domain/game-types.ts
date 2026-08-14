@@ -4,6 +4,21 @@ export type Stat = 'health' | 'ad' | 'ap' | 'armor' | 'mr' | 'speed';
 
 export type Stats = Record<Stat, number>;
 
+export type PowerUpType = 'health' | 'ad' | 'ap' | 'speed';
+
+export interface PowerUpState {
+  readonly pending: number;
+  readonly history: Readonly<Record<PowerUpType, number>>;
+}
+
+export interface ItemState {
+  readonly id: string;
+  readonly name: string;
+  readonly price: number;
+  readonly bonus: Stats;
+  readonly asset: string;
+}
+
 export interface CharacterDefinition {
   readonly id: CharacterId;
   readonly name: string;
@@ -26,9 +41,12 @@ export interface PlayerState {
   readonly name: string;
   readonly character: CharacterDefinition;
   readonly level: number;
+  readonly experience: number;
   readonly stats: Stats;
   readonly potions: number;
   readonly gold: number;
+  readonly inventory: readonly ItemState[];
+  readonly powerUps: PowerUpState;
 }
 
 export interface EnemyState {

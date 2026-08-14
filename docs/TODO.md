@@ -37,25 +37,25 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 ### TODO-004 [High] Extract and characterize game rules
 
--   **Status:** Planned
+-   **Status:** Partially resolved
 -   **Affected area:** `src/lib/models/`, `src/lib/services/combat.service.ts`, `enemy.service.ts`, `utils.service.ts`, config files
--   **Evidence:** Randomness, mutable class instances, timers, and global stores are mixed with combat logic in the legacy app. The Angular prototype now has pure combat, enemy-generation, action-policy, and transition modules, but they do not yet establish full legacy parity.
+-   **Evidence:** Randomness, mutable class instances, timers, and global stores are mixed with combat logic in the legacy app. The Angular prototype now has pure combat, enemy-generation, action-policy, transition, progression, and store modules, but they do not yet establish full legacy parity.
 -   **Risk:** A rewrite can accidentally rebalance or change gameplay while appearing structurally cleaner.
--   **Next action:** Extend fixtures for progression, bosses, power-ups, and defeat/reset behavior; mark each rule intentional, suspicious, or obsolete before implementing those rewrite slices.
+-   **Next action:** Extend fixtures for bosses, persistence, reset behavior, and final balance; mark each rule intentional, suspicious, or obsolete before migration.
 -   **Dependencies:** Product review of current gameplay and TODO-005
 -   **Owner:** Tech Lead / gameplay owner
 -   **Target:** First rewrite design session
 
 ### TODO-005 [High] Decide store contract and item effects
 
--   **Status:** Planned
+-   **Status:** Partially resolved
 -   **Affected area:** `Store.svelte`, `StoreItem.svelte`, `CharacterModel.addItem`, inventory/stat display
--   **Evidence:** Purchases mutate inventory and show bonuses, but current combat calculations do not clearly apply item totals; user context says the store was never truly finished.
+-   **Evidence:** Legacy offers and bonuses were characterized. The Angular prototype has a documented provisional contract and pure purchase rules with immediate stat application, repeatable potion offers, one-time items, and immutable failure paths; product acceptance is still missing.
 -   **Risk:** Rewriting the store without a product contract preserves or removes progression accidentally.
--   **Next action:** Decide item effect timing, stat application, restocking, pricing, duplicate purchases, persistence across runs, and failure feedback; record in an ADR.
+-   **Next action:** Review [the provisional store contract](architecture/rewrite-store.md), decide item effect timing, restocking, persistence, and final balance, then record an ADR.
 -   **Dependencies:** TODO-004
 -   **Owner:** Product owner / Tech Lead
--   **Target:** Before store implementation
+-   **Target:** Before production migration
 
 ### TODO-006 [High] Introduce explicit domain state machine
 

@@ -35,12 +35,12 @@ The isolated rewrite is the currently validated implementation surface. Run thes
 | Purpose              | Command                                                         | Current result                                                                 |
 | -------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | Clean install        | `npm ci`                                                        | Passes with the committed `package-lock.json`.                                 |
-| Unit/component tests | `npm test -- --watch=false --no-progress`                       | Passes: 6 files, 25 tests.                                                     |
+| Unit/component tests | `npm test -- --watch=false --no-progress`                       | Passes: 8 files, 31 tests.                                                     |
 | Production build     | `npm run build`                                                 | Passes; the Angular production budget is clean.                                |
 | Formatting           | `npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'` | Passes.                                                                        |
 | Browser smoke        | `npm start`                                                     | Previously verified welcome → character selection → ready run → combat → Attack; repeat after current combat UI changes. |
 
-This prototype is not a production deployment. It intentionally has no persistence, store, enemy turns, progression, audio, CI, or deployment target yet.
+This prototype is not a production deployment. It has provisional in-memory combat, progression, power-up, and store behavior; persistence, audio, CI, browser E2E, and deployment remain unresolved.
 
 ## Runtime configuration
 

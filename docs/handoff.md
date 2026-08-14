@@ -23,13 +23,13 @@ The current vertical slice is:
 
 The Angular application service coordinates signals and random input. Domain rules do not import Angular. The `Clock` port exists and is injected at the application boundary; the provisional enemy turn uses it for a short presentation delay.
 
-The combat slice also characterizes legacy speed ordering, enemy attack/magic/heal selection, fixed 20% healing, player damage, and defeat. It remains provisional because full progression and product balancing are not yet accepted.
+The combat slice also characterizes legacy speed ordering, enemy attack/magic/heal selection, fixed 20% healing, player damage, and defeat. The prototype now has provisional victory rewards, leveling, power-up allocation, and an in-memory store; these are characterization slices rather than accepted product balance.
 
 The prototype now consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields and copies the legacy `static/` tree into its Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is intentionally not implemented yet.
 
 ## Deliberate non-goals
 
-Timers, potions, victory rewards, experience, leveling, store behavior, power-ups, persistence, audio playback, full asset mapping, CI, browser E2E tests, and deployment remain unresolved. Do not infer final balance from the provisional combat slice.
+Persistence, audio playback, full asset mapping, CI, browser E2E tests, deployment, and final gameplay balancing remain unresolved. Do not infer final balance from the provisional combat, progression, or store slices.
 
 ## Known characterization points
 
@@ -43,8 +43,8 @@ Timers, potions, victory rewards, experience, leveling, store behavior, power-up
 
 1. Characterize victory rewards, experience, leveling, and power-up allocation.
 2. Decide whether the rewrite keeps the current provisional turn delay or changes it; keep delayed behavior on the injected `Clock`.
-3. Create a separate ADR for store/progression before implementing purchases or rewards.
-4. Add browser critical-journey coverage after the state transitions stabilize.
+3. Review and accept/revise the provisional [store contract](architecture/rewrite-store.md) and progression formulas.
+4. Add browser critical-journey coverage for combat, defeat, rewards, and store purchases.
 
 ## Validation at handoff
 
@@ -57,4 +57,4 @@ npm run build
 npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'
 ```
 
-The current verified result is a clean install, 6 test files with 25 passing tests, a passing production build, copied asset output, and passing formatting checks. Browser smoke should be repeated after the current combat UI changes.
+The current verified result is a clean install, 8 test files with 31 passing tests, a passing production build, copied asset output, and passing formatting checks. Browser smoke should be repeated after the current progression/store UI changes.

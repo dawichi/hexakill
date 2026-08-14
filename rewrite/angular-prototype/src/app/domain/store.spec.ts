@@ -1,0 +1,36 @@
+import { describe, expect, it } from 'vitest';
+import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
+import { purchaseItem, purchasePotions } from './store';
+
+const player = createInitialPlayer('David', CHARACTER_DEFINITIONS[0]);
+
+describe('store rules', () => {
+  it('purchases an item once and applies its bonus immediately', () => {
+    const result = purchaseItem(player, 'sword');
+
+    expect(result.purchased).toBe(true);
+    if (!result.purchased) return;
+    expect(result.player.gold).toBe(1100);
+    expect(result.player.stats.ad).toBe(216);
+    expect(result.player.stats.speed).toBe(54);
+    expect(result.player.inventory).toHaveLength(1);
+    expect(purchaseItem(result.player, 'sword').purchased).toBe(false);
+  });
+
+  it('rejects unaffordable purchases without changing the player', () => {
+    const poorPlayer = { ...player, gold: 10 };
+    const result = purchaseItem(poorPlayer, 'orb');
+
+    expect(result.purchased).toBe(false);
+    expect(result.player).toBe(poorPlayer);
+  });
+
+  it('purchases potion offers with their configured quantity', () => {
+    const result = purchasePotions(player, 'potion-pack');
+
+    expect(result.purchased).toBe(true);
+    if (!result.purchased) return;
+    expect(result.player.gold).toBe(1600);
+    expect(result.player.potions).toBe(10);
+  });
+});

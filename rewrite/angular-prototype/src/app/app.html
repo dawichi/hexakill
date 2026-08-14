@@ -17,7 +17,8 @@
           Choose your champion
         </button>
         <p class="prototype-note">
-          Prototype scope: no persistence, store, audio, rewards, or progression yet.
+          Prototype scope: combat, progression, power-ups, and store are provisional; persistence
+          and audio are still pending.
         </p>
       </section>
     }
@@ -89,7 +90,12 @@
               <p class="eyebrow">Step 2 · run ready</p>
               <h2 id="combat-title">Welcome, {{ player.name }}.</h2>
             </div>
-            <button class="quiet-button" type="button" (click)="session.reset()">New run</button>
+            <div class="button-row">
+              <button class="quiet-button" type="button" (click)="session.openStore()">
+                Store
+              </button>
+              <button class="quiet-button" type="button" (click)="session.reset()">New run</button>
+            </div>
           </div>
 
           <div
@@ -139,7 +145,14 @@
                 <p class="eyebrow">Step 3 · combat</p>
                 <h2 id="combat-screen-title">{{ enemy.definition.name }} appears.</h2>
               </div>
-              <button class="quiet-button" type="button" (click)="session.reset()">New run</button>
+              <div class="button-row">
+                <button class="quiet-button" type="button" (click)="session.openStore()">
+                  Store
+                </button>
+                <button class="quiet-button" type="button" (click)="session.reset()">
+                  New run
+                </button>
+              </div>
             </div>
 
             <div class="combat-grid">
@@ -209,6 +222,45 @@
 
             @if (session.combatStatus() === 'defeated') {
               @if (session.combatState().phase === 'victory') {
+                @if (session.player(); as rewardedPlayer) {
+                  @if (rewardedPlayer.powerUps.pending > 0) {
+                    <div class="power-up-panel" aria-labelledby="power-up-title">
+                      <p class="eyebrow">Choose an upgrade</p>
+                      <h3 id="power-up-title">Power-up available</h3>
+                      <div class="power-up-grid">
+                        <button
+                          type="button"
+                          class="action-button"
+                          (click)="session.choosePowerUp('health')"
+                        >
+                          Health <span>+500</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="action-button"
+                          (click)="session.choosePowerUp('ad')"
+                        >
+                          Attack <span>+40</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="action-button"
+                          (click)="session.choosePowerUp('ap')"
+                        >
+                          Magic <span>+50</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="action-button"
+                          (click)="session.choosePowerUp('speed')"
+                        >
+                          Speed <span>+10</span>
+                        </button>
+                      </div>
+                      <p class="health-label">Pending: {{ rewardedPlayer.powerUps.pending }}</p>
+                    </div>
+                  }
+                }
                 <button class="primary-button" type="button" (click)="session.findEnemy()">
                   Find another enemy
                 </button>
@@ -221,6 +273,64 @@
             }
           </section>
         }
+      }
+    }
+
+    @case ('store') {
+      @if (session.player(); as player) {
+        <section class="panel" aria-labelledby="store-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Between turns · store</p>
+              <h2 id="store-title">Spend your gold.</h2>
+            </div>
+            <button class="quiet-button" type="button" (click)="session.closeStore()">
+              Close store
+            </button>
+          </div>
+          <p class="store-balance">
+            Gold: <strong>{{ player.gold }}</strong> · Potions:
+            <strong>{{ player.potions }}</strong>
+          </p>
+          <p class="combat-message" role="status">{{ session.combatMessage() }}</p>
+
+          <h3>Potions</h3>
+          <div class="store-grid">
+            @for (offer of session.storePotions; track offer.id) {
+              <button
+                class="store-card"
+                type="button"
+                [disabled]="player.gold < offer.price"
+                (click)="session.buyPotions(offer.id)"
+              >
+                <span class="item-sprite potion-icon" aria-hidden="true">♥</span>
+                <strong>{{ offer.name }}</strong>
+                <span
+                  >{{ offer.quantity }} potion{{ offer.quantity === 1 ? '' : 's' }} ·
+                  {{ offer.price }} gold</span
+                >
+              </button>
+            }
+          </div>
+
+          <h3>Items</h3>
+          <div class="store-grid">
+            @for (item of session.storeItems; track item.id) {
+              <button
+                class="store-card"
+                type="button"
+                [disabled]="
+                  player.gold < item.price || player.inventory.some((owned) => owned.id === item.id)
+                "
+                (click)="session.buyItem(item.id)"
+              >
+                <img class="item-sprite" [src]="item.asset" [alt]="item.name" />
+                <strong>{{ item.name }}</strong>
+                <span>{{ item.price }} gold</span>
+              </button>
+            }
+          </div>
+        </section>
       }
     }
   }
