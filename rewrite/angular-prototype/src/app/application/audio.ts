@@ -3,7 +3,10 @@ import { InjectionToken } from '@angular/core';
 export interface AudioPort {
   playSound(asset: string): void;
   playMusic(asset: string): void;
+  stopMusic(): void;
 }
+
+let currentMusic: HTMLAudioElement | null = null;
 
 export const BROWSER_AUDIO: AudioPort = {
   playSound: (asset) => {
@@ -17,13 +20,19 @@ export const BROWSER_AUDIO: AudioPort = {
   },
   playMusic: (asset) => {
     try {
+      currentMusic?.pause();
       const audio = new Audio(asset);
+      currentMusic = audio;
       audio.loop = true;
       audio.volume = 0.35;
       void audio.play().catch(() => undefined);
     } catch {
       // Audio is an enhancement and is safe to omit.
     }
+  },
+  stopMusic: () => {
+    currentMusic?.pause();
+    currentMusic = null;
   },
 };
 

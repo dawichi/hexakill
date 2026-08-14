@@ -130,6 +130,7 @@ export class GameSessionService {
 
   beginCharacterSelection(): void {
     this.screen.set('character-select');
+    this.audio?.playMusic(ASSET_MANIFEST.music.characterSelect);
   }
 
   setPlayerName(name: string): void {
@@ -152,6 +153,7 @@ export class GameSessionService {
     this.combatState.set(INITIAL_COMBAT_STATE);
     this.combatMessage.set('Find an enemy to begin combat.');
     this.screen.set('combat-ready');
+    this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
   }
 
   findEnemy(): void {
@@ -173,10 +175,12 @@ export class GameSessionService {
     if (!this.player() || (this.screen() === 'combat' && !this.canAct())) return;
     this.screen.set('store');
     this.combatMessage.set('');
+    this.audio?.playMusic(ASSET_MANIFEST.music.store);
   }
 
   closeStore(): void {
     this.screen.set(this.enemy() ? 'combat' : 'combat-ready');
+    this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
   }
 
   buyItem(itemId: string): void {
@@ -285,6 +289,7 @@ export class GameSessionService {
     this.lastActionAt.set(null);
     this.combatMessage.set('');
     this.storage?.clear();
+    this.audio?.stopMusic();
   }
 
   private applyCombatEvent(event: Parameters<typeof transitionCombat>[1]): boolean {
