@@ -127,7 +127,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Planned
 - **Affected area:** `static/images/`, `static/music/`, `static/sounds/`, fonts, CDN resources
-- **Evidence:** The repository contains 111 image files, 5 music tracks, 7 sound effects, and external CDN dependencies. The active Angular app consumes the retained `static/` tree through a typed manifest, but there is still no provenance/license manifest; the historical README advertised MIT without a tracked `LICENSE` file.
+- **Evidence:** The repository contains 111 image files, 5 music tracks, 7 sound effects, and external CDN dependencies. The active Angular app consumes the retained `static/` tree through typed idle/animation/item/audio paths, but there is still no provenance/license manifest; the historical README advertised MIT without a tracked `LICENSE` file.
 - **Risk:** Rewrite or redeploy can lose assets or create unreviewed licensing/privacy exposure.
 - **Next action:** Confirm the repository license with the owner, then complete the inventory in [assets.md](assets.md) with source, license, attribution requirement, dimensions/format, and intended replacement/optimization.
 - **Dependencies:** Product decision on retained visual identity

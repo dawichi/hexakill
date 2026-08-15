@@ -35,6 +35,8 @@ export interface EnemyDefinition {
   readonly archetype: 'basic' | 'ad' | 'ap' | 'tank' | 'boss';
   readonly modifiers: Stats;
   readonly idleAsset: string;
+  readonly attackAsset?: string;
+  readonly defeatAsset?: string;
 }
 
 export interface PlayerState {

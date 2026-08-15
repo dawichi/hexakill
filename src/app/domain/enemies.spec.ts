@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generateEnemy } from './enemies';
+import { enemyAssetFor, generateEnemy } from './enemies';
 
 describe('enemy generation', () => {
   it('selects a typed enemy and keeps the legacy level range', () => {
@@ -34,5 +34,12 @@ describe('enemy generation', () => {
   it('rejects invalid random rolls', () => {
     expect(() => generateEnemy(4, 1, 0.5)).toThrow(RangeError);
     expect(() => generateEnemy(4, 0.5, -0.1)).toThrow(RangeError);
+  });
+
+  it('uses observed attack and defeat assets, with idle fallback for other enemies', () => {
+    expect(enemyAssetFor('slime-blue', 'attack')).toBe('/images/slime-blue/attack.gif');
+    expect(enemyAssetFor('slime-blue', 'defeat')).toBe('/images/slime-blue/die.gif');
+    expect(enemyAssetFor('knight', 'attack')).toBe('/images/knight/idle.gif');
+    expect(enemyAssetFor('unknown', 'idle')).toBeUndefined();
   });
 });

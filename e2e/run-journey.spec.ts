@@ -74,8 +74,10 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   await wizardButton.focus();
   await page.keyboard.press('Enter');
   const startButton = page.getByRole('button', { name: 'Start game' });
+  await expect(startButton).toBeEnabled();
   await startButton.focus();
-  await page.keyboard.press('Enter');
+  await expect(startButton).toBeFocused();
+  await startButton.press('Enter');
   await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
 });
 

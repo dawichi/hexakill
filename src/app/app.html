@@ -201,7 +201,7 @@
                 <h3>{{ enemy.definition.name }}</h3>
                 <img
                   class="entity-sprite combat-sprite"
-                  [src]="enemy.definition.idleAsset"
+                  [src]="session.enemyAsset()"
                   [alt]="enemy.definition.name"
                 />
                 <p>

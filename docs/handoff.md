@@ -27,7 +27,7 @@ The combat slice also characterizes legacy speed ordering, enemy attack/magic/he
 
 Defeat now writes a validated, versioned local personal-record envelope through a separate storage port. The active contract preserves the legacy top-five descending-level behavior, shows records on welcome and game-over, and keeps them when a run is reset. The old `hxkllPersonalRecords` key is not auto-migrated; that is an explicit unresolved data decision in [the persistence contract](architecture/rewrite-persistence.md).
 
-The active app consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields and uses the retained root `static/` tree in its Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is behind an injectable audio port.
+The active app consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields and uses observed Evil Tree/slime attack and defeat GIFs through optional typed enemy animation fields. The retained root `static/` tree is copied into Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is behind an injectable audio port.
 
 ## Deliberate non-goals
 
@@ -46,7 +46,7 @@ Final persistence acceptance, deployment, and gameplay balancing remain unresolv
 1. Decide whether to migrate legacy `hxkllPersonalRecords` and whether records remain local-only; record the decision in an ADR.
 2. Complete the asset provenance map and accessibility review.
 3. Select an accepted hosting provider and run an authorized Angular preview.
-4. Review final gameplay balance, store effects, and the remaining 87 unmapped animation sources.
+4. Review final gameplay balance, store effects, and the remaining 75 unmapped animation sources.
 
 ## Validation at handoff
 
@@ -59,4 +59,4 @@ npm run build
 npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'
 ```
 
-The current verified result is a clean root install, 11 test files with 40 passing tests, a passing root production build, all 21 idle assets in the output, passing formatting checks, and seven Chromium journeys covering progression/store/combat, local-session restore, invalid-session recovery, keyboard start, potion-driven defeat and records, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
+The current verified result is a clean root install, 11 test files with 41 passing tests, a passing root production build, all 21 idle assets in the output, passing formatting checks, and seven Chromium journeys covering progression/store/combat, local-session restore, invalid-session recovery, keyboard start, potion-driven defeat and records, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.

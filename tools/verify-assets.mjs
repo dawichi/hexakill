@@ -30,6 +30,18 @@ const idleEntities = [
 
 const requiredAssets = [
   ...idleEntities.map((entity) => `images/${entity}/idle.gif`),
+  'images/evil-tree/attack.gif',
+  'images/evil-tree/die.gif',
+  'images/slime-blue/attack.gif',
+  'images/slime-blue/die.gif',
+  'images/slime-gold/attack.gif',
+  'images/slime-gold/die.gif',
+  'images/slime-green/attack.gif',
+  'images/slime-green/die.gif',
+  'images/slime-purple/attack.gif',
+  'images/slime-purple/die.gif',
+  'images/slime-red/attack.gif',
+  'images/slime-red/die.gif',
   'images/items/orb.png',
   'images/items/sword.png',
   'images/items/wand.png',

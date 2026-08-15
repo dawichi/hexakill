@@ -18,9 +18,15 @@ function enemy(
   archetype: EnemyDefinition['archetype'],
   idleAsset: string,
   enemyModifiers: Stats,
+  animationAssets: Pick<EnemyDefinition, 'attackAsset' | 'defeatAsset'> = {},
 ): EnemyDefinition {
-  return { id, name, archetype, modifiers: enemyModifiers, idleAsset };
+  return { id, name, archetype, modifiers: enemyModifiers, idleAsset, ...animationAssets };
 }
+
+const BLUE_SLIME_ANIMATIONS = {
+  attackAsset: '/images/slime-blue/attack.gif',
+  defeatAsset: '/images/slime-blue/die.gif',
+} as const;
 
 const BASIC_MODIFIERS = modifiers();
 const AD_MODIFIERS = modifiers({ health: 0.75, ad: 1.5, ap: 0.5, speed: 1.5 });
@@ -60,17 +66,39 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     '/images/bringer-of-death/idle.gif',
     BOSS_MODIFIERS,
   ),
-  enemy('evil-tree', 'Evil tree', 'ap', '/images/evil-tree/idle.gif', AP_MODIFIERS),
+  enemy('evil-tree', 'Evil tree', 'ap', '/images/evil-tree/idle.gif', AP_MODIFIERS, {
+    attackAsset: '/images/evil-tree/attack.gif',
+    defeatAsset: '/images/evil-tree/die.gif',
+  }),
   enemy('evil-wizard', 'Evil Wizard', 'ap', '/images/evil-wizard/idle.gif', AP_MODIFIERS),
   enemy('fire-knight', 'Fire knight', 'tank', '/images/fire-knight/idle.gif', TANK_MODIFIERS),
   enemy('fire-worm', 'Fire worm', 'ap', '/images/fire-worm/idle.gif', AP_MODIFIERS),
   enemy('knight', 'Knight', 'tank', '/images/knight/idle.gif', TANK_MODIFIERS),
   enemy('martial-hero', 'Martial Hero', 'ad', '/images/martial-hero/idle.gif', AD_MODIFIERS),
-  enemy('slime-blue', 'Slime Blue', 'basic', '/images/slime-blue/idle.gif', BASIC_MODIFIERS),
-  enemy('slime-red', 'Slime Red', 'basic', '/images/slime-red/idle.gif', BASIC_MODIFIERS),
-  enemy('slime-green', 'Slime Green', 'basic', '/images/slime-green/idle.gif', BASIC_MODIFIERS),
-  enemy('slime-purple', 'Slime Purple', 'ap', '/images/slime-purple/idle.gif', AP_MODIFIERS),
-  enemy('slime-gold', 'Slime Gold', 'basic', '/images/slime-gold/idle.gif', BOSS_MODIFIERS),
+  enemy(
+    'slime-blue',
+    'Slime Blue',
+    'basic',
+    '/images/slime-blue/idle.gif',
+    BASIC_MODIFIERS,
+    BLUE_SLIME_ANIMATIONS,
+  ),
+  enemy('slime-red', 'Slime Red', 'basic', '/images/slime-red/idle.gif', BASIC_MODIFIERS, {
+    attackAsset: '/images/slime-red/attack.gif',
+    defeatAsset: '/images/slime-red/die.gif',
+  }),
+  enemy('slime-green', 'Slime Green', 'basic', '/images/slime-green/idle.gif', BASIC_MODIFIERS, {
+    attackAsset: '/images/slime-green/attack.gif',
+    defeatAsset: '/images/slime-green/die.gif',
+  }),
+  enemy('slime-purple', 'Slime Purple', 'ap', '/images/slime-purple/idle.gif', AP_MODIFIERS, {
+    attackAsset: '/images/slime-purple/attack.gif',
+    defeatAsset: '/images/slime-purple/die.gif',
+  }),
+  enemy('slime-gold', 'Slime Gold', 'basic', '/images/slime-gold/idle.gif', BOSS_MODIFIERS, {
+    attackAsset: '/images/slime-gold/attack.gif',
+    defeatAsset: '/images/slime-gold/die.gif',
+  }),
   enemy(
     'water-priestess',
     'Water Priestess',
@@ -83,10 +111,34 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
 ];
 
 const BOSS_DEFINITIONS: readonly EnemyDefinition[] = [
-  enemy('gold-slime-1', 'Gold Slime 1', 'boss', '/images/slime-gold/idle.gif', BOSS_MODIFIERS),
-  enemy('gold-slime-2', 'Gold Slime 2', 'boss', '/images/slime-gold/idle.gif', BOSS_MODIFIERS),
-  enemy('gold-slime-3', 'Gold Slime 3', 'boss', '/images/slime-gold/idle.gif', BOSS_MODIFIERS),
+  enemy('gold-slime-1', 'Gold Slime 1', 'boss', '/images/slime-gold/idle.gif', BOSS_MODIFIERS, {
+    attackAsset: '/images/slime-gold/attack.gif',
+    defeatAsset: '/images/slime-gold/die.gif',
+  }),
+  enemy('gold-slime-2', 'Gold Slime 2', 'boss', '/images/slime-gold/idle.gif', BOSS_MODIFIERS, {
+    attackAsset: '/images/slime-gold/attack.gif',
+    defeatAsset: '/images/slime-gold/die.gif',
+  }),
+  enemy('gold-slime-3', 'Gold Slime 3', 'boss', '/images/slime-gold/idle.gif', BOSS_MODIFIERS, {
+    attackAsset: '/images/slime-gold/attack.gif',
+    defeatAsset: '/images/slime-gold/die.gif',
+  }),
 ];
+
+export function findEnemyDefinition(id: string): EnemyDefinition | undefined {
+  return [...ENEMY_DEFINITIONS, ...BOSS_DEFINITIONS].find((candidate) => candidate.id === id);
+}
+
+export function enemyAssetFor(
+  id: string,
+  animation: 'idle' | 'attack' | 'defeat',
+): string | undefined {
+  const definition = findEnemyDefinition(id);
+  if (!definition) return undefined;
+  if (animation === 'attack') return definition.attackAsset ?? definition.idleAsset;
+  if (animation === 'defeat') return definition.defeatAsset ?? definition.idleAsset;
+  return definition.idleAsset;
+}
 
 function assertRoll(roll: number): void {
   if (roll < 0 || roll >= 1) throw new RangeError('Random rolls must be in the range [0, 1).');

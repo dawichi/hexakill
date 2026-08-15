@@ -10,7 +10,12 @@ import {
   MAX_POWER_UPS_PER_STAT,
 } from '../domain/progression';
 import { purchaseItem, purchasePotions, STORE_ITEMS, STORE_POTIONS } from '../domain/store';
-import { ENEMY_DEFINITIONS, generateEnemy } from '../domain/enemies';
+import {
+  enemyAssetFor,
+  ENEMY_DEFINITIONS,
+  findEnemyDefinition,
+  generateEnemy,
+} from '../domain/enemies';
 import { DamageKind, resolveDamage } from '../domain/combat-rules';
 import { INITIAL_COMBAT_STATE, CombatState, transitionCombat } from '../domain/combat-state';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
@@ -158,6 +163,10 @@ export class GameSessionService {
   readonly player = signal<PlayerState | null>(null);
   readonly combatState = signal<CombatState>(INITIAL_COMBAT_STATE);
   readonly enemy = computed(() => this.combatState().enemy);
+  readonly enemyAnimation = signal<'idle' | 'attack' | 'defeat'>('idle');
+  readonly enemyAsset = computed(
+    () => enemyAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? '',
+  );
   readonly combatStatus = computed<'ready' | 'defeated'>(() =>
     this.combatState().phase === 'victory' || this.combatState().phase === 'defeat'
       ? 'defeated'
@@ -222,6 +231,7 @@ export class GameSessionService {
 
     this.player.set(createInitialPlayer(name, character));
     this.combatState.set(INITIAL_COMBAT_STATE);
+    this.enemyAnimation.set('idle');
     this.combatMessage.set('Find an enemy to begin combat.');
     this.screen.set('combat-ready');
     this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
@@ -238,6 +248,7 @@ export class GameSessionService {
       type: 'enemy-spawned',
       enemy: generateEnemy(player.level, this.random(), this.random(), player.bossesDefeated),
     });
+    this.enemyAnimation.set('idle');
     this.combatMessage.set('The enemy has appeared. Choose an action.');
     this.screen.set('combat');
   }
@@ -301,6 +312,7 @@ export class GameSessionService {
     this.applyCombatEvent({ type: 'player-action-resolved', result });
 
     if (defeated) {
+      this.enemyAnimation.set('defeat');
       const reward = calculateVictoryReward(player, enemy);
       this.player.set(applyVictoryReward(player, enemy));
       this.combatMessage.set(
@@ -362,6 +374,7 @@ export class GameSessionService {
     this.selectedCharacter.set(null);
     this.player.set(null);
     this.applyCombatEvent({ type: 'reset' });
+    this.enemyAnimation.set('idle');
     this.lastActionAt.set(null);
     this.combatMessage.set('');
     this.storage?.clear();
@@ -388,6 +401,7 @@ export class GameSessionService {
     }
 
     const action: CombatAction = chooseEnemyAction(enemy, this.random());
+    this.enemyAnimation.set('attack');
     const result = resolveAction(
       { stats: enemy.stats },
       enemy.damageTaken,
@@ -518,7 +532,18 @@ export class GameSessionService {
           character: character ?? snapshot.player.character,
           inventory,
         });
-        this.combatState.set(snapshot.combatState);
+        const restoredEnemy = snapshot.combatState.enemy;
+        this.combatState.set({
+          ...snapshot.combatState,
+          enemy: restoredEnemy
+            ? {
+                ...restoredEnemy,
+                definition:
+                  findEnemyDefinition(restoredEnemy.definition.id) ?? restoredEnemy.definition,
+              }
+            : null,
+        });
+        this.enemyAnimation.set('idle');
         this.screen.set(
           snapshot.screen === 'combat'
             ? 'combat'
