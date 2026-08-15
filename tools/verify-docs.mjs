@@ -68,6 +68,9 @@ const requiredCommands = [
   'verify:assets',
   'verify:docs',
   'verify:preview',
+  'verify:types',
+  'verify:toolchain',
+  'verify:release',
 ];
 for (const command of requiredCommands) {
   if (typeof packageJson.scripts?.[command] !== 'string') {

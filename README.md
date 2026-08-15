@@ -17,9 +17,13 @@ Open `http://localhost:4200/`. The main validation commands are:
 
 ```sh
 npm run format:check
+npm run verify:types
+npm run verify:docs
+npm run verify:assets
 npm test -- --watch=false --no-progress
 npm run test:e2e
 npm run build
+npm run verify:release
 ```
 
 The production artifact is written to `dist/hexakill/browser/` and includes the migrated `static/` image, music, and sound assets.
