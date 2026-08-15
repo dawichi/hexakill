@@ -25,6 +25,7 @@ The archived package retains SvelteKit, Vite, Tailwind, Flowbite-Svelte, Iconify
 
 - Use Node.js `24.19.0`, npm `11.17.0`, and the committed root `package-lock.json`.
 - `.nvmrc` selects Node.js `24.19.0`; the active package accepts only Node.js `24.x` from `24.19.0` onward.
+- Run `npm run verify:toolchain` before install/test work; CI installs and verifies the same npm version.
 - Use `npm ci`; do not update the lockfile with an unconstrained install during feature work.
 - `.npmrc` enables `engine-strict=true`.
 - The root `package.json` has no `preinstall`, `install`, or `postinstall` lifecycle hooks.

@@ -46,6 +46,7 @@ This file is the canonical project-specific instruction entry point for AI devel
 The archived Svelte source is not reproducible and is not the active application. Use the root Angular commands below:
 
 - Install: `npm ci`
+- Toolchain: `npm run verify:toolchain`
 - Formatting: `npm run format:check`
 - Documentation contract: `npm run verify:docs`
 - Asset manifest: `npm run verify:assets`
