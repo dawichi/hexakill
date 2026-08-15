@@ -146,6 +146,15 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
   await expect(
     page.evaluate(() => localStorage.getItem('hexakill.angular.records.v1')),
   ).resolves.toContain('Agent');
+
+  const clearRecordsButton = page.getByRole('button', { name: 'Clear records' });
+  await clearRecordsButton.focus();
+  await expect(clearRecordsButton).toBeFocused();
+  await clearRecordsButton.press('Enter');
+  await expect(page.getByText('No records yet.')).toBeVisible();
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.records.v1')),
+  ).resolves.toBeNull();
 });
 
 test('a victory grants progression and a power-up choice', async ({ page }) => {

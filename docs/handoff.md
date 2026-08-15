@@ -59,4 +59,4 @@ npm run build
 npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'
 ```
 
-The current verified result is a clean root install, 11 test files with 41 passing tests, a passing root production build, all 21 idle assets in the output, passing formatting checks, and seven Chromium journeys covering progression/store/combat, local-session restore, invalid-session recovery, keyboard start, potion-driven defeat and records, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
+The current verified result is a clean root install, 11 test files with 41 passing tests, a passing root production build, all 21 idle assets in the output, passing formatting checks, and seven Chromium journeys covering progression/store/combat, local-session restore, invalid-session recovery, keyboard start, keyboard game-over/reset and record clearing, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
