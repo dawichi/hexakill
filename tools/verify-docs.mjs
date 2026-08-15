@@ -47,6 +47,7 @@ const requiredIndexTargets = [
   'architecture/rewrite-persistence.md',
   'assets-provenance.md',
   'assets-sprite-sources.md',
+  'accessibility-review.md',
   'adr/README.md',
 ];
 

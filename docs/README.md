@@ -19,6 +19,7 @@ This directory is the local operating manual for Hexakill and future AI develope
 - [Asset inventory](assets.md) — retained assets, active Angular usage, and migration rules.
 - [Deferred sprite-source catalog](assets-sprite-sources.md) — exact retained sprite/sheet files awaiting frame and provenance mapping.
 - [Asset provenance register](assets-provenance.md) — evidence, unknown ownership/licensing, and release requirements.
+- [Accessibility review](accessibility-review.md) — automated/static evidence and the remaining manual review matrix.
 - [Standards assessment](standards-assessment.md) — rule-level evidence and compliance states.
 
 ## Future rewrite
