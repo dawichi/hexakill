@@ -6,6 +6,7 @@ import { CLOCK, Clock } from './clock';
 import { RANDOM_SOURCE } from './random';
 import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
 import { AUDIO, AudioPort } from './audio';
+import { SESSION_STORAGE, SessionStoragePort } from './storage';
 
 describe('GameSessionService', () => {
   let service: GameSessionService;
@@ -14,6 +15,7 @@ describe('GameSessionService', () => {
   let scheduledTask: (() => void) | undefined;
   let cancelled = false;
   let playedSounds: string[];
+  let sessionValue: string | null;
   const testClock: Clock = {
     now: () => 1234,
     schedule: (task) => {
@@ -26,6 +28,7 @@ describe('GameSessionService', () => {
   beforeEach(() => {
     rolls = [0, 0, 0.5, 0.5];
     recordsValue = null;
+    sessionValue = null;
     playedSounds = [];
     const recordsStorage: RecordsStoragePort = {
       read: () => recordsValue,
@@ -39,12 +42,18 @@ describe('GameSessionService', () => {
       setMusicVolume: () => undefined,
       setEffectsVolume: () => undefined,
     };
+    const sessionStorage: SessionStoragePort = {
+      read: () => sessionValue,
+      write: (value) => (sessionValue = value),
+      clear: () => (sessionValue = null),
+    };
     TestBed.configureTestingModule({
       providers: [
         GameSessionService,
         { provide: CLOCK, useValue: testClock },
         { provide: RANDOM_SOURCE, useValue: () => rolls.shift() ?? 0.5 },
         { provide: RECORDS_STORAGE, useValue: recordsStorage },
+        { provide: SESSION_STORAGE, useValue: sessionStorage },
         { provide: AUDIO, useValue: audio },
       ],
     });
@@ -158,6 +167,71 @@ describe('GameSessionService', () => {
     scheduledTask?.();
     expect(service.screen()).toBe('welcome');
     expect(service.player()).toBeNull();
+  });
+
+  it('discards snapshots with impossible terminal combat damage', () => {
+    sessionValue = JSON.stringify({
+      version: 1,
+      screen: 'game-over',
+      playerName: 'David',
+      selectedCharacterId: 'wizard',
+      player: {
+        name: 'David',
+        character: CHARACTER_DEFINITIONS[0],
+        level: 4,
+        experience: 0,
+        stats: { health: 200, ad: 200, ap: 60, armor: 20, mr: 20, speed: 50 },
+        potions: 5,
+        gold: 2000,
+        inventory: [],
+        powerUps: { pending: 0, history: { health: 0, ad: 0, ap: 0, speed: 0 } },
+        bossesDefeated: 0,
+        defeatedEnemies: [],
+      },
+      combatState: {
+        phase: 'defeat',
+        enemy: {
+          definition: {
+            id: 'adventurer',
+            name: 'Adventurer',
+            archetype: 'basic',
+            modifiers: { health: 1, ad: 1, ap: 1, armor: 1, mr: 1, speed: 1 },
+            idleAsset: '/images/adventurer/idle.gif',
+          },
+          level: 2,
+          stats: { health: 100, ad: 10, ap: 10, armor: 10, mr: 10, speed: 10 },
+          damageTaken: 0,
+          potions: 0,
+          gold: 125,
+        },
+        playerDamageTaken: 0,
+        pendingAction: null,
+        lastResult: null,
+      },
+    });
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        GameSessionService,
+        {
+          provide: SESSION_STORAGE,
+          useValue: {
+            read: () => sessionValue,
+            write: () => undefined,
+            clear: () => (sessionValue = null),
+          },
+        },
+        {
+          provide: RECORDS_STORAGE,
+          useValue: { read: () => null, write: () => undefined, clear: () => undefined },
+        },
+      ],
+    });
+    const restored = TestBed.inject(GameSessionService);
+
+    expect(restored.screen()).toBe('welcome');
+    expect(sessionValue).toBeNull();
   });
 
   it('lets a faster enemy take the opening turn', () => {

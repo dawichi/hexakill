@@ -211,7 +211,7 @@ function isRestorableCombatState(value: unknown): value is CombatState {
 }
 
 function hasCoherentSessionState(snapshot: Partial<StoredSessionSnapshot>): boolean {
-  const hasPlayer = snapshot.player !== null;
+  const hasPlayer = snapshot.player !== null && snapshot.player !== undefined;
   const hasEnemy = snapshot.combatState?.enemy !== null;
   const phase = snapshot.combatState?.phase;
 
@@ -228,10 +228,25 @@ function hasCoherentSessionState(snapshot: Partial<StoredSessionSnapshot>): bool
   }
 
   if (snapshot.screen === 'combat') {
-    return (phase === 'awaiting-player-action' || phase === 'victory') && hasEnemy;
+    if (!hasEnemy || !snapshot.combatState?.enemy) return false;
+
+    const enemyDefeated =
+      snapshot.combatState.enemy.damageTaken >= snapshot.combatState.enemy.stats.health;
+    return (
+      (phase === 'awaiting-player-action' && !enemyDefeated) ||
+      (phase === 'victory' && enemyDefeated)
+    );
   }
 
-  return snapshot.screen === 'game-over' && phase === 'defeat' && hasEnemy;
+  return (
+    snapshot.screen === 'game-over' &&
+    phase === 'defeat' &&
+    hasEnemy &&
+    snapshot.player !== null &&
+    snapshot.player !== undefined &&
+    snapshot.combatState !== undefined &&
+    snapshot.combatState.playerDamageTaken >= snapshot.player.stats.health
+  );
 }
 
 @Injectable({ providedIn: 'root' })
