@@ -699,22 +699,33 @@ export class GameSessionService {
 
     try {
       const snapshot = JSON.parse(raw) as Partial<StoredSessionSnapshot>;
+      const selectedCharacter = CHARACTER_DEFINITIONS.find(
+        (item) => item.id === snapshot.selectedCharacterId,
+      );
+      const playerCharacterId = isRecord(snapshot.player?.character)
+        ? snapshot.player.character['id']
+        : undefined;
+      const playerHealth = isRestorablePlayer(snapshot.player)
+        ? snapshot.player.stats.health
+        : null;
       if (
         snapshot.version !== 1 ||
         typeof snapshot.playerName !== 'string' ||
+        snapshot.selectedCharacterId === undefined ||
         !['welcome', 'character-select', 'combat-ready', 'combat', 'game-over'].includes(
           String(snapshot.screen),
         ) ||
         !isRestorableCombatState(snapshot.combatState) ||
-        (snapshot.player !== null && !isRestorablePlayer(snapshot.player))
+        (snapshot.player !== null && !isRestorablePlayer(snapshot.player)) ||
+        (snapshot.selectedCharacterId !== null && !selectedCharacter) ||
+        (playerCharacterId !== undefined && selectedCharacter?.id !== playerCharacterId) ||
+        (playerHealth !== null && snapshot.combatState.playerDamageTaken > playerHealth)
       ) {
         this.storage?.clear();
         return;
       }
 
-      const character = CHARACTER_DEFINITIONS.find(
-        (item) => item.id === snapshot.selectedCharacterId,
-      );
+      const character = selectedCharacter;
       if (character) this.selectedCharacter.set(character);
       this.playerName.set(snapshot.playerName.slice(0, 14));
       if (snapshot.player) {

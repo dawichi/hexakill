@@ -219,6 +219,24 @@ test('negative restored stats are discarded safely', async ({ page }) => {
   ).resolves.toBeNull();
 });
 
+test('a restored run with unbound character metadata is discarded safely', async ({ page }) => {
+  await startRun(page);
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.selectedCharacterId = null;
+  snapshot.player.character.modifiers.health = 9999;
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
+  ).resolves.toBeNull();
+});
+
 test('the start journey is operable with keyboard activation', async ({ page }) => {
   const chooseButton = page.getByRole('button', { name: 'Choose your champion' });
   await chooseButton.focus();
