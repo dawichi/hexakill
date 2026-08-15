@@ -19,7 +19,7 @@ The root Angular application now uses the retained `static/` tree directly. The 
 
 | Asset group                         | Retained files | Active typed/use boundary                                                                         | Remaining work                                             |
 | ----------------------------------- | -------------: | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| Character/enemy idle GIFs           |             21 | `CharacterDefinition.idleAsset`, `EnemyDefinition.idleAsset`, rendered in root combat/ready views | Verify dimensions and accessibility presentation           |
+| Character/enemy idle GIFs           |             21 | `CharacterDefinition.idleAsset`, `EnemyDefinition.idleAsset`, rendered in selection, ready, combat, and history views | Verify dimensions and accessibility presentation           |
 | Item images                         |              3 | `STORE_ITEMS[].asset`, rendered in the store and owned-equipment panels                         | Provenance/license record                                  |
 | Music tracks                        |              5 | `ASSET_MANIFEST.music`, application audio lifecycle                                               | Autoplay policy and failure handling                        |
 | Sound effects                       |              7 | `ASSET_MANIFEST.sounds`, injectable `AudioPort`                                                   | Failure handling and final feedback policy                  |

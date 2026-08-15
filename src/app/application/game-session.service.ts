@@ -546,6 +546,8 @@ export class GameSessionService {
       this.addPersonalRecord(player);
       this.screen.set('game-over');
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
+    } else {
+      this.enemyAnimation.set('idle');
     }
   }
 

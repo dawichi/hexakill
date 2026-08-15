@@ -15,7 +15,7 @@ The repository is an unfinished legacy application, not a clean foundation for i
 - `legacy/svelte/src/app.html` provided the legacy HTML document and CDN resources.
 - The active root uses `src/main.ts`, standalone Angular components, and `GameSessionService`.
 
-The application has one route and no URL-level route model for the game phases. Refreshing or opening the URL begins from the store initializer's `welcome` state; no session restoration is implemented.
+The archived Svelte application had one route and no URL-level route model for its game phases; its store initializer began from `welcome` and had no session restoration. The active Angular root also has one route, but restores a validated in-progress session from `hexakill.angular.session.v1` when one exists; URL-level phase routing is not implemented.
 
 ## Technology inventory
 

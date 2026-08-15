@@ -133,5 +133,9 @@ describe('GameSessionService', () => {
     expect(service.combatState().phase).toBe('enemy-turn');
     expect(service.combatMessage()).toContain('attacks first');
     expect(service.canAct()).toBe(false);
+
+    scheduledTask?.();
+    expect(service.combatState().phase).toBe('awaiting-player-action');
+    expect(service.enemyAnimation()).toBe('idle');
   });
 });

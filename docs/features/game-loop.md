@@ -1,39 +1,50 @@
-# Current Gameplay Loop
+# Gameplay Loop and Characterization Boundary
 
-**Status:** Observed legacy implementation, not a complete product specification. The active Angular behavior is a provisional rewrite contract and may intentionally differ where documented.
+**Status:** The legacy behavior and active Angular behavior are recorded separately. The Angular rules remain provisional until product balance and persistence decisions are accepted.
 
-## Journey
+## Active Angular journey
 
-1. `welcome` renders the instructions. Start loads saved volume preferences and moves to `champSelect`.
-2. `champSelect` accepts a name only when its length is 3–14 characters and offers Wizard, Samurai, or Warrior. Starting creates a level-4 `CharacterModel` and moves to `combat`.
-3. `combat` can spawn an enemy, open the store, show entity stats, logs, items, power-ups, and action buttons.
-4. A combat turn uses Attack, Magic, or Potion. Entity speed determines who acts first; the second action is delayed by two seconds. Defeat transitions are delayed again before the next state is visible.
-5. Defeating an enemy grants experience and gold, records the enemy, and can grant power-ups. The player can return to the combat screen and spawn another enemy.
-6. `store` displays two potion offers and the remaining item offers. Purchases mutate the character's gold, potions, or inventory and remove purchased items from the current session shop.
-7. Player defeat writes a local personal record and moves to `gameover`. Retry resets most session state and repopulates the item shop, then returns to `champSelect`.
+The root Angular application uses these screens:
 
-Keyboard shortcuts are currently implemented through window handlers: Space spawns a fight or retries, P opens/closes the store, A attacks, S uses magic, and D uses a potion. Power-up shortcuts use the number keys 1–4, but the handler does not guard unmapped keys.
+1. `welcome` displays the entry point, local personal records, and persistent audio controls.
+2. `character-select` accepts a trimmed name of 3–14 characters, renders Wizard, Samurai, and Warrior idle art, and starts a level-4 player.
+3. `combat-ready` displays the player, stats, owned equipment, store access, and enemy generation.
+4. `combat` displays the current enemy, idle/attack/defeat art where an asset is characterized, health, combat messages, actions, power-ups, and reset/store controls.
+5. `store` displays repeatable potion offers and one-time item offers. Purchased item art and bonuses are shown in the owned-equipment panel.
+6. `game-over` displays the defeat message, grouped defeated-enemy history, local personal records, and a new-run action.
 
-## Current rules observed in code
+The active UI relies on native buttons, inputs, and range controls. Legacy global keyboard shortcuts (`Space`, `P`, `A`, `S`, `D`, and power-up number keys) are not part of the current Angular contract; keyboard operation is currently characterized through native activation and browser journeys.
 
-- Character base level is 4.
-- Archived base stats were defined in `legacy/svelte/src/lib/models/config.ts`.
-- Archived character modifiers were defined in `legacy/svelte/src/lib/config/characters.ts`.
-- Enemy levels are generated from the player level, except for boss entries at thresholds 10, 20, and 30.
-- Attack and magic damage use random ranges, miss chances, critical chances, and resistance reduction.
-- Potions heal a portion of damage received and are limited by the entity's potion count.
-- Power-ups have four types and a maximum of six allocations per type in the UI.
-- Personal records are sorted by level and truncated to five entries in local storage.
+## Active combat sequencing
 
-The values above are implementation facts, not a balanced or approved game design. The rewrite MUST first decide which rules are intentional, which are bugs, and which are obsolete.
+- `findEnemy` generates a regular enemy from the observed level range or the next Gold Slime boss at levels 10, 20, and 30.
+- The active service compares player and enemy speed. The faster actor opens the encounter; a delayed enemy turn is scheduler-backed and the action controls remain disabled while it resolves.
+- Player Attack and Magic use the characterized random ranges, miss/critical rules, and resistance reduction. Potion use heals the observed truncated 20% of damage received and then gives the enemy a turn.
+- Enemy actions use the observed attack/magic/heal policy. The provisional delay is 300 ms through the injected `Clock` port.
+- Reset cancels pending delayed enemy work and guards stale callbacks with a run-generation token.
+- Victory applies provisional experience, gold, level, boss, power-up, and defeated-enemy-history updates. Pending power-ups must be chosen before another enemy can be generated.
+- Defeat writes a versioned local personal-record envelope and changes the screen to `game-over` after the enemy turn resolves.
 
-The active Angular implementation currently preserves the defeat-record and enemy-history behavior at safer boundaries: it writes a versioned local top-five list using stable character IDs, appends typed defeated-enemy entries to the run, groups history on game-over, and preserves records across run reset. These are provisional characterization contracts, not a decision that records must remain local-only; see [the persistence contract](../architecture/rewrite-persistence.md).
+## Active store behavior
 
-## Product gaps to clarify later
+- The store is reachable from a ready run or while an active combat is awaiting the player's action.
+- Items are one-time purchases and apply their provisional stat bonus immediately. The item remains represented in the player's inventory and is disabled in later store views.
+- Potion offers are repeatable while the player can afford them.
+- Closing the store returns to `combat-ready` when no enemy exists, otherwise to `combat`.
+- Store balance, item timing, health semantics, restocking, selling, and final acceptance remain open in [the provisional store contract](../architecture/rewrite-store.md).
 
-- Whether item bonuses are intended to affect effective combat stats; current code displays them but does not clearly apply them to combat calculations.
+## Legacy observations retained for comparison
+
+- The archived Svelte journey used `welcome`, `champSelect`, `combat`, `store`, and `gameover` views, plus global keyboard handlers.
+- The archived combat service used speed to choose the first actor, two-second delayed turns, mutable logs, and delayed defeat callbacks without explicit cancellation.
+- The archived game created a level-4 character, generated regular enemies from player-level ranges, consumed Gold Slime bosses in sequence, wrote unversioned top-five records, and grouped defeated-enemy history by image.
+- Archived formulas and configuration remain evidence in `legacy/svelte/src/lib/`; the Angular implementation is not assumed to be exact parity until each difference is classified.
+
+## Product gaps to clarify
+
+- Whether the provisional stat and reward values are accepted balance.
+- Whether item bonuses should change maximum/current health and every combat formula.
 - Whether the store should restock, persist purchases across runs, or become a progression system.
-- Whether bosses should be repeatable or consumed once per service instance.
-- Whether the active versioned local run should survive a browser refresh or be intentionally ephemeral.
-- Whether personal records should remain local-only or become account-backed.
-- Whether keyboard controls and audio behavior are required accessibility/product contracts or legacy conveniences.
+- Whether all historical sprite sheets and animation sources should be mapped into gameplay or explicitly deferred.
+- Whether personal records remain local-only or migrate from the legacy storage key/account-backed data.
+- Whether legacy shortcut keys should become an intentional accessibility/product contract.
