@@ -44,4 +44,14 @@ describe('store rules', () => {
     expect(second.player.gold).toBe(1800);
     expect(second.player.potions).toBe(7);
   });
+
+  it('rejects unknown item and potion offer identifiers without mutation', () => {
+    const itemResult = purchaseItem(player, 'unknown-item');
+    const potionResult = purchasePotions(player, 'unknown-offer');
+
+    expect(itemResult.purchased).toBe(false);
+    expect(itemResult.player).toBe(player);
+    expect(potionResult.purchased).toBe(false);
+    expect(potionResult.player).toBe(player);
+  });
 });

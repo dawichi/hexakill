@@ -58,6 +58,29 @@ describe('progression rules', () => {
     expect(rewardedPlayer.bossesDefeated).toBe(1);
   });
 
+  it('grants the legacy even-level power-up count after multiple levels', () => {
+    const boss = generateEnemy(10, 0, 0, 0);
+    const leveledPlayer = { ...player, level: 10 };
+    const reward = calculateVictoryReward(leveledPlayer, boss);
+
+    expect(reward.experience).toBe(150);
+    expect(reward.levelsGained).toBe(1);
+    expect(reward.powerUpsGranted).toBe(1);
+  });
+
+  it('caps newly granted power-ups at the global legacy maximum', () => {
+    const enemy = generateEnemy(10, 0, 0, 0);
+    const nearlyCappedPlayer = {
+      ...player,
+      powerUps: {
+        pending: 0,
+        history: { health: 6, ad: 6, ap: 6, speed: 5 },
+      },
+    };
+
+    expect(calculateVictoryReward(nearlyCappedPlayer, enemy).powerUpsGranted).toBe(1);
+  });
+
   it('records the defeated enemy and level for the game-over history', () => {
     const enemy = generateEnemy(4, 0, 0);
     const rewardedPlayer = applyVictoryReward(player, enemy);
