@@ -43,7 +43,7 @@ The Angular application is not a production deployment. It has provisional comba
 
 ## Runtime configuration
 
-No `.env.example`, runtime environment schema, server endpoint, API key, database, or deployment secret was found. The current game uses local browser APIs and bundled/static assets. The CDN resources in `src/app.html` are external runtime dependencies and should be reviewed for availability, integrity, licensing, and privacy before the rewrite.
+No `.env.example`, runtime environment schema, server endpoint, API key, database, or deployment secret was found. The current Angular game uses local browser APIs and bundled/static assets. The archived Svelte document included CDN resources under `legacy/svelte/src/app.html`; those are not active Angular runtime dependencies, but should remain part of the historical licensing/integrity review.
 
 ## Deployment evidence
 
