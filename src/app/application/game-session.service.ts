@@ -418,7 +418,9 @@ export class GameSessionService {
       this.combatMessage.set(
         `The ${enemy.definition.name} was defeated. You gained ${reward.experience} exp and ${reward.gold} gold.`,
       );
-      this.audio?.playSound(ASSET_MANIFEST.sounds.enemyKilled);
+      this.audio?.playSound(
+        reward.levelsGained > 0 ? ASSET_MANIFEST.sounds.levelUp : ASSET_MANIFEST.sounds.enemyKilled,
+      );
       return;
     }
 

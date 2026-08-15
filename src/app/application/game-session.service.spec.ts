@@ -5,6 +5,7 @@ import { GameSessionService } from './game-session.service';
 import { CLOCK, Clock } from './clock';
 import { RANDOM_SOURCE } from './random';
 import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
+import { AUDIO, AudioPort } from './audio';
 
 describe('GameSessionService', () => {
   let service: GameSessionService;
@@ -12,6 +13,7 @@ describe('GameSessionService', () => {
   let recordsValue: string | null;
   let scheduledTask: (() => void) | undefined;
   let cancelled = false;
+  let playedSounds: string[];
   const testClock: Clock = {
     now: () => 1234,
     schedule: (task) => {
@@ -24,10 +26,18 @@ describe('GameSessionService', () => {
   beforeEach(() => {
     rolls = [0, 0, 0.5, 0.5];
     recordsValue = null;
+    playedSounds = [];
     const recordsStorage: RecordsStoragePort = {
       read: () => recordsValue,
       write: (value) => (recordsValue = value),
       clear: () => (recordsValue = null),
+    };
+    const audio: AudioPort = {
+      playSound: (asset) => playedSounds.push(asset),
+      playMusic: () => undefined,
+      stopMusic: () => undefined,
+      setMusicVolume: () => undefined,
+      setEffectsVolume: () => undefined,
     };
     TestBed.configureTestingModule({
       providers: [
@@ -35,6 +45,7 @@ describe('GameSessionService', () => {
         { provide: CLOCK, useValue: testClock },
         { provide: RANDOM_SOURCE, useValue: () => rolls.shift() ?? 0.5 },
         { provide: RECORDS_STORAGE, useValue: recordsStorage },
+        { provide: AUDIO, useValue: audio },
       ],
     });
     service = TestBed.inject(GameSessionService);
@@ -99,6 +110,31 @@ describe('GameSessionService', () => {
     expect(service.screen()).toBe('game-over');
     expect(service.personalRecords()).toEqual([{ characterId: 'wizard', name: 'David', level: 4 }]);
     expect(recordsValue).toContain('"version":1');
+  });
+
+  it('plays the legacy level-up sound when a victory crosses a level', () => {
+    service.setPlayerName('David');
+    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
+    service.startRun();
+    service.findEnemy();
+
+    const player = service.player();
+    const enemy = service.enemy();
+    if (!player || !enemy) throw new Error('Expected an active player and enemy.');
+
+    service.player.set({ ...player, experience: 75 });
+    service.combatState.set({
+      phase: 'awaiting-player-action',
+      enemy: { ...enemy, stats: { ...enemy.stats, health: 1 } },
+      playerDamageTaken: 0,
+      pendingAction: null,
+      lastResult: null,
+    });
+
+    service.attack('attack');
+
+    expect(playedSounds).toContain('/sounds/levelup.mp3');
+    expect(playedSounds).not.toContain('/sounds/enemy_killed.mp3');
   });
 
   it('keeps records when the run is reset', () => {
