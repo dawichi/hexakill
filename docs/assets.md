@@ -13,7 +13,7 @@ The root Angular application now uses the retained `static/` tree directly. The 
 - Character definitions reference typed idle assets for Wizard, Samurai, and Warrior.
 - The enemy catalog references typed idle assets for all 18 observed enemy definitions, including the three sequential Gold Slime boss encounters.
 - `src/app/domain/assets.ts` centralizes music, sound, and item paths for future adapters.
-- The active root UI uses idle character/enemy sprites and item images. Observed Evil Tree and slime attack/defeat GIFs are now typed as optional enemy assets and selected during the corresponding provisional combat phases; all other enemies fall back to idle art. The application port triggers bundled attack, magic, coin, potion, error, and enemy-killed sounds plus welcome/character-select/dungeon/store music lifecycle. Accessible music/effects volume controls now persist in the Angular preferences envelope; autoplay policy, failure handling, mute labels, player action/death animation coverage, and final animation timing remain unresolved.
+- The active root UI uses idle character/enemy sprites and item images. Observed Evil Tree and slime attack/defeat GIFs are now typed as optional enemy assets and selected during the corresponding provisional combat phases; all other enemies fall back to idle art. The application port triggers bundled attack, magic, coin, potion, error, and enemy-killed sounds plus character-select/dungeon/boss/store music lifecycle. Accessible music/effects volume controls now persist in the Angular preferences envelope; autoplay policy, failure handling, mute labels, player action/death animation coverage, and final animation timing remain unresolved.
 
 ## Asset coverage evidence
 

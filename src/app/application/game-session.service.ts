@@ -307,13 +307,24 @@ export class GameSessionService {
       return;
     }
 
+    const spawnedEnemy = generateEnemy(
+      player.level,
+      this.random(),
+      this.random(),
+      player.bossesDefeated,
+    );
     this.applyCombatEvent({
       type: 'enemy-spawned',
-      enemy: generateEnemy(player.level, this.random(), this.random(), player.bossesDefeated),
+      enemy: spawnedEnemy,
     });
     this.enemyAnimation.set('idle');
     this.combatMessage.set('The enemy has appeared. Choose an action.');
     this.screen.set('combat');
+    this.audio?.playMusic(
+      spawnedEnemy.definition.archetype === 'boss'
+        ? ASSET_MANIFEST.music.boss
+        : ASSET_MANIFEST.music.dungeon,
+    );
   }
 
   openStore(): void {
