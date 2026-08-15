@@ -14,6 +14,7 @@ This directory is the local operating manual for Hexakill and future AI develope
 - [Current architecture](architecture/current-state.md) — verified runtime, source boundaries, state, persistence, integrations, and risks.
 - [Gameplay loop](features/game-loop.md) — current user journey and implemented game rules, with known inconsistencies called out.
 - [Operations](operations.md) — setup, commands, build/deployment evidence, and troubleshooting.
+- [Dependency inventory](dependencies.md) — active Angular graph, archived Svelte graph, and install trust policy.
 - [Deployment contract](architecture/rewrite-deployment.md) — proposed static output, hosting requirements, and release gate.
 - [Angular persistence contract](architecture/rewrite-persistence.md) — observed records behavior, active versioned keys, and migration unknowns.
 - [Asset inventory](assets.md) — retained assets, active Angular usage, and migration rules.

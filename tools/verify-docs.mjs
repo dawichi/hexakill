@@ -48,6 +48,7 @@ const requiredIndexTargets = [
   'assets-provenance.md',
   'assets-sprite-sources.md',
   'accessibility-review.md',
+  'dependencies.md',
   'adr/README.md',
 ];
 
