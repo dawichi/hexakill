@@ -99,6 +99,38 @@ if (deferredImageCount !== 61) {
   process.exit(1);
 }
 
+const sourceRegister = readFileSync(resolve(projectRoot, 'docs/assets-sprite-sources.md'), 'utf8');
+const catalogedDeferredImagePaths = new Set();
+for (const line of sourceRegister.split('\n')) {
+  const retainedFilesCell = line.split('|')[3] ?? '';
+  for (const match of retainedFilesCell.matchAll(/`([^`]+)`/g)) {
+    catalogedDeferredImagePaths.add(`images/${match[1]}`);
+  }
+}
+const actualDeferredImagePaths = new Set(
+  allImagePaths.filter((asset) => !activeImagePaths.has(asset)),
+);
+const missingFromSourceRegister = [...actualDeferredImagePaths].filter(
+  (asset) => !catalogedDeferredImagePaths.has(asset),
+);
+const staleInSourceRegister = [...catalogedDeferredImagePaths].filter(
+  (asset) => !actualDeferredImagePaths.has(asset),
+);
+if (missingFromSourceRegister.length > 0 || staleInSourceRegister.length > 0) {
+  console.error('The deferred asset register does not match the retained image tree.');
+  if (missingFromSourceRegister.length > 0) {
+    console.error(
+      `- Deferred files missing from docs/assets-sprite-sources.md: ${missingFromSourceRegister.join(', ')}`,
+    );
+  }
+  if (staleInSourceRegister.length > 0) {
+    console.error(
+      `- Catalog entries no longer present as deferred files: ${staleInSourceRegister.join(', ')}`,
+    );
+  }
+  process.exit(1);
+}
+
 const sourceAssetPaths = new Set();
 for (const sourcePath of listFiles(resolve(projectRoot, 'src/app'))) {
   const source = readFileSync(sourcePath, 'utf8');
@@ -127,5 +159,5 @@ if (undeclaredSourceAssets.length > 0 || missingSourceDeclarations.length > 0) {
 }
 
 console.log(
-  `Verified ${requiredAssets.length} active asset paths, ${deferredImageCount} cataloged deferred image sources, and source-reference parity under ${assetRoot}.`,
+  `Verified ${requiredAssets.length} active asset paths, ${deferredImageCount} exact deferred image sources, source-reference parity, and deferred-register parity under ${assetRoot}.`,
 );
