@@ -267,6 +267,9 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
   const gameOverHeading = page.getByRole('heading', { name: 'Game over.' });
   await expect(gameOverHeading).toBeVisible();
   await expect(gameOverHeading).toBeFocused();
+  const playerDefeat = page.getByRole('img', { name: 'Wizard defeat animation' });
+  await expect(playerDefeat).toBeVisible();
+  await expect(playerDefeat).toHaveCSS('background-image', /wizard/);
   await expect(page.getByRole('heading', { name: 'Enemies defeated' })).toBeVisible();
   await expect(page.locator('.enemy-history-row')).toContainText('Slime Blue');
   await expect(page.locator('.enemy-history-row')).toContainText('Levels: 3');

@@ -514,6 +514,22 @@
           <p class="validation" role="alert" aria-atomic="true">
             {{ session.combatMessage() }}
           </p>
+          @if (
+            session.playerAnimation() === 'defeat' && player.character.defeatAsset;
+            as defeatAsset
+          ) {
+            <span
+              class="entity-sprite game-over-sprite sprite-strip"
+              role="img"
+              [attr.aria-label]="player.character.name + ' defeat animation'"
+              [style.background-image]="'url(' + defeatAsset.src + ')'"
+              [style.background-size]="defeatAsset.frameCount * 100 + '% 100%'"
+              [style.aspect-ratio]="defeatAsset.frameWidth + ' / ' + defeatAsset.frameHeight"
+              [style.animation]="
+                'sprite-strip-play 900ms steps(' + defeatAsset.frameCount + ') 1 both'
+              "
+            ></span>
+          }
           @if (session.defeatedEnemySummary().length) {
             <section class="enemy-history" aria-labelledby="enemy-history-title">
               <h3 id="enemy-history-title">Enemies defeated</h3>

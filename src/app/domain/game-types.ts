@@ -35,6 +35,7 @@ export interface CharacterDefinition {
   readonly accent: 'blue' | 'red' | 'amber';
   readonly idleAsset: string;
   readonly actionAsset?: SpriteStripAsset;
+  readonly defeatAsset?: SpriteStripAsset;
 }
 
 export interface EnemyDefinition {

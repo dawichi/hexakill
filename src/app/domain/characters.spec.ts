@@ -23,4 +23,26 @@ describe('character asset contracts', () => {
       undefined,
     );
   });
+
+  it('records observed defeat-strip geometry for supported player animations', () => {
+    expect(
+      CHARACTER_DEFINITIONS.find((character) => character.id === 'wizard')?.defeatAsset,
+    ).toEqual({
+      src: '/images/wizard/sprites/Death.png',
+      frameWidth: 231,
+      frameHeight: 190,
+      frameCount: 7,
+    });
+    expect(
+      CHARACTER_DEFINITIONS.find((character) => character.id === 'samurai')?.defeatAsset,
+    ).toEqual({
+      src: '/images/samurai/Sprites/Death.png',
+      frameWidth: 200,
+      frameHeight: 200,
+      frameCount: 6,
+    });
+    expect(CHARACTER_DEFINITIONS.find((character) => character.id === 'warrior')?.defeatAsset).toBe(
+      undefined,
+    );
+  });
 });

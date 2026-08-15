@@ -216,7 +216,7 @@ export class GameSessionService {
   readonly combatState = signal<CombatState>(INITIAL_COMBAT_STATE);
   readonly enemy = computed(() => this.combatState().enemy);
   readonly enemyAnimation = signal<'idle' | 'attack' | 'defeat'>('idle');
-  readonly playerAnimation = signal<'idle' | 'action'>('idle');
+  readonly playerAnimation = signal<'idle' | 'action' | 'defeat'>('idle');
   readonly enemyAsset = computed(
     () => enemyAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? '',
   );
@@ -559,6 +559,7 @@ export class GameSessionService {
       playerHealth: player.stats.health,
     });
     if (this.combatState().phase === 'defeat') {
+      this.playerAnimation.set('defeat');
       this.addPersonalRecord(player);
       this.screen.set('game-over');
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
@@ -738,6 +739,11 @@ export class GameSessionService {
             : null,
         });
         this.enemyAnimation.set('idle');
+        this.playerAnimation.set(
+          snapshot.screen === 'game-over' && snapshot.combatState.phase === 'defeat'
+            ? 'defeat'
+            : 'idle',
+        );
         this.screen.set(
           snapshot.screen === 'combat'
             ? 'combat'

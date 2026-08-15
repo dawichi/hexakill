@@ -43,3 +43,19 @@ export const PLAYER_ACTION_ASSETS: Readonly<Partial<Record<CharacterId, SpriteSt
     frameCount: 6,
   },
 };
+
+/** Provisional single-row player defeat strips with observed frame geometry. */
+export const PLAYER_DEFEAT_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
+  wizard: {
+    src: '/images/wizard/sprites/Death.png',
+    frameWidth: 231,
+    frameHeight: 190,
+    frameCount: 7,
+  },
+  samurai: {
+    src: '/images/samurai/Sprites/Death.png',
+    frameWidth: 200,
+    frameHeight: 200,
+    frameCount: 6,
+  },
+};
