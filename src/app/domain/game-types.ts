@@ -6,6 +6,13 @@ export type Stats = Record<Stat, number>;
 
 export type PowerUpType = 'health' | 'ad' | 'ap' | 'speed';
 
+export interface SpriteStripAsset {
+  readonly src: string;
+  readonly frameWidth: number;
+  readonly frameHeight: number;
+  readonly frameCount: number;
+}
+
 export interface PowerUpState {
   readonly pending: number;
   readonly history: Readonly<Record<PowerUpType, number>>;
@@ -27,6 +34,7 @@ export interface CharacterDefinition {
   readonly modifiers: Stats;
   readonly accent: 'blue' | 'red' | 'amber';
   readonly idleAsset: string;
+  readonly actionAsset?: SpriteStripAsset;
 }
 
 export interface EnemyDefinition {

@@ -213,6 +213,7 @@ export class GameSessionService {
   readonly combatState = signal<CombatState>(INITIAL_COMBAT_STATE);
   readonly enemy = computed(() => this.combatState().enemy);
   readonly enemyAnimation = signal<'idle' | 'attack' | 'defeat'>('idle');
+  readonly playerAnimation = signal<'idle' | 'action'>('idle');
   readonly enemyAsset = computed(
     () => enemyAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? '',
   );
@@ -305,6 +306,7 @@ export class GameSessionService {
     this.player.set(createInitialPlayer(name, character));
     this.combatState.set(INITIAL_COMBAT_STATE);
     this.enemyAnimation.set('idle');
+    this.playerAnimation.set('idle');
     this.combatMessage.set('Find an enemy to begin combat.');
     this.screen.set('combat-ready');
     this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
@@ -328,6 +330,7 @@ export class GameSessionService {
       enemy: spawnedEnemy,
     });
     this.enemyAnimation.set('idle');
+    this.playerAnimation.set('idle');
     this.screen.set('combat');
     this.audio?.playMusic(
       spawnedEnemy.definition.archetype === 'boss'
@@ -388,6 +391,7 @@ export class GameSessionService {
     if (!this.applyCombatEvent({ type: 'player-action-started', kind })) {
       return;
     }
+    this.playerAnimation.set('action');
     this.lastActionAt.set(this.clock.now());
     this.audio?.playSound(
       kind === 'attack' ? ASSET_MANIFEST.sounds.attack : ASSET_MANIFEST.sounds.magic,
@@ -481,6 +485,7 @@ export class GameSessionService {
     this.player.set(null);
     this.applyCombatEvent({ type: 'reset' });
     this.enemyAnimation.set('idle');
+    this.playerAnimation.set('idle');
     this.lastActionAt.set(null);
     this.combatMessage.set('');
     this.storage?.clear();
@@ -551,6 +556,7 @@ export class GameSessionService {
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
     } else {
       this.enemyAnimation.set('idle');
+      this.playerAnimation.set('idle');
     }
   }
 

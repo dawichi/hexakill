@@ -1,4 +1,5 @@
 import { CharacterDefinition, CharacterId, PlayerState, Stats } from './game-types';
+import { PLAYER_ACTION_ASSETS } from './assets';
 
 export const BASE_STATS: Stats = {
   health: 200,
@@ -18,6 +19,7 @@ export const CHARACTER_DEFINITIONS: readonly CharacterDefinition[] = [
     modifiers: { health: 1, ad: 0.5, ap: 2, armor: 0.5, mr: 0.75, speed: 1.25 },
     accent: 'blue',
     idleAsset: '/images/wizard/idle.gif',
+    actionAsset: PLAYER_ACTION_ASSETS.wizard,
   },
   {
     id: 'samurai',
@@ -27,6 +29,7 @@ export const CHARACTER_DEFINITIONS: readonly CharacterDefinition[] = [
     modifiers: { health: 0.75, ad: 2, ap: 0.5, armor: 0.75, mr: 0.5, speed: 1.5 },
     accent: 'red',
     idleAsset: '/images/samurai/idle.gif',
+    actionAsset: PLAYER_ACTION_ASSETS.samurai,
   },
   {
     id: 'warrior',

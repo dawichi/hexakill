@@ -33,3 +33,19 @@ input:focus-visible {
   outline: 3px solid #67e8f9;
   outline-offset: 3px;
 }
+
+.sprite-strip {
+  width: 5rem;
+  background: no-repeat 0 0;
+  image-rendering: pixelated;
+}
+
+@keyframes sprite-strip-play {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 100% 0;
+  }
+}

@@ -49,7 +49,13 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
     'aria-valuemin',
     '0',
   );
-  await expect(page.getByRole('button', { name: 'Attack' })).toBeEnabled();
+  const attackButton = page.getByRole('button', { name: 'Attack' });
+  await expect(attackButton).toBeEnabled();
+  await attackButton.click();
+  const playerAction = page.locator('.sprite-strip');
+  await expect(playerAction).toBeVisible();
+  await expect(playerAction).toHaveAttribute('aria-label', 'Wizard action animation');
+  await expect(playerAction).toHaveCSS('background-image', /wizard/);
 });
 
 test('a run is restored after a browser reload', async ({ page }) => {
@@ -271,6 +277,7 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
 
 test('a victory grants progression and a power-up choice', async ({ page }) => {
   await startRun(page);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')))
     .toContain('Agent');
@@ -308,6 +315,7 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   await expect(attackButton).toBeFocused();
   await attackButton.press('Enter');
   await expect(page.getByText(/gained 100 exp and 100 gold/)).toBeVisible();
+  await expect(page.locator('.sprite-strip')).toHaveCSS('animation-name', 'none');
   await expect(page.getByText('Pending: 1')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Power-up available' })).toBeFocused();
   await expect(page.getByRole('button', { name: 'Find another enemy' })).toBeDisabled();

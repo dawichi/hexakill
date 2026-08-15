@@ -242,11 +242,35 @@
               <article class="combatant-card player-combatant">
                 <p class="eyebrow">You · level {{ player.level }}</p>
                 <h3>{{ player.name }} the {{ player.character.name }}</h3>
-                <img
-                  class="entity-sprite combat-sprite"
-                  [src]="player.character.idleAsset"
-                  [alt]="player.character.name"
-                />
+                @if (session.playerAnimation() === 'action') {
+                  @if (player.character.actionAsset; as actionAsset) {
+                    <span
+                      class="entity-sprite combat-sprite sprite-strip"
+                      role="img"
+                      [attr.aria-label]="player.character.name + ' action animation'"
+                      [style.background-image]="'url(' + actionAsset.src + ')'"
+                      [style.background-size]="actionAsset.frameCount * 100 + '% 100%'"
+                      [style.aspect-ratio]="
+                        actionAsset.frameWidth + ' / ' + actionAsset.frameHeight
+                      "
+                      [style.animation]="
+                        'sprite-strip-play 600ms steps(' + actionAsset.frameCount + ') 1 both'
+                      "
+                    ></span>
+                  } @else {
+                    <img
+                      class="entity-sprite combat-sprite"
+                      [src]="player.character.idleAsset"
+                      [alt]="player.character.name"
+                    />
+                  }
+                } @else {
+                  <img
+                    class="entity-sprite combat-sprite"
+                    [src]="player.character.idleAsset"
+                    [alt]="player.character.name"
+                  />
+                }
                 <p>
                   {{ session.playerRemainingHealth() }} / {{ player.stats.health }} health ·
                   {{ player.stats.ad }} attack · {{ player.stats.ap }} magic

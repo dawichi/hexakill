@@ -1,3 +1,5 @@
+import { CharacterId, SpriteStripAsset } from './game-types';
+
 export const ASSET_MANIFEST = {
   music: {
     welcome: '/music/welcome.mp3',
@@ -21,3 +23,23 @@ export const ASSET_MANIFEST = {
     wand: '/images/items/wand.png',
   },
 } as const;
+
+/**
+ * Provisional single-row player action strips. The original files are retained
+ * historical art; the dimensions describe the observed files, not a product
+ * decision about the final combat animation language.
+ */
+export const PLAYER_ACTION_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
+  wizard: {
+    src: '/images/wizard/sprites/Attack1.png',
+    frameWidth: 231,
+    frameHeight: 190,
+    frameCount: 8,
+  },
+  samurai: {
+    src: '/images/samurai/Sprites/Attack1.png',
+    frameWidth: 200,
+    frameHeight: 200,
+    frameCount: 6,
+  },
+};
