@@ -112,7 +112,7 @@ test('mapped enemy attack strips render during the enemy turn', async ({ page })
   await expect(enemyAttack).toHaveCSS('background-image', /evil-wizard/);
 });
 
-test('vertical Witch Blue attack strips render without replacing idle art', async ({ page }) => {
+test('vertical Witch Blue attack and defeat strips render in their states', async ({ page }) => {
   await startRun(page);
   const snapshot = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
@@ -141,6 +141,9 @@ test('vertical Witch Blue attack strips render without replacing idle art', asyn
   await page.evaluate((value) => {
     localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
   }, snapshot);
+  await page.addInitScript(() => {
+    Math.random = () => 0.5;
+  });
   await page.reload();
 
   const idleEnemy = page.getByRole('img', { name: 'Witch Blue' });
@@ -150,6 +153,29 @@ test('vertical Witch Blue attack strips render without replacing idle art', asyn
   const enemyAttack = page.getByRole('img', { name: 'Witch Blue attack animation' });
   await expect(enemyAttack).toBeVisible();
   await expect(enemyAttack).toHaveCSS('background-size', /100% 400%/);
+
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}').combatState.phase,
+      ),
+    )
+    .toBe('awaiting-player-action');
+  const defeatSnapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  defeatSnapshot.combatState.enemy.stats.health = 1;
+  defeatSnapshot.combatState.enemy.damageTaken = 0;
+  defeatSnapshot.combatState.playerDamageTaken = 0;
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, defeatSnapshot);
+  await page.reload();
+  await page.getByRole('button', { name: 'Attack' }).click();
+  const enemyDefeat = page.getByRole('img', { name: 'Witch Blue defeat animation' });
+  await expect(enemyDefeat).toBeVisible();
+  await expect(enemyDefeat).toHaveCSS('background-size', /100% 1500%/);
 });
 
 test('a run is restored after a browser reload', async ({ page }) => {
