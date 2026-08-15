@@ -16,6 +16,28 @@
         <button class="primary-button" type="button" (click)="session.beginCharacterSelection()">
           Choose your champion
         </button>
+        <section class="records-panel" aria-labelledby="records-title">
+          <div class="records-heading">
+            <h3 id="records-title">Personal records</h3>
+            @if (session.personalRecords().length) {
+              <button class="quiet-button" type="button" (click)="session.clearPersonalRecords()">
+                Clear records
+              </button>
+            }
+          </div>
+          @if (session.personalRecords().length) {
+            <ol class="records-list">
+              @for (record of session.personalRecords(); track $index) {
+                <li [class]="'record-row ' + recordCharacter(record).accent">
+                  <span>{{ record.name }} · {{ recordCharacter(record).name }}</span>
+                  <strong>Level {{ record.level }}</strong>
+                </li>
+              }
+            </ol>
+          } @else {
+            <p class="empty-records">No records yet.</p>
+          }
+        </section>
         <p class="prototype-note">
           Current scope: combat, progression, power-ups, store, persistence, and audio are active;
           balance and final release behavior remain provisional.
@@ -358,6 +380,24 @@
             {{ player.bossesDefeated === 1 ? 'defeat' : 'defeats' }}.
           </p>
           <p class="validation" role="alert">{{ session.combatMessage() }}</p>
+          <section class="records-panel" aria-labelledby="game-over-records-title">
+            <div class="records-heading">
+              <h3 id="game-over-records-title">Personal records</h3>
+              @if (session.personalRecords().length) {
+                <button class="quiet-button" type="button" (click)="session.clearPersonalRecords()">
+                  Clear records
+                </button>
+              }
+            </div>
+            <ol class="records-list">
+              @for (record of session.personalRecords(); track $index) {
+                <li [class]="'record-row ' + recordCharacter(record).accent">
+                  <span>{{ record.name }} · {{ recordCharacter(record).name }}</span>
+                  <strong>Level {{ record.level }}</strong>
+                </li>
+              }
+            </ol>
+          </section>
           <button class="primary-button" type="button" (click)="session.reset()">
             Start a new run
           </button>

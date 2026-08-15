@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { GameSessionService } from './application/game-session.service';
 import { CharacterDefinition } from './domain/game-types';
+import { PersonalRecord } from './domain/records';
 
 @Component({
   selector: 'app-root',
@@ -26,5 +27,12 @@ export class App {
 
   protected selectCharacter(character: CharacterDefinition): void {
     this.session.selectCharacter(character);
+  }
+
+  protected recordCharacter(record: PersonalRecord): CharacterDefinition {
+    return (
+      this.session.characters.find((character) => character.id === record.characterId) ??
+      this.session.characters[0]
+    );
   }
 }

@@ -41,7 +41,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 - **Affected area:** `legacy/svelte/src/lib/models/`, archived services/config, and active `src/app/domain/`
 - **Evidence:** Randomness, mutable class instances, timers, and global stores are mixed with combat logic in the archived app. The active Angular app now has pure combat, full-roster/boss enemy generation, action-policy, transition, potion, progression, and store modules, but they do not yet establish full legacy parity.
 - **Risk:** A rewrite can accidentally rebalance or change gameplay while appearing structurally cleaner.
-- **Next action:** Extend fixtures for defeat records/personal records, power-up presentation, persistence, reset behavior, and final balance; mark each rule intentional, suspicious, or obsolete before migration.
+- **Next action:** Review the now-implemented defeat-record/game-over contract, then extend fixtures for power-up presentation, persistence migration, reset behavior, and final balance; mark each rule intentional, suspicious, or obsolete before migration.
 - **Dependencies:** Product review of current gameplay and TODO-005
 - **Owner:** Tech Lead / gameplay owner
 - **Target:** First rewrite design session
@@ -72,9 +72,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** `legacy/svelte/src/lib/services/storage.service.ts`, root Angular storage adapter, and volume preference handling
-- **Evidence:** The active Angular app has a versioned `hexakill.angular.session.v1` envelope, injectable storage boundary, structural validation for player/enemy/progression data, canonical character/item hydration, invalid-record clearing, and non-fatal browser storage failure handling. Migration from legacy keys and preference persistence remain missing.
+- **Evidence:** The active Angular app has versioned `hexakill.angular.session.v1` and `hexakill.angular.records.v1` envelopes, injectable storage boundaries, structural validation for player/enemy/progression/record data, canonical character/item hydration, invalid-record clearing, and non-fatal browser storage failure handling. Migration from legacy keys and preference persistence remain missing.
 - **Risk:** Old/corrupt local storage can crash or create invalid records and preferences.
-- **Next action:** Decide migration policy for legacy keys/preferences and extend malformed-record fixtures as the session schema evolves.
+- **Next action:** Decide migration policy for legacy keys/preferences, record the decision in an ADR, and extend malformed-record fixtures as the schemas evolve.
 - **Dependencies:** TODO-006
 - **Owner:** Future rewrite agent
 - **Target:** Before persistence is retained
@@ -83,7 +83,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** Active root Angular application and CI
-- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app has 10 deterministic unit/component test files, injectable random/clock/storage/audio ports, application transition coverage, and seven Playwright journeys for store/combat, reload restore, invalid-session recovery, keyboard start, defeat, rewards/power-ups, and sequential bosses. The same journeys pass against the built static artifact.
+- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app has 11 deterministic unit/component test files, injectable random/clock/storage/audio/records ports, application transition coverage, and seven Playwright journeys for store/combat, reload restore, invalid-session recovery, keyboard start, defeat/records, rewards/power-ups, and sequential bosses. The same journeys pass against the built static artifact.
 - **Risk:** Combat and store regressions will be detected only by manual play.
 - **Next action:** Add accessibility assertions and retain deterministic ports as feature coverage expands.
 - **Dependencies:** TODO-004 and TODO-006

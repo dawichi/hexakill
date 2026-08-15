@@ -135,6 +135,15 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
 
   await page.getByRole('button', { name: 'Potion' }).click();
   await expect(page.getByRole('heading', { name: 'Game over.' })).toBeVisible();
+  await expect(page.locator('.record-row')).toContainText('Agent · Wizard');
+  await expect(page.locator('.record-row')).toContainText('Level 4');
+
+  await page.getByRole('button', { name: 'Start a new run' }).click();
+  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+  await expect(page.locator('.record-row')).toContainText('Agent · Wizard');
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.records.v1')),
+  ).resolves.toContain('Agent');
 });
 
 test('a victory grants progression and a power-up choice', async ({ page }) => {

@@ -10,6 +10,7 @@ This file is the canonical project-specific instruction entry point for AI devel
 4. Read [current architecture](architecture/current-state.md) and the relevant [game-loop documentation](features/game-loop.md).
 5. For architecture work, read the [framework evaluation](architecture/rewrite-evaluation.md) and [target architecture proposal](architecture/rewrite-target.md).
 6. For continuation work, read the [current development handoff](handoff.md).
+7. For persistence changes, read the [Angular persistence contract](architecture/rewrite-persistence.md).
 
 ## Source-of-truth map
 
@@ -23,6 +24,7 @@ This file is the canonical project-specific instruction entry point for AI devel
 - Active Angular application: root `src/`, `package.json`, `angular.json`, and `e2e/`. The isolated prototype was promoted and removed after validation; the former Svelte source is archived under `legacy/svelte/`.
 - Durable project decisions: [ADR index](adr/README.md).
 - Known gaps and deferred work: [TODO.md](TODO.md).
+- Active local persistence contract: [rewrite persistence](architecture/rewrite-persistence.md).
 
 ## Working rules
 

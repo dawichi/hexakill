@@ -43,11 +43,11 @@ compliance:
   summary_document: standards-assessment.md
   status_counts:
     compliant: 15
-    partial: 40
-    gap: 6
+    partial: 39
+    gap: 1
     deferred: 5
     exception: 0
-    not_applicable: 26
+    not_applicable: 19
     unknown: 7
   rules:
     - id: DOC-001
@@ -72,7 +72,7 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: The archived Svelte root has no suite; the active Angular root has 10 test files, 36 passing tests, and seven Playwright journeys, including keyboard start and a built-artifact run, but not complete gameplay/accessibility coverage.
+      evidence: The archived Svelte root has no suite; the active Angular root has 11 test files, 40 passing tests, and seven Playwright journeys, including keyboard start, defeat records, and a built-artifact run, but not complete gameplay/accessibility coverage.
       priority: high
       next_action: Add accessibility assertions and retain browser coverage as product features expand.
     - id: TS-001
@@ -80,6 +80,11 @@ compliance:
       evidence: tsconfig.json enables strict, but the supported check script fails before checking because jsconfig.json is missing.
       priority: high
       next_action: Repair the check command and make the effective compiler baseline reproducible.
+    - id: TS-005
+      status: partial
+      evidence: Archived Svelte storage trusts JSON.parse; active Angular session and records adapters validate versioned browser envelopes.
+      priority: high
+      next_action: Decide legacy-key migration and retain runtime validation for new schemas.
     - id: DEP-001
       status: partial
       evidence: The archived Svelte package has no tracked lockfile; the active Angular root has a committed package-lock.json, pinned Node/npm baseline, and frozen-install validation.

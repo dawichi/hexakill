@@ -17,7 +17,14 @@ import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters
 import { ASSET_MANIFEST } from '../domain/assets';
 import { CharacterDefinition, EnemyState, PlayerState, Stats } from '../domain/game-types';
 import { RANDOM_SOURCE, RandomSource } from './random';
+import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
 import { SESSION_STORAGE, SessionStoragePort } from './storage';
+import {
+  createPersonalRecord,
+  isStoredRecordsSnapshot,
+  PersonalRecord,
+  sortPersonalRecords,
+} from '../domain/records';
 
 export type GameScreen =
   'welcome' | 'character-select' | 'combat-ready' | 'combat' | 'store' | 'game-over';
@@ -141,6 +148,9 @@ export class GameSessionService {
   private readonly random: RandomSource = inject(RANDOM_SOURCE, { optional: true }) ?? Math.random;
   private readonly clock: Clock = inject(CLOCK, { optional: true }) ?? BROWSER_CLOCK;
   private readonly storage: SessionStoragePort | null = inject(SESSION_STORAGE, { optional: true });
+  private readonly recordsStorage: RecordsStoragePort | null = inject(RECORDS_STORAGE, {
+    optional: true,
+  });
   private readonly audio: AudioPort | null = inject(AUDIO, { optional: true });
   readonly screen = signal<GameScreen>('welcome');
   readonly playerName = signal('');
@@ -162,8 +172,10 @@ export class GameSessionService {
   readonly storePotions = STORE_POTIONS;
   readonly lastActionAt = signal<number | null>(null);
   readonly combatMessage = signal('');
+  readonly personalRecords = signal<readonly PersonalRecord[]>([]);
 
   constructor() {
+    this.restorePersonalRecords();
     this.restore();
     effect(() => this.persist());
   }
@@ -339,6 +351,11 @@ export class GameSessionService {
     this.player.set(applyPowerUp(player, type));
   }
 
+  clearPersonalRecords(): void {
+    this.personalRecords.set([]);
+    this.recordsStorage?.clear();
+  }
+
   reset(): void {
     this.screen.set('welcome');
     this.playerName.set('');
@@ -408,6 +425,7 @@ export class GameSessionService {
       playerHealth: player.stats.health,
     });
     if (this.combatState().phase === 'defeat') {
+      this.addPersonalRecord(player);
       this.screen.set('game-over');
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
     }
@@ -439,6 +457,32 @@ export class GameSessionService {
         combatState: this.combatState(),
       }),
     );
+  }
+
+  private addPersonalRecord(player: PlayerState): void {
+    const records = sortPersonalRecords([
+      ...this.personalRecords(),
+      createPersonalRecord(player.character.id, player.name, player.level),
+    ]);
+    this.personalRecords.set(records);
+    this.recordsStorage?.write(JSON.stringify({ version: 1, records }));
+  }
+
+  private restorePersonalRecords(): void {
+    const raw = this.recordsStorage?.read();
+    if (!raw) return;
+
+    try {
+      const snapshot: unknown = JSON.parse(raw);
+      if (!isStoredRecordsSnapshot(snapshot)) {
+        this.recordsStorage?.clear();
+        return;
+      }
+
+      this.personalRecords.set(sortPersonalRecords(snapshot.records));
+    } catch {
+      this.recordsStorage?.clear();
+    }
   }
 
   private restore(): void {

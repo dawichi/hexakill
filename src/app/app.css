@@ -288,6 +288,66 @@ h3 {
   margin-top: 1rem;
 }
 
+.records-panel {
+  margin-top: 1.5rem;
+  border: 1px solid #3f3f46;
+  border-radius: 0.75rem;
+  background: #18181b;
+  padding: 1rem;
+}
+
+.records-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.records-heading h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.records-list {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.record-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-left: 3px solid #71717a;
+  border-radius: 0.35rem;
+  background: #27272a;
+  padding: 0.6rem 0.75rem;
+}
+
+.record-row.blue {
+  border-left-color: #38bdf8;
+}
+
+.record-row.red {
+  border-left-color: #fb7185;
+}
+
+.record-row.amber {
+  border-left-color: #fbbf24;
+}
+
+.record-row strong {
+  color: #fde68a;
+  white-space: nowrap;
+}
+
+.empty-records {
+  margin: 0.75rem 0 0;
+  color: #a1a1aa;
+}
+
 .combat-grid {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
