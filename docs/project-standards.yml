@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: legacy unfinished browser game; rewrite preparation
   current_branch: main
-  current_revision: a3760c07a75f5270643e2d3144eed3ded6c39348
+  current_revision: 5710391ef10859e5f2b16f28e912c18ac021ae42
 
 standards:
   - documentation
@@ -72,7 +72,7 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: The archived Svelte root has no suite; the active Angular root has 13 test files, 60 passing tests, including enemy-action thresholds, power-up caps, state reset/spawn boundaries, repeatable potion purchases, legacy numeric rounding/fractional-level boundaries, and observed enemy attack-strip mappings, plus thirteen Playwright journeys including Wizard/Samurai player-action asset rendering, mapped player/enemy attack/defeat-strip rendering, keyboard/focus transitions, reduced-motion/narrow-viewport behavior, audio-preference restore, invalid/whitespace-only/negative-stat persistence recovery, defeat records/history, malformed persistence-boundary rejection, and a built-artifact run, but not complete gameplay/accessibility coverage.
+      evidence: The archived Svelte root has no suite; the active Angular root has 13 test files, 60 passing tests, including enemy-action thresholds, power-up caps, state reset/spawn boundaries, repeatable potion purchases, legacy numeric rounding/fractional-level boundaries, observed enemy attack-strip mappings, and canonical restored-character binding, plus fourteen Playwright journeys including Wizard/Samurai player-action asset rendering, mapped player/enemy attack/defeat-strip rendering, keyboard/focus transitions, reduced-motion/narrow-viewport behavior, audio-preference restore, invalid/whitespace-only/negative-stat/unbound-character persistence recovery, defeat records/history, malformed persistence-boundary rejection, and a built-artifact run, but not complete gameplay/accessibility coverage.
       priority: high
       next_action: Retain the automated focus/responsive assertions and add manual accessibility evidence before release.
     - id: TS-001
