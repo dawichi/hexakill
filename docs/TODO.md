@@ -83,7 +83,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** Active root Angular application and CI
-- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app has 12 deterministic unit/component test files with 47 passing tests, injectable random/clock/storage/audio/records/preferences ports, application transition coverage, and eight Playwright journeys for store/combat, reload restore, audio-preference restore, invalid-session recovery, keyboard start, defeat/history/records, rewards/power-ups, and sequential bosses. The same journeys pass against the built static artifact.
+- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app has 12 deterministic unit/component test files with 47 passing tests, injectable random/clock/storage/audio/records/preferences ports, application transition coverage, and nine Playwright journeys for store/combat, reload restore, audio-preference restore, invalid-session recovery, keyboard/focus transitions, responsive reduced-motion behavior, defeat/history/records, rewards/power-ups, and sequential bosses. The same journeys pass against the built static artifact.
 - **Risk:** Combat and store regressions will be detected only by manual play.
 - **Next action:** Add accessibility assertions and retain deterministic ports as feature coverage expands.
 - **Dependencies:** TODO-004 and TODO-006
@@ -116,9 +116,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** All game views and interactive components
-- **Evidence:** Archived Svelte warnings identify mouse-only tooltip behavior and clickable non-controls. The active root has labeled name/audio inputs, semantic buttons/status regions, visible focus styles, and keyboard browser coverage for start, store, combat, power-up, audio, game-over/reset, and record clearing, but no full focus/assistive-technology review.
+- **Evidence:** Archived Svelte warnings identify mouse-only tooltip behavior and clickable non-controls. The active root has labeled name/audio inputs, semantic buttons/status regions, visible focus styles, programmatic focus targets for screen transitions and power-up progression, and browser coverage for keyboard/focus, store, combat, audio, game-over/reset, reduced motion, and narrow viewport behavior, but no full assistive-technology review.
 - **Risk:** Players cannot complete core flows with keyboard, assistive technology, or non-pointer input.
-- **Next action:** Define and test focus order/return, status announcements, reduced-motion/audio behavior, and keyboard completion of combat/store/power-up/game-over journeys.
+- **Next action:** Perform manual screen-reader, contrast, zoom, and focus-visibility review; retain automated focus/reduced-motion journeys as regression coverage.
 - **Dependencies:** TODO-006 and TODO-009
 - **Owner:** Future UI agent
 - **Target:** Before browser test completion

@@ -35,9 +35,9 @@
 
   @switch (session.screen()) {
     @case ('welcome') {
-      <section class="panel welcome" aria-labelledby="welcome-title">
+      <section class="panel welcome" data-screen="welcome" aria-labelledby="welcome-title">
         <p class="eyebrow">A new run begins here</p>
-        <h2 id="welcome-title">Survive the dungeon.</h2>
+        <h2 id="welcome-title" data-screen-heading tabindex="-1">Survive the dungeon.</h2>
         <p class="lead">
           Choose a champion, learn the combat rules, and build a run one decision at a time.
         </p>
@@ -86,11 +86,11 @@
     }
 
     @case ('character-select') {
-      <section class="panel" aria-labelledby="select-title">
+      <section class="panel" data-screen="character-select" aria-labelledby="select-title">
         <div class="section-heading">
           <div>
             <p class="eyebrow">Step 1 · your run</p>
-            <h2 id="select-title">Choose a champion</h2>
+            <h2 id="select-title" data-screen-heading tabindex="-1">Choose a champion</h2>
           </div>
           <button class="quiet-button" type="button" (click)="session.reset()">Start over</button>
         </div>
@@ -144,11 +144,13 @@
 
     @case ('combat-ready') {
       @if (session.player(); as player) {
-        <section class="panel" aria-labelledby="combat-title">
+        <section class="panel" data-screen="combat-ready" aria-labelledby="combat-title">
           <div class="section-heading">
             <div>
               <p class="eyebrow">Step 2 · run ready</p>
-              <h2 id="combat-title">Welcome, {{ player.name }}.</h2>
+              <h2 id="combat-title" data-screen-heading tabindex="-1">
+                Welcome, {{ player.name }}.
+              </h2>
             </div>
             <div class="button-row">
               <button class="quiet-button" type="button" (click)="session.openStore()">
@@ -216,11 +218,13 @@
     @case ('combat') {
       @if (session.player(); as player) {
         @if (session.enemy(); as enemy) {
-          <section class="panel" aria-labelledby="combat-screen-title">
+          <section class="panel" data-screen="combat" aria-labelledby="combat-screen-title">
             <div class="section-heading">
               <div>
                 <p class="eyebrow">Step 3 · combat</p>
-                <h2 id="combat-screen-title">{{ enemy.definition.name }} appears.</h2>
+                <h2 id="combat-screen-title" data-screen-heading tabindex="-1">
+                  {{ enemy.definition.name }} appears.
+                </h2>
               </div>
               <div class="button-row">
                 <button class="quiet-button" type="button" (click)="session.openStore()">
@@ -336,7 +340,9 @@
                   @if (rewardedPlayer.powerUps.pending > 0) {
                     <div class="power-up-panel" aria-labelledby="power-up-title">
                       <p class="eyebrow">Choose an upgrade</p>
-                      <h3 id="power-up-title">Power-up available</h3>
+                      <h3 id="power-up-title" data-focus-target="power-up" tabindex="-1">
+                        Power-up available
+                      </h3>
                       <div class="power-up-grid">
                         <button
                           type="button"
@@ -373,6 +379,7 @@
                 }
                 <button
                   class="primary-button"
+                  data-focus-target="next-enemy"
                   type="button"
                   [disabled]="player.powerUps.pending > 0"
                   (click)="session.findEnemy()"
@@ -393,11 +400,11 @@
 
     @case ('store') {
       @if (session.player(); as player) {
-        <section class="panel" aria-labelledby="store-title">
+        <section class="panel" data-screen="store" aria-labelledby="store-title">
           <div class="section-heading">
             <div>
               <p class="eyebrow">Between turns · store</p>
-              <h2 id="store-title">Spend your gold.</h2>
+              <h2 id="store-title" data-screen-heading tabindex="-1">Spend your gold.</h2>
             </div>
             <button class="quiet-button" type="button" (click)="session.closeStore()">
               Close store
@@ -451,9 +458,9 @@
 
     @case ('game-over') {
       @if (session.player(); as player) {
-        <section class="panel game-over" aria-labelledby="game-over-title">
+        <section class="panel game-over" data-screen="game-over" aria-labelledby="game-over-title">
           <p class="eyebrow">Run ended</p>
-          <h2 id="game-over-title">Game over.</h2>
+          <h2 id="game-over-title" data-screen-heading tabindex="-1">Game over.</h2>
           <p class="lead">
             {{ player.name }} reached level {{ player.level }} with {{ player.bossesDefeated }} boss
             {{ player.bossesDefeated === 1 ? 'defeat' : 'defeats' }}.

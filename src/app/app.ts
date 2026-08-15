@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { afterRenderEffect, Component, DOCUMENT, inject } from '@angular/core';
 import { GameSessionService } from './application/game-session.service';
 import { CharacterDefinition, ItemState } from './domain/game-types';
 import { PersonalRecord } from './domain/records';
@@ -11,6 +11,7 @@ import { PersonalRecord } from './domain/records';
 })
 export class App {
   protected readonly session = inject(GameSessionService);
+  private readonly document = inject(DOCUMENT);
   protected readonly statLabels = [
     ['health', 'Health'],
     ['ad', 'Attack'],
@@ -19,6 +20,23 @@ export class App {
     ['mr', 'Magic resist'],
     ['speed', 'Speed'],
   ] as const;
+
+  constructor() {
+    afterRenderEffect(() => {
+      const screen = this.session.screen();
+      const pendingPowerUps = this.session.player()?.powerUps.pending ?? 0;
+      const selector =
+        screen === 'combat' && pendingPowerUps > 0
+          ? '[data-focus-target="power-up"]'
+          : screen === 'combat' && pendingPowerUps === 0
+            ? '[data-focus-target="next-enemy"]'
+            : `[data-screen="${screen}"] [data-screen-heading]`;
+      const target =
+        this.document.querySelector<HTMLElement>(selector) ??
+        this.document.querySelector<HTMLElement>(`[data-screen="${screen}"] [data-screen-heading]`);
+      if (target && this.document.activeElement !== target) target.focus();
+    });
+  }
 
   protected onNameInput(event: Event): void {
     const input = event.target as HTMLInputElement;

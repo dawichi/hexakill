@@ -26,7 +26,9 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await storeButton.focus();
   await expect(storeButton).toBeFocused();
   await storeButton.press('Enter');
-  await expect(page.getByRole('heading', { name: 'Spend your gold.' })).toBeVisible();
+  const storeHeading = page.getByRole('heading', { name: 'Spend your gold.' });
+  await expect(storeHeading).toBeVisible();
+  await expect(storeHeading).toBeFocused();
   const swordButton = page.getByRole('button', { name: /Sword/ });
   await swordButton.focus();
   await expect(swordButton).toBeFocused();
@@ -36,6 +38,7 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   const closeStoreButton = page.getByRole('button', { name: 'Close store' });
   await closeStoreButton.focus();
   await closeStoreButton.press('Enter');
+  await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeFocused();
   const findEnemyButton = page.getByRole('button', { name: 'Find an enemy' });
   await findEnemyButton.focus();
   await findEnemyButton.press('Enter');
@@ -76,6 +79,23 @@ test('audio preferences are keyboard-accessible and restored independently', asy
   await expect(musicVolume).toBeFocused();
 });
 
+test('reduced motion and a narrow viewport remain usable', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.reload();
+
+  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Choose your champion' })).toHaveCSS(
+    'transition-duration',
+    '1e-05s',
+  );
+  const dimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+  expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
+});
+
 test('an invalid saved session is discarded safely', async ({ page }) => {
   await page.evaluate(() => {
     localStorage.setItem(
@@ -103,7 +123,9 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   await chooseButton.focus();
   await expect(chooseButton).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('heading', { name: 'Choose a champion' })).toBeVisible();
+  const selectHeading = page.getByRole('heading', { name: 'Choose a champion' });
+  await expect(selectHeading).toBeVisible();
+  await expect(selectHeading).toBeFocused();
 
   await page.getByLabel('Player name').fill('Agent');
   const wizardButton = page.getByRole('button', { name: /Wizard/ });
@@ -114,7 +136,9 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   await startButton.focus();
   await expect(startButton).toBeFocused();
   await startButton.press('Enter');
-  await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
+  const readyHeading = page.getByRole('heading', { name: 'Welcome, Agent.' });
+  await expect(readyHeading).toBeVisible();
+  await expect(readyHeading).toBeFocused();
 });
 
 test('a player can use a potion and reach the defeat screen', async ({ page }) => {
@@ -176,7 +200,9 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
   await potionButton.focus();
   await expect(potionButton).toBeFocused();
   await potionButton.press('Enter');
-  await expect(page.getByRole('heading', { name: 'Game over.' })).toBeVisible();
+  const gameOverHeading = page.getByRole('heading', { name: 'Game over.' });
+  await expect(gameOverHeading).toBeVisible();
+  await expect(gameOverHeading).toBeFocused();
   await expect(page.getByRole('heading', { name: 'Enemies defeated' })).toBeVisible();
   await expect(page.locator('.enemy-history-row')).toContainText('Slime Blue');
   await expect(page.locator('.enemy-history-row')).toContainText('Levels: 3');
@@ -184,7 +210,9 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
   await expect(page.locator('.record-row')).toContainText('Level 4');
 
   await page.getByRole('button', { name: 'Start a new run' }).click();
-  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+  const welcomeHeading = page.getByRole('heading', { name: 'Survive the dungeon.' });
+  await expect(welcomeHeading).toBeVisible();
+  await expect(welcomeHeading).toBeFocused();
   await expect(page.locator('.record-row')).toContainText('Agent · Wizard');
   await expect(
     page.evaluate(() => localStorage.getItem('hexakill.angular.records.v1')),
@@ -240,6 +268,7 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   await attackButton.press('Enter');
   await expect(page.getByText(/gained 100 exp and 100 gold/)).toBeVisible();
   await expect(page.getByText('Pending: 1')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Power-up available' })).toBeFocused();
   await expect(page.getByRole('button', { name: 'Find another enemy' })).toBeDisabled();
 
   const powerUpAttack = page.locator('.power-up-panel').getByRole('button', { name: 'Attack' });
@@ -247,7 +276,9 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   await expect(powerUpAttack).toBeFocused();
   await powerUpAttack.press('Enter');
   await expect(page.locator('.power-up-panel')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Find another enemy' })).toBeEnabled();
+  const nextEnemyButton = page.getByRole('button', { name: 'Find another enemy' });
+  await expect(nextEnemyButton).toBeEnabled();
+  await expect(nextEnemyButton).toBeFocused();
 });
 
 test('boss encounters advance in sequence after level ten', async ({ page }) => {
