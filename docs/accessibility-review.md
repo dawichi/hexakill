@@ -27,6 +27,10 @@ The following foreground/background pairs were calculated from the active CSS us
 
 Disabled controls use reduced opacity and must be reviewed separately for discoverability and whether the disabled state is understandable without relying on color.
 
+## Rendered browser smoke review
+
+The local Angular preview was inspected at 1280×800 and 360×800 on 2026-08-15. Welcome, character selection, ready, combat, store, and game-over surfaces rendered without horizontal overflow. The browser accessibility tree exposed native slider, button, disclosure, status, alert, meter, heading, and labelled-region roles; focus moved to the relevant screen heading after navigation, store return, and game-over transitions. A synthetic 2× CSS layout check at a 640px viewport also reported equal document/client widths. This is browser smoke evidence, not a substitute for using a screen reader or operating-system zoom/high-contrast modes.
+
 ## Still required before release
 
 - Test the complete run with a screen reader, including focus order, announcements for combat results, enemy health, power-up availability, and game-over history.
