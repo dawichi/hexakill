@@ -207,6 +207,22 @@ test('audio preferences are keyboard-accessible and restored independently', asy
   await expect(musicVolume).toBeFocused();
 });
 
+test('malformed audio preferences recover to safe defaults', async ({ page }) => {
+  await page.evaluate(() => {
+    localStorage.setItem(
+      'hexakill.angular.preferences.v1',
+      JSON.stringify({ version: 1, musicVolume: 'corrupt', effectsVolume: 2 }),
+    );
+  });
+
+  await page.reload();
+  await expect(page.getByLabel('Music volume')).toHaveValue('0.05');
+  await expect(page.getByLabel('Effects volume')).toHaveValue('0.2');
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.preferences.v1')),
+  ).resolves.toBeNull();
+});
+
 test('reduced motion and a narrow viewport remain usable', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
