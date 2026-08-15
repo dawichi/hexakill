@@ -42,6 +42,20 @@ const WILD_HUNTRESS_DEFEAT_SPRITE: SpriteStripAsset = {
   frameCount: 8,
 };
 
+const FIRE_WORM_DEFEAT_SPRITE: SpriteStripAsset = {
+  src: '/images/fire-worm/Sprites/Worm/Death.png',
+  frameWidth: 90,
+  frameHeight: 90,
+  frameCount: 8,
+};
+
+const MARTIAL_HERO_DEFEAT_SPRITE: SpriteStripAsset = {
+  src: '/images/martial-hero/Sprite/Death.png',
+  frameWidth: 126,
+  frameHeight: 126,
+  frameCount: 11,
+};
+
 const BASIC_MODIFIERS = modifiers();
 const AD_MODIFIERS = modifiers({ health: 0.75, ad: 1.5, ap: 0.5, speed: 1.5 });
 const AP_MODIFIERS = modifiers({ ad: 0.5, ap: 1.5 });
@@ -88,9 +102,13 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     defeatSpriteAsset: EVIL_WIZARD_DEFEAT_SPRITE,
   }),
   enemy('fire-knight', 'Fire knight', 'tank', '/images/fire-knight/idle.gif', TANK_MODIFIERS),
-  enemy('fire-worm', 'Fire worm', 'ap', '/images/fire-worm/idle.gif', AP_MODIFIERS),
+  enemy('fire-worm', 'Fire worm', 'ap', '/images/fire-worm/idle.gif', AP_MODIFIERS, {
+    defeatSpriteAsset: FIRE_WORM_DEFEAT_SPRITE,
+  }),
   enemy('knight', 'Knight', 'tank', '/images/knight/idle.gif', TANK_MODIFIERS),
-  enemy('martial-hero', 'Martial Hero', 'ad', '/images/martial-hero/idle.gif', AD_MODIFIERS),
+  enemy('martial-hero', 'Martial Hero', 'ad', '/images/martial-hero/idle.gif', AD_MODIFIERS, {
+    defeatSpriteAsset: MARTIAL_HERO_DEFEAT_SPRITE,
+  }),
   enemy(
     'slime-blue',
     'Slime Blue',

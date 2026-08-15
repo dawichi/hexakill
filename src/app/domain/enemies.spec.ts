@@ -56,6 +56,18 @@ describe('enemy generation', () => {
       frameHeight: 250,
       frameCount: 7,
     });
+    expect(enemySpriteAssetFor('fire-worm', 'defeat')).toEqual({
+      src: '/images/fire-worm/Sprites/Worm/Death.png',
+      frameWidth: 90,
+      frameHeight: 90,
+      frameCount: 8,
+    });
+    expect(enemySpriteAssetFor('martial-hero', 'defeat')).toEqual({
+      src: '/images/martial-hero/Sprite/Death.png',
+      frameWidth: 126,
+      frameHeight: 126,
+      frameCount: 11,
+    });
     expect(enemySpriteAssetFor('wild-huntress', 'attack')).toBeUndefined();
     expect(enemySpriteAssetFor('knight', 'defeat')).toBeUndefined();
   });
