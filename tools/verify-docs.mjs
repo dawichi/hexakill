@@ -68,6 +68,7 @@ const requiredCommands = [
   'verify:assets',
   'verify:docs',
   'verify:preview',
+  'verify:deployment',
   'verify:types',
   'verify:toolchain',
   'verify:release',

@@ -52,6 +52,7 @@ The archived Svelte source is not reproducible and is not the active application
 - Documentation contract: `npm run verify:docs`
 - Asset manifest: `npm run verify:assets`
 - Production preview contract: `npm run verify:preview`
+- Deployment contract: `npm run verify:deployment`
 - Release gate: `npm run verify:release`
 - Unit/component tests: `npm test -- --watch=false --no-progress`
 - Browser journeys: `npm run test:e2e`

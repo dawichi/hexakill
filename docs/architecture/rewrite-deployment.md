@@ -9,6 +9,7 @@ The active Angular application is a browser-only application with no server rout
 ```sh
 npm ci
 npm run build
+npm run verify:deployment
 npm run verify:preview
 # Optional local production-artifact verification
 npm run test:e2e:production
@@ -29,6 +30,10 @@ The publishable artifact is `dist/hexakill/browser/`. It includes the applicatio
 ## Provider status
 
 `https://hexakill.vercel.app` was observed returning `200` from Vercel on 2026-08-15, with `x-sveltekit-page: true`; it still serves the archived SvelteKit application. Repository evidence does not prove project ownership or deployment authorization. `vercel.json` records the candidate Angular install/build/output contract, but it is not evidence of a completed deployment. The first Angular deployment must record the provider/project, preview URL, rollback procedure, 404 behavior, headers, and asset verification.
+
+## Local contract verification
+
+`npm run verify:deployment` validates the committed `vercel.json` framework, install command, build command, output directory, and required security headers. When passed an artifact path, it also verifies that the publishable directory contains `index.html`. This is repository evidence only; it does not prove provider ownership or authorize a deployment.
 
 ## Release gate
 

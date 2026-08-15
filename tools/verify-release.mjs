@@ -10,6 +10,7 @@ const checks = [
   { label: 'formatting', args: ['run', 'format:check'] },
   { label: 'TypeScript', args: ['run', 'verify:types'] },
   { label: 'documentation', args: ['run', 'verify:docs'] },
+  { label: 'deployment contract', args: ['run', 'verify:deployment'] },
   { label: 'assets', args: ['run', 'verify:assets'] },
   { label: 'unit tests', args: ['test', '--', '--watch=false', '--no-progress'] },
   { label: 'dependency audit', args: ['audit', '--audit-level=high'] },

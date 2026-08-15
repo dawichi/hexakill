@@ -94,7 +94,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** Rewrite workspace, hosting configuration, framework profile
-- **Evidence:** Angular is accepted for the rewrite in [ADR-0001](adr/0001-angular-rewrite.md). The proposed [deployment contract](architecture/rewrite-deployment.md) defines static output, asset behavior, and release gates, but provider and owner acceptance remain unresolved.
+- **Evidence:** Angular is accepted for the rewrite in [ADR-0001](adr/0001-angular-rewrite.md). The proposed [deployment contract](architecture/rewrite-deployment.md) defines static output, asset behavior, security headers, and release gates; `npm run verify:deployment` now validates the committed Vercel contract, but provider and owner acceptance remain unresolved.
 - **Risk:** Framework churn can consume the rewrite without improving domain quality.
 - **Next action:** Select the hosting provider and promote the proposed contract into a separate accepted ADR after a production-like preview.
 - **Dependencies:** TODO-001, TODO-004, TODO-008, hosting constraints
@@ -138,7 +138,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** Vercel claim, adapter-auto, build output, static assets, 404/headers
-- **Evidence:** `https://hexakill.vercel.app` is reachable and returns a Vercel-served SvelteKit response, proving an existing endpoint but not Angular ownership or migration. The active Angular root has `vercel.json`, a passing production build, a static preview server, a `verify:preview` gate for headers/cache/404 behavior, and browser journeys against the built output.
+- **Evidence:** `https://hexakill.vercel.app` is reachable and returns a Vercel-served SvelteKit response, proving an existing endpoint but not Angular ownership or migration. The active Angular root has `vercel.json`, a passing `verify:deployment` contract check, a passing production build, a static preview server, a `verify:preview` gate for headers/cache/404 behavior, and browser journeys against the built output.
 - **Risk:** Agents may assume a deployment target or claim production readiness without evidence.
 - **Next action:** Confirm project ownership/authorization, deploy Angular to a preview, and document rollback and post-deploy asset behavior in an ADR; compare the external headers/404 behavior with the local contract.
 - **Dependencies:** TODO-001 and TODO-009
