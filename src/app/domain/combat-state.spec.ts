@@ -109,6 +109,32 @@ describe('combat state transitions', () => {
     expect(resolved.state.phase).toBe('defeat');
   });
 
+  it('rejects invalid numeric payloads from an enemy resolution', () => {
+    const started = transitionCombat(activeState(), {
+      type: 'player-action-started',
+      kind: 'attack',
+    }).state;
+    const enemyTurn = transitionCombat(started, {
+      type: 'player-action-resolved',
+      result,
+    }).state;
+
+    for (const payload of [
+      { playerDamageTaken: -1, playerHealth: 200 },
+      { playerDamageTaken: Number.NaN, playerHealth: 200 },
+      { playerDamageTaken: 1, playerHealth: 0 },
+    ]) {
+      const transition = transitionCombat(enemyTurn, {
+        type: 'enemy-action-resolved',
+        ...payload,
+      });
+
+      expect(transition.accepted).toBe(false);
+      if (transition.accepted) throw new Error('Expected invalid payload to be rejected.');
+      expect(transition.reason).toContain('valid player health');
+    }
+  });
+
   it('rejects actions outside the player-action phase', () => {
     const transition = transitionCombat(INITIAL_COMBAT_STATE, {
       type: 'player-action-started',

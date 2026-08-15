@@ -108,6 +108,15 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
       return rejected(state, 'An enemy action cannot be resolved in the current combat phase.');
     }
 
+    if (
+      !Number.isFinite(event.playerDamageTaken) ||
+      event.playerDamageTaken < 0 ||
+      !Number.isFinite(event.playerHealth) ||
+      event.playerHealth <= 0
+    ) {
+      return rejected(state, 'An enemy action requires valid player health values.');
+    }
+
     return {
       accepted: true,
       state: {
