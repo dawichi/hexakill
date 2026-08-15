@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: legacy unfinished browser game; rewrite preparation
   current_branch: main
-  current_revision: 81f184c6c4acd39040022fc35697af3272afa326
+  current_revision: 0b651958ab4952f4d5086702a46eb04f7249441d
 
 standards:
   - documentation
@@ -72,7 +72,7 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: The archived Svelte root has no suite; the active Angular root has 13 test files, 55 passing tests, including enemy-action thresholds, power-up caps, state reset/spawn boundaries, and repeatable potion purchases, plus twelve Playwright journeys including Wizard/Samurai player-action asset rendering, keyboard/focus transitions, reduced-motion/narrow-viewport behavior, audio-preference restore, invalid/whitespace-only/negative-stat persistence recovery, defeat records/history, malformed persistence-boundary rejection, and a built-artifact run, but not complete gameplay/accessibility coverage.
+      evidence: The archived Svelte root has no suite; the active Angular root has 13 test files, 56 passing tests, including enemy-action thresholds, power-up caps, state reset/spawn boundaries, and repeatable potion purchases, plus twelve Playwright journeys including Wizard/Samurai player-action asset rendering, Wild Huntress defeat-strip rendering, keyboard/focus transitions, reduced-motion/narrow-viewport behavior, audio-preference restore, invalid/whitespace-only/negative-stat persistence recovery, defeat records/history, malformed persistence-boundary rejection, and a built-artifact run, but not complete gameplay/accessibility coverage.
       priority: high
       next_action: Retain the automated focus/responsive assertions and add manual accessibility evidence before release.
     - id: TS-001
