@@ -20,6 +20,13 @@ describe('progression rules', () => {
     expect(reward.levelsGained).toBe(0);
   });
 
+  it('rounds fractional experience using the legacy toFixed rule', () => {
+    const enemy = generateEnemy(3, 0, 0.3);
+    const lowerLevelPlayer = { ...player, level: 3 };
+
+    expect(calculateVictoryReward(lowerLevelPlayer, enemy).experience).toBe(67);
+  });
+
   it('levels up after crossing one hundred experience', () => {
     const enemy = generateEnemy(4, 0, 0);
     const leveledPlayer = applyVictoryReward({ ...player, experience: 75 }, enemy);

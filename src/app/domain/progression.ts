@@ -12,7 +12,7 @@ export interface VictoryReward {
 }
 
 export function calculateVictoryReward(player: PlayerState, enemy: EnemyState): VictoryReward {
-  const experience = Math.trunc((enemy.level / player.level) * 100);
+  const experience = Number(((enemy.level / player.level) * 100).toFixed(0));
   const gold = enemy.gold;
   let level = player.level;
   let remainingExperience = player.experience + experience;

@@ -9,7 +9,7 @@ describe('enemy generation', () => {
     expect(enemy.level).toBe(7);
     expect(enemy.stats.health).toBe(1050);
     expect(enemy.damageTaken).toBe(0);
-    expect(enemy.gold).toBe(437);
+    expect(enemy.gold).toBe(438);
   });
 
   it('generates the lower bound for a low roll', () => {
@@ -18,6 +18,12 @@ describe('enemy generation', () => {
     expect(enemy.definition.name).toBe('Adventurer');
     expect(enemy.level).toBe(2);
     expect(enemy.stats.health).toBe(300);
+  });
+
+  it('preserves the legacy fractional upper-bound level calculation', () => {
+    const enemy = generateEnemy(3, 0, 0.99);
+
+    expect(enemy.level).toBe(6);
   });
 
   it('opens the sequential gold-slime bosses at level ten', () => {

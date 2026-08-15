@@ -45,7 +45,7 @@ function integerBetween(min: number, max: number, roll: number): number {
 }
 
 export function reduceDamage(damage: number, resistance: number): number {
-  return Math.trunc((damage * 600) / (600 + resistance));
+  return Number(((damage * 600) / (600 + resistance)).toFixed(0));
 }
 
 export function resolveDamage(

@@ -226,7 +226,7 @@ export function generateEnemy(
 
   const regularEnemies = ENEMY_DEFINITIONS.filter((candidate) => candidate.archetype !== 'boss');
   const minLevel = Math.floor(playerLevel / 2);
-  const maxLevel = Math.floor(playerLevel * 1.75);
+  const maxLevel = playerLevel * 1.75;
   const level = Math.floor(levelRoll * (maxLevel - minLevel + 1)) + minLevel;
   const definition = regularEnemies[Math.floor(definitionRoll * regularEnemies.length)];
   return {
@@ -235,6 +235,6 @@ export function generateEnemy(
     stats: calculateStats(level, definition),
     damageTaken: 0,
     potions: 3,
-    gold: Math.trunc((level / playerLevel) * 250),
+    gold: Number(((level / playerLevel) * 250).toFixed(0)),
   };
 }

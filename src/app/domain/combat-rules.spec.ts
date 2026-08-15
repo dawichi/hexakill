@@ -19,6 +19,7 @@ const defender = {
 describe('combat rules', () => {
   it('reduces physical damage using armor', () => {
     expect(reduceDamage(1000, 100)).toBe(857);
+    expect(reduceDamage(100, 100)).toBe(86);
   });
 
   it('resolves a normal attack and caps damage at remaining health', () => {
