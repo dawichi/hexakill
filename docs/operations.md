@@ -10,17 +10,18 @@ The archived Svelte commands below are historical evidence only. They are not pa
 
 ## Commands and observed results
 
-| Purpose                   | Command                                   | Current result                                                                                       |
-| ------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Archived Svelte build     | `legacy/svelte/`                          | Not a supported active command; historical failures remain documented.                               |
-| Active development server | `npm start`                               | Passes for the Angular root.                                                                         |
-| Toolchain verification    | `npm run verify:toolchain`                | Verifies Node.js 24.19.0 and npm 11.17.0.                                                            |
-| Active tests              | `npm test -- --watch=false --no-progress` | Passes: 13 files, 57 tests.                                                                          |
-| Active browser journeys   | `npm run test:e2e`                        | Passes locally: 12 Chromium journeys.                                                                |
-| Active build              | `npm run build`                           | Passes; output is `dist/hexakill/browser/`.                                                          |
-| Dependency audit          | `npm audit --audit-level=high`            | Passes locally with 0 high-severity vulnerabilities; CI now runs the same gate.                      |
-| Active asset paths        | `npm run verify:assets`                   | Verifies all 56 typed idle/animation/item/music/sound paths and the 67-file deferred image boundary. |
-| Preview contract          | `npm run verify:preview`                  | Verifies the built static root, security headers, representative asset caching, and 404 behavior.    |
+| Purpose                   | Command                                   | Current result                                                                                                                  |
+| ------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Archived Svelte build     | `legacy/svelte/`                          | Not a supported active command; historical failures remain documented.                                                          |
+| Active development server | `npm start`                               | Passes for the Angular root.                                                                                                    |
+| Toolchain verification    | `npm run verify:toolchain`                | Verifies Node.js 24.19.0 and npm 11.17.0.                                                                                       |
+| Active tests              | `npm test -- --watch=false --no-progress` | Passes: 13 files, 57 tests.                                                                                                     |
+| Active browser journeys   | `npm run test:e2e`                        | Passes locally: 12 Chromium journeys.                                                                                           |
+| Active build              | `npm run build`                           | Passes; output is `dist/hexakill/browser/`.                                                                                     |
+| Dependency audit          | `npm audit --audit-level=high`            | Passes locally with 0 high-severity vulnerabilities; CI now runs the same gate.                                                 |
+| Active asset paths        | `npm run verify:assets`                   | Verifies all 56 typed idle/animation/item/music/sound paths and the 67-file deferred image boundary.                            |
+| Release gate              | `npm run verify:release`                  | Runs the reproducible toolchain, formatting, docs, assets, unit, audit, build, preview, and production-artifact browser checks. |
+| Preview contract          | `npm run verify:preview`                  | Verifies the built static root, security headers, representative asset caching, and 404 behavior.                               |
 
 The archived Svelte findings are recorded in [TODO-003](TODO.md#todo-003-high-clear-current-type-and-accessibility-errors); they are not active root blockers.
 
@@ -40,6 +41,7 @@ The root Angular application is the currently validated implementation surface. 
 | Browser journeys        | `npm run test:e2e`                                              | Passes locally: 12 Chromium journeys cover store/combat, Wizard/Samurai action assets, Wild Huntress defeat-strip rendering, restore, audio preferences, invalid/whitespace-only/negative-stat session recovery, keyboard/focus transitions, reduced motion/narrow viewport, defeat/history/records, rewards/power-ups, and sequential bosses; CI installs Chromium. |
 | Production-like browser | `npm run test:e2e:production`                                   | Passes locally against `dist/hexakill/browser/` through the repository static preview server.                                                                                                                                                                                                                                                                        |
 | Active asset paths      | `npm run verify:assets`                                         | Passes locally for all 56 typed idle/animation/item/music/sound paths plus the 67-file deferred image boundary.                                                                                                                                                                                                                                                      |
+| Release gate            | `npm run verify:release`                                        | Passes locally when run from the root; repeats the production build and production-artifact browser journey as the final aggregate gate.                                                                                                                                                                                                                             |
 | Browser smoke           | `npm start`                                                     | Verified welcome → character selection → ready run → store purchase → combat → Attack with migrated sprites.                                                                                                                                                                                                                                                         |
 
 The Angular application is not a production deployment. It has provisional combat, progression, power-up, store, versioned local-session persistence, sound/music lifecycle, and CI/browser journey gates; hosting acceptance and final gameplay balance remain unresolved.
