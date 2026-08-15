@@ -149,7 +149,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** CI configuration, lockfile, audit tooling, branch protection
-- **Evidence:** The Angular rewrite has a committed lockfile, `npm ci`, formatting/test/browser/build/asset CI gates, and local validation evidence. Dependency audit reporting, artifact retention, and branch protection are not configured.
+- **Evidence:** The Angular root has a committed lockfile, `npm ci`, `npm audit --audit-level=high` with 0 high-severity vulnerabilities, formatting/test/browser/build/asset CI gates, and local validation evidence. Artifact retention and branch protection are not configured.
 - **Risk:** Broken builds, dependency vulnerabilities, and quality regressions can merge unnoticed.
 - **Next action:** Add audit/report retention, type/lint gates where applicable, and verify required checks protect the promoted Angular delivery.
 - **Dependencies:** TODO-001, TODO-002, TODO-008

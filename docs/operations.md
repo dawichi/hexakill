@@ -10,14 +10,14 @@ The archived Svelte commands below are historical evidence only. They are not pa
 
 ## Commands and observed results
 
-| Purpose                   | Command                                   | Current result                                                         |
-| ------------------------- | ----------------------------------------- | ---------------------------------------------------------------------- |
-| Archived Svelte build     | `legacy/svelte/`                          | Not a supported active command; historical failures remain documented. |
-| Active development server | `npm start`                               | Passes for the Angular root.                                           |
-| Active tests              | `npm test -- --watch=false --no-progress` | Passes: 10 files, 36 tests.                                            |
-| Active browser journeys   | `npm run test:e2e`                        | Passes locally: 7 Chromium journeys.                                   |
-| Active build              | `npm run build`                           | Passes; output is `dist/hexakill/browser/`.                            |
-| Dependency audit          | `npm audit`                               | Not yet added to the supported CI gate.                                |
+| Purpose                   | Command                                   | Current result                                                                  |
+| ------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------- |
+| Archived Svelte build     | `legacy/svelte/`                          | Not a supported active command; historical failures remain documented.          |
+| Active development server | `npm start`                               | Passes for the Angular root.                                                    |
+| Active tests              | `npm test -- --watch=false --no-progress` | Passes: 10 files, 36 tests.                                                     |
+| Active browser journeys   | `npm run test:e2e`                        | Passes locally: 7 Chromium journeys.                                            |
+| Active build              | `npm run build`                           | Passes; output is `dist/hexakill/browser/`.                                     |
+| Dependency audit          | `npm audit --audit-level=high`            | Passes locally with 0 high-severity vulnerabilities; CI now runs the same gate. |
 
 The archived Svelte findings are recorded in [TODO-003](TODO.md#todo-003-high-clear-current-type-and-accessibility-errors); they are not active root blockers.
 
