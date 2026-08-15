@@ -118,6 +118,28 @@ test('an invalid saved session is discarded safely', async ({ page }) => {
   ).resolves.toBeNull();
 });
 
+test('a whitespace-only restored player is discarded safely', async ({ page }) => {
+  await page.evaluate(() => {
+    localStorage.setItem(
+      'hexakill.angular.session.v1',
+      JSON.stringify({
+        version: 1,
+        screen: 'combat',
+        playerName: '   ',
+        selectedCharacterId: 'wizard',
+        player: { name: '   ', level: 4 },
+        combatState: { phase: 'idle', enemy: null, playerDamageTaken: 0 },
+      }),
+    );
+  });
+
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
+  ).resolves.toBeNull();
+});
+
 test('the start journey is operable with keyboard activation', async ({ page }) => {
   const chooseButton = page.getByRole('button', { name: 'Choose your champion' });
   await chooseButton.focus();
