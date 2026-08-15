@@ -37,6 +37,14 @@ describe('combat state transitions', () => {
     expect(potion.state.phase).toBe('enemy-turn');
   });
 
+  it('moves to the enemy turn when speed gives the enemy the opening action', () => {
+    const spawned = transitionCombat(INITIAL_COMBAT_STATE, { type: 'enemy-spawned', enemy });
+    const opening = transitionCombat(spawned.state, { type: 'enemy-turn-started' });
+
+    expect(opening.accepted).toBe(true);
+    expect(opening.state.phase).toBe('enemy-turn');
+  });
+
   it('requires resolution after an action starts', () => {
     const transition = transitionCombat(activeState(), {
       type: 'player-action-started',

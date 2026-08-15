@@ -83,7 +83,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** Active root Angular application and CI
-- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app has 12 deterministic unit/component test files with 46 passing tests, injectable random/clock/storage/audio/records/preferences ports, application transition coverage, and eight Playwright journeys for store/combat, reload restore, audio-preference restore, invalid-session recovery, keyboard start, defeat/history/records, rewards/power-ups, and sequential bosses. The same journeys pass against the built static artifact.
+- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app has 12 deterministic unit/component test files with 47 passing tests, injectable random/clock/storage/audio/records/preferences ports, application transition coverage, and eight Playwright journeys for store/combat, reload restore, audio-preference restore, invalid-session recovery, keyboard start, defeat/history/records, rewards/power-ups, and sequential bosses. The same journeys pass against the built static artifact.
 - **Risk:** Combat and store regressions will be detected only by manual play.
 - **Next action:** Add accessibility assertions and retain deterministic ports as feature coverage expands.
 - **Dependencies:** TODO-004 and TODO-006
