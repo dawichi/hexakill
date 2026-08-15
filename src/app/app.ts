@@ -55,6 +55,10 @@ export class App {
     this.session.setEffectsVolume(Number((event.target as HTMLInputElement).value));
   }
 
+  protected volumeLabel(volume: number): string {
+    return `${Math.round(volume * 100)} percent`;
+  }
+
   protected recordCharacter(record: PersonalRecord): CharacterDefinition {
     return (
       this.session.characters.find((character) => character.id === record.characterId) ??

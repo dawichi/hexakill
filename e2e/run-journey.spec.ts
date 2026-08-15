@@ -68,6 +68,8 @@ test('audio preferences are keyboard-accessible and restored independently', asy
   const effectsVolume = page.getByLabel('Effects volume');
   await musicVolume.fill('0.12');
   await effectsVolume.fill('0.31');
+  await expect(musicVolume).toHaveAttribute('aria-valuetext', '12 percent');
+  await expect(effectsVolume).toHaveAttribute('aria-valuetext', '31 percent');
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem('hexakill.angular.preferences.v1')))
     .toContain('0.12');

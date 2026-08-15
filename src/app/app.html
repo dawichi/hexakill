@@ -10,6 +10,7 @@
         Music
         <input
           aria-label="Music volume"
+          [attr.aria-valuetext]="volumeLabel(session.musicVolume())"
           type="range"
           min="0"
           max="0.5"
@@ -22,6 +23,7 @@
         Effects
         <input
           aria-label="Effects volume"
+          [attr.aria-valuetext]="volumeLabel(session.effectsVolume())"
           type="range"
           min="0"
           max="0.5"
