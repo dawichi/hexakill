@@ -317,6 +317,32 @@ test('a restored transient combat action is discarded safely', async ({ page }) 
   ).resolves.toBeNull();
 });
 
+test('a restored malformed combat result is discarded safely', async ({ page }) => {
+  await startRun(page);
+  await page.getByRole('button', { name: 'Find an enemy' }).click();
+  await expect(page.getByRole('heading', { name: /appears/ })).toBeVisible();
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.combatState.lastResult = {
+    kind: 'attack',
+    rawDamage: 'corrupt',
+    damageAfterResistance: 0,
+    critical: false,
+    missed: false,
+    damageTaken: 0,
+  };
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
+  ).resolves.toBeNull();
+});
+
 test('a whitespace-only restored player is discarded safely', async ({ page }) => {
   await page.evaluate(() => {
     localStorage.setItem(
