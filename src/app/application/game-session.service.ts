@@ -95,7 +95,7 @@ function isRestorablePlayer(value: unknown): value is PlayerState {
   if (
     !isRecord(value) ||
     typeof value['name'] !== 'string' ||
-    value['name'].length < 3 ||
+    value['name'].trim().length < 3 ||
     value['name'].length > 14 ||
     !isNonNegativeInteger(value['level']) ||
     value['level'] < 1 ||
