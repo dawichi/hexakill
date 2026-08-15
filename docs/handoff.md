@@ -31,7 +31,7 @@ Victory now also appends a typed defeated-enemy history entry to the run. Game o
 
 Audio preferences now use a separate validated envelope with the observed legacy defaults (`music=0.05`, `effects=0.2`), accessible range controls, and audio-port volume application. The old `musicVolume` and `effectsVolume` keys are not auto-migrated.
 
-The active app consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields and uses observed Evil Tree/slime attack and defeat GIFs through optional typed enemy animation fields. Boss encounters select the typed boss music asset; regular encounters select dungeon music. The retained root `static/` tree is copied into Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is behind an injectable audio port.
+The active app consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields, uses observed Evil Tree/slime attack and defeat GIFs through optional typed enemy animation fields, and renders provisional Wizard/Samurai single-row `Attack1.png` strips during player actions. Boss encounters select the typed boss music asset; regular encounters select dungeon music. The retained root `static/` tree is copied into Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is behind an injectable audio port.
 
 ## Deliberate non-goals
 
@@ -50,7 +50,7 @@ Final persistence acceptance, deployment, and gameplay balancing remain unresolv
 1. Decide whether to migrate legacy `hxkllPersonalRecords` and whether records remain local-only; record the decision in an ADR.
 2. Resolve owner/source/license decisions recorded in [the asset provenance register](assets-provenance.md), then complete the accessibility review.
 3. Select an accepted hosting provider and run an authorized Angular preview.
-4. Review final gameplay balance, store effects, and the remaining 75 unmapped animation sources in [the sprite-source catalog](assets-sprite-sources.md).
+4. Review final gameplay balance, store effects, and the remaining 73 unmapped animation sources in [the sprite-source catalog](assets-sprite-sources.md).
 
 ## Validation at handoff
 
@@ -63,4 +63,4 @@ npm run build
 npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'
 ```
 
-The current verified result is a clean root install, 12 test files with 49 passing tests, a passing root production build, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and eleven Chromium journeys covering progression/store/combat, local-session restore, audio-preference restore, invalid-session recovery including whitespace-only and negative-stat restored data, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
+The current verified result is a clean root install, 13 test files with 50 passing tests, a passing root production build, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and eleven Chromium journeys covering progression/store/combat, local-session restore, audio-preference restore, invalid-session recovery including whitespace-only and negative-stat restored data, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, provisional player-action sprite rendering, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
