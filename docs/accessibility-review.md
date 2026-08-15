@@ -31,7 +31,7 @@ Disabled controls use reduced opacity and must be reviewed separately for discov
 
 ## Rendered browser smoke review
 
-The local Angular preview was inspected at 1280×800 and 360×800 on 2026-08-15. Welcome, character selection, ready, combat, store, and game-over surfaces rendered without horizontal overflow. The browser accessibility tree exposed native slider, button, disclosure, status, alert, meter, heading, and labelled-region roles; focus moved to the relevant screen heading after navigation, store return, and game-over transitions. The Wizard player-action strip was reachable in the combat flow; its timing and final semantic treatment remain provisional. A synthetic 2× CSS layout check at a 640px viewport also reported equal document/client widths. This is browser smoke evidence, not a substitute for using a screen reader or operating-system zoom/high-contrast modes.
+The local Angular preview was inspected at 1280×800 and 360×800 on 2026-08-15. Welcome, character selection, ready, combat, store, and game-over surfaces rendered without horizontal overflow. The browser accessibility tree exposed native slider, button, disclosure, status, alert, meter, heading, and labelled-region roles; focus moved to the relevant screen heading after navigation, store return, and game-over transitions. The Wizard and Samurai player-action strips are covered by the browser journeys; the Wizard strip was also reached during the manual combat flow. Their timing and final semantic treatment remain provisional. A synthetic 2× CSS layout check at a 640px viewport also reported equal document/client widths. This is browser smoke evidence, not a substitute for using a screen reader or operating-system zoom/high-contrast modes.
 
 ## Still required before release
 
