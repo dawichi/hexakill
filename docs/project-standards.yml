@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: legacy unfinished browser game; rewrite preparation
   current_branch: main
-  current_revision: 89a2f963d32ca02c291b9adfdb79e7d139f28e39
+  current_revision: 21033ebf428d8e4dc5d2a79f6a80ad77a34b7300
 
 standards:
   - documentation
@@ -72,7 +72,7 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: The archived Svelte root has no suite; the active Angular root has 12 test files, 47 passing tests, and nine Playwright journeys, including keyboard/focus transitions, reduced-motion/narrow-viewport behavior, audio-preference restore, defeat records/history, and a built-artifact run, but not complete gameplay/accessibility coverage.
+      evidence: The archived Svelte root has no suite; the active Angular root has 12 test files, 49 passing tests, and nine Playwright journeys, including keyboard/focus transitions, reduced-motion/narrow-viewport behavior, audio-preference restore, defeat records/history, malformed persistence-boundary rejection, and a built-artifact run, but not complete gameplay/accessibility coverage.
       priority: high
       next_action: Retain the automated focus/responsive assertions and add manual accessibility evidence before release.
     - id: TS-001
