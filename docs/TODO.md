@@ -26,11 +26,11 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 ### TODO-003 [High] Clear current type and accessibility errors
 
-- **Status:** Planned
+- **Status:** Deferred for archived source; active root has a separate accessibility backlog
 - **Affected area:** `Tooltip.svelte`, `PowerUps.svelte`, `StoreItem.svelte`, `Modal.svelte`, `Welcome.svelte`, `src/routes/+layout.svelte`
 - **Evidence:** Direct `svelte-check` found 4 type errors and 3 warnings; ESLint found 5 errors and 3 warnings.
 - **Risk:** The current source cannot serve as a clean characterization baseline, and interaction defects are hidden by tooling noise.
-- **Next action:** Decide whether to repair legacy files minimally or freeze them and cover the rewrite; record each intentional legacy exception.
+- **Next action:** Keep the archived findings as evidence and track active-root accessibility in TODO-011; do not repair archived source without an explicit compatibility need.
 - **Dependencies:** TODO-001 and TODO-002
 - **Owner:** Future developer agent
 - **Target:** Before migration comparison
@@ -72,9 +72,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** `legacy/svelte/src/lib/services/storage.service.ts`, root Angular storage adapter, and volume preference handling
-- **Evidence:** The active Angular app has a versioned `hexakill.angular.session.v1` envelope, injectable storage boundary, invalid-JSON clearing, and non-fatal browser storage failure handling. Full migration coverage remains missing.
+- **Evidence:** The active Angular app has a versioned `hexakill.angular.session.v1` envelope, injectable storage boundary, structural validation for player/enemy/progression data, canonical character/item hydration, invalid-record clearing, and non-fatal browser storage failure handling. Migration from legacy keys and preference persistence remain missing.
 - **Risk:** Old/corrupt local storage can crash or create invalid records and preferences.
-- **Next action:** Add runtime schema validation, migration policy, browser restore tests, and malformed-record fixtures.
+- **Next action:** Decide migration policy for legacy keys/preferences and extend malformed-record fixtures as the session schema evolves.
 - **Dependencies:** TODO-006
 - **Owner:** Future rewrite agent
 - **Target:** Before persistence is retained
@@ -114,11 +114,11 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 ### TODO-011 [Medium] Accessibility critical-journey contract
 
-- **Status:** Planned
+- **Status:** Partially resolved
 - **Affected area:** All game views and interactive components
-- **Evidence:** Current svelte-check warnings identify mouse-only tooltip behavior and clickable non-controls; name input lacks a label; no manual review exists.
+- **Evidence:** Archived Svelte warnings identify mouse-only tooltip behavior and clickable non-controls. The active root has labeled name input, semantic buttons/status regions, visible focus styles, and one keyboard-start journey, but no full focus/assistive-technology review.
 - **Risk:** Players cannot complete core flows with keyboard, assistive technology, or non-pointer input.
-- **Next action:** Define accessible names, focus order/return, dialog behavior, status announcements, reduced motion/audio behavior, and keyboard alternatives for the run journey.
+- **Next action:** Define and test focus order/return, status announcements, reduced-motion/audio behavior, and keyboard completion of combat/store/power-up/game-over journeys.
 - **Dependencies:** TODO-006 and TODO-009
 - **Owner:** Future UI agent
 - **Target:** Before browser test completion

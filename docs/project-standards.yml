@@ -91,10 +91,10 @@ compliance:
       priority: high
       next_action: Add audit/report retention and keep the workflow aligned with top-level promotion.
     - id: A11Y-002
-      status: gap
-      evidence: svelte-check and source review identify non-keyboard tooltip/store interactions.
+      status: partial
+      evidence: Archived Svelte source has non-keyboard tooltip/store findings; the active root replaces those interactions with buttons and covers keyboard activation for the start journey.
       priority: high
-      next_action: Define keyboard-accessible critical journeys for the rewrite and cover them in browser tests.
+      next_action: Extend focus/keyboard assertions across combat, store, power-up, and game-over views.
 
 exceptions: []
 

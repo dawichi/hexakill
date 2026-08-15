@@ -18,6 +18,7 @@ The archived Svelte commands below are historical evidence only. They are not pa
 | Active browser journeys   | `npm run test:e2e`                        | Passes locally: 7 Chromium journeys.                                            |
 | Active build              | `npm run build`                           | Passes; output is `dist/hexakill/browser/`.                                     |
 | Dependency audit          | `npm audit --audit-level=high`            | Passes locally with 0 high-severity vulnerabilities; CI now runs the same gate. |
+| Active asset paths        | `npm run verify:assets`                   | Verifies all 36 typed idle/item/music/sound paths used by the active app.       |
 
 The archived Svelte findings are recorded in [TODO-003](TODO.md#todo-003-high-clear-current-type-and-accessibility-errors); they are not active root blockers.
 
@@ -34,6 +35,7 @@ The root Angular application is the currently validated implementation surface. 
 | CI validation           | `.github/workflows/angular-rewrite.yml`                         | Runs install, formatting, dev-server and production-artifact browser journeys, build, and representative/full idle-asset checks.                                                   |
 | Browser journeys        | `npm run test:e2e`                                              | Passes locally: 7 Chromium journeys cover store/combat, restore, invalid-session recovery, keyboard start, defeat, rewards/power-ups, and sequential bosses; CI installs Chromium. |
 | Production-like browser | `npm run test:e2e:production`                                   | Passes locally against `dist/hexakill/browser/` through the repository static preview server.                                                                                      |
+| Active asset paths      | `npm run verify:assets`                                         | Passes locally for all 36 typed idle/item/music/sound paths.                                                                                                                       |
 | Browser smoke           | `npm start`                                                     | Verified welcome → character selection → ready run → store purchase → combat → Attack with migrated sprites.                                                                       |
 
 The Angular application is not a production deployment. It has provisional combat, progression, power-up, store, versioned local-session persistence, sound/music lifecycle, and CI/browser journey gates; hosting acceptance and final gameplay balance remain unresolved.

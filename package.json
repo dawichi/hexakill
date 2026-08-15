@@ -7,6 +7,7 @@
     "build": "ng build",
     "serve:dist": "node tools/serve-static.mjs dist/hexakill/browser",
     "preview": "npm run build && npm run serve:dist",
+    "verify:assets": "node tools/verify-assets.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "format:check": "prettier --check 'src/**/*.{ts,html,css}' 'e2e/**/*.ts' 'tools/**/*.mjs' 'playwright.config.ts' '*.json' '*.md'",
