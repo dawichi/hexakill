@@ -59,10 +59,15 @@ From the repository root:
 
 ```sh
 npm ci
+npm run verify:toolchain
+npm run format:check
+npm run verify:types
+npm run verify:docs
+npm run verify:assets
+npm run verify:deployment
 npm test -- --watch=false --no-progress
 npm run build
 npm run verify:release
-npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'
 ```
 
 The current verified result is a clean root install, 13 test files with 60 passing tests, a passing aggregate `npm run verify:release` gate, a passing root production build, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and thirteen Chromium journeys covering progression/store/combat, Wizard and Samurai provisional player-action sprite rendering, mapped player/enemy attack/defeat-strip rendering, local-session restore, audio-preference restore, invalid-session recovery including whitespace-only and negative-stat restored data, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
