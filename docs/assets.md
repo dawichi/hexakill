@@ -37,4 +37,4 @@ The counts above are repository observations from `static/`; rerun `find static/
 
 ## Deferred work
 
-The full asset set is not yet mapped to every enemy, attack, death state, item, or UI surface. That work belongs with combat, store, progression, and accessibility slices. See [TODO-012](TODO.md#todo-012-medium-asset-and-licensing-inventory) and [handoff](handoff.md).
+The full asset set is not yet mapped to every enemy, attack, death state, item, or UI surface. The exact 75 deferred files are cataloged in [the sprite-source register](assets-sprite-sources.md). That work belongs with combat, store, progression, and accessibility slices. See [TODO-012](TODO.md#todo-012-medium-asset-and-licensing-inventory) and [handoff](handoff.md).

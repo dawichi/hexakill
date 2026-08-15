@@ -19,6 +19,7 @@ This file is the canonical project-specific instruction entry point for AI devel
 - Current game state and rules: `src/app/application/` and `src/app/domain/`.
 - Current static assets: `static/`.
 - Asset provenance and release restrictions: [asset provenance register](assets-provenance.md).
+- Deferred sprite/sheet evidence: [sprite-source catalog](assets-sprite-sources.md).
 - Package and tool configuration: `package.json`, `package-lock.json`, `angular.json`, TypeScript/Prettier files, and the CI workflow.
 - Current deployment evidence: [operations documentation](operations.md), `vercel.json`, and the root `README.md`. The Vercel endpoint is observed but still serves the archived SvelteKit deployment.
 - Proposed future design: `docs/architecture/rewrite-*.md`. These files MUST NOT be used as evidence that the proposed architecture already exists.
