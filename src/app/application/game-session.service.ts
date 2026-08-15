@@ -194,6 +194,30 @@ function isRestorableCombatState(value: unknown): value is CombatState {
   );
 }
 
+function hasCoherentSessionState(snapshot: Partial<StoredSessionSnapshot>): boolean {
+  const hasPlayer = snapshot.player !== null;
+  const hasEnemy = snapshot.combatState?.enemy !== null;
+  const phase = snapshot.combatState?.phase;
+
+  if (!hasPlayer) {
+    return (
+      (snapshot.screen === 'welcome' || snapshot.screen === 'character-select') &&
+      phase === 'idle' &&
+      !hasEnemy
+    );
+  }
+
+  if (snapshot.screen === 'combat-ready') {
+    return phase === 'idle' && !hasEnemy;
+  }
+
+  if (snapshot.screen === 'combat') {
+    return (phase === 'awaiting-player-action' || phase === 'victory') && hasEnemy;
+  }
+
+  return snapshot.screen === 'game-over' && phase === 'defeat' && hasEnemy;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GameSessionService {
   private readonly random: RandomSource = inject(RANDOM_SOURCE, { optional: true }) ?? Math.random;
@@ -721,7 +745,8 @@ export class GameSessionService {
         (snapshot.player !== null && !isRestorablePlayer(snapshot.player)) ||
         (snapshot.selectedCharacterId !== null && !selectedCharacter) ||
         (playerCharacterId !== undefined && selectedCharacter?.id !== playerCharacterId) ||
-        (playerHealth !== null && snapshot.combatState.playerDamageTaken > playerHealth)
+        (playerHealth !== null && snapshot.combatState.playerDamageTaken > playerHealth) ||
+        !hasCoherentSessionState(snapshot)
       ) {
         this.storage?.clear();
         return;
