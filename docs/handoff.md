@@ -35,7 +35,7 @@ The active app consumes the legacy character/enemy idle GIFs through typed `idle
 
 ## Deliberate non-goals
 
-Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session, records, and preferences envelopes, non-fatal audio playback, CI, and nine Chromium journeys, but these are still provisional.
+Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session, records, and preferences envelopes, non-fatal audio playback, CI, and ten Chromium journeys, but these are still provisional.
 
 ## Known characterization points
 
@@ -63,4 +63,4 @@ npm run build
 npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'
 ```
 
-The current verified result is a clean root install, 12 test files with 49 passing tests, a passing root production build, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and nine Chromium journeys covering progression/store/combat, local-session restore, audio-preference restore, invalid-session recovery, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
+The current verified result is a clean root install, 12 test files with 49 passing tests, a passing root production build, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and ten Chromium journeys covering progression/store/combat, local-session restore, audio-preference restore, invalid-session recovery including whitespace-only restored names, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
