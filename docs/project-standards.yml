@@ -42,13 +42,13 @@ profiles:
 compliance:
   summary_document: standards-assessment.md
   status_counts:
-    compliant: 10
-    partial: 17
-    gap: 21
+    compliant: 15
+    partial: 40
+    gap: 6
     deferred: 5
     exception: 0
-    not_applicable: 21
-    unknown: 10
+    not_applicable: 26
+    unknown: 7
   rules:
     - id: DOC-001
       status: compliant
