@@ -17,7 +17,7 @@ The root application separates the active run from personal records:
 - Each record uses the stable `characterId`, the player `name`, and the reached `level`.
 - Records are validated on restore, sorted descending by level, and capped at five entries.
 - Invalid or malformed records are discarded safely.
-- Restored run snapshots must match a coherent screen/phase shape: character selection has no player or enemy, a ready screen has an idle player with no enemy, combat has an enemy awaiting action or showing victory, and game-over has an enemy with a defeat phase.
+- Restored run snapshots must match a coherent screen/phase shape: character selection has no player or enemy, a ready screen has an idle player with no enemy, combat has an undamaged enemy awaiting action or a defeated enemy showing victory, and game-over has an enemy with a defeat phase and lethal player damage.
 - Durable v1 snapshots reject transient `pendingAction` values and malformed `lastResult` values; the application never resumes an in-flight action or delayed enemy turn after reload.
 - Defeat writes one record; resetting a run preserves the records list.
 - The welcome and game-over views expose the list and a clear action.
