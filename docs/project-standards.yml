@@ -72,7 +72,7 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: The archived Svelte root has no suite; the active Angular root has 12 test files, 44 passing tests, and eight Playwright journeys, including keyboard start, audio-preference restore, defeat records/history, and a built-artifact run, but not complete gameplay/accessibility coverage.
+      evidence: The archived Svelte root has no suite; the active Angular root has 12 test files, 46 passing tests, and eight Playwright journeys, including keyboard start, audio-preference restore, defeat records/history, and a built-artifact run, but not complete gameplay/accessibility coverage.
       priority: high
       next_action: Add accessibility assertions and retain browser coverage as product features expand.
     - id: TS-001

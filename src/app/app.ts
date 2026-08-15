@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { GameSessionService } from './application/game-session.service';
-import { CharacterDefinition } from './domain/game-types';
+import { CharacterDefinition, ItemState } from './domain/game-types';
 import { PersonalRecord } from './domain/records';
 
 @Component({
@@ -42,5 +42,12 @@ export class App {
       this.session.characters.find((character) => character.id === record.characterId) ??
       this.session.characters[0]
     );
+  }
+
+  protected itemBonusLabel(item: ItemState): string {
+    return Object.entries(item.bonus)
+      .filter(([, value]) => value !== 0)
+      .map(([stat, value]) => `+${value} ${stat.toUpperCase()}`)
+      .join(' · ');
   }
 }

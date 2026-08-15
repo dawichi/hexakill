@@ -107,9 +107,7 @@
               [attr.aria-pressed]="session.selectedCharacter()?.id === character.id"
               (click)="selectCharacter(character)"
             >
-              <span class="character-icon" aria-hidden="true">{{
-                character.name.slice(0, 1)
-              }}</span>
+              <img class="character-art" [src]="character.idleAsset" alt="" aria-hidden="true" />
               <span class="character-name">{{ character.name }}</span>
               <span>{{ character.description }}</span>
               <span class="weakness">{{ character.weakness }}</span>
@@ -174,6 +172,23 @@
               </div>
             }
           </dl>
+
+          @if (player.inventory.length) {
+            <section class="inventory-panel" aria-labelledby="ready-inventory-title">
+              <h3 id="ready-inventory-title">Equipment</h3>
+              <div class="inventory-grid">
+                @for (item of player.inventory; track item.id) {
+                  <article class="inventory-item">
+                    <img class="item-sprite" [src]="item.asset" [alt]="item.name" />
+                    <span>
+                      <strong>{{ item.name }}</strong>
+                      <small>{{ itemBonusLabel(item) }}</small>
+                    </span>
+                  </article>
+                }
+              </div>
+            </section>
+          }
 
           <div class="next-step">
             <p class="eyebrow">Next action</p>
@@ -253,6 +268,23 @@
                 </p>
               </article>
             </div>
+
+            @if (player.inventory.length) {
+              <section class="inventory-panel" aria-labelledby="combat-inventory-title">
+                <h3 id="combat-inventory-title">Equipment</h3>
+                <div class="inventory-grid">
+                  @for (item of player.inventory; track item.id) {
+                    <article class="inventory-item">
+                      <img class="item-sprite" [src]="item.asset" [alt]="item.name" />
+                      <span>
+                        <strong>{{ item.name }}</strong>
+                        <small>{{ itemBonusLabel(item) }}</small>
+                      </span>
+                    </article>
+                  }
+                </div>
+              </section>
+            }
 
             <p class="combat-message" role="status">{{ session.combatMessage() }}</p>
 

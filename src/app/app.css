@@ -216,22 +216,12 @@ h3 {
   font-weight: 800;
 }
 
-.character-icon {
-  display: grid;
-  width: 3rem;
-  height: 3rem;
-  place-items: center;
-  border-radius: 50%;
-  background: #18181b;
-  color: #67e8f9;
-  font-size: 1.5rem;
-  font-weight: 900;
-}
-
-.character-icon.large {
-  width: 5rem;
-  height: 5rem;
-  font-size: 2.5rem;
+.character-art {
+  display: block;
+  width: 6rem;
+  height: 6rem;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 .entity-sprite {
@@ -360,6 +350,44 @@ h3 {
 
 .empty-records {
   margin: 0.75rem 0 0;
+  color: #a1a1aa;
+}
+
+.inventory-panel {
+  margin: 1.5rem 0;
+  border: 1px solid #3f3f46;
+  border-radius: 0.75rem;
+  background: #18181b;
+  padding: 1rem;
+}
+
+.inventory-panel h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.inventory-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.inventory-item {
+  display: flex;
+  min-width: 12rem;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 0.5rem;
+  background: #27272a;
+  padding: 0.5rem 0.75rem;
+}
+
+.inventory-item span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.inventory-item small {
   color: #a1a1aa;
 }
 

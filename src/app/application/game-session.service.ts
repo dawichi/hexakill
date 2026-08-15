@@ -1,7 +1,12 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { AUDIO, AudioPort } from './audio';
-import { BROWSER_CLOCK, CLOCK, Clock } from './clock';
-import { chooseEnemyAction, CombatAction, resolveAction } from '../domain/combat-actions';
+import { BROWSER_CLOCK, CLOCK, Clock, ClockHandle } from './clock';
+import {
+  chooseEnemyAction,
+  CombatAction,
+  determineFirstActor,
+  resolveAction,
+} from '../domain/combat-actions';
 import {
   applyPowerUp,
   applyVictoryReward,
@@ -196,6 +201,8 @@ export class GameSessionService {
     optional: true,
   });
   private readonly audio: AudioPort | null = inject(AUDIO, { optional: true });
+  private pendingEnemyTurn: ClockHandle | null = null;
+  private runGeneration = 0;
   readonly screen = signal<GameScreen>('welcome');
   readonly playerName = signal('');
   readonly selectedCharacter = signal<CharacterDefinition | null>(null);
@@ -318,13 +325,19 @@ export class GameSessionService {
       enemy: spawnedEnemy,
     });
     this.enemyAnimation.set('idle');
-    this.combatMessage.set('The enemy has appeared. Choose an action.');
     this.screen.set('combat');
     this.audio?.playMusic(
       spawnedEnemy.definition.archetype === 'boss'
         ? ASSET_MANIFEST.music.boss
         : ASSET_MANIFEST.music.dungeon,
     );
+
+    if (determineFirstActor(player.stats.speed, spawnedEnemy.stats.speed) === 'enemy') {
+      this.combatMessage.set(`${spawnedEnemy.definition.name} attacks first.`);
+      this.startEnemyTurn();
+    } else {
+      this.combatMessage.set('The enemy has appeared. Choose an action.');
+    }
   }
 
   openStore(): void {
@@ -409,7 +422,7 @@ export class GameSessionService {
 
     if (this.combatState().phase === 'enemy-turn') {
       this.combatMessage.set(`${this.combatMessage()} The enemy is preparing its turn.`);
-      this.clock.schedule(() => this.resolveEnemyTurn(), 300);
+      this.scheduleEnemyTurn();
     }
   }
 
@@ -428,7 +441,7 @@ export class GameSessionService {
     }));
     this.combatMessage.set(`You used a potion and healed ${healed} HP.`);
     this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
-    this.clock.schedule(() => this.resolveEnemyTurn(), 300);
+    this.scheduleEnemyTurn();
   }
 
   choosePowerUp(type: Parameters<typeof applyPowerUp>[1]): void {
@@ -457,6 +470,8 @@ export class GameSessionService {
   }
 
   reset(): void {
+    this.cancelPendingEnemyTurn();
+    this.runGeneration += 1;
     this.screen.set('welcome');
     this.playerName.set('');
     this.selectedCharacter.set(null);
@@ -481,6 +496,7 @@ export class GameSessionService {
   }
 
   private resolveEnemyTurn(): void {
+    this.pendingEnemyTurn = null;
     const player = this.player();
     const enemy = this.enemy();
 
@@ -531,6 +547,25 @@ export class GameSessionService {
       this.screen.set('game-over');
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
     }
+  }
+
+  private startEnemyTurn(): void {
+    if (!this.applyCombatEvent({ type: 'enemy-turn-started' })) return;
+    this.scheduleEnemyTurn();
+  }
+
+  private scheduleEnemyTurn(): void {
+    this.cancelPendingEnemyTurn();
+    const generation = this.runGeneration;
+    this.pendingEnemyTurn = this.clock.schedule(() => {
+      if (generation !== this.runGeneration) return;
+      this.resolveEnemyTurn();
+    }, 300);
+  }
+
+  private cancelPendingEnemyTurn(): void {
+    this.pendingEnemyTurn?.cancel();
+    this.pendingEnemyTurn = null;
   }
 
   get characters(): readonly CharacterDefinition[] {

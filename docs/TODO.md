@@ -61,9 +61,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** Future rewrite domain/application layers
-- **Evidence:** Current `GameDTO` allowed mutable nested combinations and view transitions were distributed across archived components/services. The Angular app now has a pure combat reducer for idle, player action, potion, enemy turn, resolution, victory, and defeat, with progression and boss progress in the run state.
+- **Evidence:** Current `GameDTO` allowed mutable nested combinations and view transitions were distributed across archived components/services. The Angular app now has a pure combat reducer for idle, player action, potion, enemy turn, resolution, victory, and defeat, with speed-based opening turns, progression, boss progress, scheduler-backed delayed turns, and reset cancellation guards at the application boundary.
 - **Risk:** Invalid transitions, duplicate delayed callbacks, and stale UI actions can corrupt a run.
-- **Next action:** Characterize progression, cancellation behavior, and terminal-state rules, then extend the pure state machine without coupling it to Angular.
+- **Next action:** Characterize progression and terminal-state rules further, then move scheduler tokens into the framework-independent state contract if delayed transitions expand.
 - **Dependencies:** TODO-004 and TODO-005
 - **Owner:** Future rewrite agent
 - **Target:** Rewrite foundation

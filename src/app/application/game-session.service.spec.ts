@@ -11,11 +11,13 @@ describe('GameSessionService', () => {
   let rolls: number[];
   let recordsValue: string | null;
   let scheduledTask: (() => void) | undefined;
+  let cancelled = false;
   const testClock: Clock = {
     now: () => 1234,
     schedule: (task) => {
       scheduledTask = task;
-      return { cancel: () => undefined };
+      cancelled = false;
+      return { cancel: () => (cancelled = true) };
     },
   };
 
@@ -42,6 +44,9 @@ describe('GameSessionService', () => {
     service.setPlayerName('David');
     service.selectCharacter(CHARACTER_DEFINITIONS[0]);
     service.startRun();
+    service.player.update((player) =>
+      player ? { ...player, stats: { ...player.stats, speed: 100 } } : player,
+    );
     service.findEnemy();
 
     expect(service.screen()).toBe('combat');
@@ -98,5 +103,35 @@ describe('GameSessionService', () => {
     service.reset();
 
     expect(service.personalRecords()).toHaveLength(1);
+  });
+
+  it('cancels delayed enemy turns when a run is reset', () => {
+    service.setPlayerName('David');
+    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
+    service.startRun();
+    service.findEnemy();
+    service.attack('attack');
+
+    service.reset();
+
+    expect(cancelled).toBe(true);
+    scheduledTask?.();
+    expect(service.screen()).toBe('welcome');
+    expect(service.player()).toBeNull();
+  });
+
+  it('lets a faster enemy take the opening turn', () => {
+    service.setPlayerName('David');
+    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
+    service.startRun();
+    const player = service.player();
+    if (!player) throw new Error('Expected a player.');
+
+    service.player.set({ ...player, stats: { ...player.stats, speed: 1 } });
+    service.findEnemy();
+
+    expect(service.combatState().phase).toBe('enemy-turn');
+    expect(service.combatMessage()).toContain('attacks first');
+    expect(service.canAct()).toBe(false);
   });
 });

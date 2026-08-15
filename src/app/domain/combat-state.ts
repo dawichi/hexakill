@@ -85,11 +85,11 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
   }
 
   if (event.type === 'enemy-turn-started') {
-    if (state.phase !== 'enemy-turn' || !state.enemy) {
+    if (state.phase !== 'awaiting-player-action' || !state.enemy) {
       return rejected(state, 'The enemy turn is not available in the current combat phase.');
     }
 
-    return { accepted: true, state };
+    return { accepted: true, state: { ...state, phase: 'enemy-turn' } };
   }
 
   if (event.type === 'player-potion-used') {

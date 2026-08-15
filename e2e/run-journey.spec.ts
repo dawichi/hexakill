@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 async function startRun(page: import('@playwright/test').Page): Promise<void> {
   await page.getByRole('button', { name: 'Choose your champion' }).click();
   await page.getByLabel('Player name').fill('Agent');
+  await expect(page.locator('.character-art')).toHaveCount(3);
   await page.getByRole('button', { name: /Wizard/ }).click();
   await page.getByRole('button', { name: 'Start game' }).click();
   await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
@@ -35,6 +36,7 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await findEnemyButton.focus();
   await findEnemyButton.press('Enter');
   await expect(page.getByRole('heading', { name: /appears/ })).toBeVisible();
+  await expect(page.locator('.inventory-item').getByRole('img', { name: 'Sword' })).toBeVisible();
   await expect(page.getByText(/216 attack/)).toBeVisible();
   await expect(page.getByRole('meter', { name: 'Enemy health' })).toHaveAttribute(
     'aria-valuemin',
