@@ -10,7 +10,7 @@ This record separates evidence that can be verified from source and automated br
 - Music and effects sliders expose a human-readable `aria-valuetext` and retain their values through the versioned preferences envelope.
 - Dynamic validation, combat, store, and game-over messages use atomic status/alert regions so assistive technology receives the complete updated message.
 - Screen headings have programmatic focus targets. The browser suite verifies focus after welcome navigation, store entry/return, combat entry, power-up selection, game-over, reset, and keyboard activation.
-- The suite verifies reduced-motion behavior and no horizontal overflow at a 360px viewport.
+- The suite verifies reduced-motion behavior and no horizontal overflow at a 360px viewport across welcome, character selection, and combat.
 - Character-selection art is decorative in context and is hidden from the accessibility tree; character, enemy, item, and history art that conveys entity identity has text alternatives.
 - A native `<details>` disclosure provides the current “How to play” content without a custom dialog or pointer-only interaction.
 

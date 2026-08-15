@@ -156,6 +156,18 @@ test('reduced motion and a narrow viewport remain usable', async ({ page }) => {
     scrollWidth: document.documentElement.scrollWidth,
   }));
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
+
+  await page.getByRole('button', { name: 'Choose your champion' }).click();
+  await page.getByLabel('Player name').fill('Agent');
+  await page.getByRole('button', { name: /Wizard/ }).click();
+  await page.getByRole('button', { name: 'Start game' }).click();
+  await page.getByRole('button', { name: 'Find an enemy' }).click();
+
+  const combatDimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+  expect(combatDimensions.scrollWidth).toBeLessThanOrEqual(combatDimensions.clientWidth);
 });
 
 test('an invalid saved session is discarded safely', async ({ page }) => {
