@@ -48,7 +48,7 @@ Final persistence acceptance, deployment, and gameplay balancing remain unresolv
 ## Next recommended session
 
 1. Decide whether to migrate legacy `hxkllPersonalRecords` and whether records remain local-only; record the decision in an ADR.
-2. Complete the asset provenance map and accessibility review.
+2. Resolve owner/source/license decisions recorded in [the asset provenance register](assets-provenance.md), then complete the accessibility review.
 3. Select an accepted hosting provider and run an authorized Angular preview.
 4. Review final gameplay balance, store effects, and the remaining 75 unmapped animation sources.
 
