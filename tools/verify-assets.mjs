@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 const projectRoot = resolve(new URL('..', import.meta.url).pathname);
@@ -99,6 +99,33 @@ if (deferredImageCount !== 61) {
   process.exit(1);
 }
 
+const sourceAssetPaths = new Set();
+for (const sourcePath of listFiles(resolve(projectRoot, 'src/app'))) {
+  const source = readFileSync(sourcePath, 'utf8');
+  for (const match of source.matchAll(/["'`](\/(?:images|music|sounds)\/[^"'`\s)]+)["'`]/g)) {
+    sourceAssetPaths.add(match[1].slice(1));
+  }
+}
+
+const undeclaredSourceAssets = [...sourceAssetPaths].filter(
+  (asset) => !requiredAssets.includes(asset),
+);
+const missingSourceDeclarations = requiredAssets.filter((asset) => !sourceAssetPaths.has(asset));
+if (undeclaredSourceAssets.length > 0 || missingSourceDeclarations.length > 0) {
+  console.error('The active source asset references and the verification contract have drifted.');
+  if (undeclaredSourceAssets.length > 0) {
+    console.error(
+      `- Source references missing from requiredAssets: ${undeclaredSourceAssets.join(', ')}`,
+    );
+  }
+  if (missingSourceDeclarations.length > 0) {
+    console.error(
+      `- requiredAssets not referenced by active source: ${missingSourceDeclarations.join(', ')}`,
+    );
+  }
+  process.exit(1);
+}
+
 console.log(
-  `Verified ${requiredAssets.length} active asset paths and ${deferredImageCount} cataloged deferred image sources under ${assetRoot}.`,
+  `Verified ${requiredAssets.length} active asset paths, ${deferredImageCount} cataloged deferred image sources, and source-reference parity under ${assetRoot}.`,
 );
