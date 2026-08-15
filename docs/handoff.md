@@ -31,11 +31,11 @@ Victory now also appends a typed defeated-enemy history entry to the run. Game o
 
 Audio preferences now use a separate validated envelope with the observed legacy defaults (`music=0.05`, `effects=0.2`), accessible range controls, and audio-port volume application. The old `musicVolume` and `effectsVolume` keys are not auto-migrated.
 
-The active app consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields, uses observed Evil Tree/slime attack and defeat GIFs through optional typed enemy animation fields with a scheduler-backed 600 ms enemy-attack window, renders provisional Wizard/Samurai single-row `Attack1.png` strips during player actions and `Death.png` strips on game over, and maps observed Wild Huntress/Evil Wizard/Fire Worm/Martial Hero single-row `Attack1.png` strips during enemy attack windows plus `Death.png` strips during provisional defeat states. Boss encounters select the typed boss music asset; regular encounters select dungeon music. The retained root `static/` tree is copied into Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is behind an injectable audio port.
+The active app consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields, uses observed Evil Tree/slime attack and defeat GIFs through optional typed enemy animation fields with a scheduler-backed 600 ms enemy-attack window, renders provisional Wizard/Samurai single-row `Attack1.png` strips during player actions and `Death.png` strips on game over, and maps observed Wild Huntress/Evil Wizard/Fire Worm/Martial Hero single-row `Attack1.png` strips plus Witch Blue's vertical attack strip during enemy attack windows, with corresponding defeat strips during provisional defeat states. Boss encounters select the typed boss music asset; regular encounters select dungeon music. The retained root `static/` tree is copied into Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is behind an injectable audio port.
 
 ## Deliberate non-goals
 
-Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session, records, and preferences envelopes, non-fatal audio playback, CI, and fifteen Chromium journeys, but these are still provisional.
+Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session, records, and preferences envelopes, non-fatal audio playback, CI, and sixteen Chromium journeys, but these are still provisional.
 
 ## Known characterization points
 
@@ -51,7 +51,7 @@ Final persistence acceptance, deployment, and gameplay balancing remain unresolv
 1. Decide whether to migrate legacy `hxkllPersonalRecords` and whether records remain local-only; record the decision in an ADR.
 2. Resolve owner/source/license decisions recorded in [the asset provenance register](assets-provenance.md), then complete the accessibility review.
 3. Select an accepted hosting provider and run an authorized Angular preview.
-4. Review final gameplay balance, store effects, and the remaining 63 unmapped animation sources in [the sprite-source catalog](assets-sprite-sources.md).
+4. Review final gameplay balance, store effects, and the remaining 61 unmapped animation sources in [the sprite-source catalog](assets-sprite-sources.md).
 
 ## Validation at handoff
 
@@ -70,4 +70,4 @@ npm run build
 npm run verify:release
 ```
 
-The current verified result is a clean root install, 13 test files with 61 passing tests, a passing aggregate `npm run verify:release` gate, a passing root production build, a passing publishable-artifact contract check for `dist/hexakill/browser/index.html`, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and fifteen Chromium journeys covering progression/store/combat, Wizard and Samurai provisional player-action sprite rendering, mapped player/enemy attack/defeat-strip rendering, local-session restore, audio-preference restore, invalid-session recovery including incoherent-screen, whitespace-only, negative-stat, and unbound-character restored data, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
+The current verified result is a clean root install, 13 test files with 62 passing tests, a passing aggregate `npm run verify:release` gate, a passing root production build, a passing publishable-artifact contract check for `dist/hexakill/browser/index.html`, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and sixteen Chromium journeys covering progression/store/combat, Wizard and Samurai provisional player-action sprite rendering, mapped player/enemy attack/defeat-strip rendering including Witch Blue's vertical attack strip, local-session restore, audio-preference restore, invalid-session recovery including incoherent-screen, whitespace-only, negative-stat, and unbound-character restored data, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.

@@ -1,6 +1,6 @@
 import { afterRenderEffect, Component, DOCUMENT, inject } from '@angular/core';
 import { GameSessionService } from './application/game-session.service';
-import { CharacterDefinition, ItemState } from './domain/game-types';
+import { CharacterDefinition, ItemState, SpriteStripAsset } from './domain/game-types';
 import { PersonalRecord } from './domain/records';
 
 @Component({
@@ -71,5 +71,17 @@ export class App {
       .filter(([, value]) => value !== 0)
       .map(([stat, value]) => `+${value} ${stat.toUpperCase()}`)
       .join(' · ');
+  }
+
+  protected spriteBackgroundSize(asset: SpriteStripAsset): string {
+    return asset.orientation === 'vertical'
+      ? `100% ${asset.frameCount * 100}%`
+      : `${asset.frameCount * 100}% 100%`;
+  }
+
+  protected spriteAnimation(asset: SpriteStripAsset, duration: number): string {
+    const animationName =
+      asset.orientation === 'vertical' ? 'sprite-strip-play-vertical' : 'sprite-strip-play';
+    return `${animationName} ${duration}ms steps(${asset.frameCount}) 1 both`;
   }
 }

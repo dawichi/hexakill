@@ -49,3 +49,13 @@ input:focus-visible {
     background-position: 100% 0;
   }
 }
+
+@keyframes sprite-strip-play-vertical {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 0 100%;
+  }
+}

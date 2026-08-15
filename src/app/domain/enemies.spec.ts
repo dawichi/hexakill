@@ -47,6 +47,7 @@ describe('enemy generation', () => {
     expect(enemyAssetFor('slime-blue', 'defeat')).toBe('/images/slime-blue/die.gif');
     expect(enemyAssetFor('knight', 'attack')).toBe('/images/knight/idle.gif');
     expect(enemyAssetFor('unknown', 'idle')).toBeUndefined();
+    expect(enemySpriteAssetFor('evil-wizard', 'idle')).toBeUndefined();
   });
 
   it('maps only observed single-row enemy defeat strips', () => {
@@ -101,6 +102,23 @@ describe('enemy generation', () => {
       frameWidth: 150,
       frameHeight: 150,
       frameCount: 5,
+    });
+  });
+
+  it('maps the observed Witch Blue vertical attack and defeat strips', () => {
+    expect(enemySpriteAssetFor('witch-blue', 'attack')).toEqual({
+      src: '/images/witch-blue/assets/B_witch_attack.png',
+      frameWidth: 104,
+      frameHeight: 104,
+      frameCount: 4,
+      orientation: 'vertical',
+    });
+    expect(enemySpriteAssetFor('witch-blue', 'defeat')).toEqual({
+      src: '/images/witch-blue/assets/B_witch_death.png',
+      frameWidth: 32,
+      frameHeight: 32,
+      frameCount: 15,
+      orientation: 'vertical',
     });
   });
 });

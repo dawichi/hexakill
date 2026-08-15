@@ -91,6 +91,8 @@ jobs:
           test -f dist/hexakill/browser/images/samurai/Sprites/Death.png
           test -f dist/hexakill/browser/images/wild-huntress/sprites/Attack1.png
           test -f dist/hexakill/browser/images/wild-huntress/sprites/Death.png
+          test -f dist/hexakill/browser/images/witch-blue/assets/B_witch_attack.png
+          test -f dist/hexakill/browser/images/witch-blue/assets/B_witch_death.png
           test -f dist/hexakill/browser/images/wizard/sprites/Death.png
           test -f dist/hexakill/browser/sounds/attack.mp3
           test "$(find dist/hexakill/browser/images -name idle.gif | wc -l | tr -d ' ')" -ge 21

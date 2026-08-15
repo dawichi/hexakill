@@ -2,7 +2,7 @@
 
 **Status:** Repository catalog, reviewed 2026-08-15. These files are retained historical assets, not approved runtime mappings.
 
-The 63 files below are present under `static/images/` but are not part of the active 60-path Angular asset contract. Most are sprite strips or sheets. Rendering one directly with `<img>` would display the full strip rather than an intentional animation, so frame geometry, timing, state semantics, accessibility behavior, and provenance must be reviewed before mapping them.
+The 61 files below are present under `static/images/` but are not part of the active 62-path Angular asset contract. Most are sprite strips or sheets. Rendering one directly with `<img>` would display the full strip rather than an intentional animation, so frame geometry, timing, state semantics, accessibility behavior, and provenance must be reviewed before mapping them.
 
 | Family           | Count | Retained files                                                                                                                                                     | Current disposition                                                                                 |
 | ---------------- | ----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
@@ -24,7 +24,7 @@ The 63 files below are present under `static/images/` but are not part of the ac
 | Slime Red        |     1 | `slime-red/slime-red.png`                                                                                                                                          | Deferred alternate source; GIF states are active separately                                         |
 | Water Priestess  |     1 | `water-priestess/WaterPriestess_SpriteSheet.png`                                                                                                                   | Deferred sheet extraction                                                                           |
 | Wild Huntress    |     9 | `wild-huntress/sprites/Attack2.png`; `Attack3.png`; `Fall.png`; `Idle.png`; `Jump.png`; `Run.png`; `Spear move.png`; `Spear.png`; `Take hit.png`                   | `Attack1.png` and `Death.png` are active provisional strips; remaining states are deferred          |
-| Witch Blue       |     7 | `witch-blue/assets/B_witch.gif`; `B_witch_attack.png`; `B_witch_charge.png`; `B_witch_death.png`; `B_witch_idle.png`; `B_witch_run.png`; `B_witch_take_damage.png` | Deferred vertical-strip states                                                                      |
+| Witch Blue       |     5 | `witch-blue/assets/B_witch.gif`; `B_witch_charge.png`; `B_witch_idle.png`; `B_witch_run.png`; `B_witch_take_damage.png`                                      | `B_witch_attack.png` and `B_witch_death.png` are active vertical provisional strips; remaining states are deferred |
 | Wizard           |     6 | `wizard/sprites/Attack2.png`; `Fall.png`; `Hit.png`; `Idle.png`; `Jump.png`; `Run.png`                                                                             | `Attack1.png` and `Death.png` are active provisional player strips; remaining states are deferred   |
 
 ## Mapping requirements

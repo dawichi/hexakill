@@ -249,13 +249,11 @@
                       role="img"
                       [attr.aria-label]="player.character.name + ' action animation'"
                       [style.background-image]="'url(' + actionAsset.src + ')'"
-                      [style.background-size]="actionAsset.frameCount * 100 + '% 100%'"
+                      [style.background-size]="spriteBackgroundSize(actionAsset)"
                       [style.aspect-ratio]="
                         actionAsset.frameWidth + ' / ' + actionAsset.frameHeight
                       "
-                      [style.animation]="
-                        'sprite-strip-play 600ms steps(' + actionAsset.frameCount + ') 1 both'
-                      "
+                      [style.animation]="spriteAnimation(actionAsset, 600)"
                     ></span>
                   } @else {
                     <img
@@ -295,13 +293,11 @@
                         : ' defeat animation')
                     "
                     [style.background-image]="'url(' + enemySpriteAsset.src + ')'"
-                    [style.background-size]="enemySpriteAsset.frameCount * 100 + '% 100%'"
+                    [style.background-size]="spriteBackgroundSize(enemySpriteAsset)"
                     [style.aspect-ratio]="
                       enemySpriteAsset.frameWidth + ' / ' + enemySpriteAsset.frameHeight
                     "
-                    [style.animation]="
-                      'sprite-strip-play 600ms steps(' + enemySpriteAsset.frameCount + ') 1 both'
-                    "
+                    [style.animation]="spriteAnimation(enemySpriteAsset, 600)"
                   ></span>
                 } @else {
                   <img
@@ -528,11 +524,9 @@
               role="img"
               [attr.aria-label]="player.character.name + ' defeat animation'"
               [style.background-image]="'url(' + defeatAsset.src + ')'"
-              [style.background-size]="defeatAsset.frameCount * 100 + '% 100%'"
+              [style.background-size]="spriteBackgroundSize(defeatAsset)"
               [style.aspect-ratio]="defeatAsset.frameWidth + ' / ' + defeatAsset.frameHeight"
-              [style.animation]="
-                'sprite-strip-play 900ms steps(' + defeatAsset.frameCount + ') 1 both'
-              "
+              [style.animation]="spriteAnimation(defeatAsset, 900)"
             ></span>
           }
           @if (session.defeatedEnemySummary().length) {

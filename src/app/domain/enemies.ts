@@ -87,6 +87,22 @@ const MARTIAL_HERO_ATTACK_SPRITE: SpriteStripAsset = {
   frameCount: 7,
 };
 
+const WITCH_BLUE_ATTACK_SPRITE: SpriteStripAsset = {
+  src: '/images/witch-blue/assets/B_witch_attack.png',
+  frameWidth: 104,
+  frameHeight: 104,
+  frameCount: 4,
+  orientation: 'vertical',
+};
+
+const WITCH_BLUE_DEFEAT_SPRITE: SpriteStripAsset = {
+  src: '/images/witch-blue/assets/B_witch_death.png',
+  frameWidth: 32,
+  frameHeight: 32,
+  frameCount: 15,
+  orientation: 'vertical',
+};
+
 const BASIC_MODIFIERS = modifiers();
 const AD_MODIFIERS = modifiers({ health: 0.75, ad: 1.5, ap: 0.5, speed: 1.5 });
 const AP_MODIFIERS = modifiers({ ad: 0.5, ap: 1.5 });
@@ -178,7 +194,10 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     attackSpriteAsset: WILD_HUNTRESS_ATTACK_SPRITE,
     defeatSpriteAsset: WILD_HUNTRESS_DEFEAT_SPRITE,
   }),
-  enemy('witch-blue', 'Witch Blue', 'ap', '/images/witch-blue/idle.gif', AP_MODIFIERS),
+  enemy('witch-blue', 'Witch Blue', 'ap', '/images/witch-blue/idle.gif', AP_MODIFIERS, {
+    attackSpriteAsset: WITCH_BLUE_ATTACK_SPRITE,
+    defeatSpriteAsset: WITCH_BLUE_DEFEAT_SPRITE,
+  }),
 ];
 
 const BOSS_DEFINITIONS: readonly EnemyDefinition[] = [
@@ -217,7 +236,9 @@ export function enemySpriteAssetFor(
 ): SpriteStripAsset | undefined {
   const definition = findEnemyDefinition(id);
   if (!definition) return undefined;
-  return animation === 'attack' ? definition.attackSpriteAsset : definition.defeatSpriteAsset;
+  if (animation === 'attack') return definition.attackSpriteAsset;
+  if (animation === 'defeat') return definition.defeatSpriteAsset;
+  return undefined;
 }
 
 function assertRoll(roll: number): void {

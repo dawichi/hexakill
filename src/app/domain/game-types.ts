@@ -11,6 +11,7 @@ export interface SpriteStripAsset {
   readonly frameWidth: number;
   readonly frameHeight: number;
   readonly frameCount: number;
+  readonly orientation?: 'horizontal' | 'vertical';
 }
 
 export interface PowerUpState {
