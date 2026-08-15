@@ -59,6 +59,10 @@ The external URL `https://hexakill.vercel.app` was reachable during this review 
 
 The Angular output mode is now documented as static in [the deployment contract](architecture/rewrite-deployment.md). The local `verify:preview` gate verifies the candidate artifact's headers, cache policy, and 404 behavior. Vercel is the observed candidate provider, but Angular migration, project ownership, rollback, and post-deploy asset behavior remain unverified.
 
+## Remote repository evidence
+
+A read-only ref check on 2026-08-15 found `origin/main` at `d441a66` (2024-01-19), `origin/develop` at `342e8b8`, and the local `main` at `371b1e1`, 135 commits ahead of `origin/main`. No push was performed in this preparation session. Local commits and green checks therefore do not prove that the Angular rewrite or its workflow has reached the remote repository; remote workflow execution, required checks, and branch protection remain unverified.
+
 ## Troubleshooting order
 
 1. Confirm the checkout and branch: `git status --short`, `git branch --show-current`, `git rev-parse HEAD`.
