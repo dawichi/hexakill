@@ -223,6 +223,21 @@ test('malformed audio preferences recover to safe defaults', async ({ page }) =>
   ).resolves.toBeNull();
 });
 
+test('malformed personal records recover to an empty list', async ({ page }) => {
+  await page.evaluate(() => {
+    localStorage.setItem(
+      'hexakill.angular.records.v1',
+      JSON.stringify({ version: 1, records: [{ characterId: 'invalid', name: '', level: -1 }] }),
+    );
+  });
+
+  await page.reload();
+  await expect(page.getByText('No records yet.')).toBeVisible();
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.records.v1')),
+  ).resolves.toBeNull();
+});
+
 test('reduced motion and a narrow viewport remain usable', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
