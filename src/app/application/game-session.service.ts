@@ -79,7 +79,10 @@ const STAT_KEYS: readonly (keyof Stats)[] = ['health', 'ad', 'ap', 'armor', 'mr'
 function hasNumberFields(value: unknown, fields: readonly string[]): boolean {
   return (
     isRecord(value) &&
-    fields.every((field) => typeof value[field] === 'number' && Number.isFinite(value[field]))
+    fields.every(
+      (field) =>
+        typeof value[field] === 'number' && Number.isFinite(value[field]) && value[field] >= 0,
+    )
   );
 }
 
