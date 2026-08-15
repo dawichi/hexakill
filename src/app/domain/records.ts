@@ -48,7 +48,7 @@ function isPersonalRecord(value: unknown): value is PersonalRecord {
     typeof record.characterId === 'string' &&
     CHARACTER_DEFINITIONS.some((character) => character.id === record.characterId) &&
     typeof record.name === 'string' &&
-    record.name.length >= 3 &&
+    record.name.trim().length >= 3 &&
     record.name.length <= 14 &&
     typeof record.level === 'number' &&
     Number.isInteger(record.level) &&

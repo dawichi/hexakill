@@ -27,4 +27,27 @@ describe('personal records', () => {
     );
     expect(isStoredRecordsSnapshot({ version: 2, records: snapshot.records })).toBe(false);
   });
+
+  it('rejects malformed record boundaries', () => {
+    expect(
+      isStoredRecordsSnapshot({
+        version: 1,
+        records: Array.from({ length: PERSONAL_RECORD_LIMIT + 1 }, () =>
+          createPersonalRecord('wizard', 'Agent', 4),
+        ),
+      }),
+    ).toBe(false);
+    expect(
+      isStoredRecordsSnapshot({
+        version: 1,
+        records: [{ characterId: 'wizard', name: '   ', level: 4 }],
+      }),
+    ).toBe(false);
+    expect(
+      isStoredRecordsSnapshot({
+        version: 1,
+        records: [{ characterId: 'wizard', name: 'Agent', level: 1.5 }],
+      }),
+    ).toBe(false);
+  });
 });

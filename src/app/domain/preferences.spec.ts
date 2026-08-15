@@ -22,4 +22,16 @@ describe('audio preferences', () => {
       false,
     );
   });
+
+  it('rejects malformed preference values', () => {
+    expect(isStoredPreferencesSnapshot({ version: 1, musicVolume: NaN, effectsVolume: 0.2 })).toBe(
+      false,
+    );
+    expect(
+      isStoredPreferencesSnapshot({ version: 1, musicVolume: 0.05, effectsVolume: undefined }),
+    ).toBe(false);
+    expect(
+      isStoredPreferencesSnapshot({ version: 1, musicVolume: -0.01, effectsVolume: 0.2 }),
+    ).toBe(false);
+  });
 });
