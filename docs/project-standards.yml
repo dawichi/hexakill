@@ -43,12 +43,12 @@ compliance:
   summary_document: standards-assessment.md
   status_counts:
     compliant: 15
-    partial: 40
+    partial: 41
     gap: 1
     deferred: 5
     exception: 0
     not_applicable: 19
-    unknown: 6
+    unknown: 5
   rules:
     - id: DOC-001
       status: compliant
