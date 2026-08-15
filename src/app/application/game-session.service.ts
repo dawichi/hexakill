@@ -20,7 +20,13 @@ import { DamageKind, resolveDamage } from '../domain/combat-rules';
 import { INITIAL_COMBAT_STATE, CombatState, transitionCombat } from '../domain/combat-state';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
 import { ASSET_MANIFEST } from '../domain/assets';
-import { CharacterDefinition, EnemyState, PlayerState, Stats } from '../domain/game-types';
+import {
+  CharacterDefinition,
+  DefeatedEnemy,
+  EnemyState,
+  PlayerState,
+  Stats,
+} from '../domain/game-types';
 import { RANDOM_SOURCE, RandomSource } from './random';
 import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
 import { SESSION_STORAGE, SessionStoragePort } from './storage';
@@ -33,6 +39,14 @@ import {
 
 export type GameScreen =
   'welcome' | 'character-select' | 'combat-ready' | 'combat' | 'store' | 'game-over';
+
+export interface DefeatedEnemySummary {
+  readonly enemyId: string;
+  readonly name: string;
+  readonly idleAsset: string;
+  readonly count: number;
+  readonly levelsLabel: string;
+}
 
 interface StoredSessionSnapshot {
   readonly version: 1;
@@ -78,7 +92,10 @@ function isRestorablePlayer(value: unknown): value is PlayerState {
     !isNonNegativeInteger(value['potions']) ||
     !isNonNegativeInteger(value['gold']) ||
     !isNonNegativeInteger(value['bossesDefeated']) ||
-    value['bossesDefeated'] > 3
+    value['bossesDefeated'] > 3 ||
+    (value['defeatedEnemies'] !== undefined &&
+      (!Array.isArray(value['defeatedEnemies']) ||
+        !value['defeatedEnemies'].every(isRestorableDefeatedEnemy)))
   ) {
     return false;
   }
@@ -103,6 +120,17 @@ function isRestorablePlayer(value: unknown): value is PlayerState {
     (['health', 'ad', 'ap', 'speed'] as const).every(
       (type) => isNonNegativeInteger(history[type]) && history[type] <= MAX_POWER_UPS_PER_STAT,
     )
+  );
+}
+
+function isRestorableDefeatedEnemy(value: unknown): value is DefeatedEnemy {
+  if (!isRecord(value)) return false;
+
+  return (
+    typeof value['enemyId'] === 'string' &&
+    findEnemyDefinition(value['enemyId']) !== undefined &&
+    isNonNegativeInteger(value['level']) &&
+    value['level'] >= 1
   );
 }
 
@@ -167,6 +195,27 @@ export class GameSessionService {
   readonly enemyAsset = computed(
     () => enemyAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? '',
   );
+  readonly defeatedEnemySummary = computed<readonly DefeatedEnemySummary[]>(() => {
+    const history = this.player()?.defeatedEnemies ?? [];
+    const grouped = new Map<string, number[]>();
+
+    for (const defeatedEnemy of history) {
+      const levels = grouped.get(defeatedEnemy.enemyId) ?? [];
+      levels.push(defeatedEnemy.level);
+      grouped.set(defeatedEnemy.enemyId, levels);
+    }
+
+    return [...grouped.entries()].map(([enemyId, levels]) => {
+      const definition = findEnemyDefinition(enemyId);
+      return {
+        enemyId,
+        name: definition?.name ?? enemyId,
+        idleAsset: enemyAssetFor(enemyId, 'idle') ?? '',
+        count: levels.length,
+        levelsLabel: levels.join(', '),
+      };
+    });
+  });
   readonly combatStatus = computed<'ready' | 'defeated'>(() =>
     this.combatState().phase === 'victory' || this.combatState().phase === 'defeat'
       ? 'defeated'
@@ -531,6 +580,7 @@ export class GameSessionService {
           ...snapshot.player,
           character: character ?? snapshot.player.character,
           inventory,
+          defeatedEnemies: snapshot.player.defeatedEnemies ?? [],
         });
         const restoredEnemy = snapshot.combatState.enemy;
         this.combatState.set({

@@ -110,6 +110,7 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
       inventory: [],
       powerUps: { pending: 0, history: { health: 0, ad: 0, ap: 0, speed: 0 } },
       bossesDefeated: 0,
+      defeatedEnemies: [{ enemyId: 'slime-blue', level: 3 }],
     },
     combatState: {
       phase: 'awaiting-player-action',
@@ -141,6 +142,9 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
 
   await page.getByRole('button', { name: 'Potion' }).click();
   await expect(page.getByRole('heading', { name: 'Game over.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Enemies defeated' })).toBeVisible();
+  await expect(page.locator('.enemy-history-row')).toContainText('Slime Blue');
+  await expect(page.locator('.enemy-history-row')).toContainText('Levels: 3');
   await expect(page.locator('.record-row')).toContainText('Agent · Wizard');
   await expect(page.locator('.record-row')).toContainText('Level 4');
 

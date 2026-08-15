@@ -61,5 +61,6 @@ export function createInitialPlayer(name: string, character: CharacterDefinition
     inventory: [],
     powerUps: { pending: 0, history: { health: 0, ad: 0, ap: 0, speed: 0 } },
     bossesDefeated: 0,
+    defeatedEnemies: [],
   };
 }

@@ -27,7 +27,7 @@ Keyboard shortcuts are currently implemented through window handlers: Space spaw
 
 The values above are implementation facts, not a balanced or approved game design. The rewrite MUST first decide which rules are intentional, which are bugs, and which are obsolete.
 
-The active Angular implementation currently preserves the defeat-record behavior at a safer boundary: it writes a versioned local top-five list using stable character IDs, displays it on welcome and game-over, and preserves it across run reset. This is a provisional characterization contract, not a decision that records must remain local-only; see [the persistence contract](../architecture/rewrite-persistence.md).
+The active Angular implementation currently preserves the defeat-record and enemy-history behavior at safer boundaries: it writes a versioned local top-five list using stable character IDs, appends typed defeated-enemy entries to the run, groups history on game-over, and preserves records across run reset. These are provisional characterization contracts, not a decision that records must remain local-only; see [the persistence contract](../architecture/rewrite-persistence.md).
 
 ## Product gaps to clarify later
 

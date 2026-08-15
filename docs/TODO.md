@@ -41,7 +41,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 - **Affected area:** `legacy/svelte/src/lib/models/`, archived services/config, and active `src/app/domain/`
 - **Evidence:** Randomness, mutable class instances, timers, and global stores are mixed with combat logic in the archived app. The active Angular app now has pure combat, full-roster/boss enemy generation, action-policy, transition, potion, progression, and store modules, but they do not yet establish full legacy parity.
 - **Risk:** A rewrite can accidentally rebalance or change gameplay while appearing structurally cleaner.
-- **Next action:** Review the now-implemented defeat-record/game-over contract, then extend fixtures for power-up presentation, persistence migration, reset behavior, and final balance; mark each rule intentional, suspicious, or obsolete before migration.
+- **Next action:** Review the now-implemented defeat-record and defeated-enemy-history/game-over contracts, then extend fixtures for power-up presentation, persistence migration, reset behavior, and final balance; mark each rule intentional, suspicious, or obsolete before migration.
 - **Dependencies:** Product review of current gameplay and TODO-005
 - **Owner:** Tech Lead / gameplay owner
 - **Target:** First rewrite design session

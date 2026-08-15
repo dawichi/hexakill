@@ -50,4 +50,11 @@ describe('progression rules', () => {
 
     expect(rewardedPlayer.bossesDefeated).toBe(1);
   });
+
+  it('records the defeated enemy and level for the game-over history', () => {
+    const enemy = generateEnemy(4, 0, 0);
+    const rewardedPlayer = applyVictoryReward(player, enemy);
+
+    expect(rewardedPlayer.defeatedEnemies).toEqual([{ enemyId: 'adventurer', level: 2 }]);
+  });
 });

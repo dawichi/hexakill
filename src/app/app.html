@@ -387,6 +387,23 @@
             {{ player.bossesDefeated === 1 ? 'defeat' : 'defeats' }}.
           </p>
           <p class="validation" role="alert">{{ session.combatMessage() }}</p>
+          @if (session.defeatedEnemySummary().length) {
+            <section class="enemy-history" aria-labelledby="enemy-history-title">
+              <h3 id="enemy-history-title">Enemies defeated</h3>
+              <div class="enemy-history-grid">
+                @for (summary of session.defeatedEnemySummary(); track summary.enemyId) {
+                  <article class="enemy-history-row">
+                    <img class="history-sprite" [src]="summary.idleAsset" [alt]="summary.name" />
+                    <span>
+                      <strong>{{ summary.name }}</strong>
+                      <small>Levels: {{ summary.levelsLabel }}</small>
+                    </span>
+                    <strong aria-label="Times defeated">x{{ summary.count }}</strong>
+                  </article>
+                }
+              </div>
+            </section>
+          }
           <section class="records-panel" aria-labelledby="game-over-records-title">
             <div class="records-heading">
               <h3 id="game-over-records-title">Personal records</h3>

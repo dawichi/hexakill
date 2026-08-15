@@ -50,6 +50,12 @@ export interface PlayerState {
   readonly inventory: readonly ItemState[];
   readonly powerUps: PowerUpState;
   readonly bossesDefeated: number;
+  readonly defeatedEnemies: readonly DefeatedEnemy[];
+}
+
+export interface DefeatedEnemy {
+  readonly enemyId: string;
+  readonly level: number;
 }
 
 export interface EnemyState {
