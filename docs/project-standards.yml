@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: legacy unfinished browser game; rewrite preparation
   current_branch: main
-  current_revision: b2e8ed57a1382a292b837fc2393d65f214f28ef1
+  current_revision: 4181c5e48adee3cb61fe48d2626ed97a2cd0ac9e
 
 standards:
   - documentation
@@ -77,9 +77,9 @@ compliance:
       next_action: Retain the automated focus/responsive assertions and add manual accessibility evidence before release.
     - id: TS-001
       status: partial
-      evidence: tsconfig.json enables strict, but the supported check script fails before checking because jsconfig.json is missing.
+      evidence: The active Angular root has strict compiler settings and npm run verify:types passes tsc --noEmit for the application and test projects; the archived Svelte npm run check command still references missing jsconfig.json.
       priority: high
-      next_action: Repair the check command and make the effective compiler baseline reproducible.
+      next_action: Retain the active compiler gate and do not revive archived tooling without a decision.
     - id: TS-005
       status: partial
       evidence: Archived Svelte storage trusts JSON.parse; active Angular session and records adapters validate versioned browser envelopes.
