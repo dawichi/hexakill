@@ -9,6 +9,7 @@ The active Angular application is a browser-only application with no server rout
 ```sh
 npm ci
 npm run build
+npm run verify:preview
 # Optional local production-artifact verification
 npm run test:e2e:production
 ```
@@ -31,4 +32,4 @@ The publishable artifact is `dist/hexakill/browser/`. It includes the applicatio
 
 ## Release gate
 
-The root Angular migration now has the first three local gates: clean-install build, browser journeys against the production-like output, and representative assets. Release still requires owner-approved deployment target/ownership, production headers, rollback, and external verification in an ADR.
+The root Angular migration now has local gates for clean-install/build, preview HTTP behavior (security headers, asset caching, and 404), browser journeys against the production-like output, and representative assets. Release still requires owner-approved deployment target/ownership, rollback, and external verification in an ADR.

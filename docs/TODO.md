@@ -138,9 +138,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** Vercel claim, adapter-auto, build output, static assets, 404/headers
-- **Evidence:** `https://hexakill.vercel.app` is reachable and returns a Vercel-served SvelteKit response, proving an existing endpoint but not Angular ownership or migration. The active Angular root has `vercel.json`, a passing production build, a static preview server, and browser journeys against the built output.
+- **Evidence:** `https://hexakill.vercel.app` is reachable and returns a Vercel-served SvelteKit response, proving an existing endpoint but not Angular ownership or migration. The active Angular root has `vercel.json`, a passing production build, a static preview server, a `verify:preview` gate for headers/cache/404 behavior, and browser journeys against the built output.
 - **Risk:** Agents may assume a deployment target or claim production readiness without evidence.
-- **Next action:** Confirm project ownership/authorization, deploy Angular to a preview, and document rollback, 404, headers, and asset behavior in an ADR.
+- **Next action:** Confirm project ownership/authorization, deploy Angular to a preview, and document rollback and post-deploy asset behavior in an ADR; compare the external headers/404 behavior with the local contract.
 - **Dependencies:** TODO-001 and TODO-009
 - **Owner:** Project owner / future operations agent
 - **Target:** Before release work
@@ -149,7 +149,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** CI configuration, lockfile, audit tooling, branch protection
-- **Evidence:** The Angular root has a committed lockfile, `npm ci`, `npm audit --audit-level=high` with 0 high-severity vulnerabilities, formatting/test/browser/build/asset CI gates, local validation evidence, and a workflow step configured to retain test/build reports for 14 days. Branch protection and successful remote workflow execution are not verified from this checkout.
+- **Evidence:** The Angular root has a committed lockfile, `npm ci`, `npm audit --audit-level=high` with 0 high-severity vulnerabilities, formatting/test/browser/build/asset/preview-contract CI gates, local validation evidence, and a workflow step configured to retain test/build reports for 14 days. Branch protection and successful remote workflow execution are not verified from this checkout.
 - **Risk:** Broken builds, dependency vulnerabilities, and quality regressions can merge unnoticed.
 - **Next action:** Verify the remote artifact upload, add type/lint gates where applicable, and confirm required checks protect the promoted Angular delivery.
 - **Dependencies:** TODO-001, TODO-002, TODO-008

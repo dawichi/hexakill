@@ -64,6 +64,7 @@ const requiredCommands = [
   'test:e2e:production',
   'verify:assets',
   'verify:docs',
+  'verify:preview',
 ];
 for (const command of requiredCommands) {
   if (typeof packageJson.scripts?.[command] !== 'string') {

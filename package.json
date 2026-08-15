@@ -6,6 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "serve:dist": "node tools/serve-static.mjs dist/hexakill/browser",
+    "verify:preview": "node tools/verify-preview.mjs dist/hexakill/browser",
     "preview": "npm run build && npm run serve:dist",
     "verify:assets": "node tools/verify-assets.mjs",
     "watch": "ng build --watch --configuration development",

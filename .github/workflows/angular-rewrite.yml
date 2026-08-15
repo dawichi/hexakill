@@ -59,6 +59,8 @@ jobs:
         run: npm run test:e2e
       - name: Build production bundle
         run: npm run build
+      - name: Verify production preview contract
+        run: npm run verify:preview
       - name: Run browser journeys against production artifact
         run: E2E_PRODUCTION=1 npm run test:e2e
       - name: Verify active asset paths

@@ -19,6 +19,7 @@ The archived Svelte commands below are historical evidence only. They are not pa
 | Active build              | `npm run build`                           | Passes; output is `dist/hexakill/browser/`.                                     |
 | Dependency audit          | `npm audit --audit-level=high`            | Passes locally with 0 high-severity vulnerabilities; CI now runs the same gate. |
 | Active asset paths        | `npm run verify:assets`                   | Verifies all 48 typed idle/animation/item/music/sound paths used by the active app. |
+| Preview contract          | `npm run verify:preview`                   | Verifies the built static root, security headers, representative asset caching, and 404 behavior. |
 
 The archived Svelte findings are recorded in [TODO-003](TODO.md#todo-003-high-clear-current-type-and-accessibility-errors); they are not active root blockers.
 
@@ -33,7 +34,7 @@ The root Angular application is the currently validated implementation surface. 
 | Production build        | `npm run build`                                                 | Passes; output is `dist/hexakill/browser/` and the Angular production budget is clean.                                                                                             |
 | Formatting              | `npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'` | Passes.                                                                                                                                                                            |
 | Documentation contract  | `npm run verify:docs`                                         | Verifies the docs index, local Markdown links, required root commands, and pinned Git revisions.                                                                                   |
-| CI validation           | `.github/workflows/angular-rewrite.yml`                         | Runs install, formatting, docs, dev-server and production-artifact browser journeys, build, asset checks, and 14-day validation-artifact retention.                                |
+| CI validation           | `.github/workflows/angular-rewrite.yml`                         | Runs install, formatting, docs, tests, preview-contract checks, dev-server and production-artifact browser journeys, build, asset checks, and 14-day validation-artifact retention. |
 | Browser journeys        | `npm run test:e2e`                                              | Passes locally: 8 Chromium journeys cover store/combat, restore, audio preferences, invalid-session recovery, keyboard start, defeat/history/records, rewards/power-ups, and sequential bosses; CI installs Chromium. |
 | Production-like browser | `npm run test:e2e:production`                                   | Passes locally against `dist/hexakill/browser/` through the repository static preview server.                                                                                      |
 | Active asset paths      | `npm run verify:assets`                                         | Passes locally for all 48 typed idle/animation/item/music/sound paths.                                                                                                            |
@@ -49,7 +50,7 @@ No `.env.example`, runtime environment schema, server endpoint, API key, databas
 
 The external URL `https://hexakill.vercel.app` was reachable during this review and returned `200` from Vercel, but its response identified the archived SvelteKit deployment (`x-sveltekit-page: true`). This verifies an existing Vercel endpoint, not an Angular deployment or project ownership. The repository now contains a candidate `vercel.json`; it has not been deployed or externally verified.
 
-The Angular output mode is now documented as static in [the deployment contract](architecture/rewrite-deployment.md). Vercel is the observed candidate provider, but Angular migration, project ownership, headers, rollback, and post-deploy asset behavior remain unverified.
+The Angular output mode is now documented as static in [the deployment contract](architecture/rewrite-deployment.md). The local `verify:preview` gate verifies the candidate artifact's headers, cache policy, and 404 behavior. Vercel is the observed candidate provider, but Angular migration, project ownership, rollback, and post-deploy asset behavior remain unverified.
 
 ## Troubleshooting order
 
@@ -58,4 +59,4 @@ The Angular output mode is now documented as static in [the deployment contract]
 3. Run `npm run format:check`, unit tests, and the production build from the active root.
 4. Run `npm run test:e2e:production` to validate the built artifact and static asset server.
 5. Add deterministic domain tests before changing gameplay behavior.
-6. Add audit/report retention and confirm deployment ownership before accepting a provider.
+6. Run `npm run verify:preview` and confirm deployment ownership before accepting a provider.

@@ -47,8 +47,11 @@ The archived Svelte source is not reproducible and is not the active application
 - Install: `npm ci`
 - Formatting: `npm run format:check`
 - Documentation contract: `npm run verify:docs`
+- Asset manifest: `npm run verify:assets`
+- Production preview contract: `npm run verify:preview`
 - Unit/component tests: `npm test -- --watch=false --no-progress`
 - Browser journeys: `npm run test:e2e`
+- Production-artifact browser journeys: `npm run test:e2e:production`
 - Build: `npm run build`
 
 Do not describe a command as passing unless it has been run from the current checkout. Before changing tooling, record the existing failure and keep the change narrowly scoped.

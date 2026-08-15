@@ -22,9 +22,20 @@ const contentTypes = {
 };
 
 function sendText(response, status, body) {
-  response.writeHead(status, { 'content-type': 'text/plain; charset=utf-8' });
+  response.writeHead(status, {
+    ...securityHeaders,
+    'content-type': 'text/plain; charset=utf-8',
+  });
   response.end(body);
 }
+
+const securityHeaders = {
+  'cross-origin-opener-policy': 'same-origin',
+  'permissions-policy': 'camera=(), microphone=(), geolocation=()',
+  'referrer-policy': 'strict-origin-when-cross-origin',
+  'x-content-type-options': 'nosniff',
+  'x-frame-options': 'DENY',
+};
 
 const server = createServer(async (request, response) => {
   if (!request.url || (request.method !== 'GET' && request.method !== 'HEAD')) {
@@ -49,6 +60,7 @@ const server = createServer(async (request, response) => {
     }
 
     response.writeHead(200, {
+      ...securityHeaders,
       'cache-control':
         extname(filePath) === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable',
       'content-type': contentTypes[extname(filePath)] ?? 'application/octet-stream',
