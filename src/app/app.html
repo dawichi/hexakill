@@ -208,7 +208,14 @@
                   {{ enemy.stats.ad }} attack · {{ enemy.stats.ap }} magic ·
                   {{ enemy.stats.speed }} speed
                 </p>
-                <div class="health-bar" aria-label="Enemy health">
+                <div
+                  class="health-bar"
+                  role="meter"
+                  aria-label="Enemy health"
+                  [attr.aria-valuenow]="enemy.stats.health - enemy.damageTaken"
+                  aria-valuemin="0"
+                  [attr.aria-valuemax]="enemy.stats.health"
+                >
                   <span
                     [style.width.%]="100 - (enemy.damageTaken / enemy.stats.health) * 100"
                   ></span>

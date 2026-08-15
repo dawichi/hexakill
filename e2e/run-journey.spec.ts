@@ -26,6 +26,10 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await page.getByRole('button', { name: 'Find an enemy' }).click();
   await expect(page.getByRole('heading', { name: /appears/ })).toBeVisible();
   await expect(page.getByText(/216 attack/)).toBeVisible();
+  await expect(page.getByRole('meter', { name: 'Enemy health' })).toHaveAttribute(
+    'aria-valuemin',
+    '0',
+  );
   await expect(page.getByRole('button', { name: 'Attack' })).toBeEnabled();
 });
 
