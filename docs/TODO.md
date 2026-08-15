@@ -6,7 +6,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved for active root
 - **Affected area:** `package.json`, `.npmrc`, `.gitignore`, lockfile, Node/package-manager configuration
-- **Evidence:** The archived `legacy/svelte/` package has no lockfile and remains unreproducible; the active Angular root has a committed lockfile, pinned Node/npm toolchain, and a source-reviewed direct dependency set with unused generated forms/router entries removed.
+- **Evidence:** The archived `legacy/svelte/` package has no lockfile and remains unreproducible; the active Angular root has a committed lockfile, Node.js range enforcement, an `.nvmrc` baseline, pinned npm metadata, and a source-reviewed direct dependency set with unused generated forms/router entries removed.
 - **Risk:** Agents cannot reproduce the same dependency graph or know whether a build failure is code or tooling.
 - **Next action:** Retain npm/Node 24.19.0 as the active baseline; decide whether the archived Svelte package metadata should be deleted after the historical audit is complete.
 - **Dependencies:** Confirm whether the archived Svelte package should be deleted after the historical audit.

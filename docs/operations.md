@@ -4,7 +4,7 @@
 
 ## Local setup
 
-The archived Svelte package under `legacy/svelte/` has no committed lockfile and is retained only for historical reference. The active root package pins Angular, Node.js 24.19.0, npm 11.17.0, and a committed lockfile.
+The archived Svelte package under `legacy/svelte/` has no committed lockfile and is retained only for historical reference. The active root package pins Angular, requires Node.js 24.x from 24.19.0 onward, documents Node.js 24.19.0 in `.nvmrc`, uses npm 11.17.0, and has a committed lockfile.
 
 The archived Svelte commands below are historical evidence only. They are not part of the active root workflow. See [TODO-001](TODO.md#todo-001-high-dependency-toolchain-baseline) and [TODO-002](TODO.md#todo-002-high-repair-validation-commands).
 
