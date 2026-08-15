@@ -280,6 +280,43 @@ test('an incoherent restored screen is discarded safely', async ({ page }) => {
   ).resolves.toBeNull();
 });
 
+test('a restored transient combat action is discarded safely', async ({ page }) => {
+  await startRun(page);
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.screen = 'combat';
+  snapshot.combatState = {
+    phase: 'awaiting-player-action',
+    enemy: {
+      definition: {
+        id: 'adventurer',
+        name: 'Adventurer',
+        archetype: 'basic',
+        modifiers: { health: 1, ad: 1, ap: 1, armor: 1, mr: 1, speed: 1 },
+        idleAsset: '/images/adventurer/idle.gif',
+      },
+      level: 2,
+      stats: { health: 100, ad: 1, ap: 1, armor: 1, mr: 1, speed: 1 },
+      damageTaken: 0,
+      potions: 0,
+      gold: 125,
+    },
+    playerDamageTaken: 0,
+    pendingAction: 'attack',
+    lastResult: null,
+  };
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
+  ).resolves.toBeNull();
+});
+
 test('a whitespace-only restored player is discarded safely', async ({ page }) => {
   await page.evaluate(() => {
     localStorage.setItem(

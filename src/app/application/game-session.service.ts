@@ -22,7 +22,7 @@ import {
   findEnemyDefinition,
   generateEnemy,
 } from '../domain/enemies';
-import { DamageKind, resolveDamage } from '../domain/combat-rules';
+import { DamageKind, DamageResult, resolveDamage } from '../domain/combat-rules';
 import { INITIAL_COMBAT_STATE, CombatState, transitionCombat } from '../domain/combat-state';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
 import { ASSET_MANIFEST } from '../domain/assets';
@@ -175,6 +175,20 @@ function isRestorableEnemy(value: unknown): value is EnemyState {
   );
 }
 
+function isDamageKind(value: unknown): value is DamageKind {
+  return value === 'attack' || value === 'magic';
+}
+
+function isRestorableDamageResult(value: unknown): value is DamageResult {
+  return (
+    isRecord(value) &&
+    isDamageKind(value['kind']) &&
+    hasNumberFields(value, ['rawDamage', 'damageAfterResistance', 'damageTaken']) &&
+    typeof value['critical'] === 'boolean' &&
+    typeof value['missed'] === 'boolean'
+  );
+}
+
 function isRestorableCombatState(value: unknown): value is CombatState {
   if (!isRecord(value)) return false;
 
@@ -190,7 +204,9 @@ function isRestorableCombatState(value: unknown): value is CombatState {
     typeof value['phase'] === 'string' &&
     phases.includes(value['phase']) &&
     (value['enemy'] === null || isRestorableEnemy(value['enemy'])) &&
-    isNonNegativeInteger(value['playerDamageTaken'])
+    isNonNegativeInteger(value['playerDamageTaken']) &&
+    value['pendingAction'] === null &&
+    (value['lastResult'] === null || isRestorableDamageResult(value['lastResult']))
   );
 }
 
