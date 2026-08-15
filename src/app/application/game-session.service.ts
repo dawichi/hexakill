@@ -17,6 +17,7 @@ import {
 import { purchaseItem, purchasePotions, STORE_ITEMS, STORE_POTIONS } from '../domain/store';
 import {
   enemyAssetFor,
+  enemySpriteAssetFor,
   ENEMY_DEFINITIONS,
   findEnemyDefinition,
   generateEnemy,
@@ -30,6 +31,7 @@ import {
   DefeatedEnemy,
   EnemyState,
   PlayerState,
+  SpriteStripAsset,
   Stats,
 } from '../domain/game-types';
 import { RANDOM_SOURCE, RandomSource } from './random';
@@ -216,6 +218,9 @@ export class GameSessionService {
   readonly playerAnimation = signal<'idle' | 'action'>('idle');
   readonly enemyAsset = computed(
     () => enemyAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? '',
+  );
+  readonly enemySpriteAsset = computed<SpriteStripAsset | null>(
+    () => enemySpriteAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? null,
   );
   readonly defeatedEnemySummary = computed<readonly DefeatedEnemySummary[]>(() => {
     const history = this.player()?.defeatedEnemies ?? [];

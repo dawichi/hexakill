@@ -1,5 +1,5 @@
 import { BASE_STATS } from './characters';
-import { EnemyDefinition, EnemyState, Stat, Stats } from './game-types';
+import { EnemyDefinition, EnemyState, SpriteStripAsset, Stat, Stats } from './game-types';
 
 function modifiers(overrides: Partial<Record<Stat, number>> = {}): Stats {
   return {
@@ -18,7 +18,7 @@ function enemy(
   archetype: EnemyDefinition['archetype'],
   idleAsset: string,
   enemyModifiers: Stats,
-  animationAssets: Pick<EnemyDefinition, 'attackAsset' | 'defeatAsset'> = {},
+  animationAssets: Pick<EnemyDefinition, 'attackAsset' | 'defeatAsset' | 'defeatSpriteAsset'> = {},
 ): EnemyDefinition {
   return { id, name, archetype, modifiers: enemyModifiers, idleAsset, ...animationAssets };
 }
@@ -27,6 +27,20 @@ const BLUE_SLIME_ANIMATIONS = {
   attackAsset: '/images/slime-blue/attack.gif',
   defeatAsset: '/images/slime-blue/die.gif',
 } as const;
+
+const EVIL_WIZARD_DEFEAT_SPRITE: SpriteStripAsset = {
+  src: '/images/evil-wizard/sprites/Death.png',
+  frameWidth: 250,
+  frameHeight: 250,
+  frameCount: 7,
+};
+
+const WILD_HUNTRESS_DEFEAT_SPRITE: SpriteStripAsset = {
+  src: '/images/wild-huntress/sprites/Death.png',
+  frameWidth: 150,
+  frameHeight: 150,
+  frameCount: 8,
+};
 
 const BASIC_MODIFIERS = modifiers();
 const AD_MODIFIERS = modifiers({ health: 0.75, ad: 1.5, ap: 0.5, speed: 1.5 });
@@ -70,7 +84,9 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     attackAsset: '/images/evil-tree/attack.gif',
     defeatAsset: '/images/evil-tree/die.gif',
   }),
-  enemy('evil-wizard', 'Evil Wizard', 'ap', '/images/evil-wizard/idle.gif', AP_MODIFIERS),
+  enemy('evil-wizard', 'Evil Wizard', 'ap', '/images/evil-wizard/idle.gif', AP_MODIFIERS, {
+    defeatSpriteAsset: EVIL_WIZARD_DEFEAT_SPRITE,
+  }),
   enemy('fire-knight', 'Fire knight', 'tank', '/images/fire-knight/idle.gif', TANK_MODIFIERS),
   enemy('fire-worm', 'Fire worm', 'ap', '/images/fire-worm/idle.gif', AP_MODIFIERS),
   enemy('knight', 'Knight', 'tank', '/images/knight/idle.gif', TANK_MODIFIERS),
@@ -106,7 +122,9 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     '/images/water-priestess/idle.gif',
     AP_MODIFIERS,
   ),
-  enemy('wild-huntress', 'Wild Huntress', 'ad', '/images/wild-huntress/idle.gif', AD_MODIFIERS),
+  enemy('wild-huntress', 'Wild Huntress', 'ad', '/images/wild-huntress/idle.gif', AD_MODIFIERS, {
+    defeatSpriteAsset: WILD_HUNTRESS_DEFEAT_SPRITE,
+  }),
   enemy('witch-blue', 'Witch Blue', 'ap', '/images/witch-blue/idle.gif', AP_MODIFIERS),
 ];
 
@@ -138,6 +156,14 @@ export function enemyAssetFor(
   if (animation === 'attack') return definition.attackAsset ?? definition.idleAsset;
   if (animation === 'defeat') return definition.defeatAsset ?? definition.idleAsset;
   return definition.idleAsset;
+}
+
+export function enemySpriteAssetFor(
+  id: string,
+  animation: 'idle' | 'attack' | 'defeat',
+): SpriteStripAsset | undefined {
+  if (animation !== 'defeat') return undefined;
+  return findEnemyDefinition(id)?.defeatSpriteAsset;
 }
 
 function assertRoll(roll: number): void {

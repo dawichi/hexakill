@@ -284,11 +284,27 @@
                   {{ enemy.definition.archetype }} enemy · level {{ enemy.level }}
                 </p>
                 <h3>{{ enemy.definition.name }}</h3>
-                <img
-                  class="entity-sprite combat-sprite"
-                  [src]="session.enemyAsset()"
-                  [alt]="enemy.definition.name"
-                />
+                @if (session.enemySpriteAsset(); as enemySpriteAsset) {
+                  <span
+                    class="entity-sprite combat-sprite sprite-strip enemy-sprite-strip"
+                    role="img"
+                    [attr.aria-label]="enemy.definition.name + ' defeat animation'"
+                    [style.background-image]="'url(' + enemySpriteAsset.src + ')'"
+                    [style.background-size]="enemySpriteAsset.frameCount * 100 + '% 100%'"
+                    [style.aspect-ratio]="
+                      enemySpriteAsset.frameWidth + ' / ' + enemySpriteAsset.frameHeight
+                    "
+                    [style.animation]="
+                      'sprite-strip-play 600ms steps(' + enemySpriteAsset.frameCount + ') 1 both'
+                    "
+                  ></span>
+                } @else {
+                  <img
+                    class="entity-sprite combat-sprite"
+                    [src]="session.enemyAsset()"
+                    [alt]="enemy.definition.name"
+                  />
+                }
                 <p>
                   {{ enemy.stats.ad }} attack · {{ enemy.stats.ap }} magic ·
                   {{ enemy.stats.speed }} speed

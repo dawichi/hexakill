@@ -45,6 +45,7 @@ export interface EnemyDefinition {
   readonly idleAsset: string;
   readonly attackAsset?: string;
   readonly defeatAsset?: string;
+  readonly defeatSpriteAsset?: SpriteStripAsset;
 }
 
 export interface PlayerState {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { enemyAssetFor, generateEnemy } from './enemies';
+import { enemyAssetFor, enemySpriteAssetFor, generateEnemy } from './enemies';
 
 describe('enemy generation', () => {
   it('selects a typed enemy and keeps the legacy level range', () => {
@@ -41,5 +41,22 @@ describe('enemy generation', () => {
     expect(enemyAssetFor('slime-blue', 'defeat')).toBe('/images/slime-blue/die.gif');
     expect(enemyAssetFor('knight', 'attack')).toBe('/images/knight/idle.gif');
     expect(enemyAssetFor('unknown', 'idle')).toBeUndefined();
+  });
+
+  it('maps only observed single-row enemy defeat strips', () => {
+    expect(enemySpriteAssetFor('wild-huntress', 'defeat')).toEqual({
+      src: '/images/wild-huntress/sprites/Death.png',
+      frameWidth: 150,
+      frameHeight: 150,
+      frameCount: 8,
+    });
+    expect(enemySpriteAssetFor('evil-wizard', 'defeat')).toEqual({
+      src: '/images/evil-wizard/sprites/Death.png',
+      frameWidth: 250,
+      frameHeight: 250,
+      frameCount: 7,
+    });
+    expect(enemySpriteAssetFor('wild-huntress', 'attack')).toBeUndefined();
+    expect(enemySpriteAssetFor('knight', 'defeat')).toBeUndefined();
   });
 });

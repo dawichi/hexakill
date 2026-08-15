@@ -306,11 +306,11 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
     phase: 'awaiting-player-action',
     enemy: {
       definition: {
-        id: 'knight',
-        name: 'Knight',
-        archetype: 'tank',
-        modifiers: { health: 1.75, ad: 0.5, ap: 0.5, armor: 1.75, mr: 1.75, speed: 0.75 },
-        idleAsset: '/images/knight/idle.gif',
+        id: 'wild-huntress',
+        name: 'Wild Huntress',
+        archetype: 'ad',
+        modifiers: { health: 0.75, ad: 1.5, ap: 0.5, armor: 1, mr: 1, speed: 1.5 },
+        idleAsset: '/images/wild-huntress/idle.gif',
       },
       level: 4,
       stats: { health: 1, ad: 1, ap: 1, armor: 1, mr: 1, speed: 1 },
@@ -332,7 +332,15 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   await expect(attackButton).toBeFocused();
   await attackButton.press('Enter');
   await expect(page.getByText(/gained 100 exp and 100 gold/)).toBeVisible();
-  await expect(page.locator('.sprite-strip')).toHaveCSS('animation-name', 'none');
+  await expect(page.getByRole('img', { name: 'Wizard action animation' })).toHaveCSS(
+    'animation-name',
+    'none',
+  );
+  const enemyDefeat = page.locator('.enemy-sprite-strip');
+  await expect(enemyDefeat).toBeVisible();
+  await expect(enemyDefeat).toHaveAttribute('aria-label', 'Wild Huntress defeat animation');
+  await expect(enemyDefeat).toHaveCSS('background-image', /wild-huntress/);
+  await expect(enemyDefeat).toHaveCSS('animation-name', 'none');
   await expect(page.getByText('Pending: 1')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Power-up available' })).toBeFocused();
   await expect(page.getByRole('button', { name: 'Find another enemy' })).toBeDisabled();
