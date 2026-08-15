@@ -29,6 +29,7 @@ import {
 } from '../domain/game-types';
 import { RANDOM_SOURCE, RandomSource } from './random';
 import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
+import { PREFERENCES_STORAGE, PreferencesStoragePort } from './preferences-storage';
 import { SESSION_STORAGE, SessionStoragePort } from './storage';
 import {
   createPersonalRecord,
@@ -36,6 +37,13 @@ import {
   PersonalRecord,
   sortPersonalRecords,
 } from '../domain/records';
+import {
+  AudioPreferences,
+  clampVolume,
+  DEFAULT_EFFECTS_VOLUME,
+  DEFAULT_MUSIC_VOLUME,
+  isStoredPreferencesSnapshot,
+} from '../domain/preferences';
 
 export type GameScreen =
   'welcome' | 'character-select' | 'combat-ready' | 'combat' | 'store' | 'game-over';
@@ -184,6 +192,9 @@ export class GameSessionService {
   private readonly recordsStorage: RecordsStoragePort | null = inject(RECORDS_STORAGE, {
     optional: true,
   });
+  private readonly preferencesStorage: PreferencesStoragePort | null = inject(PREFERENCES_STORAGE, {
+    optional: true,
+  });
   private readonly audio: AudioPort | null = inject(AUDIO, { optional: true });
   readonly screen = signal<GameScreen>('welcome');
   readonly playerName = signal('');
@@ -231,8 +242,11 @@ export class GameSessionService {
   readonly lastActionAt = signal<number | null>(null);
   readonly combatMessage = signal('');
   readonly personalRecords = signal<readonly PersonalRecord[]>([]);
+  readonly musicVolume = signal(DEFAULT_MUSIC_VOLUME);
+  readonly effectsVolume = signal(DEFAULT_EFFECTS_VOLUME);
 
   constructor() {
+    this.restorePreferences();
     this.restorePersonalRecords();
     this.restore();
     effect(() => this.persist());
@@ -417,6 +431,20 @@ export class GameSessionService {
     this.recordsStorage?.clear();
   }
 
+  setMusicVolume(volume: number): void {
+    const next = clampVolume(volume);
+    this.musicVolume.set(next);
+    this.audio?.setMusicVolume(next);
+    this.persistPreferences();
+  }
+
+  setEffectsVolume(volume: number): void {
+    const next = clampVolume(volume);
+    this.effectsVolume.set(next);
+    this.audio?.setEffectsVolume(next);
+    this.persistPreferences();
+  }
+
   reset(): void {
     this.screen.set('welcome');
     this.playerName.set('');
@@ -545,6 +573,38 @@ export class GameSessionService {
       this.personalRecords.set(sortPersonalRecords(snapshot.records));
     } catch {
       this.recordsStorage?.clear();
+    }
+  }
+
+  private persistPreferences(): void {
+    const preferences: AudioPreferences = {
+      musicVolume: this.musicVolume(),
+      effectsVolume: this.effectsVolume(),
+    };
+    this.preferencesStorage?.write(JSON.stringify({ version: 1, ...preferences }));
+  }
+
+  private restorePreferences(): void {
+    const raw = this.preferencesStorage?.read();
+    if (!raw) {
+      this.audio?.setMusicVolume(DEFAULT_MUSIC_VOLUME);
+      this.audio?.setEffectsVolume(DEFAULT_EFFECTS_VOLUME);
+      return;
+    }
+
+    try {
+      const snapshot: unknown = JSON.parse(raw);
+      if (!isStoredPreferencesSnapshot(snapshot)) {
+        this.preferencesStorage?.clear();
+        return;
+      }
+
+      this.musicVolume.set(snapshot.musicVolume);
+      this.effectsVolume.set(snapshot.effectsVolume);
+      this.audio?.setMusicVolume(snapshot.musicVolume);
+      this.audio?.setEffectsVolume(snapshot.effectsVolume);
+    } catch {
+      this.preferencesStorage?.clear();
     }
   }
 

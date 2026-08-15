@@ -12,12 +12,14 @@ The root application separates the active run from personal records:
 
 - Run state uses `hexakill.angular.session.v1` through `SESSION_STORAGE`.
 - Personal records use `hexakill.angular.records.v1` through `RECORDS_STORAGE`.
+- Audio preferences use `hexakill.angular.preferences.v1` through `PREFERENCES_STORAGE`.
 - The records envelope is `{ version: 1, records: [...] }`.
 - Each record uses the stable `characterId`, the player `name`, and the reached `level`.
 - Records are validated on restore, sorted descending by level, and capped at five entries.
 - Invalid or malformed records are discarded safely.
 - Defeat writes one record; resetting a run preserves the records list.
 - The welcome and game-over views expose the list and a clear action.
+- Music and effects volumes use the observed `0.05` and `0.2` defaults, an accessible `0`–`0.5` range, and persist independently from the run.
 
 The browser adapter is deliberately non-fatal when storage is blocked or full. Records are local-only and are not an account, leaderboard, analytics, or remote persistence feature.
 
@@ -27,5 +29,6 @@ The browser adapter is deliberately non-fatal when storage is blocked or full. R
 - Whether records should remain local-only when the product scope is finalized.
 - Whether a future record needs timestamp, run identifier, score, or additional statistics.
 - Whether the active session and records need export, deletion confirmation, or privacy copy.
+- Whether legacy `musicVolume` and `effectsVolume` keys should be migrated into the Angular preferences envelope.
 
 Do not add migration, remote records, or new fields as an incidental cleanup. Resolve the product/data decision in an ADR, then add fixtures and a migration policy.

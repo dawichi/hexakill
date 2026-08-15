@@ -8,6 +8,8 @@ describe('audio boundary', () => {
       playSound: (asset) => played.push(asset),
       playMusic: (asset) => played.push(asset),
       stopMusic: () => played.push('stop'),
+      setMusicVolume: () => undefined,
+      setEffectsVolume: () => undefined,
     };
 
     audio.playSound('/sounds/attack.mp3');

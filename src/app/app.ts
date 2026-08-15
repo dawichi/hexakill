@@ -29,6 +29,14 @@ export class App {
     this.session.selectCharacter(character);
   }
 
+  protected setMusicVolume(event: Event): void {
+    this.session.setMusicVolume(Number((event.target as HTMLInputElement).value));
+  }
+
+  protected setEffectsVolume(event: Event): void {
+    this.session.setEffectsVolume(Number((event.target as HTMLInputElement).value));
+  }
+
   protected recordCharacter(record: PersonalRecord): CharacterDefinition {
     return (
       this.session.characters.find((character) => character.id === record.characterId) ??

@@ -44,6 +44,22 @@ test('a run is restored after a browser reload', async ({ page }) => {
   await expect(page.getByText('LEVEL 4 WIZARD')).toBeVisible();
 });
 
+test('audio preferences are keyboard-accessible and restored independently', async ({ page }) => {
+  const musicVolume = page.getByLabel('Music volume');
+  const effectsVolume = page.getByLabel('Effects volume');
+  await musicVolume.fill('0.12');
+  await effectsVolume.fill('0.31');
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('hexakill.angular.preferences.v1')))
+    .toContain('0.12');
+
+  await page.reload();
+  await expect(musicVolume).toHaveValue('0.12');
+  await expect(effectsVolume).toHaveValue('0.31');
+  await musicVolume.focus();
+  await expect(musicVolume).toBeFocused();
+});
+
 test('an invalid saved session is discarded safely', async ({ page }) => {
   await page.evaluate(() => {
     localStorage.setItem(

@@ -45,7 +45,7 @@ Browser storage is used for:
 - `hxkllPersonalRecords` — top five local records written after player defeat in the archived implementation.
 - `musicVolume` and `effectsVolume` — volume preferences.
 
-Archived stored JSON was parsed without runtime validation or schema versioning. The active Angular session uses a versioned local envelope with a storage port, and active personal records use a separate `hexakill.angular.records.v1` envelope with validation and a records storage port. Legacy-key migration and final schema acceptance remain open; see [the persistence contract](rewrite-persistence.md).
+Archived stored JSON was parsed without runtime validation or schema versioning. The active Angular session uses a versioned local envelope with a storage port, active personal records use a separate `hexakill.angular.records.v1` envelope with validation and a records storage port, and audio preferences use `hexakill.angular.preferences.v1` with validated volume values. Legacy-key migration and final schema acceptance remain open; see [the persistence contract](rewrite-persistence.md).
 
 ## Integrations and trust boundaries
 

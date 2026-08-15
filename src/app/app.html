@@ -1,8 +1,36 @@
 <main class="shell">
   <header class="topbar">
-    <p class="eyebrow">Hexakill · Angular edition</p>
-    <h1>HEXAKILL</h1>
-    <p class="status">First playable slice · typed combat rules</p>
+    <div>
+      <p class="eyebrow">Hexakill · Angular edition</p>
+      <h1>HEXAKILL</h1>
+      <p class="status">First playable slice · typed combat rules</p>
+    </div>
+    <section class="audio-controls" aria-label="Audio controls">
+      <label>
+        Music
+        <input
+          aria-label="Music volume"
+          type="range"
+          min="0"
+          max="0.5"
+          step="0.01"
+          [value]="session.musicVolume()"
+          (input)="setMusicVolume($event)"
+        />
+      </label>
+      <label>
+        Effects
+        <input
+          aria-label="Effects volume"
+          type="range"
+          min="0"
+          max="0.5"
+          step="0.01"
+          [value]="session.effectsVolume()"
+          (input)="setEffectsVolume($event)"
+        />
+      </label>
+    </section>
   </header>
 
   @switch (session.screen()) {

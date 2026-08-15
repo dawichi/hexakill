@@ -28,6 +28,21 @@ p {
   letter-spacing: 0.35em;
 }
 
+.audio-controls {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 12rem;
+}
+
+.audio-controls label {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  color: #a1a1aa;
+  font-size: 0.75rem;
+}
+
 .eyebrow,
 .status,
 .prototype-note,
