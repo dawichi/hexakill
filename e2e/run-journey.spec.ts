@@ -17,13 +17,23 @@ test.beforeEach(async ({ page }) => {
 test('a player can start a run, buy an item, and enter combat', async ({ page }) => {
   await startRun(page);
 
-  await page.getByRole('button', { name: 'Store' }).click();
+  const storeButton = page.getByRole('button', { name: 'Store' });
+  await storeButton.focus();
+  await expect(storeButton).toBeFocused();
+  await storeButton.press('Enter');
   await expect(page.getByRole('heading', { name: 'Spend your gold.' })).toBeVisible();
-  await page.getByRole('button', { name: /Sword/ }).click();
+  const swordButton = page.getByRole('button', { name: /Sword/ });
+  await swordButton.focus();
+  await expect(swordButton).toBeFocused();
+  await swordButton.press('Enter');
   await expect(page.getByText('Gold: 1100')).toBeVisible();
 
-  await page.getByRole('button', { name: 'Close store' }).click();
-  await page.getByRole('button', { name: 'Find an enemy' }).click();
+  const closeStoreButton = page.getByRole('button', { name: 'Close store' });
+  await closeStoreButton.focus();
+  await closeStoreButton.press('Enter');
+  const findEnemyButton = page.getByRole('button', { name: 'Find an enemy' });
+  await findEnemyButton.focus();
+  await findEnemyButton.press('Enter');
   await expect(page.getByRole('heading', { name: /appears/ })).toBeVisible();
   await expect(page.getByText(/216 attack/)).toBeVisible();
   await expect(page.getByRole('meter', { name: 'Enemy health' })).toHaveAttribute(
@@ -156,7 +166,10 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Knight appears.' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Potion' }).click();
+  const potionButton = page.getByRole('button', { name: 'Potion' });
+  await potionButton.focus();
+  await expect(potionButton).toBeFocused();
+  await potionButton.press('Enter');
   await expect(page.getByRole('heading', { name: 'Game over.' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Enemies defeated' })).toBeVisible();
   await expect(page.locator('.enemy-history-row')).toContainText('Slime Blue');
@@ -215,12 +228,18 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   }, snapshot);
   await page.reload();
 
-  await page.getByRole('button', { name: /Attack Physical damage/ }).click();
+  const attackButton = page.getByRole('button', { name: /Attack Physical damage/ });
+  await attackButton.focus();
+  await expect(attackButton).toBeFocused();
+  await attackButton.press('Enter');
   await expect(page.getByText(/gained 100 exp and 100 gold/)).toBeVisible();
   await expect(page.getByText('Pending: 1')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Find another enemy' })).toBeDisabled();
 
-  await page.locator('.power-up-panel').getByRole('button', { name: 'Attack' }).click();
+  const powerUpAttack = page.locator('.power-up-panel').getByRole('button', { name: 'Attack' });
+  await powerUpAttack.focus();
+  await expect(powerUpAttack).toBeFocused();
+  await powerUpAttack.press('Enter');
   await expect(page.locator('.power-up-panel')).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Find another enemy' })).toBeEnabled();
 });

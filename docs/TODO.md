@@ -116,7 +116,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** All game views and interactive components
-- **Evidence:** Archived Svelte warnings identify mouse-only tooltip behavior and clickable non-controls. The active root has labeled name input, semantic buttons/status regions, visible focus styles, and one keyboard-start journey, but no full focus/assistive-technology review.
+- **Evidence:** Archived Svelte warnings identify mouse-only tooltip behavior and clickable non-controls. The active root has labeled name/audio inputs, semantic buttons/status regions, visible focus styles, and keyboard browser coverage for start, store, combat, power-up, audio, game-over/reset, and record clearing, but no full focus/assistive-technology review.
 - **Risk:** Players cannot complete core flows with keyboard, assistive technology, or non-pointer input.
 - **Next action:** Define and test focus order/return, status announcements, reduced-motion/audio behavior, and keyboard completion of combat/store/power-up/game-over journeys.
 - **Dependencies:** TODO-006 and TODO-009
