@@ -40,6 +40,45 @@ test('a run is restored after a browser reload', async ({ page }) => {
   await expect(page.getByText('LEVEL 4 WIZARD')).toBeVisible();
 });
 
+test('an invalid saved session is discarded safely', async ({ page }) => {
+  await page.evaluate(() => {
+    localStorage.setItem(
+      'hexakill.angular.session.v1',
+      JSON.stringify({
+        version: 1,
+        screen: 'combat',
+        playerName: 'Agent',
+        selectedCharacterId: 'wizard',
+        player: { name: 'Agent', level: 0 },
+        combatState: { phase: 'idle', enemy: null, playerDamageTaken: 0 },
+      }),
+    );
+  });
+
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
+  ).resolves.toBeNull();
+});
+
+test('the start journey is operable with keyboard activation', async ({ page }) => {
+  const chooseButton = page.getByRole('button', { name: 'Choose your champion' });
+  await chooseButton.focus();
+  await expect(chooseButton).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: 'Choose a champion' })).toBeVisible();
+
+  await page.getByLabel('Player name').fill('Agent');
+  const wizardButton = page.getByRole('button', { name: /Wizard/ });
+  await wizardButton.focus();
+  await page.keyboard.press('Enter');
+  const startButton = page.getByRole('button', { name: 'Start game' });
+  await startButton.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
+});
+
 test('a player can use a potion and reach the defeat screen', async ({ page }) => {
   const snapshot = {
     version: 1,
@@ -59,7 +98,7 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
       },
       level: 4,
       experience: 0,
-      stats: { health: 200, ad: 16, ap: 20, armor: 12, mr: 12, speed: 4 },
+      stats: { health: 1, ad: 16, ap: 20, armor: 12, mr: 12, speed: 4 },
       potions: 1,
       gold: 2000,
       inventory: [],
@@ -82,7 +121,7 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
         potions: 0,
         gold: 100,
       },
-      playerDamageTaken: 199,
+      playerDamageTaken: 1,
       pendingAction: null,
       lastResult: null,
     },
@@ -96,4 +135,92 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
 
   await page.getByRole('button', { name: 'Potion' }).click();
   await expect(page.getByRole('heading', { name: 'Game over.' })).toBeVisible();
+});
+
+test('a victory grants progression and a power-up choice', async ({ page }) => {
+  await startRun(page);
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')))
+    .toContain('Agent');
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.screen = 'combat';
+  snapshot.combatState = {
+    phase: 'awaiting-player-action',
+    enemy: {
+      definition: {
+        id: 'knight',
+        name: 'Knight',
+        archetype: 'tank',
+        modifiers: { health: 1.75, ad: 0.5, ap: 0.5, armor: 1.75, mr: 1.75, speed: 0.75 },
+        idleAsset: '/images/knight/idle.gif',
+      },
+      level: 4,
+      stats: { health: 1, ad: 1, ap: 1, armor: 1, mr: 1, speed: 1 },
+      damageTaken: 1,
+      potions: 0,
+      gold: 100,
+    },
+    playerDamageTaken: 0,
+    pendingAction: null,
+    lastResult: null,
+  };
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+  await page.reload();
+
+  await page.getByRole('button', { name: /Attack Physical damage/ }).click();
+  await expect(page.getByText(/gained 100 exp and 100 gold/)).toBeVisible();
+  await expect(page.getByText('Pending: 1')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Find another enemy' })).toBeDisabled();
+
+  await page.locator('.power-up-panel').getByRole('button', { name: 'Attack' }).click();
+  await expect(page.locator('.power-up-panel')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Find another enemy' })).toBeEnabled();
+});
+
+test('boss encounters advance in sequence after level ten', async ({ page }) => {
+  await startRun(page);
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')))
+    .toContain('Agent');
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.screen = 'combat';
+  snapshot.player.level = 10;
+  snapshot.player.bossesDefeated = 0;
+  snapshot.combatState = {
+    phase: 'awaiting-player-action',
+    enemy: {
+      definition: {
+        id: 'gold-slime-1',
+        name: 'Gold Slime 1',
+        archetype: 'boss',
+        modifiers: { health: 1.5, ad: 1.25, ap: 1.25, armor: 1.25, mr: 1.25, speed: 2 },
+        idleAsset: '/images/slime-gold/idle.gif',
+      },
+      level: 15,
+      stats: { health: 1, ad: 1, ap: 1, armor: 1, mr: 1, speed: 1 },
+      damageTaken: 1,
+      potions: 0,
+      gold: 1000,
+    },
+    playerDamageTaken: 0,
+    pendingAction: null,
+    lastResult: null,
+  };
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+  await page.reload();
+
+  await expect(page.getByRole('heading', { name: 'Gold Slime 1 appears.' })).toBeVisible();
+  await page.getByRole('button', { name: /Attack Physical damage/ }).click();
+  await expect(page.getByText(/gained 150 exp and 1000 gold/)).toBeVisible();
+  await page.locator('.power-up-panel').getByRole('button', { name: 'Attack' }).click();
+  await page.getByRole('button', { name: 'Find another enemy' }).click();
+  await expect(page.getByRole('heading', { name: 'Gold Slime 2 appears.' })).toBeVisible();
 });

@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const productionPreview = process.env['E2E_PRODUCTION'] === '1';
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -7,7 +9,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
-    baseURL: 'http://127.0.0.1:4200',
+    baseURL: productionPreview ? 'http://127.0.0.1:4300' : 'http://127.0.0.1:4200',
     trace: 'on-first-retry',
   },
   projects: [
@@ -17,8 +19,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm start -- --host 127.0.0.1',
-    url: 'http://127.0.0.1:4200',
+    command: productionPreview ? 'npm run serve:dist' : 'npm start -- --host 127.0.0.1',
+    url: productionPreview ? 'http://127.0.0.1:4300' : 'http://127.0.0.1:4200',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

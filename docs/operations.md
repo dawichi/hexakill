@@ -15,7 +15,7 @@ The archived Svelte commands below are historical evidence only. They are not pa
 | Archived Svelte build     | `legacy/svelte/`                          | Not a supported active command; historical failures remain documented. |
 | Active development server | `npm start`                               | Passes for the Angular root.                                           |
 | Active tests              | `npm test -- --watch=false --no-progress` | Passes: 10 files, 36 tests.                                            |
-| Active browser journeys   | `npm run test:e2e`                        | Passes locally: 3 Chromium journeys.                                   |
+| Active browser journeys   | `npm run test:e2e`                        | Passes locally: 7 Chromium journeys.                                   |
 | Active build              | `npm run build`                           | Passes; output is `dist/hexakill/browser/`.                            |
 | Dependency audit          | `npm audit`                               | Not yet added to the supported CI gate.                                |
 
@@ -25,15 +25,16 @@ The archived Svelte findings are recorded in [TODO-003](TODO.md#todo-003-high-cl
 
 The root Angular application is the currently validated implementation surface. Run these commands from the repository root with Node.js 24.19.0 and npm 11.17.0:
 
-| Purpose              | Command                                                         | Current result                                                                                                                      |
-| -------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Clean install        | `npm ci`                                                        | Passes with the committed root `package-lock.json`.                                                                                 |
-| Unit/component tests | `npm test -- --watch=false --no-progress`                       | Passes: 10 files, 36 tests.                                                                                                         |
-| Production build     | `npm run build`                                                 | Passes; output is `dist/hexakill/browser/` and the Angular production budget is clean.                                              |
-| Formatting           | `npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'` | Passes.                                                                                                                             |
-| CI validation        | `.github/workflows/angular-rewrite.yml`                         | Added; runs install, formatting, tests, browser journeys, build, and representative/full idle-asset checks on rewrite/docs changes. |
-| Browser journeys     | `npm run test:e2e`                                              | Passes locally: 3 Chromium journeys cover store/combat, local-session restore, and potion-driven defeat; CI installs Chromium.      |
-| Browser smoke        | `npm start`                                                     | Verified welcome → character selection → ready run → store purchase → combat → Attack with migrated sprites.                        |
+| Purpose                 | Command                                                         | Current result                                                                                                                                                                     |
+| ----------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Clean install           | `npm ci`                                                        | Passes with the committed root `package-lock.json`.                                                                                                                                |
+| Unit/component tests    | `npm test -- --watch=false --no-progress`                       | Passes: 10 files, 36 tests.                                                                                                                                                        |
+| Production build        | `npm run build`                                                 | Passes; output is `dist/hexakill/browser/` and the Angular production budget is clean.                                                                                             |
+| Formatting              | `npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'` | Passes.                                                                                                                                                                            |
+| CI validation           | `.github/workflows/angular-rewrite.yml`                         | Runs install, formatting, dev-server and production-artifact browser journeys, build, and representative/full idle-asset checks.                                                   |
+| Browser journeys        | `npm run test:e2e`                                              | Passes locally: 7 Chromium journeys cover store/combat, restore, invalid-session recovery, keyboard start, defeat, rewards/power-ups, and sequential bosses; CI installs Chromium. |
+| Production-like browser | `npm run test:e2e:production`                                   | Passes locally against `dist/hexakill/browser/` through the repository static preview server.                                                                                      |
+| Browser smoke           | `npm start`                                                     | Verified welcome → character selection → ready run → store purchase → combat → Attack with migrated sprites.                                                                       |
 
 The Angular application is not a production deployment. It has provisional combat, progression, power-up, store, versioned local-session persistence, sound/music lifecycle, and CI/browser journey gates; hosting acceptance and final gameplay balance remain unresolved.
 
@@ -43,15 +44,15 @@ No `.env.example`, runtime environment schema, server endpoint, API key, databas
 
 ## Deployment evidence
 
-The root README links to `https://hexakill.vercel.app`, and `.gitignore` contains `.vercel`, but there is no Vercel project configuration, adapter selection, deployment script, headers/redirects policy, or verified deployment record in the repository. The rewrite has a scoped CI workflow, but hosting remains unknown until checked outside the repository.
+The external URL `https://hexakill.vercel.app` was reachable during this review and returned `200` from Vercel, but its response identified the archived SvelteKit deployment (`x-sveltekit-page: true`). This verifies an existing Vercel endpoint, not an Angular deployment or project ownership. The repository now contains a candidate `vercel.json`; it has not been deployed or externally verified.
 
-The Angular output mode is now documented as static in [the deployment contract](architecture/rewrite-deployment.md), but no provider is accepted or externally verified yet.
+The Angular output mode is now documented as static in [the deployment contract](architecture/rewrite-deployment.md). Vercel is the observed candidate provider, but Angular migration, project ownership, headers, rollback, and post-deploy asset behavior remain unverified.
 
 ## Troubleshooting order
 
 1. Confirm the checkout and branch: `git status --short`, `git branch --show-current`, `git rev-parse HEAD`.
 2. Establish a reproducible Node/package-manager toolchain and lockfile before upgrading or removing dependencies.
-3. Run `npx svelte-kit sync`, then the direct type check.
-4. Repair the package scripts and formatter/build dependency graph.
+3. Run `npm run format:check`, unit tests, and the production build from the active root.
+4. Run `npm run test:e2e:production` to validate the built artifact and static asset server.
 5. Add deterministic domain tests before changing gameplay behavior.
-6. Run the rewrite CI-equivalent gates, then add audit/report retention before accepting a deployment provider.
+6. Add audit/report retention and confirm deployment ownership before accepting a provider.

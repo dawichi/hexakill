@@ -2,14 +2,20 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { AUDIO, AudioPort } from './audio';
 import { BROWSER_CLOCK, CLOCK, Clock } from './clock';
 import { chooseEnemyAction, CombatAction, resolveAction } from '../domain/combat-actions';
-import { applyPowerUp, applyVictoryReward, calculateVictoryReward } from '../domain/progression';
+import {
+  applyPowerUp,
+  applyVictoryReward,
+  calculateVictoryReward,
+  MAX_POWER_UPS,
+  MAX_POWER_UPS_PER_STAT,
+} from '../domain/progression';
 import { purchaseItem, purchasePotions, STORE_ITEMS, STORE_POTIONS } from '../domain/store';
-import { generateEnemy } from '../domain/enemies';
+import { ENEMY_DEFINITIONS, generateEnemy } from '../domain/enemies';
 import { DamageKind, resolveDamage } from '../domain/combat-rules';
 import { INITIAL_COMBAT_STATE, CombatState, transitionCombat } from '../domain/combat-state';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
 import { ASSET_MANIFEST } from '../domain/assets';
-import { CharacterDefinition, PlayerState } from '../domain/game-types';
+import { CharacterDefinition, EnemyState, PlayerState, Stats } from '../domain/game-types';
 import { RANDOM_SOURCE, RandomSource } from './random';
 import { SESSION_STORAGE, SessionStoragePort } from './storage';
 
@@ -29,6 +35,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
+const STAT_KEYS: readonly (keyof Stats)[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed'];
+
 function hasNumberFields(value: unknown, fields: readonly string[]): boolean {
   return (
     isRecord(value) &&
@@ -36,25 +44,76 @@ function hasNumberFields(value: unknown, fields: readonly string[]): boolean {
   );
 }
 
+function isStats(value: unknown): value is Stats {
+  return hasNumberFields(value, STAT_KEYS);
+}
+
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
+}
+
 function isRestorablePlayer(value: unknown): value is PlayerState {
-  if (!isRecord(value) || typeof value['name'] !== 'string' || typeof value['level'] !== 'number') {
+  if (
+    !isRecord(value) ||
+    typeof value['name'] !== 'string' ||
+    value['name'].length < 3 ||
+    value['name'].length > 14 ||
+    !isNonNegativeInteger(value['level']) ||
+    value['level'] < 1 ||
+    !isNonNegativeInteger(value['experience']) ||
+    value['experience'] >= 100 ||
+    !isStats(value['stats']) ||
+    !isNonNegativeInteger(value['potions']) ||
+    !isNonNegativeInteger(value['gold']) ||
+    !isNonNegativeInteger(value['bossesDefeated']) ||
+    value['bossesDefeated'] > 3
+  ) {
     return false;
   }
 
   const character = value['character'];
   const powerUps = value['powerUps'];
+  const history = isRecord(powerUps) ? powerUps['history'] : null;
   return (
     isRecord(character) &&
-    typeof character['id'] === 'string' &&
-    hasNumberFields(value['stats'], ['health', 'ad', 'ap', 'armor', 'mr', 'speed']) &&
-    typeof value['experience'] === 'number' &&
-    typeof value['potions'] === 'number' &&
-    typeof value['gold'] === 'number' &&
-    typeof value['bossesDefeated'] === 'number' &&
+    CHARACTER_DEFINITIONS.some((candidate) => candidate.id === character['id']) &&
     Array.isArray(value['inventory']) &&
+    value['inventory'].every(
+      (item) =>
+        isRecord(item) &&
+        typeof item['id'] === 'string' &&
+        STORE_ITEMS.some((candidate) => candidate.id === item['id']),
+    ) &&
     isRecord(powerUps) &&
-    typeof powerUps['pending'] === 'number' &&
-    isRecord(powerUps['history'])
+    isNonNegativeInteger(powerUps['pending']) &&
+    powerUps['pending'] <= MAX_POWER_UPS &&
+    isRecord(history) &&
+    (['health', 'ad', 'ap', 'speed'] as const).every(
+      (type) => isNonNegativeInteger(history[type]) && history[type] <= MAX_POWER_UPS_PER_STAT,
+    )
+  );
+}
+
+function isRestorableEnemy(value: unknown): value is EnemyState {
+  if (!isRecord(value)) return false;
+
+  const definition = value['definition'];
+  return (
+    isRecord(definition) &&
+    typeof definition['id'] === 'string' &&
+    (ENEMY_DEFINITIONS.some((candidate) => candidate.id === definition['id']) ||
+      /^gold-slime-[1-3]$/.test(definition['id'])) &&
+    typeof definition['name'] === 'string' &&
+    ['basic', 'ad', 'ap', 'tank', 'boss'].includes(String(definition['archetype'])) &&
+    isStats(definition['modifiers']) &&
+    typeof definition['idleAsset'] === 'string' &&
+    isNonNegativeInteger(value['level']) &&
+    value['level'] >= 1 &&
+    isStats(value['stats']) &&
+    isNonNegativeInteger(value['damageTaken']) &&
+    value['damageTaken'] <= value['stats']['health'] &&
+    isNonNegativeInteger(value['potions']) &&
+    isNonNegativeInteger(value['gold'])
   );
 }
 
@@ -72,8 +131,8 @@ function isRestorableCombatState(value: unknown): value is CombatState {
   return (
     typeof value['phase'] === 'string' &&
     phases.includes(value['phase']) &&
-    (value['enemy'] === null || isRecord(value['enemy'])) &&
-    typeof value['playerDamageTaken'] === 'number'
+    (value['enemy'] === null || isRestorableEnemy(value['enemy'])) &&
+    isNonNegativeInteger(value['playerDamageTaken'])
   );
 }
 
@@ -159,7 +218,7 @@ export class GameSessionService {
   findEnemy(): void {
     const player = this.player();
 
-    if (!player) {
+    if (!player || player.powerUps.pending > 0) {
       return;
     }
 
@@ -391,6 +450,9 @@ export class GameSessionService {
       if (
         snapshot.version !== 1 ||
         typeof snapshot.playerName !== 'string' ||
+        !['welcome', 'character-select', 'combat-ready', 'combat', 'game-over'].includes(
+          String(snapshot.screen),
+        ) ||
         !isRestorableCombatState(snapshot.combatState) ||
         (snapshot.player !== null && !isRestorablePlayer(snapshot.player))
       ) {
@@ -404,7 +466,14 @@ export class GameSessionService {
       if (character) this.selectedCharacter.set(character);
       this.playerName.set(snapshot.playerName.slice(0, 14));
       if (snapshot.player) {
-        this.player.set(snapshot.player);
+        const inventory = snapshot.player.inventory.map(
+          (item) => STORE_ITEMS.find((candidate) => candidate.id === item.id) ?? item,
+        );
+        this.player.set({
+          ...snapshot.player,
+          character: character ?? snapshot.player.character,
+          inventory,
+        });
         this.combatState.set(snapshot.combatState);
         this.screen.set(
           snapshot.screen === 'combat'
@@ -414,6 +483,8 @@ export class GameSessionService {
               : 'combat-ready',
         );
         this.combatMessage.set('Your saved run was restored.');
+      } else {
+        this.screen.set(snapshot.screen === 'character-select' ? 'character-select' : 'welcome');
       }
     } catch {
       this.storage?.clear();

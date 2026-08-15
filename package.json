@@ -5,10 +5,13 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "serve:dist": "node tools/serve-static.mjs dist/hexakill/browser",
+    "preview": "npm run build && npm run serve:dist",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "format:check": "prettier --check 'src/**/*.{ts,html,css}' 'e2e/**/*.ts' 'playwright.config.ts' '*.json' '*.md'",
-    "test:e2e": "playwright test"
+    "format:check": "prettier --check 'src/**/*.{ts,html,css}' 'e2e/**/*.ts' 'tools/**/*.mjs' 'playwright.config.ts' '*.json' '*.md'",
+    "test:e2e": "playwright test",
+    "test:e2e:production": "npm run build && E2E_PRODUCTION=1 npm run test:e2e"
   },
   "private": true,
   "packageManager": "npm@11.17.0",

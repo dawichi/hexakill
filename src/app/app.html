@@ -2,7 +2,7 @@
   <header class="topbar">
     <p class="eyebrow">Hexakill · Angular edition</p>
     <h1>HEXAKILL</h1>
-    <p class="status">First vertical slice · typed combat prototype</p>
+    <p class="status">First playable slice · typed combat rules</p>
   </header>
 
   @switch (session.screen()) {
@@ -270,7 +270,12 @@
                     </div>
                   }
                 }
-                <button class="primary-button" type="button" (click)="session.findEnemy()">
+                <button
+                  class="primary-button"
+                  type="button"
+                  [disabled]="player.powerUps.pending > 0"
+                  (click)="session.findEnemy()"
+                >
                   Find another enemy
                 </button>
               } @else {

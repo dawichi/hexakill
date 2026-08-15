@@ -1,6 +1,6 @@
 # Hexakill Agent Instructions
 
-This file is the canonical project-specific instruction entry point for AI developer agents. Hexakill is an existing, unfinished browser game being prepared for a future rewrite. Treat the current code as the source of truth for implemented behavior and treat rewrite documents as proposals unless they explicitly say otherwise.
+This file is the canonical project-specific instruction entry point for AI developer agents. Hexakill is an existing, unfinished browser game whose Angular rewrite is now the active root implementation. Treat the current root code as the source of truth for implemented behavior and treat rewrite documents as proposals unless they explicitly say otherwise.
 
 ## Read first
 
@@ -8,17 +8,17 @@ This file is the canonical project-specific instruction entry point for AI devel
 2. Read the [documentation index](README.md).
 3. Read the [standards contract](project-standards.yml) and [standards assessment](standards-assessment.md).
 4. Read [current architecture](architecture/current-state.md) and the relevant [game-loop documentation](features/game-loop.md).
-5. For rewrite work, read the [framework evaluation](architecture/rewrite-evaluation.md) and [target architecture proposal](architecture/rewrite-target.md).
+5. For architecture work, read the [framework evaluation](architecture/rewrite-evaluation.md) and [target architecture proposal](architecture/rewrite-target.md).
 6. For continuation work, read the [current development handoff](handoff.md).
 
 ## Source-of-truth map
 
-- Current implementation and behavior: root `src/` Angular application.
+- Current implementation and behavior: root `src/` Angular application; archived Svelte code under `legacy/svelte/` is historical evidence only.
 - Current entry points and composition: `src/main.ts`, `src/app/app.ts`, and `src/app/app.html`.
 - Current game state and rules: `src/app/application/` and `src/app/domain/`.
 - Current static assets: `static/`.
 - Package and tool configuration: `package.json`, `package-lock.json`, `angular.json`, TypeScript/Prettier files, and the CI workflow.
-- Current deployment evidence: [operations documentation](operations.md) and the root `README.md`. The README's Vercel URL is a claim from project history, not verified deployment infrastructure.
+- Current deployment evidence: [operations documentation](operations.md), `vercel.json`, and the root `README.md`. The Vercel endpoint is observed but still serves the archived SvelteKit deployment.
 - Proposed future design: `docs/architecture/rewrite-*.md`. These files MUST NOT be used as evidence that the proposed architecture already exists.
 - Active Angular application: root `src/`, `package.json`, `angular.json`, and `e2e/`. The isolated prototype was promoted and removed after validation; the former Svelte source is archived under `legacy/svelte/`.
 - Durable project decisions: [ADR index](adr/README.md).

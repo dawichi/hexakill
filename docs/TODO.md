@@ -4,22 +4,22 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 ### TODO-001 [High] Dependency toolchain baseline
 
-- **Status:** Planned
+- **Status:** Partially resolved for active root
 - **Affected area:** `package.json`, `.npmrc`, `.gitignore`, lockfile, Node/package-manager configuration
 - **Evidence:** The archived `legacy/svelte/` package has no lockfile and remains unreproducible; the active Angular root has a committed lockfile and pinned Node/npm toolchain.
 - **Risk:** Agents cannot reproduce the same dependency graph or know whether a build failure is code or tooling.
-- **Next action:** Retain npm/Node 24.19.0 as the active baseline; decide whether the archived Svelte package should be deleted after the historical audit is complete.
+- **Next action:** Retain npm/Node 24.19.0 as the active baseline; decide whether the archived Svelte package metadata should be deleted after the historical audit is complete.
 - **Dependencies:** Confirm whether the archived Svelte package should be deleted after the historical audit.
 - **Owner:** Tech Lead / future developer agent
 - **Target:** Before dependency upgrades or feature work
 
 ### TODO-002 [High] Repair validation commands
 
-- **Status:** Planned
+- **Status:** Resolved for active root; archived Svelte commands retained as historical failures
 - **Affected area:** `package.json`, SvelteKit generated config, Prettier/ESLint configuration
 - **Evidence:** `npm run check` references missing `jsconfig.json`; `npm run lint` cannot resolve the Svelte parser; `npm run build` cannot resolve the SvelteKit Vite peer.
 - **Risk:** A future agent cannot establish a trustworthy green baseline.
-- **Next action:** Make check, format/lint, and build commands agree with the chosen toolchain; keep a direct command for each gate.
+- **Next action:** Keep root format/test/build/browser/production-preview commands aligned; do not revive archived Svelte commands without a deliberate decision.
 - **Dependencies:** TODO-001
 - **Owner:** Future developer agent
 - **Target:** First implementation session
@@ -83,9 +83,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** Active root Angular application and CI
-- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app has 10 deterministic unit/component test files, injectable random/clock/storage/audio ports, application transition coverage, and three Playwright journeys for store/combat, reload restore, and potion-driven defeat.
+- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app has 10 deterministic unit/component test files, injectable random/clock/storage/audio ports, application transition coverage, and seven Playwright journeys for store/combat, reload restore, invalid-session recovery, keyboard start, defeat, rewards/power-ups, and sequential bosses. The same journeys pass against the built static artifact.
 - **Risk:** Combat and store regressions will be detected only by manual play.
-- **Next action:** Extend browser journeys to rewards/power-ups/bosses and keep delayed behavior on the injected clock.
+- **Next action:** Add accessibility assertions and retain deterministic ports as feature coverage expands.
 - **Dependencies:** TODO-004 and TODO-006
 - **Owner:** Future rewrite agent
 - **Target:** Before feature expansion
@@ -136,11 +136,11 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 ### TODO-013 [Medium] Verify hosting and production behavior
 
-- **Status:** Planned
+- **Status:** Partially resolved
 - **Affected area:** Vercel claim, adapter-auto, build output, static assets, 404/headers
-- **Evidence:** README links to Vercel but repository has no provider configuration or verified deployment record. The active Angular root has a passing production build and documented static output, but hosting behavior is not externally verified.
+- **Evidence:** `https://hexakill.vercel.app` is reachable and returns a Vercel-served SvelteKit response, proving an existing endpoint but not Angular ownership or migration. The active Angular root has `vercel.json`, a passing production build, a static preview server, and browser journeys against the built output.
 - **Risk:** Agents may assume a deployment target or claim production readiness without evidence.
-- **Next action:** Verify URL ownership/availability, identify the deployment project, run a production-like preview, and document rollback, 404, headers, and asset behavior.
+- **Next action:** Confirm project ownership/authorization, deploy Angular to a preview, and document rollback, 404, headers, and asset behavior in an ADR.
 - **Dependencies:** TODO-001 and TODO-009
 - **Owner:** Project owner / future operations agent
 - **Target:** Before release work

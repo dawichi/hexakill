@@ -1,6 +1,6 @@
 # Angular Rewrite Deployment Contract
 
-**Status:** Proposed static deployment contract; hosting provider acceptance is still pending.
+**Status:** Proposed static deployment contract; Vercel endpoint observed, Angular deployment still pending.
 
 ## Current output
 
@@ -9,6 +9,8 @@ The active Angular application is a browser-only application with no server rout
 ```sh
 npm ci
 npm run build
+# Optional local production-artifact verification
+npm run test:e2e:production
 ```
 
 The publishable artifact is `dist/hexakill/browser/`. It includes the application bundle, hashed styles/scripts, and the retained asset tree under `images/`, `music/`, and `sounds/`.
@@ -25,8 +27,8 @@ The publishable artifact is `dist/hexakill/browser/`. It includes the applicatio
 
 ## Provider status
 
-The legacy README links to Vercel, but repository evidence does not prove ownership, project configuration, current availability, or deployment history. Vercel is therefore a candidate rather than an accepted target. The first production-like deployment must record the provider/project, build command, output directory, preview URL, rollback procedure, 404 behavior, headers, and asset verification.
+`https://hexakill.vercel.app` was observed returning `200` from Vercel on 2026-08-15, with `x-sveltekit-page: true`; it still serves the archived SvelteKit application. Repository evidence does not prove project ownership or deployment authorization. `vercel.json` records the candidate Angular install/build/output contract, but it is not evidence of a completed deployment. The first Angular deployment must record the provider/project, preview URL, rollback procedure, 404 behavior, headers, and asset verification.
 
 ## Release gate
 
-The rewrite is not ready for top-level promotion until the static artifact is built from a clean install, browser journeys pass against the production-like output, representative assets load, and an owner-approved deployment target is recorded in an ADR.
+The root Angular migration now has the first three local gates: clean-install build, browser journeys against the production-like output, and representative assets. Release still requires owner-approved deployment target/ownership, production headers, rollback, and external verification in an ADR.

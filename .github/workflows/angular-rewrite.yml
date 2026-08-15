@@ -8,6 +8,8 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'angular.json'
+      - 'vercel.json'
+      - 'tools/**'
       - 'static/**'
       - 'docs/**'
       - '.github/workflows/angular-rewrite.yml'
@@ -18,6 +20,8 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'angular.json'
+      - 'vercel.json'
+      - 'tools/**'
       - 'static/**'
       - 'docs/**'
       - '.github/workflows/angular-rewrite.yml'
@@ -49,6 +53,8 @@ jobs:
         run: npm run test:e2e
       - name: Build production bundle
         run: npm run build
+      - name: Run browser journeys against production artifact
+        run: E2E_PRODUCTION=1 npm run test:e2e
       - name: Verify representative migrated assets
         run: |
           test -f dist/hexakill/browser/images/wizard/idle.gif

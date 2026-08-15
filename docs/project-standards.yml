@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: legacy unfinished browser game; rewrite preparation
   current_branch: main
-  current_revision: 84ba64a5f94a4ec2b4c8215dffab9c83f50e402b
+  current_revision: b5086b6393cef04fc79847d294feddef8227fca8
 
 standards:
   - documentation
@@ -72,9 +72,9 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: The archived Svelte root has no suite; the active Angular root has 10 test files, 36 passing tests, and three Playwright journeys, but not complete gameplay coverage.
+      evidence: The archived Svelte root has no suite; the active Angular root has 10 test files, 36 passing tests, and seven Playwright journeys, including keyboard start and a built-artifact run, but not complete gameplay/accessibility coverage.
       priority: high
-      next_action: Extend root journeys to rewards, power-ups, and bosses before production acceptance.
+      next_action: Add accessibility assertions and retain browser coverage as product features expand.
     - id: TS-001
       status: partial
       evidence: tsconfig.json enables strict, but the supported check script fails before checking because jsconfig.json is missing.
@@ -82,12 +82,12 @@ compliance:
       next_action: Repair the check command and make the effective compiler baseline reproducible.
     - id: DEP-001
       status: partial
-      evidence: The archived Svelte package has no tracked lockfile; the active Angular root has a committed package-lock.json and frozen-install baseline.
+      evidence: The archived Svelte package has no tracked lockfile; the active Angular root has a committed package-lock.json, pinned Node/npm baseline, and frozen-install validation.
       priority: high
       next_action: Retain the root Angular baseline and remove/archive legacy package metadata when the historical audit is complete.
     - id: CI-001
-      status: gap
-      evidence: .github/workflows/angular-rewrite.yml validates active root/docs changes with frozen install, formatting, tests, browser journeys, build, and asset checks; archived Svelte is intentionally out of scope.
+      status: partial
+      evidence: .github/workflows/angular-rewrite.yml validates active root/docs changes with frozen install, formatting, tests, dev-server and production-artifact browser journeys, build, and asset checks; archived Svelte is intentionally out of scope.
       priority: high
       next_action: Add audit/report retention and keep the workflow aligned with top-level promotion.
     - id: A11Y-002

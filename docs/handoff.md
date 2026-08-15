@@ -29,7 +29,7 @@ The active app consumes the legacy character/enemy idle GIFs through typed `idle
 
 ## Deliberate non-goals
 
-Full persistence validation, deployment, and final gameplay balancing remain unresolved. The app has a versioned local-session envelope, non-fatal audio playback, CI, and three Chromium journeys, but these are still provisional.
+Full persistence validation, deployment, and final gameplay balancing remain unresolved. The app has a versioned local-session envelope, non-fatal audio playback, CI, and seven Chromium journeys, but these are still provisional.
 
 ## Known characterization points
 
@@ -57,4 +57,4 @@ npm run build
 npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'
 ```
 
-The current verified result is a clean root install, 10 test files with 36 passing tests, a passing root production build, all 21 idle assets in the output, passing formatting checks, and three Chromium journeys covering progression/store/combat, local-session restore, and potion-driven defeat.
+The current verified result is a clean root install, 10 test files with 36 passing tests, a passing root production build, all 21 idle assets in the output, passing formatting checks, and seven Chromium journeys covering progression/store/combat, local-session restore, invalid-session recovery, keyboard start, potion-driven defeat, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.

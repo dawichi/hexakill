@@ -1,6 +1,6 @@
 # Asset Inventory and Migration Contract
 
-**Status:** Initial inventory, reviewed 2026-08-13.
+**Status:** Initial inventory, reviewed 2026-08-15.
 
 ## Inventory
 
@@ -11,9 +11,21 @@ The root Angular application now uses the retained `static/` tree directly. The 
 ## Current usage
 
 - Character definitions reference typed idle assets for Wizard, Samurai, and Warrior.
-- The provisional enemy catalog references idle assets for Slime Blue, Archer, Evil Wizard, and Knight.
+- The enemy catalog references typed idle assets for all 18 observed enemy definitions, including the three sequential Gold Slime boss encounters.
 - `src/app/domain/assets.ts` centralizes music, sound, and item paths for future adapters.
-- The active root UI uses idle character/enemy sprites and the application port triggers bundled attack, magic, coin, potion, error, and enemy-killed sounds plus welcome/character-select/dungeon/store music lifecycle. Mute/volume controls and action/death animations remain unresolved.
+- The active root UI uses idle character/enemy sprites and item images. The application port triggers bundled attack, magic, coin, potion, error, and enemy-killed sounds plus welcome/character-select/dungeon/store music lifecycle. Mute/volume controls and action/death animations remain unresolved.
+
+## Asset coverage evidence
+
+| Asset group                         | Retained files | Active typed/use boundary                                                                         | Remaining work                                             |
+| ----------------------------------- | -------------: | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Character/enemy idle GIFs           |             21 | `CharacterDefinition.idleAsset`, `EnemyDefinition.idleAsset`, rendered in root combat/ready views | Verify dimensions and accessibility presentation           |
+| Item images                         |              3 | `STORE_ITEMS[].asset`, rendered in the store                                                      | Provenance/license record                                  |
+| Music tracks                        |              5 | `ASSET_MANIFEST.music`, application audio lifecycle                                               | Volume/mute controls and release autoplay policy           |
+| Sound effects                       |              7 | `ASSET_MANIFEST.sounds`, injectable `AudioPort`                                                   | Volume/mute controls and failure telemetry policy          |
+| Additional sprite/animation sources |             87 | Retained in `static/`; no active animation contract yet                                           | Map attack/death states or explicitly classify as deferred |
+
+The counts above are repository observations from `static/`; rerun `find static/images -type f`, `find static/music -type f`, and `find static/sounds -type f` when assets change.
 
 ## Migration rules
 
