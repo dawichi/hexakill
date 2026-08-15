@@ -25,7 +25,7 @@ The root Angular application now uses the retained `static/` tree directly. The 
 | Sound effects                       |              7 | `ASSET_MANIFEST.sounds`, injectable `AudioPort`                                                   | Failure handling and final feedback policy                  |
 | Additional sprite/animation sources |             75 | Retained in `static/`; no active contract for most spritesheets and character animations            | Map remaining states or explicitly classify as deferred     |
 
-The counts above are repository observations from `static/`; rerun `find static/images -type f`, `find static/music -type f`, and `find static/sounds -type f` when assets change. `npm run verify:assets` checks the 48 active typed idle/animation/item/music/sound paths in local and CI validation.
+The counts above are repository observations from `static/`; rerun `find static/images -type f`, `find static/music -type f`, and `find static/sounds -type f` when assets change. `npm run verify:assets` checks the 48 active typed idle/animation/item/music/sound paths and the expected 75-file deferred image boundary in local and CI validation.
 
 ## Migration rules
 

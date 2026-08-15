@@ -18,7 +18,7 @@ The archived Svelte commands below are historical evidence only. They are not pa
 | Active browser journeys   | `npm run test:e2e`                        | Passes locally: 9 Chromium journeys.                                            |
 | Active build              | `npm run build`                           | Passes; output is `dist/hexakill/browser/`.                                     |
 | Dependency audit          | `npm audit --audit-level=high`            | Passes locally with 0 high-severity vulnerabilities; CI now runs the same gate. |
-| Active asset paths        | `npm run verify:assets`                   | Verifies all 48 typed idle/animation/item/music/sound paths used by the active app. |
+| Active asset paths        | `npm run verify:assets`                   | Verifies all 48 typed idle/animation/item/music/sound paths and the 75-file deferred image boundary. |
 | Preview contract          | `npm run verify:preview`                   | Verifies the built static root, security headers, representative asset caching, and 404 behavior. |
 
 The archived Svelte findings are recorded in [TODO-003](TODO.md#todo-003-high-clear-current-type-and-accessibility-errors); they are not active root blockers.
@@ -37,7 +37,7 @@ The root Angular application is the currently validated implementation surface. 
 | CI validation           | `.github/workflows/angular-rewrite.yml`                         | Runs install, formatting, docs, tests, preview-contract checks, dev-server and production-artifact browser journeys, build, asset checks, and 14-day validation-artifact retention. |
 | Browser journeys        | `npm run test:e2e`                                              | Passes locally: 9 Chromium journeys cover store/combat, restore, audio preferences, invalid-session recovery, keyboard/focus transitions, reduced motion/narrow viewport, defeat/history/records, rewards/power-ups, and sequential bosses; CI installs Chromium. |
 | Production-like browser | `npm run test:e2e:production`                                   | Passes locally against `dist/hexakill/browser/` through the repository static preview server.                                                                                      |
-| Active asset paths      | `npm run verify:assets`                                         | Passes locally for all 48 typed idle/animation/item/music/sound paths.                                                                                                            |
+| Active asset paths      | `npm run verify:assets`                                         | Passes locally for all 48 typed idle/animation/item/music/sound paths plus the 75-file deferred image boundary.                                                                      |
 | Browser smoke           | `npm start`                                                     | Verified welcome → character selection → ready run → store purchase → combat → Attack with migrated sprites.                                                                       |
 
 The Angular application is not a production deployment. It has provisional combat, progression, power-up, store, versioned local-session persistence, sound/music lifecycle, and CI/browser journey gates; hosting acceptance and final gameplay balance remain unresolved.

@@ -1,8 +1,15 @@
-import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readdirSync } from 'node:fs';
+import { relative, resolve } from 'node:path';
 
 const projectRoot = resolve(new URL('..', import.meta.url).pathname);
 const assetRoot = resolve(projectRoot, process.argv[2] ?? 'static');
+
+function listFiles(directory) {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = resolve(directory, entry.name);
+    return entry.isDirectory() ? listFiles(path) : [path];
+  });
+}
 
 const idleEntities = [
   'adventurer',
@@ -66,4 +73,18 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-console.log(`Verified ${requiredAssets.length} active asset paths under ${assetRoot}.`);
+const activeImagePaths = new Set(requiredAssets.filter((asset) => asset.startsWith('images/')));
+const allImagePaths = listFiles(resolve(assetRoot, 'images')).map((path) =>
+  relative(assetRoot, path).split('\\').join('/'),
+);
+const deferredImageCount = allImagePaths.filter((asset) => !activeImagePaths.has(asset)).length;
+if (deferredImageCount !== 75) {
+  console.error(
+    `Expected 75 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
+  );
+  process.exit(1);
+}
+
+console.log(
+  `Verified ${requiredAssets.length} active asset paths and ${deferredImageCount} cataloged deferred image sources under ${assetRoot}.`,
+);
