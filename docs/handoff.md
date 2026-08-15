@@ -40,8 +40,9 @@ Final persistence acceptance, deployment, and gameplay balancing remain unresolv
 ## Known characterization points
 
 - Player starts at level 4 with base stats, 5 potions, and 2000 gold, matching the observed legacy initialization.
-- Enemy levels use the legacy pre-boss range: `floor(playerLevel / 2)` through `floor(playerLevel * 1.75)`.
-- Enemy gold uses truncated `(enemyLevel / playerLevel) * 250`.
+- Enemy levels preserve the archived pre-boss calculation: `minLevel = floor(playerLevel / 2)`, `maxLevel = playerLevel * 1.75`, then `floor(random * (maxLevel - minLevel + 1)) + minLevel`. The upper bound is intentionally fractional before the final level conversion; for example, player level 3 with a `0.99` roll produces enemy level 6.
+- Enemy gold preserves the archived `Number(((enemyLevel / playerLevel) * 250).toFixed(0))` rule, including its numeric rounding behavior.
+- Combat resistance reduction and victory experience likewise preserve the archived `toFixed(0)` rounding rules; these boundaries have deterministic regression fixtures.
 - Legacy enemy stat scaling for levels below 10 does not apply enemy modifiers; the active app preserves that behavior intentionally as a characterization point, not as an approved balance decision.
 - The legacy enemy catalog contains a broken `presets.easy` reference; the active app keeps the complete observed roster explicit and treats the three Gold Slime encounters as a separate sequential boss schedule.
 
@@ -64,4 +65,4 @@ npm run verify:release
 npx prettier --check 'src/**/*.{ts,html,css}' '*.json' '*.md'
 ```
 
-The current verified result is a clean root install, 13 test files with 57 passing tests, a passing aggregate `npm run verify:release` gate, a passing root production build, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and twelve Chromium journeys covering progression/store/combat, Wizard and Samurai provisional player-action sprite rendering, mapped player/enemy defeat-strip rendering, local-session restore, audio-preference restore, invalid-session recovery including whitespace-only and negative-stat restored data, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
+The current verified result is a clean root install, 13 test files with 59 passing tests, a passing aggregate `npm run verify:release` gate, a passing root production build, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and twelve Chromium journeys covering progression/store/combat, Wizard and Samurai provisional player-action sprite rendering, mapped player/enemy defeat-strip rendering, local-session restore, audio-preference restore, invalid-session recovery including whitespace-only and negative-stat restored data, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
