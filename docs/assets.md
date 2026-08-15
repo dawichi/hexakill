@@ -1,6 +1,6 @@
 # Asset Inventory and Migration Contract
 
-**Status:** Initial inventory, reviewed 2026-08-15.
+**Status:** Initial inventory, reviewed 2026-08-15. Provenance details are tracked separately in [the provenance register](assets-provenance.md).
 
 ## Inventory
 

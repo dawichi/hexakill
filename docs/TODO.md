@@ -125,11 +125,11 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 ### TODO-012 [Medium] Asset and licensing inventory
 
-- **Status:** Planned
+- **Status:** Partially resolved
 - **Affected area:** `static/images/`, `static/music/`, `static/sounds/`, fonts, CDN resources
-- **Evidence:** The repository contains 111 image files, 5 music tracks, 7 sound effects, and external CDN dependencies. The active Angular app consumes the retained `static/` tree through typed idle/animation/item/audio paths, but there is still no provenance/license manifest; the historical README advertised MIT without a tracked `LICENSE` file.
+- **Evidence:** The repository contains 111 image files, 5 music tracks, 7 sound effects, and external CDN dependencies. The active Angular app consumes the retained `static/` tree through typed idle/animation/item/audio paths, and [the provenance register](assets-provenance.md) records the exact unknown source/license/attribution boundary; the historical README advertised MIT without a tracked `LICENSE` file.
 - **Risk:** Rewrite or redeploy can lose assets or create unreviewed licensing/privacy exposure.
-- **Next action:** Confirm the repository license with the owner, then complete the inventory in [assets.md](assets.md) with source, license, attribution requirement, dimensions/format, and intended replacement/optimization.
+- **Next action:** Confirm the repository and bundled-media rights with the owner, then replace the unknown fields in [assets-provenance.md](assets-provenance.md) with source, license, attribution, dimensions/format, and intended replacement/optimization evidence.
 - **Dependencies:** Product decision on retained visual identity
 - **Owner:** Project owner / Tech Lead
 - **Target:** Before asset migration
@@ -149,9 +149,9 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** CI configuration, lockfile, audit tooling, branch protection
-- **Evidence:** The Angular root has a committed lockfile, `npm ci`, `npm audit --audit-level=high` with 0 high-severity vulnerabilities, formatting/test/browser/build/asset CI gates, and local validation evidence. Artifact retention and branch protection are not configured.
+- **Evidence:** The Angular root has a committed lockfile, `npm ci`, `npm audit --audit-level=high` with 0 high-severity vulnerabilities, formatting/test/browser/build/asset CI gates, local validation evidence, and a workflow step configured to retain test/build reports for 14 days. Branch protection and successful remote workflow execution are not verified from this checkout.
 - **Risk:** Broken builds, dependency vulnerabilities, and quality regressions can merge unnoticed.
-- **Next action:** Add audit/report retention, type/lint gates where applicable, and verify required checks protect the promoted Angular delivery.
+- **Next action:** Verify the remote artifact upload, add type/lint gates where applicable, and confirm required checks protect the promoted Angular delivery.
 - **Dependencies:** TODO-001, TODO-002, TODO-008
 - **Owner:** Future operations agent
 - **Target:** Before merging rewrite features

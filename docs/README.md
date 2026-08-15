@@ -17,6 +17,7 @@ This directory is the local operating manual for Hexakill and future AI develope
 - [Deployment contract](architecture/rewrite-deployment.md) — proposed static output, hosting requirements, and release gate.
 - [Angular persistence contract](architecture/rewrite-persistence.md) — observed records behavior, active versioned keys, and migration unknowns.
 - [Asset inventory](assets.md) — retained assets, active Angular usage, and migration rules.
+- [Asset provenance register](assets-provenance.md) — evidence, unknown ownership/licensing, and release requirements.
 - [Standards assessment](standards-assessment.md) — rule-level evidence and compliance states.
 
 ## Future rewrite

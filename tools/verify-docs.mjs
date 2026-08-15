@@ -45,6 +45,7 @@ const requiredIndexTargets = [
   'architecture/current-state.md',
   'architecture/rewrite-target.md',
   'architecture/rewrite-persistence.md',
+  'assets-provenance.md',
   'adr/README.md',
 ];
 
