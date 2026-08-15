@@ -174,6 +174,26 @@ describe('combat state transitions', () => {
     expect(resolved.state.phase).toBe('victory');
   });
 
+  it('rejects player actions and potions after combat reaches a terminal phase', () => {
+    const victory = transitionCombat(
+      transitionCombat(
+        transitionCombat(activeState(), { type: 'player-action-started', kind: 'magic' }).state,
+        { type: 'player-action-resolved', result: { ...result, kind: 'magic', damageTaken: 999 } },
+      ).state,
+      { type: 'player-action-started', kind: 'attack' },
+    );
+    const defeat = transitionCombat(
+      transitionCombat(
+        transitionCombat(activeState(), { type: 'player-action-started', kind: 'attack' }).state,
+        { type: 'player-action-resolved', result },
+      ).state,
+      { type: 'enemy-action-resolved', playerDamageTaken: 200, playerHealth: 200 },
+    ).state;
+
+    expect(victory.accepted).toBe(false);
+    expect(transitionCombat(defeat, { type: 'player-potion-used' }).accepted).toBe(false);
+  });
+
   it('rejects an active-combat spawn and resets to the idle boundary', () => {
     const active = activeState();
     const rejected = transitionCombat(active, { type: 'enemy-spawned', enemy });
