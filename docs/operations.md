@@ -22,7 +22,7 @@ The archived Svelte commands below are historical evidence only. They are not pa
 | Dependency audit          | `npm audit --audit-level=high`            | Passes locally with 0 high-severity vulnerabilities; CI now runs the same gate.                                                             |
 | Active asset paths        | `npm run verify:assets`                   | Verifies all 60 typed idle/animation/item/music/sound paths and the 63-file deferred image boundary.                                        |
 | Deployment contract       | `npm run verify:deployment`               | Verifies the committed Angular/Vercel install, build, output, and required security-header contract.                                        |
-| Release gate              | `npm run verify:release`                  | Runs the reproducible toolchain, formatting, TypeScript, docs, assets, unit, audit, build, preview, and production-artifact browser checks. |
+| Release gate              | `npm run verify:release`                  | Runs the reproducible toolchain, formatting, TypeScript, docs, assets, unit, audit, build, publishable-artifact, preview, and production-artifact browser checks. |
 | Preview contract          | `npm run verify:preview`                  | Verifies the built static root, security headers, representative asset caching, and 404 behavior.                                           |
 
 The archived Svelte findings are recorded in [TODO-003](TODO.md#todo-003-high-clear-current-type-and-accessibility-errors); they are not active root blockers.

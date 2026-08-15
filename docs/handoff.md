@@ -35,7 +35,7 @@ The active app consumes the legacy character/enemy idle GIFs through typed `idle
 
 ## Deliberate non-goals
 
-Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session, records, and preferences envelopes, non-fatal audio playback, CI, and twelve Chromium journeys, but these are still provisional.
+Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session, records, and preferences envelopes, non-fatal audio playback, CI, and fourteen Chromium journeys, but these are still provisional.
 
 ## Known characterization points
 
@@ -70,4 +70,4 @@ npm run build
 npm run verify:release
 ```
 
-The current verified result is a clean root install, 13 test files with 60 passing tests, a passing aggregate `npm run verify:release` gate, a passing root production build, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and fourteen Chromium journeys covering progression/store/combat, Wizard and Samurai provisional player-action sprite rendering, mapped player/enemy attack/defeat-strip rendering, local-session restore, audio-preference restore, invalid-session recovery including whitespace-only, negative-stat, and unbound-character restored data, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.
+The current verified result is a clean root install, 13 test files with 60 passing tests, a passing aggregate `npm run verify:release` gate, a passing root production build, a passing publishable-artifact contract check for `dist/hexakill/browser/index.html`, a passing preview-contract check for security headers/asset caching/404 behavior, all 21 idle assets in the output, passing formatting checks, and fourteen Chromium journeys covering progression/store/combat, Wizard and Samurai provisional player-action sprite rendering, mapped player/enemy attack/defeat-strip rendering, local-session restore, audio-preference restore, invalid-session recovery including whitespace-only, negative-stat, and unbound-character restored data, keyboard/focus transitions, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. A separate production-artifact run passes through the repository static preview server.

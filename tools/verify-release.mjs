@@ -15,6 +15,10 @@ const checks = [
   { label: 'unit tests', args: ['test', '--', '--watch=false', '--no-progress'] },
   { label: 'dependency audit', args: ['audit', '--audit-level=high'] },
   { label: 'production build', args: ['run', 'build'] },
+  {
+    label: 'publishable artifact contract',
+    args: ['run', 'verify:deployment', '--', 'dist/hexakill/browser'],
+  },
   { label: 'preview contract', args: ['run', 'verify:preview'] },
   { label: 'production browser journeys', args: ['run', 'test:e2e:production'] },
 ];

@@ -67,6 +67,8 @@ jobs:
         run: npm run test:e2e
       - name: Build production bundle
         run: npm run build
+      - name: Verify publishable artifact contract
+        run: npm run verify:deployment -- dist/hexakill/browser
       - name: Verify production preview contract
         run: npm run verify:preview
       - name: Run browser journeys against production artifact
