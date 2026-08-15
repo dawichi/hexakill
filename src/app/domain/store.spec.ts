@@ -33,4 +33,15 @@ describe('store rules', () => {
     expect(result.player.gold).toBe(1600);
     expect(result.player.potions).toBe(10);
   });
+
+  it('allows repeatable potion purchases while the player can afford them', () => {
+    const first = purchasePotions(player, 'potion');
+    if (!first.purchased) return;
+    const second = purchasePotions(first.player, 'potion');
+
+    expect(second.purchased).toBe(true);
+    if (!second.purchased) return;
+    expect(second.player.gold).toBe(1800);
+    expect(second.player.potions).toBe(7);
+  });
 });

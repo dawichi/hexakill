@@ -147,4 +147,12 @@ describe('combat state transitions', () => {
 
     expect(resolved.state.phase).toBe('victory');
   });
+
+  it('rejects an active-combat spawn and resets to the idle boundary', () => {
+    const active = activeState();
+    const rejected = transitionCombat(active, { type: 'enemy-spawned', enemy });
+
+    expect(rejected.accepted).toBe(false);
+    expect(transitionCombat(active, { type: 'reset' }).state).toEqual(INITIAL_COMBAT_STATE);
+  });
 });

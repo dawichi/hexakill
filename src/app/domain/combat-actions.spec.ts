@@ -27,6 +27,21 @@ describe('combat action policy', () => {
     expect(chooseEnemyAction(enemy, 0)).toBe('heal');
   });
 
+  it('keeps the healthy threshold at sixty percent and uses the injured split below it', () => {
+    const enemy = { ...generateEnemy(4, 0, 0), potions: 1 };
+    expect(chooseEnemyAction({ ...enemy, damageTaken: 120 }, 0.5)).toBe('attack');
+    expect(chooseEnemyAction({ ...enemy, damageTaken: 120 }, 0.51)).toBe('magic');
+    expect(chooseEnemyAction({ ...enemy, damageTaken: 121 }, 0.33)).toBe('attack');
+    expect(chooseEnemyAction({ ...enemy, damageTaken: 121 }, 0.34)).toBe('magic');
+    expect(chooseEnemyAction({ ...enemy, damageTaken: 121 }, 0.67)).toBe('heal');
+  });
+
+  it('does not select healing when an injured enemy has no potions', () => {
+    const enemy = { ...generateEnemy(4, 0, 0), damageTaken: 299, potions: 0 };
+    expect(chooseEnemyAction(enemy, 0.5)).toBe('attack');
+    expect(chooseEnemyAction(enemy, 0.51)).toBe('magic');
+  });
+
   it('reduces damage taken by the legacy fixed twenty percent heal', () => {
     expect(resolveHeal(100)).toEqual({ action: 'heal', healed: 20, damageTaken: 80 });
   });

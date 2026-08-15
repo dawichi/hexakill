@@ -57,4 +57,13 @@ describe('progression rules', () => {
 
     expect(rewardedPlayer.defeatedEnemies).toEqual([{ enemyId: 'adventurer', level: 2 }]);
   });
+
+  it('does not spend a pending power-up on a capped stat', () => {
+    const cappedPlayer = {
+      ...player,
+      powerUps: { pending: 1, history: { health: 6, ad: 0, ap: 0, speed: 0 } },
+    };
+
+    expect(applyPowerUp(cappedPlayer, 'health')).toBe(cappedPlayer);
+  });
 });
