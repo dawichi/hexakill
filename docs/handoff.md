@@ -35,7 +35,7 @@ The active app consumes the legacy character/enemy idle GIFs through typed `idle
 
 ## Deliberate non-goals
 
-Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session and records envelopes, non-fatal audio playback, CI, and seven Chromium journeys, but these are still provisional.
+Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session, records, and preferences envelopes, non-fatal audio playback, CI, and eight Chromium journeys, but these are still provisional.
 
 ## Known characterization points
 

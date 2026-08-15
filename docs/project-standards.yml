@@ -97,9 +97,9 @@ compliance:
       next_action: Add audit/report retention and keep the workflow aligned with top-level promotion.
     - id: A11Y-002
       status: partial
-      evidence: Archived Svelte source has non-keyboard tooltip/store findings; the active root replaces those interactions with buttons and covers keyboard activation for the start journey.
+      evidence: Archived Svelte source has non-keyboard tooltip/store findings; the active root replaces those interactions with buttons and covers keyboard activation for the core run controls.
       priority: high
-      next_action: Extend focus/keyboard assertions across combat, store, power-up, and game-over views.
+      next_action: Complete focus-order/return and manual assistive-technology review across the core run journey.
 
 exceptions: []
 
