@@ -48,6 +48,7 @@ The archived Svelte source is not reproducible and is not the active application
 - Install: `npm ci`
 - Toolchain: `npm run verify:toolchain`
 - Formatting: `npm run format:check`
+- TypeScript: `npm run verify:types`
 - Documentation contract: `npm run verify:docs`
 - Asset manifest: `npm run verify:assets`
 - Production preview contract: `npm run verify:preview`

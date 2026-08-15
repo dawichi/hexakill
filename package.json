@@ -11,6 +11,7 @@
     "verify:assets": "node tools/verify-assets.mjs",
     "verify:release": "node tools/verify-release.mjs",
     "verify:toolchain": "node tools/verify-toolchain.mjs",
+    "verify:types": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "format:check": "prettier --check 'src/**/*.{ts,html,css}' 'e2e/**/*.ts' 'tools/**/*.mjs' 'playwright.config.ts' '*.json' '*.md'",
