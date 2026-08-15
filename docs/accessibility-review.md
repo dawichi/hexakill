@@ -8,6 +8,7 @@ This record separates evidence that can be verified from source and automated br
 
 - Core actions use native buttons, the player name uses a label, volume controls use labels, and status/error feedback uses `role="status"` or `role="alert"`.
 - Music and effects sliders expose a human-readable `aria-valuetext` and retain their values through the versioned preferences envelope.
+- Dynamic validation, combat, store, and game-over messages use atomic status/alert regions so assistive technology receives the complete updated message.
 - Screen headings have programmatic focus targets. The browser suite verifies focus after welcome navigation, store entry/return, combat entry, power-up selection, game-over, reset, and keyboard activation.
 - The suite verifies reduced-motion behavior and no horizontal overflow at a 360px viewport.
 - Character-selection art is decorative in context and is hidden from the accessibility tree; character, enemy, item, and history art that conveys entity identity has text alternatives.
