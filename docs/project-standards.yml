@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: legacy unfinished browser game; rewrite preparation
   current_branch: main
-  current_revision: 62ae42ab971fc3fd3fe56170f681048c694cf025
+  current_revision: a4c8236b3d483881ea59c7bd77cffed5a868ad09
 
 standards:
   - documentation
