@@ -13,26 +13,55 @@ function fail(message) {
   process.exit(1);
 }
 
+function headingAnchor(text) {
+  return text
+    .replace(/<[^>]+>/g, '')
+    .replace(/[`*_~]/g, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{Letter}\p{Number}\s-]/gu, '')
+    .replace(/\s+/g, '-');
+}
+
+function documentAnchors(source) {
+  return new Set(
+    [...source.matchAll(/^#{1,6}\s+(.+?)\s*#?\s*$/gm)].map((match) => headingAnchor(match[1])),
+  );
+}
+
 const index = readFileSync(indexPath, 'utf8');
 const markdownFiles = readdirSync(docsRoot, { recursive: true }).filter((file) =>
   file.endsWith('.md'),
 );
 const missingLinks = [];
+const missingAnchors = [];
 
 for (const relative of markdownFiles) {
   const sourcePath = resolve(docsRoot, relative);
   const source = readFileSync(sourcePath, 'utf8');
 
   for (const match of source.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
-    const target = match[1].split('#')[0];
-    if (!target || /^(https?:|mailto:)/.test(target)) continue;
-    if (!existsSync(resolve(dirname(sourcePath), target))) {
+    const [rawPath, rawAnchor] = match[1].split('#');
+    const target = rawPath;
+    if (/^(https?:|mailto:)/.test(target)) continue;
+    const targetPath = target ? resolve(dirname(sourcePath), target) : sourcePath;
+    if (!existsSync(targetPath)) {
       missingLinks.push(`${relative} -> ${target}`);
+      continue;
+    }
+
+    if (rawAnchor) {
+      const targetSource = readFileSync(targetPath, 'utf8');
+      const anchors = documentAnchors(targetSource);
+      if (!anchors.has(decodeURIComponent(rawAnchor))) {
+        missingAnchors.push(`${relative} -> ${match[1]}`);
+      }
     }
   }
 }
 
 if (missingLinks.length) fail(`missing local links:\n${missingLinks.join('\n')}`);
+if (missingAnchors.length) fail(`missing local heading anchors:\n${missingAnchors.join('\n')}`);
 
 const requiredIndexTargets = [
   'AGENTS.md',
@@ -90,5 +119,5 @@ try {
 }
 
 console.log(
-  `Verified docs index, ${markdownFiles.length} Markdown files, local links, commands, and project revision ${projectRevision}.`,
+  `Verified docs index, ${markdownFiles.length} Markdown files, local links and anchors, commands, and project revision ${projectRevision}.`,
 );
