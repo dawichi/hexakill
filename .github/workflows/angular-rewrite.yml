@@ -47,6 +47,8 @@ jobs:
         run: npm audit --audit-level=high
       - name: Check formatting
         run: npm run format:check
+      - name: Verify project documentation contract
+        run: npm run verify:docs
       - name: Run tests
         run: npm test -- --watch=false --no-progress
       - name: Install browser for end-to-end tests

@@ -45,6 +45,7 @@ The archived Svelte source is not reproducible and is not the active application
 
 - Install: `npm ci`
 - Formatting: `npm run format:check`
+- Documentation contract: `npm run verify:docs`
 - Unit/component tests: `npm test -- --watch=false --no-progress`
 - Browser journeys: `npm run test:e2e`
 - Build: `npm run build`
