@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
 
-async function startRun(page: import('@playwright/test').Page): Promise<void> {
+async function startRun(
+  page: import('@playwright/test').Page,
+  characterName = 'Wizard',
+): Promise<void> {
   await page.getByText('How to play', { exact: true }).click();
   await expect(
     page.getByText('Choose a champion, find enemies, and survive as many encounters as possible.'),
@@ -8,7 +11,7 @@ async function startRun(page: import('@playwright/test').Page): Promise<void> {
   await page.getByRole('button', { name: 'Choose your champion' }).click();
   await page.getByLabel('Player name').fill('Agent');
   await expect(page.locator('.character-art')).toHaveCount(3);
-  await page.getByRole('button', { name: /Wizard/ }).click();
+  await page.getByRole('button', { name: new RegExp(characterName) }).click();
   await page.getByRole('button', { name: 'Start game' }).click();
   await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
 }
@@ -56,6 +59,20 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await expect(playerAction).toBeVisible();
   await expect(playerAction).toHaveAttribute('aria-label', 'Wizard action animation');
   await expect(playerAction).toHaveCSS('background-image', /wizard/);
+});
+
+test('the Samurai uses its mapped player action strip', async ({ page }) => {
+  await startRun(page, 'Samurai');
+
+  await page.getByRole('button', { name: 'Find an enemy' }).click();
+  const attackButton = page.getByRole('button', { name: 'Attack' });
+  await expect(attackButton).toBeEnabled();
+  await attackButton.click();
+
+  const playerAction = page.locator('.sprite-strip');
+  await expect(playerAction).toBeVisible();
+  await expect(playerAction).toHaveAttribute('aria-label', 'Samurai action animation');
+  await expect(playerAction).toHaveCSS('background-image', /samurai/);
 });
 
 test('a run is restored after a browser reload', async ({ page }) => {
