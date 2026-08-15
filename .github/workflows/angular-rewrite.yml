@@ -76,10 +76,14 @@ jobs:
           test -f dist/hexakill/browser/images/samurai/Sprites/Attack1.png
           test -f dist/hexakill/browser/images/slime-blue/attack.gif
           test -f dist/hexakill/browser/images/slime-blue/die.gif
+          test -f dist/hexakill/browser/images/evil-wizard/sprites/Attack1.png
           test -f dist/hexakill/browser/images/evil-wizard/sprites/Death.png
+          test -f dist/hexakill/browser/images/fire-worm/Sprites/Worm/Attack.png
           test -f dist/hexakill/browser/images/fire-worm/Sprites/Worm/Death.png
+          test -f dist/hexakill/browser/images/martial-hero/Sprite/Attack1.png
           test -f dist/hexakill/browser/images/martial-hero/Sprite/Death.png
           test -f dist/hexakill/browser/images/samurai/Sprites/Death.png
+          test -f dist/hexakill/browser/images/wild-huntress/sprites/Attack1.png
           test -f dist/hexakill/browser/images/wild-huntress/sprites/Death.png
           test -f dist/hexakill/browser/images/wizard/sprites/Death.png
           test -f dist/hexakill/browser/sounds/attack.mp3

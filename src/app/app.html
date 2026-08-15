@@ -288,7 +288,12 @@
                   <span
                     class="entity-sprite combat-sprite sprite-strip enemy-sprite-strip"
                     role="img"
-                    [attr.aria-label]="enemy.definition.name + ' defeat animation'"
+                    [attr.aria-label]="
+                      enemy.definition.name +
+                      (session.enemyAnimation() === 'attack'
+                        ? ' attack animation'
+                        : ' defeat animation')
+                    "
                     [style.background-image]="'url(' + enemySpriteAsset.src + ')'"
                     [style.background-size]="enemySpriteAsset.frameCount * 100 + '% 100%'"
                     [style.aspect-ratio]="

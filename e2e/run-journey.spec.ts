@@ -55,7 +55,7 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   const attackButton = page.getByRole('button', { name: 'Attack' });
   await expect(attackButton).toBeEnabled();
   await attackButton.click();
-  const playerAction = page.locator('.sprite-strip');
+  const playerAction = page.getByRole('img', { name: 'Wizard action animation' });
   await expect(playerAction).toBeVisible();
   await expect(playerAction).toHaveAttribute('aria-label', 'Wizard action animation');
   await expect(playerAction).toHaveCSS('background-image', /wizard/);
@@ -69,10 +69,47 @@ test('the Samurai uses its mapped player action strip', async ({ page }) => {
   await expect(attackButton).toBeEnabled();
   await attackButton.click();
 
-  const playerAction = page.locator('.sprite-strip');
+  const playerAction = page.getByRole('img', { name: 'Samurai action animation' });
   await expect(playerAction).toBeVisible();
   await expect(playerAction).toHaveAttribute('aria-label', 'Samurai action animation');
   await expect(playerAction).toHaveCSS('background-image', /samurai/);
+});
+
+test('mapped enemy attack strips render during the enemy turn', async ({ page }) => {
+  await startRun(page);
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.screen = 'combat';
+  snapshot.combatState = {
+    phase: 'awaiting-player-action',
+    enemy: {
+      definition: {
+        id: 'evil-wizard',
+        name: 'Evil Wizard',
+        archetype: 'ap',
+        modifiers: { health: 1, ad: 0.5, ap: 1.5, armor: 1, mr: 1, speed: 1 },
+        idleAsset: '/images/evil-wizard/idle.gif',
+      },
+      level: 4,
+      stats: { health: 100, ad: 1, ap: 1, armor: 1, mr: 1, speed: 1 },
+      damageTaken: 0,
+      potions: 0,
+      gold: 100,
+    },
+    playerDamageTaken: 20,
+    pendingAction: null,
+    lastResult: null,
+  };
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+  await page.reload();
+
+  await page.getByRole('button', { name: 'Potion' }).click();
+  const enemyAttack = page.getByRole('img', { name: 'Evil Wizard attack animation' });
+  await expect(enemyAttack).toBeVisible();
+  await expect(enemyAttack).toHaveCSS('background-image', /evil-wizard/);
 });
 
 test('a run is restored after a browser reload', async ({ page }) => {

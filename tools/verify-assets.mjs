@@ -50,10 +50,14 @@ const requiredAssets = [
   'images/slime-red/attack.gif',
   'images/slime-red/die.gif',
   'images/evil-wizard/sprites/Death.png',
+  'images/evil-wizard/sprites/Attack1.png',
   'images/fire-worm/Sprites/Worm/Death.png',
+  'images/fire-worm/Sprites/Worm/Attack.png',
   'images/martial-hero/Sprite/Death.png',
+  'images/martial-hero/Sprite/Attack1.png',
   'images/samurai/Sprites/Death.png',
   'images/wild-huntress/sprites/Death.png',
+  'images/wild-huntress/sprites/Attack1.png',
   'images/wizard/sprites/Attack1.png',
   'images/wizard/sprites/Death.png',
   'images/samurai/Sprites/Attack1.png',
@@ -86,9 +90,9 @@ const allImagePaths = listFiles(resolve(assetRoot, 'images')).map((path) =>
   relative(assetRoot, path).split('\\').join('/'),
 );
 const deferredImageCount = allImagePaths.filter((asset) => !activeImagePaths.has(asset)).length;
-if (deferredImageCount !== 67) {
+if (deferredImageCount !== 63) {
   console.error(
-    `Expected 67 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
+    `Expected 63 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
   );
   process.exit(1);
 }

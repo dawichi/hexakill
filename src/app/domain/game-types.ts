@@ -45,6 +45,7 @@ export interface EnemyDefinition {
   readonly modifiers: Stats;
   readonly idleAsset: string;
   readonly attackAsset?: string;
+  readonly attackSpriteAsset?: SpriteStripAsset;
   readonly defeatAsset?: string;
   readonly defeatSpriteAsset?: SpriteStripAsset;
 }

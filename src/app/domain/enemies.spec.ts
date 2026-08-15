@@ -74,7 +74,33 @@ describe('enemy generation', () => {
       frameHeight: 126,
       frameCount: 11,
     });
-    expect(enemySpriteAssetFor('wild-huntress', 'attack')).toBeUndefined();
     expect(enemySpriteAssetFor('knight', 'defeat')).toBeUndefined();
+  });
+
+  it('maps observed single-row enemy attack strips', () => {
+    expect(enemySpriteAssetFor('evil-wizard', 'attack')).toEqual({
+      src: '/images/evil-wizard/sprites/Attack1.png',
+      frameWidth: 250,
+      frameHeight: 250,
+      frameCount: 8,
+    });
+    expect(enemySpriteAssetFor('fire-worm', 'attack')).toEqual({
+      src: '/images/fire-worm/Sprites/Worm/Attack.png',
+      frameWidth: 90,
+      frameHeight: 90,
+      frameCount: 16,
+    });
+    expect(enemySpriteAssetFor('martial-hero', 'attack')).toEqual({
+      src: '/images/martial-hero/Sprite/Attack1.png',
+      frameWidth: 126,
+      frameHeight: 126,
+      frameCount: 7,
+    });
+    expect(enemySpriteAssetFor('wild-huntress', 'attack')).toEqual({
+      src: '/images/wild-huntress/sprites/Attack1.png',
+      frameWidth: 150,
+      frameHeight: 150,
+      frameCount: 5,
+    });
   });
 });

@@ -18,7 +18,10 @@ function enemy(
   archetype: EnemyDefinition['archetype'],
   idleAsset: string,
   enemyModifiers: Stats,
-  animationAssets: Pick<EnemyDefinition, 'attackAsset' | 'defeatAsset' | 'defeatSpriteAsset'> = {},
+  animationAssets: Pick<
+    EnemyDefinition,
+    'attackAsset' | 'attackSpriteAsset' | 'defeatAsset' | 'defeatSpriteAsset'
+  > = {},
 ): EnemyDefinition {
   return { id, name, archetype, modifiers: enemyModifiers, idleAsset, ...animationAssets };
 }
@@ -35,11 +38,25 @@ const EVIL_WIZARD_DEFEAT_SPRITE: SpriteStripAsset = {
   frameCount: 7,
 };
 
+const EVIL_WIZARD_ATTACK_SPRITE: SpriteStripAsset = {
+  src: '/images/evil-wizard/sprites/Attack1.png',
+  frameWidth: 250,
+  frameHeight: 250,
+  frameCount: 8,
+};
+
 const WILD_HUNTRESS_DEFEAT_SPRITE: SpriteStripAsset = {
   src: '/images/wild-huntress/sprites/Death.png',
   frameWidth: 150,
   frameHeight: 150,
   frameCount: 8,
+};
+
+const WILD_HUNTRESS_ATTACK_SPRITE: SpriteStripAsset = {
+  src: '/images/wild-huntress/sprites/Attack1.png',
+  frameWidth: 150,
+  frameHeight: 150,
+  frameCount: 5,
 };
 
 const FIRE_WORM_DEFEAT_SPRITE: SpriteStripAsset = {
@@ -49,11 +66,25 @@ const FIRE_WORM_DEFEAT_SPRITE: SpriteStripAsset = {
   frameCount: 8,
 };
 
+const FIRE_WORM_ATTACK_SPRITE: SpriteStripAsset = {
+  src: '/images/fire-worm/Sprites/Worm/Attack.png',
+  frameWidth: 90,
+  frameHeight: 90,
+  frameCount: 16,
+};
+
 const MARTIAL_HERO_DEFEAT_SPRITE: SpriteStripAsset = {
   src: '/images/martial-hero/Sprite/Death.png',
   frameWidth: 126,
   frameHeight: 126,
   frameCount: 11,
+};
+
+const MARTIAL_HERO_ATTACK_SPRITE: SpriteStripAsset = {
+  src: '/images/martial-hero/Sprite/Attack1.png',
+  frameWidth: 126,
+  frameHeight: 126,
+  frameCount: 7,
 };
 
 const BASIC_MODIFIERS = modifiers();
@@ -99,14 +130,17 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     defeatAsset: '/images/evil-tree/die.gif',
   }),
   enemy('evil-wizard', 'Evil Wizard', 'ap', '/images/evil-wizard/idle.gif', AP_MODIFIERS, {
+    attackSpriteAsset: EVIL_WIZARD_ATTACK_SPRITE,
     defeatSpriteAsset: EVIL_WIZARD_DEFEAT_SPRITE,
   }),
   enemy('fire-knight', 'Fire knight', 'tank', '/images/fire-knight/idle.gif', TANK_MODIFIERS),
   enemy('fire-worm', 'Fire worm', 'ap', '/images/fire-worm/idle.gif', AP_MODIFIERS, {
+    attackSpriteAsset: FIRE_WORM_ATTACK_SPRITE,
     defeatSpriteAsset: FIRE_WORM_DEFEAT_SPRITE,
   }),
   enemy('knight', 'Knight', 'tank', '/images/knight/idle.gif', TANK_MODIFIERS),
   enemy('martial-hero', 'Martial Hero', 'ad', '/images/martial-hero/idle.gif', AD_MODIFIERS, {
+    attackSpriteAsset: MARTIAL_HERO_ATTACK_SPRITE,
     defeatSpriteAsset: MARTIAL_HERO_DEFEAT_SPRITE,
   }),
   enemy(
@@ -141,6 +175,7 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     AP_MODIFIERS,
   ),
   enemy('wild-huntress', 'Wild Huntress', 'ad', '/images/wild-huntress/idle.gif', AD_MODIFIERS, {
+    attackSpriteAsset: WILD_HUNTRESS_ATTACK_SPRITE,
     defeatSpriteAsset: WILD_HUNTRESS_DEFEAT_SPRITE,
   }),
   enemy('witch-blue', 'Witch Blue', 'ap', '/images/witch-blue/idle.gif', AP_MODIFIERS),
@@ -180,8 +215,9 @@ export function enemySpriteAssetFor(
   id: string,
   animation: 'idle' | 'attack' | 'defeat',
 ): SpriteStripAsset | undefined {
-  if (animation !== 'defeat') return undefined;
-  return findEnemyDefinition(id)?.defeatSpriteAsset;
+  const definition = findEnemyDefinition(id);
+  if (!definition) return undefined;
+  return animation === 'attack' ? definition.attackSpriteAsset : definition.defeatSpriteAsset;
 }
 
 function assertRoll(roll: number): void {
