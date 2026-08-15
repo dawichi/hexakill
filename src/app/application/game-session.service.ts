@@ -207,6 +207,7 @@ export class GameSessionService {
   });
   private readonly audio: AudioPort | null = inject(AUDIO, { optional: true });
   private pendingEnemyTurn: ClockHandle | null = null;
+  private pendingEnemyAnimationReset: ClockHandle | null = null;
   private runGeneration = 0;
   readonly screen = signal<GameScreen>('welcome');
   readonly playerName = signal('');
@@ -483,6 +484,7 @@ export class GameSessionService {
 
   reset(): void {
     this.cancelPendingEnemyTurn();
+    this.cancelPendingEnemyAnimationReset();
     this.runGeneration += 1;
     this.screen.set('welcome');
     this.playerName.set('');
@@ -517,6 +519,7 @@ export class GameSessionService {
       return;
     }
 
+    this.cancelPendingEnemyAnimationReset();
     const action: CombatAction = chooseEnemyAction(enemy, this.random());
     this.enemyAnimation.set('attack');
     const result = resolveAction(
@@ -560,7 +563,7 @@ export class GameSessionService {
       this.screen.set('game-over');
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
     } else {
-      this.enemyAnimation.set('idle');
+      this.scheduleEnemyAnimationReset();
       this.playerAnimation.set('idle');
     }
   }
@@ -582,6 +585,25 @@ export class GameSessionService {
   private cancelPendingEnemyTurn(): void {
     this.pendingEnemyTurn?.cancel();
     this.pendingEnemyTurn = null;
+  }
+
+  private scheduleEnemyAnimationReset(): void {
+    const generation = this.runGeneration;
+    this.pendingEnemyAnimationReset = this.clock.schedule(() => {
+      this.pendingEnemyAnimationReset = null;
+      if (
+        generation !== this.runGeneration ||
+        this.combatState().phase !== 'awaiting-player-action'
+      ) {
+        return;
+      }
+      this.enemyAnimation.set('idle');
+    }, 600);
+  }
+
+  private cancelPendingEnemyAnimationReset(): void {
+    this.pendingEnemyAnimationReset?.cancel();
+    this.pendingEnemyAnimationReset = null;
   }
 
   get characters(): readonly CharacterDefinition[] {

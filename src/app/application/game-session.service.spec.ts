@@ -64,6 +64,10 @@ describe('GameSessionService', () => {
 
     expect(service.combatState().phase).toBe('awaiting-player-action');
     expect(service.playerRemainingHealth()).toBeLessThan(200);
+    expect(service.enemyAnimation()).toBe('attack');
+
+    scheduledTask?.();
+    expect(service.enemyAnimation()).toBe('idle');
 
     service.usePotion();
     expect(service.player()?.potions).toBe(4);
@@ -136,6 +140,8 @@ describe('GameSessionService', () => {
 
     scheduledTask?.();
     expect(service.combatState().phase).toBe('awaiting-player-action');
+    expect(service.enemyAnimation()).toBe('attack');
+    scheduledTask?.();
     expect(service.enemyAnimation()).toBe('idle');
   });
 });
