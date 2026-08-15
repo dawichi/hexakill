@@ -43,6 +43,21 @@ export class App {
     this.session.setPlayerName(input.value);
   }
 
+  protected nameValidationMessage(): string {
+    const name = this.session.playerName().trim();
+
+    if (!name) return 'Enter a name to continue.';
+    if (name.length < 3 || name.length > 14) {
+      return 'Name must contain between 3 and 14 characters.';
+    }
+
+    return '';
+  }
+
+  protected nameValidationMessageId(): string | null {
+    return this.nameValidationMessage() ? 'player-name-validation' : null;
+  }
+
   protected selectCharacter(character: CharacterDefinition): void {
     this.session.selectCharacter(character);
   }

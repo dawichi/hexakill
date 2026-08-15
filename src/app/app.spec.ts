@@ -42,6 +42,35 @@ describe('App', () => {
     expect(compiled.querySelector('h2')?.textContent).toContain('Welcome, David');
   });
 
+  it('exposes name validation semantics before character selection', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
+    fixture.detectChanges();
+
+    const nameInput = compiled.querySelector<HTMLInputElement>('#player-name');
+    if (!nameInput) throw new Error('Player name input was not rendered.');
+    expect(nameInput.required).toBe(true);
+    expect(nameInput.getAttribute('aria-required')).toBe('true');
+    expect(nameInput.getAttribute('aria-invalid')).toBe('true');
+    expect(nameInput.getAttribute('aria-describedby')).toBe('player-name-validation');
+    expect(compiled.querySelector('#player-name-validation')?.textContent).toContain(
+      'Enter a name to continue',
+    );
+
+    nameInput.value = 'David';
+    nameInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(nameInput.getAttribute('aria-invalid')).toBeNull();
+    expect(nameInput.getAttribute('aria-describedby')).toBeNull();
+    expect(compiled.querySelector('.validation')?.textContent).toContain(
+      'Choose a character to continue',
+    );
+  });
+
   it('moves from a ready run into combat with a generated enemy', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();

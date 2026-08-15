@@ -102,9 +102,13 @@
           id="player-name"
           class="name-input"
           type="text"
+          required
+          aria-required="true"
           maxlength="14"
           autocomplete="nickname"
           placeholder="3–14 characters"
+          [attr.aria-invalid]="nameValidationMessage() ? 'true' : null"
+          [attr.aria-describedby]="nameValidationMessageId()"
           [value]="session.playerName()"
           (input)="onNameInput($event)"
         />
@@ -130,7 +134,9 @@
         </div>
 
         @if (session.validationMessage(); as validationMessage) {
-          <p class="validation" role="status" aria-atomic="true">{{ validationMessage }}</p>
+          <p class="validation" [id]="nameValidationMessageId()" role="status" aria-atomic="true">
+            {{ validationMessage }}
+          </p>
         }
 
         <button
