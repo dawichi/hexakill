@@ -130,7 +130,7 @@
         </div>
 
         @if (session.validationMessage(); as validationMessage) {
-          <p class="validation" role="status">{{ validationMessage }}</p>
+          <p class="validation" role="status" aria-atomic="true">{{ validationMessage }}</p>
         }
 
         <button
@@ -304,7 +304,9 @@
               </section>
             }
 
-            <p class="combat-message" role="status">{{ session.combatMessage() }}</p>
+            <p class="combat-message" role="status" aria-atomic="true">
+              {{ session.combatMessage() }}
+            </p>
 
             <div class="action-grid" aria-label="Combat actions">
               <button
@@ -416,7 +418,9 @@
             Gold: <strong>{{ player.gold }}</strong> · Potions:
             <strong>{{ player.potions }}</strong>
           </p>
-          <p class="combat-message" role="status">{{ session.combatMessage() }}</p>
+          <p class="combat-message" role="status" aria-atomic="true">
+            {{ session.combatMessage() }}
+          </p>
 
           <h3>Potions</h3>
           <div class="store-grid">
@@ -467,7 +471,9 @@
             {{ player.name }} reached level {{ player.level }} with {{ player.bossesDefeated }} boss
             {{ player.bossesDefeated === 1 ? 'defeat' : 'defeats' }}.
           </p>
-          <p class="validation" role="alert">{{ session.combatMessage() }}</p>
+          <p class="validation" role="alert" aria-atomic="true">
+            {{ session.combatMessage() }}
+          </p>
           @if (session.defeatedEnemySummary().length) {
             <section class="enemy-history" aria-labelledby="enemy-history-title">
               <h3 id="enemy-history-title">Enemies defeated</h3>
