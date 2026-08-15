@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 async function startRun(page: import('@playwright/test').Page): Promise<void> {
+  await page.getByText('How to play', { exact: true }).click();
+  await expect(
+    page.getByText('Choose a champion, find enemies, and survive as many encounters as possible.'),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Choose your champion' }).click();
   await page.getByLabel('Player name').fill('Agent');
   await expect(page.locator('.character-art')).toHaveCount(3);

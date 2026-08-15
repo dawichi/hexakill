@@ -6,7 +6,7 @@
 
 The root Angular application uses these screens:
 
-1. `welcome` displays the entry point, local personal records, and persistent audio controls.
+1. `welcome` displays the entry point, keyboard-accessible “How to play” guidance, local personal records, and persistent audio controls.
 2. `character-select` accepts a trimmed name of 3–14 characters, renders Wizard, Samurai, and Warrior idle art, and starts a level-4 player.
 3. `combat-ready` displays the player, stats, owned equipment, store access, and enemy generation.
 4. `combat` displays the current enemy, idle/attack/defeat art where an asset is characterized, health, combat messages, actions, power-ups, and reset/store controls.
