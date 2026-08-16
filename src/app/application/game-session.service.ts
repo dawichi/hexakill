@@ -31,6 +31,7 @@ import {
   CombatLogEntry,
   DefeatedEnemy,
   EnemyState,
+  MAX_COMBAT_LOG_ENTRIES,
   PlayerState,
   SpriteStripAsset,
   Stats,
@@ -514,7 +515,7 @@ export class GameSessionService {
     this.addCombatLog('player', {
       title: player.name,
       message: result.missed ? `${kind} missed.` : '',
-      value: result.damageAfterResistance,
+      ...(result.missed ? {} : { value: result.damageAfterResistance }),
       icon: kind === 'attack' ? '🔪' : '☄',
     });
 
@@ -522,6 +523,20 @@ export class GameSessionService {
       this.enemyAnimation.set('defeat');
       const reward = calculateVictoryReward(player, enemy);
       this.player.set(applyVictoryReward(player, enemy));
+      this.addCombatLog('enemy', {
+        title: enemy.definition.name,
+        message: `lv ${enemy.level} has been defeated! 🎉🎉`,
+      });
+      this.addCombatLog('player', {
+        title: '',
+        message: `Well done, you have gained ${reward.experience} exp!`,
+      });
+      if (reward.powerUpsGranted > 0) {
+        this.addCombatLog('player', {
+          title: '',
+          message: 'You have leveled up! 🎉🎉',
+        });
+      }
       this.combatMessage.set(
         `The ${enemy.definition.name} was defeated. You gained ${reward.experience} exp and ${reward.gold} gold.`,
       );
@@ -673,7 +688,7 @@ export class GameSessionService {
       this.addCombatLog('enemy', {
         title: enemy.definition.name,
         message: result.missed ? `${action} missed.` : '',
-        value: result.damageAfterResistance,
+        ...(result.missed ? {} : { value: result.damageAfterResistance }),
         icon: action === 'attack' ? '🔪' : '☄',
       });
       this.combatMessage.set(
@@ -692,6 +707,10 @@ export class GameSessionService {
     });
     if (this.combatState().phase === 'defeat') {
       this.playerAnimation.set('defeat');
+      this.addCombatLog('player', {
+        title: 'Oh no!',
+        message: 'You have been defeated! 😭',
+      });
       this.addPersonalRecord(player);
       this.screen.set('game-over');
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
@@ -744,7 +763,9 @@ export class GameSessionService {
 
   private addCombatLog(side: 'player' | 'enemy', entry: CombatLogEntry): void {
     const log = side === 'player' ? this.playerCombatLog : this.enemyCombatLog;
-    log.update((entries) => [...entries, entry]);
+    log.update((entries) =>
+      entries.length >= MAX_COMBAT_LOG_ENTRIES ? [...entries.slice(1), entry] : [...entries, entry],
+    );
   }
 
   private clearCombatLogs(): void {

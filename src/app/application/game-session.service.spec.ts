@@ -7,6 +7,7 @@ import { RANDOM_SOURCE } from './random';
 import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
 import { AUDIO, AudioPort } from './audio';
 import { SESSION_STORAGE, SessionStoragePort } from './storage';
+import { INITIAL_COMBAT_STATE } from '../domain/combat-state';
 
 describe('GameSessionService', () => {
   let service: GameSessionService;
@@ -167,6 +168,35 @@ describe('GameSessionService', () => {
 
     expect(playedSounds).toContain('/sounds/levelup.mp3');
     expect(playedSounds).not.toContain('/sounds/enemy_killed.mp3');
+    expect(service.enemyCombatLog()).toContainEqual({
+      title: 'Adventurer',
+      message: expect.stringContaining('has been defeated'),
+    });
+    expect(service.playerCombatLog()).toContainEqual({
+      title: '',
+      message: expect.stringContaining('gained'),
+    });
+    expect(service.playerCombatLog()).toContainEqual({
+      title: '',
+      message: expect.stringContaining('leveled up'),
+    });
+  });
+
+  it('keeps each combat log to the legacy eight-entry window', () => {
+    service.setPlayerName('David');
+    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
+    service.startRun();
+    service.player.update((player) =>
+      player ? { ...player, stats: { ...player.stats, speed: 100 } } : player,
+    );
+
+    for (let index = 0; index < 9; index += 1) {
+      service.combatState.set(INITIAL_COMBAT_STATE);
+      service.findEnemy();
+    }
+
+    expect(service.enemyCombatLog()).toHaveLength(8);
+    expect(service.playerCombatLog()).toHaveLength(8);
   });
 
   it('keeps records when the run is reset', () => {

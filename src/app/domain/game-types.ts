@@ -36,6 +36,8 @@ export interface CombatLogEntry {
   readonly icon?: string;
 }
 
+export const MAX_COMBAT_LOG_ENTRIES = 8;
+
 export interface CharacterDefinition {
   readonly id: CharacterId;
   readonly name: string;
