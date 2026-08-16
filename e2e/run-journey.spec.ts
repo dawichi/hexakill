@@ -515,6 +515,29 @@ test('a restored transient combat action is discarded safely', async ({ page }) 
   ).resolves.toBeNull();
 });
 
+test('restored resolving and enemy-turn phases are discarded safely', async ({ page }) => {
+  for (const phase of ['resolving-player-action', 'enemy-turn'] as const) {
+    await startRun(page);
+    await page.getByRole('button', { name: 'Find an enemy' }).click();
+    await expect(page.getByRole('heading', { name: /appears/ })).toBeVisible();
+
+    const snapshot = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+    );
+    snapshot.combatState.phase = phase;
+    snapshot.combatState.pendingAction = phase === 'resolving-player-action' ? 'attack' : null;
+    await page.evaluate((value) => {
+      localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+    }, snapshot);
+
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+    await expect(
+      page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
+    ).resolves.toBeNull();
+  }
+});
+
 test('a restored malformed combat result is discarded safely', async ({ page }) => {
   await startRun(page);
   await page.getByRole('button', { name: 'Find an enemy' }).click();
