@@ -1,6 +1,6 @@
 # Operations and Development Commands
 
-**Status:** Current repository evidence, reviewed 2026-08-15.
+**Status:** Current repository evidence, reviewed 2026-08-16.
 
 ## Local setup
 

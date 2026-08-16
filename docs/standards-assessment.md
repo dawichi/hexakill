@@ -1,6 +1,6 @@
 # Standards Assessment
 
-**Snapshot:** 2026-08-15, active Angular application promoted to repository root; final commit recorded after validation.
+**Snapshot:** 2026-08-16, active Angular application promoted to repository root; current implementation and release evidence recorded after validation.
 
 Statuses use the shared definitions: `Compliant`, `Partial`, `Gap`, `Deferred`, `Exception`, `Not applicable`, and `Unknown`. The YAML contract contains a compact machine-readable summary; this document contains the reasoning and evidence.
 
