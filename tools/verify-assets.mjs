@@ -1,4 +1,5 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 const projectRoot = resolve(new URL('..', import.meta.url).pathname);
@@ -11,6 +12,10 @@ function listFiles(directory) {
     const path = resolve(directory, entry.name);
     return entry.isDirectory() ? listFiles(path) : [path];
   });
+}
+
+function fileDigest(path) {
+  return createHash('sha256').update(readFileSync(path)).digest('hex');
 }
 
 const idleEntities = [
@@ -176,7 +181,23 @@ if (artifactArgument) {
     process.exit(1);
   }
 
-  console.log(`Verified complete retained static tree parity for ${sourceStaticPaths.size} files.`);
+  const changedCopiedAssets = [...sourceStaticPaths].filter((asset) => {
+    const sourcePath = resolve(sourceAssetRoot, asset);
+    const artifactPath = resolve(assetRoot, asset);
+    return (
+      statSync(sourcePath).size !== statSync(artifactPath).size ||
+      fileDigest(sourcePath) !== fileDigest(artifactPath)
+    );
+  });
+  if (changedCopiedAssets.length > 0) {
+    console.error('The publishable artifact changed retained static assets:');
+    console.error(changedCopiedAssets.map((asset) => `- ${asset}`).join('\n'));
+    process.exit(1);
+  }
+
+  console.log(
+    `Verified complete retained static-tree path and byte parity for ${sourceStaticPaths.size} files.`,
+  );
 }
 
 console.log(
