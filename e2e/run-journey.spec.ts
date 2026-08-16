@@ -78,6 +78,16 @@ test('the Samurai uses its mapped player action strip', async ({ page }) => {
 test('Magic uses the mapped secondary player action strip', async ({ page }) => {
   await startRun(page);
 
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.player.stats.speed = 100;
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
+
   await page.getByRole('button', { name: 'Find an enemy' }).click();
   const magicButton = page.getByRole('button', { name: 'Magic' });
   await expect(magicButton).toBeEnabled();
