@@ -34,6 +34,8 @@ Disabled controls use reduced opacity and must be reviewed separately for discov
 
 The local Angular preview was inspected at 1280×800 and 360×800 on 2026-08-15. Welcome, character selection, ready, combat, store, and game-over surfaces rendered without horizontal overflow. The browser accessibility tree exposed native slider, button, disclosure, status, alert, meter, heading, and labelled-region roles; focus moved to the relevant screen heading after navigation, store return, and game-over transitions. The Wizard and Samurai player-action strips are covered by the browser journeys; the Wizard strip was also reached during the manual combat flow. Their timing and final semantic treatment remain provisional. A synthetic 2× CSS layout check at a 640px viewport also reported equal document/client widths. This is browser smoke evidence, not a substitute for using a screen reader or operating-system zoom/high-contrast modes.
 
+A follow-up shared-preview semantic snapshot was attempted on 2026-08-16 after the deployment-preview hardening work, but the preview automation timed out. No additional manual accessibility evidence is accepted from that attempt; the 2026-08-15 smoke record above remains the latest successful visual/tree inspection.
+
 ## Still required before release
 
 - Test the complete run with a screen reader, including focus order, announcements for combat results, enemy health, power-up availability, and game-over history.
