@@ -386,8 +386,8 @@ export function generateEnemy(
   levelRoll: number,
   bossesDefeated = 0,
 ): EnemyState {
-  if (!Number.isFinite(playerLevel) || playerLevel < 1) {
-    throw new RangeError('Player level must be positive.');
+  if (!Number.isInteger(playerLevel) || playerLevel < 1) {
+    throw new RangeError('Player level must be a positive integer.');
   }
   if (
     !Number.isInteger(bossesDefeated) ||
@@ -413,7 +413,7 @@ export function generateEnemy(
   }
 
   const regularEnemies = ENEMY_DEFINITIONS.filter((candidate) => candidate.archetype !== 'boss');
-  const minLevel = Math.floor(playerLevel / 2);
+  const minLevel = Math.max(1, Math.floor(playerLevel / 2));
   const maxLevel = playerLevel * 1.75;
   const level = Math.floor(levelRoll * (maxLevel - minLevel + 1)) + minLevel;
   const definition = regularEnemies[Math.floor(definitionRoll * regularEnemies.length)];

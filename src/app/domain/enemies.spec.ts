@@ -26,6 +26,13 @@ describe('enemy generation', () => {
     expect(enemy.level).toBe(6);
   });
 
+  it('keeps the lowest valid player level from producing a zero-health enemy', () => {
+    const enemy = generateEnemy(1, 0, 0);
+
+    expect(enemy.level).toBe(1);
+    expect(enemy.stats.health).toBeGreaterThan(0);
+  });
+
   it('opens the sequential gold-slime bosses at level ten', () => {
     const firstBoss = generateEnemy(10, 0.5, 0, 0);
     const secondBoss = generateEnemy(20, 0.5, 0, 1);
@@ -47,6 +54,7 @@ describe('enemy generation', () => {
   it('rejects non-finite player levels and fractional boss progress', () => {
     expect(() => generateEnemy(Number.NaN, 0.5, 0.5)).toThrow(RangeError);
     expect(() => generateEnemy(Number.POSITIVE_INFINITY, 0.5, 0.5)).toThrow(RangeError);
+    expect(() => generateEnemy(1.5, 0.5, 0.5)).toThrow(RangeError);
     expect(() => generateEnemy(10, 0.5, 0.5, 0.5)).toThrow(RangeError);
   });
 
