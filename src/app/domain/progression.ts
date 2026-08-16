@@ -120,8 +120,13 @@ export function applyVictoryReward(player: PlayerState, enemy: EnemyState): Play
   const reward = calculateVictoryReward(player, enemy);
   const nextLevel = player.level + reward.levelsGained;
   const nextGold = player.gold + reward.gold;
+  const nextBossesDefeated =
+    player.bossesDefeated + (enemy.definition.archetype === 'boss' ? 1 : 0);
   if (!Number.isSafeInteger(nextLevel) || !Number.isSafeInteger(nextGold)) {
     throw new RangeError('Victory reward must keep player level and gold safe integers.');
+  }
+  if (!isSafeNonNegativeInteger(nextBossesDefeated) || nextBossesDefeated > 3) {
+    throw new RangeError('Victory reward must keep boss progress between 0 and 3.');
   }
   const experience = (player.experience + reward.experience) % 100;
 
@@ -135,7 +140,7 @@ export function applyVictoryReward(player: PlayerState, enemy: EnemyState): Play
       ...player.powerUps,
       pending: player.powerUps.pending + reward.powerUpsGranted,
     },
-    bossesDefeated: player.bossesDefeated + (enemy.definition.archetype === 'boss' ? 1 : 0),
+    bossesDefeated: nextBossesDefeated,
     defeatedEnemies: [
       ...player.defeatedEnemies,
       { enemyId: enemy.definition.id, level: enemy.level },

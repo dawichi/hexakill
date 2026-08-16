@@ -100,6 +100,14 @@ describe('progression rules', () => {
     ).toThrow(RangeError);
   });
 
+  it('rejects a boss reward that would exceed the three-boss schedule', () => {
+    const finalBoss = generateEnemy(30, 0, 0, 2);
+
+    expect(() => applyVictoryReward({ ...player, bossesDefeated: 3 }, finalBoss)).toThrow(
+      RangeError,
+    );
+  });
+
   it('records sequential boss progress in the player run', () => {
     const boss = generateEnemy(10, 0, 0, 0);
     const bossPlayer = { ...player, level: 10 };
