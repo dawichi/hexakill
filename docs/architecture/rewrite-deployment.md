@@ -29,7 +29,7 @@ The publishable artifact is `dist/hexakill/browser/`. It includes the applicatio
 
 ## Provider status
 
-`https://hexakill.vercel.app` was observed returning `200` from Vercel on 2026-08-15, with `x-sveltekit-page: true`; it still serves the archived SvelteKit application. Repository evidence does not prove project ownership or deployment authorization. `vercel.json` records the candidate Angular install/build/output contract, but it is not evidence of a completed deployment. The first Angular deployment must record the provider/project, preview URL, rollback procedure, 404 behavior, headers, and asset verification.
+`https://hexakill.vercel.app` was observed returning HTTP `200` from Vercel on 2026-08-16, with `x-sveltekit-page: true` and the legacy `TS + Svelte game` description; it still serves the archived SvelteKit application. Repository evidence does not prove project ownership or deployment authorization. `vercel.json` records the candidate Angular install/build/output contract, but it is not evidence of a completed deployment. The first Angular deployment must record the provider/project, preview URL, rollback procedure, 404 behavior, headers, and asset verification.
 
 ## Local contract verification
 
