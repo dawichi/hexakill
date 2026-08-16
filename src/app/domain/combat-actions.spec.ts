@@ -25,8 +25,14 @@ describe('combat action policy', () => {
   it('rejects non-finite enemy action rolls', () => {
     const enemy = generateEnemy(4, 0, 0);
 
+    expect(() => determineFirstActor(Number.NaN, 4)).toThrow(RangeError);
+    expect(() => determineFirstActor(4, -1)).toThrow(RangeError);
     expect(() => chooseEnemyAction(enemy, Number.NaN)).toThrow(RangeError);
     expect(() => chooseEnemyAction(enemy, Number.POSITIVE_INFINITY)).toThrow(RangeError);
+    expect(() => chooseEnemyAction({ ...enemy, damageTaken: enemy.stats.health + 1 }, 0.5)).toThrow(
+      RangeError,
+    );
+    expect(() => chooseEnemyAction({ ...enemy, potions: 0.5 }, 0.5)).toThrow(RangeError);
   });
 
   it('chooses healing below ten percent health when potions remain', () => {

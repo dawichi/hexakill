@@ -3,12 +3,40 @@ import { EnemyState } from './game-types';
 
 export type CombatAction = DamageKind | 'heal';
 
+function assertNonNegativeFinite(value: number, label: string): void {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new RangeError(`${label} must be finite and non-negative.`);
+  }
+}
+
+function assertEnemyState(enemy: EnemyState): void {
+  if (
+    !Object.values(enemy.stats).every((value) => Number.isFinite(value) && value >= 0) ||
+    enemy.stats.health <= 0
+  ) {
+    throw new RangeError('Enemy stats must be finite and non-negative with positive health.');
+  }
+  if (!Number.isInteger(enemy.potions) || enemy.potions < 0) {
+    throw new RangeError('Enemy potions must be a non-negative integer.');
+  }
+  if (
+    !Number.isFinite(enemy.damageTaken) ||
+    enemy.damageTaken < 0 ||
+    enemy.damageTaken > enemy.stats.health
+  ) {
+    throw new RangeError('Enemy damage must be within its health bounds.');
+  }
+}
+
 export function determineFirstActor(playerSpeed: number, enemySpeed: number): 'player' | 'enemy' {
+  assertNonNegativeFinite(playerSpeed, 'Player speed');
+  assertNonNegativeFinite(enemySpeed, 'Enemy speed');
   return playerSpeed > enemySpeed ? 'player' : 'enemy';
 }
 
 /** Preserves the legacy enemy action policy until gameplay balance is reviewed. */
 export function chooseEnemyAction(enemy: EnemyState, roll: number): CombatAction {
+  assertEnemyState(enemy);
   if (!Number.isFinite(roll) || roll < 0 || roll >= 1) {
     throw new RangeError('Random rolls must be in the range [0, 1).');
   }
