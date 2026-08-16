@@ -44,7 +44,20 @@ function integerBetween(min: number, max: number, roll: number): number {
   return Math.floor(roll * (max - min + 1) + min);
 }
 
+function assertStats(stats: Stats, role: string): void {
+  if (
+    !Object.values(stats).every((value) => Number.isFinite(value) && value >= 0) ||
+    stats.health <= 0
+  ) {
+    throw new RangeError(`${role} stats must be finite and non-negative with positive health.`);
+  }
+}
+
 export function reduceDamage(damage: number, resistance: number): number {
+  if (!Number.isFinite(damage) || damage < 0 || !Number.isFinite(resistance) || resistance < 0) {
+    throw new RangeError('Damage and resistance must be finite and non-negative.');
+  }
+
   return Number(((damage * 600) / (600 + resistance)).toFixed(0));
 }
 
@@ -54,6 +67,15 @@ export function resolveDamage(
   kind: DamageKind,
   rolls: DamageRoll,
 ): DamageResult {
+  assertStats(attacker.stats, 'Attacker');
+  assertStats(defender.stats, 'Defender');
+  if (
+    !Number.isFinite(defender.damageTaken) ||
+    defender.damageTaken < 0 ||
+    defender.damageTaken > defender.stats.health
+  ) {
+    throw new RangeError('Defender damage must be within its health bounds.');
+  }
   if (!Number.isFinite(rolls.chanceRoll) || rolls.chanceRoll < 0 || rolls.chanceRoll >= 1) {
     throw new RangeError('Random rolls must be in the range [0, 1).');
   }

@@ -125,5 +125,24 @@ describe('combat rules', () => {
         chanceRoll: 0.5,
       }),
     ).toThrow(RangeError);
+    expect(() => reduceDamage(-1, 100)).toThrow(RangeError);
+    expect(() => reduceDamage(100, Number.NaN)).toThrow(RangeError);
+    expect(() =>
+      resolveDamage({ stats: { ...attackerStats, ad: Number.NaN } }, defender, 'attack', {
+        damageRoll: 0.5,
+        chanceRoll: 0.5,
+      }),
+    ).toThrow(RangeError);
+    expect(() =>
+      resolveDamage(
+        { stats: attackerStats },
+        { ...defender, damageTaken: defender.stats.health + 1 },
+        'attack',
+        {
+          damageRoll: 0.5,
+          chanceRoll: 0.5,
+        },
+      ),
+    ).toThrow(RangeError);
   });
 });
