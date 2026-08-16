@@ -33,6 +33,9 @@ describe('combat action policy', () => {
       RangeError,
     );
     expect(() => chooseEnemyAction({ ...enemy, potions: 0.5 }, 0.5)).toThrow(RangeError);
+    expect(() =>
+      chooseEnemyAction({ ...enemy, potions: Number.MAX_SAFE_INTEGER + 1 }, 0.5),
+    ).toThrow(RangeError);
   });
 
   it('chooses healing below ten percent health when potions remain', () => {

@@ -59,6 +59,9 @@ describe('store rules', () => {
     expect(() => purchaseItem({ ...player, gold: -1 }, 'orb')).toThrow(RangeError);
     expect(() => purchasePotions({ ...player, potions: Number.NaN }, 'potion')).toThrow(RangeError);
     expect(() =>
+      purchasePotions({ ...player, potions: Number.MAX_SAFE_INTEGER }, 'potion'),
+    ).toThrow(RangeError);
+    expect(() =>
       purchaseItem({ ...player, stats: { ...player.stats, ap: Number.NaN } }, 'orb'),
     ).toThrow(RangeError);
     expect(() =>

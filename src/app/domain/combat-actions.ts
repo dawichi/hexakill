@@ -16,8 +16,8 @@ function assertEnemyState(enemy: EnemyState): void {
   ) {
     throw new RangeError('Enemy stats must be finite and non-negative with positive health.');
   }
-  if (!Number.isInteger(enemy.potions) || enemy.potions < 0) {
-    throw new RangeError('Enemy potions must be a non-negative integer.');
+  if (!Number.isSafeInteger(enemy.potions) || enemy.potions < 0) {
+    throw new RangeError('Enemy potions must be a non-negative safe integer.');
   }
   if (
     !Number.isFinite(enemy.damageTaken) ||

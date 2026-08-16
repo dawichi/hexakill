@@ -110,13 +110,17 @@ export function purchasePotions(player: PlayerState, offerId: string): PurchaseR
   if (!offer) return { purchased: false, player, reason: 'That potion offer is not available.' };
   if (player.gold < offer.price)
     return { purchased: false, player, reason: 'You cannot afford that potion offer.' };
+  const nextPotions = player.potions + offer.quantity;
+  if (!Number.isSafeInteger(nextPotions)) {
+    throw new RangeError('Player potions must remain a non-negative safe integer.');
+  }
 
   return {
     purchased: true,
     player: {
       ...player,
       gold: player.gold - offer.price,
-      potions: player.potions + offer.quantity,
+      potions: nextPotions,
     },
     message: `${offer.name} purchased.`,
   };
