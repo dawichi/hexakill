@@ -43,7 +43,7 @@ Final persistence acceptance, deployment, and gameplay balancing remain unresolv
 
 ## Known characterization points
 
-- Player starts at level 4 with base stats, 5 potions, and 2000 gold, matching the observed legacy initialization.
+- Player starts at level 4 with the current Angular prototype's unscaled base stats, 5 potions, and 2000 gold. This intentionally remains an unresolved divergence from the archived constructor, which initializes a level-4 entity with `level × base` stats; see [TODO-016](TODO.md#todo-016-high-resolve-initial-player-stat-parity).
 - Enemy levels preserve the archived pre-boss calculation: `minLevel = floor(playerLevel / 2)`, `maxLevel = playerLevel * 1.75`, then `floor(random * (maxLevel - minLevel + 1)) + minLevel`. The upper bound is intentionally fractional before the final level conversion; for example, player level 3 with a `0.99` roll produces enemy level 6.
 - Enemy gold preserves the archived `Number(((enemyLevel / playerLevel) * 250).toFixed(0))` rule, including its numeric rounding behavior.
 - Combat resistance reduction and victory experience likewise preserve the archived `toFixed(0)` rounding rules; these boundaries have deterministic regression fixtures.

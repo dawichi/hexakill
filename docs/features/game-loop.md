@@ -44,6 +44,7 @@ The active UI relies on native buttons, inputs, and range controls. Legacy globa
 ## Product gaps to clarify
 
 - Whether the provisional stat and reward values are accepted balance.
+- Whether level-4 player initialization should preserve the archived `level × base` stats or retain the current Angular prototype's unscaled base-stat baseline; see [TODO-016](../TODO.md#todo-016-high-resolve-initial-player-stat-parity).
 - Whether item bonuses should change maximum/current health and every combat formula.
 - Whether the store should restock, persist purchases across runs, or become a progression system.
 - Whether all historical sprite sheets and animation sources should be mapped into gameplay or explicitly deferred.

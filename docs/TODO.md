@@ -167,3 +167,14 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 - **Dependencies:** Project-owner decision
 - **Owner:** Project owner
 - **Target:** Before backend design
+
+### TODO-016 [High] Resolve initial player-stat parity
+
+- **Status:** Unknown
+- **Affected area:** `legacy/svelte/src/lib/models/Entity.ts`, `legacy/svelte/src/lib/models/Character.ts`, `src/app/domain/characters.ts`, combat balance
+- **Evidence:** The archived `BaseEntityModel` initializes every stat as `level * base`, and character selection constructs `CharacterModel` at level 4. The active Angular `createInitialPlayer` starts level 4 but stores unscaled `BASE_STATS`; character modifiers are currently applied only during Angular level-up progression. This is a confirmed behavioral divergence, not an implementation detail.
+- **Risk:** Changing it later will alter opening health, damage, speed ordering, store value, enemy difficulty, and every browser fixture; preserving the current prototype may intentionally reject the legacy balance.
+- **Next action:** Product/gameplay owner must choose legacy-scaled level-4 initialization or the current unscaled prototype baseline, then record the accepted rule in an ADR and update characterization fixtures.
+- **Dependencies:** TODO-004 and TODO-005
+- **Owner:** Project owner / Tech Lead
+- **Target:** Before gameplay balance is accepted
