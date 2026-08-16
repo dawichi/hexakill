@@ -19,7 +19,7 @@ The active UI relies on native buttons, inputs, and range controls. Legacy globa
 
 - `findEnemy` generates a regular enemy from the observed level range or the next Gold Slime boss at levels 10, 20, and 30.
 - The active service compares player and enemy speed. The faster actor opens the encounter; a delayed enemy turn is scheduler-backed and the action controls remain disabled while it resolves.
-- Player Attack and Magic use the characterized random ranges, miss/critical rules, and resistance reduction. Critical thresholds preserve the archived strict comparisons: AD is critical only above `0.9`, and AP only above `0.6`; exact threshold rolls are not critical. Resistance reduction preserves the archived `toFixed(0)` rounding rule. Potion use heals the observed truncated 20% of damage received and then gives the enemy a turn.
+- Player Attack and Magic use the characterized random ranges, miss/critical rules, and resistance reduction. Critical thresholds preserve the archived strict comparisons: AD is critical only above `0.9`, and AP only above `0.6`; miss thresholds are strict below `0.1` for AD and `0.25` for AP. Exact threshold rolls are neither critical nor misses. Resistance reduction preserves the archived `toFixed(0)` rounding rule. Potion use heals the observed truncated 20% of damage received and then gives the enemy a turn.
 - Enemy actions use the observed attack/magic/heal policy. The provisional delay is 300 ms through the injected `Clock` port.
 - Reset cancels pending delayed enemy work and guards stale callbacks with a run-generation token.
 - Victory applies provisional experience, gold, level, boss, power-up, and defeated-enemy-history updates. Pending power-ups must be chosen before another enemy can be generated.
