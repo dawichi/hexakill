@@ -92,6 +92,12 @@ describe('progression rules', () => {
         level: Number.MAX_SAFE_INTEGER,
       }),
     ).toThrow(RangeError);
+    expect(() =>
+      calculateVictoryReward({ ...player, bossesDefeated: Number.NaN }, generateEnemy(4, 0, 0)),
+    ).toThrow(RangeError);
+    expect(() =>
+      calculateVictoryReward({ ...player, bossesDefeated: 4 }, generateEnemy(4, 0, 0)),
+    ).toThrow(RangeError);
   });
 
   it('records sequential boss progress in the player run', () => {

@@ -64,6 +64,9 @@ function assertProgressionInputs(player: PlayerState, enemy: EnemyState): void {
   if (!isSafeNonNegativeInteger(enemy.gold)) {
     throw new RangeError('Enemy gold must be a non-negative integer.');
   }
+  if (!isSafeNonNegativeInteger(player.bossesDefeated) || player.bossesDefeated > 3) {
+    throw new RangeError('Boss progress must be between 0 and 3.');
+  }
   if (!isSafeNonNegativeInteger(player.gold) || !isSafeNonNegativeInteger(player.potions)) {
     throw new RangeError('Player gold and potions must be non-negative safe integers.');
   }
