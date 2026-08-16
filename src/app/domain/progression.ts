@@ -77,7 +77,11 @@ const POWER_UP_VALUES: Record<PowerUpType, number> = {
 };
 
 export function powerUpValue(type: PowerUpType, currentCount: number): number {
-  if (currentCount < 0 || currentCount >= MAX_POWER_UPS_PER_STAT) {
+  if (
+    !Number.isInteger(currentCount) ||
+    currentCount < 0 ||
+    currentCount >= MAX_POWER_UPS_PER_STAT
+  ) {
     throw new RangeError('Power-up count must be between 0 and 5.');
   }
 

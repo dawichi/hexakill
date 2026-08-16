@@ -263,8 +263,14 @@ export function generateEnemy(
   levelRoll: number,
   bossesDefeated = 0,
 ): EnemyState {
-  if (playerLevel < 1) throw new RangeError('Player level must be positive.');
-  if (bossesDefeated < 0 || bossesDefeated > BOSS_DEFINITIONS.length) {
+  if (!Number.isFinite(playerLevel) || playerLevel < 1) {
+    throw new RangeError('Player level must be positive.');
+  }
+  if (
+    !Number.isInteger(bossesDefeated) ||
+    bossesDefeated < 0 ||
+    bossesDefeated > BOSS_DEFINITIONS.length
+  ) {
     throw new RangeError('Boss progress must be between 0 and 3.');
   }
   assertRoll(definitionRoll);

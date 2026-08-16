@@ -44,6 +44,12 @@ describe('enemy generation', () => {
     expect(() => generateEnemy(4, 0.5, Number.POSITIVE_INFINITY)).toThrow(RangeError);
   });
 
+  it('rejects non-finite player levels and fractional boss progress', () => {
+    expect(() => generateEnemy(Number.NaN, 0.5, 0.5)).toThrow(RangeError);
+    expect(() => generateEnemy(Number.POSITIVE_INFINITY, 0.5, 0.5)).toThrow(RangeError);
+    expect(() => generateEnemy(10, 0.5, 0.5, 0.5)).toThrow(RangeError);
+  });
+
   it('uses observed attack and defeat assets, with idle fallback for other enemies', () => {
     expect(enemyAssetFor('slime-blue', 'attack')).toBe('/images/slime-blue/attack.gif');
     expect(enemyAssetFor('slime-blue', 'defeat')).toBe('/images/slime-blue/die.gif');

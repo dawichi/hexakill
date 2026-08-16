@@ -53,6 +53,12 @@ describe('combat action policy', () => {
     expect(resolveHeal(100)).toEqual({ action: 'heal', healed: 20, damageTaken: 80 });
   });
 
+  it('rejects invalid damage input for healing', () => {
+    expect(() => resolveHeal(Number.NaN)).toThrow(RangeError);
+    expect(() => resolveHeal(Number.POSITIVE_INFINITY)).toThrow(RangeError);
+    expect(() => resolveHeal(-1)).toThrow(RangeError);
+  });
+
   it('resolves a damage action through the shared combat rules', () => {
     const result = resolveAction({ stats }, 0, { stats, damageTaken: 0 }, 'attack', {
       damageRoll: 0.5,

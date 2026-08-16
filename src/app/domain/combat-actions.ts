@@ -33,6 +33,10 @@ export interface HealResult {
 
 /** The legacy implementation heals exactly 20% despite a 20–30% config range. */
 export function resolveHeal(damageTaken: number): HealResult {
+  if (!Number.isFinite(damageTaken) || damageTaken < 0) {
+    throw new RangeError('Damage taken must be a finite non-negative number.');
+  }
+
   const healed = Math.trunc(damageTaken * 0.2);
   return { action: 'heal', healed, damageTaken: Math.max(0, damageTaken - healed) };
 }

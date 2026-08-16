@@ -50,6 +50,12 @@ describe('progression rules', () => {
     expect(poweredPlayer.powerUps.history.health).toBe(1);
   });
 
+  it('rejects non-integer power-up counts', () => {
+    expect(() => powerUpValue('health', Number.NaN)).toThrow(RangeError);
+    expect(() => powerUpValue('health', 1.5)).toThrow(RangeError);
+    expect(() => powerUpValue('health', Number.POSITIVE_INFINITY)).toThrow(RangeError);
+  });
+
   it('records sequential boss progress in the player run', () => {
     const boss = generateEnemy(10, 0, 0, 0);
     const bossPlayer = { ...player, level: 10 };
