@@ -85,6 +85,15 @@ describe('progression rules', () => {
     ).toThrow(RangeError);
   });
 
+  it('rejects overflow-sized victory experience before level-up arithmetic', () => {
+    expect(() =>
+      calculateVictoryReward(player, {
+        ...generateEnemy(4, 0, 0),
+        level: Number.MAX_SAFE_INTEGER,
+      }),
+    ).toThrow(RangeError);
+  });
+
   it('records sequential boss progress in the player run', () => {
     const boss = generateEnemy(10, 0, 0, 0);
     const bossPlayer = { ...player, level: 10 };

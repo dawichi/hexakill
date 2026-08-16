@@ -75,16 +75,19 @@ function assertProgressionInputs(player: PlayerState, enemy: EnemyState): void {
 export function calculateVictoryReward(player: PlayerState, enemy: EnemyState): VictoryReward {
   assertProgressionInputs(player, enemy);
   const experience = Number(((enemy.level / player.level) * 100).toFixed(0));
-  const gold = enemy.gold;
-  let level = player.level;
-  let remainingExperience = player.experience + experience;
-
-  while (remainingExperience >= 100) {
-    level += 1;
-    remainingExperience -= 100;
+  if (!Number.isSafeInteger(experience) || experience < 0) {
+    throw new RangeError('Victory experience must be a non-negative safe integer.');
   }
-
-  const levelsGained = level - player.level;
+  const gold = enemy.gold;
+  const totalExperience = player.experience + experience;
+  if (!Number.isSafeInteger(totalExperience)) {
+    throw new RangeError('Total experience must remain a safe integer.');
+  }
+  const levelsGained = Math.floor(totalExperience / 100);
+  const nextLevel = player.level + levelsGained;
+  if (!Number.isSafeInteger(nextLevel)) {
+    throw new RangeError('Victory level must remain a safe integer.');
+  }
   const usedPowerUps =
     player.powerUps.pending +
     Object.values(player.powerUps.history).reduce((sum, count) => sum + count, 0);
@@ -98,11 +101,14 @@ export function calculateVictoryReward(player: PlayerState, enemy: EnemyState): 
 function levelStats(player: PlayerState, levelsGained: number): Stats {
   const stats = { ...player.stats };
 
-  for (let level = 0; level < levelsGained; level += 1) {
-    (Object.keys(BASE_STATS) as (keyof Stats)[]).forEach((stat) => {
-      stats[stat] += BASE_STATS[stat] * player.character.modifiers[stat];
-    });
-  }
+  (Object.keys(BASE_STATS) as (keyof Stats)[]).forEach((stat) => {
+    const nextValue =
+      stats[stat] + BASE_STATS[stat] * player.character.modifiers[stat] * levelsGained;
+    if (!Number.isFinite(nextValue) || nextValue < 0) {
+      throw new RangeError('Level-up stats must remain finite and non-negative.');
+    }
+    stats[stat] = nextValue;
+  });
 
   return stats;
 }
@@ -114,8 +120,7 @@ export function applyVictoryReward(player: PlayerState, enemy: EnemyState): Play
   if (!Number.isSafeInteger(nextLevel) || !Number.isSafeInteger(nextGold)) {
     throw new RangeError('Victory reward must keep player level and gold safe integers.');
   }
-  let experience = player.experience + reward.experience;
-  while (experience >= 100) experience -= 100;
+  const experience = (player.experience + reward.experience) % 100;
 
   return {
     ...player,
