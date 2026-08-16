@@ -1,6 +1,6 @@
 # Deferred Sprite and Animation Sources
 
-**Status:** Repository catalog, reviewed 2026-08-15. These files are retained historical assets, not approved runtime mappings.
+**Status:** Repository catalog, reviewed 2026-08-16. These files are retained historical assets, not approved runtime mappings.
 
 The 61 files below are present under `static/images/` but are not part of the active 62-path Angular asset contract. Most are sprite strips or sheets. Rendering one directly with `<img>` would display the full strip rather than an intentional animation, so frame geometry, timing, state semantics, accessibility behavior, and provenance must be reviewed before mapping them.
 
