@@ -41,6 +41,19 @@ The active app consumes the legacy character/enemy idle GIFs through typed `idle
 
 Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session, records, and preferences envelopes, non-fatal audio playback, CI, and twenty-five Chromium journeys, but these are still provisional.
 
+## Completion gate
+
+The current green release gate means the Angular rewrite is reproducible and safe to continue; it does not mean the product is finished or ready for final manual acceptance. Do not close the development effort until the owner-dependent items below are resolved and documented:
+
+- initial player-stat parity and final gameplay balance;
+- store effect timing, health semantics, restocking, persistence, and refund behavior;
+- legacy persistence migration or an explicit abandonment decision;
+- manual accessibility and assistive-technology review;
+- asset provenance/licensing and disposition of the 42 deferred image sources;
+- hosting/provider ownership, remote CI/branch protection, and release verification.
+
+The application may be played for engineering smoke checks before that gate, but those sessions must not be interpreted as product acceptance.
+
 ## Known characterization points
 
 - Player starts at level 4 with the current Angular prototype's unscaled base stats, 5 potions, and 2000 gold. This intentionally remains an unresolved divergence from the archived constructor, which initializes a level-4 entity with `level × base` stats; the exact values and decision gate are recorded in [the initial player-stat parity characterization](architecture/initial-player-stat-parity.md) and tracked by [TODO-016](TODO.md#todo-016-high-resolve-initial-player-stat-parity).
