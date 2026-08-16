@@ -32,6 +32,7 @@ const requiredRootFiles = [
   'e2e/run-journey.spec.ts',
   'static/favicon.ico',
   'rewrite/README.md',
+  'legacy/svelte/README.md',
   'legacy/svelte/package.json',
 ];
 
@@ -76,6 +77,11 @@ for (const relativeDirectory of ['src', 'e2e']) {
 const migrationNote = readFileSync(resolve(projectRoot, 'rewrite/README.md'), 'utf8');
 if (!/promoted/i.test(migrationNote) || !/repository root/i.test(migrationNote)) {
   fail('rewrite/README.md does not document the isolated-to-root promotion');
+}
+
+const archiveNote = readFileSync(resolve(projectRoot, 'legacy/svelte/README.md'), 'utf8');
+if (!/historical behavior/i.test(archiveNote) || !/not the active application/i.test(archiveNote)) {
+  fail('legacy/svelte/README.md does not document the archived Svelte boundary');
 }
 
 const angularManifest = readJson('angular.json');
