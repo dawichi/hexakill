@@ -23,7 +23,7 @@ The current vertical slice is:
 
 The Angular application service coordinates signals and random input. Domain rules do not import Angular. The `Clock` port exists and is injected at the application boundary; the provisional enemy turn uses it for a short presentation delay.
 
-The combat slice also characterizes legacy speed ordering, enemy attack/magic/heal selection, fixed 20% healing, player potion use, player damage, and defeat. Delayed enemy turns are scheduler-backed, generation-guarded, and cancelled on reset. The active app now has provisional victory rewards, leveling, power-up allocation, and an in-memory store; these are characterization slices rather than accepted product balance.
+The combat slice also characterizes legacy speed ordering, enemy attack/magic/heal selection, fixed 20% healing, player potion use, player damage, and defeat. Damage actions select attack/Magic animation assets while healing remains visually idle. Delayed enemy turns are scheduler-backed, generation-guarded, and cancelled on reset. The active app now has provisional victory rewards, leveling, power-up allocation, and an in-memory store; these are characterization slices rather than accepted product balance.
 
 The combat boundaries reject malformed attacker/defender stats, invalid resistance or damage values, impossible damage totals, invalid opening-turn speeds, and malformed enemy potion state before applying legacy rules. These are input-safety constraints, not gameplay rebalance decisions.
 

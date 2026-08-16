@@ -92,6 +92,16 @@ describe('GameSessionService', () => {
     service.usePotion();
     expect(service.player()?.potions).toBe(4);
     expect(service.combatState().phase).toBe('enemy-turn');
+
+    service.combatState.update((state) => ({
+      ...state,
+      enemy: state.enemy
+        ? { ...state.enemy, damageTaken: state.enemy.stats.health - 1, potions: 1 }
+        : null,
+    }));
+    scheduledTask?.();
+    expect(service.enemyAnimation()).toBe('idle');
+    expect(service.combatMessage()).toContain('healed');
   });
 
   it('writes one local personal record when a run reaches defeat', () => {

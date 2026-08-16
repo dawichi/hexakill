@@ -610,8 +610,9 @@ export class GameSessionService {
 
     this.cancelPendingEnemyAnimationReset();
     const action: CombatAction = chooseEnemyAction(enemy, this.random());
-    this.enemyActionKind.set(action === 'magic' || action === 'attack' ? action : null);
-    this.enemyAnimation.set('attack');
+    const isDamageAction = action === 'magic' || action === 'attack';
+    this.enemyActionKind.set(isDamageAction ? action : null);
+    this.enemyAnimation.set(isDamageAction ? 'attack' : 'idle');
     const result = resolveAction(
       { stats: enemy.stats },
       enemy.damageTaken,
