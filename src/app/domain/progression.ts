@@ -3,6 +3,7 @@ import { EnemyState, PlayerState, PowerUpType, Stats } from './game-types';
 
 export const MAX_POWER_UPS = 24;
 export const MAX_POWER_UPS_PER_STAT = 6;
+const POWER_UP_TYPES: readonly PowerUpType[] = ['health', 'ad', 'ap', 'speed'];
 
 export interface VictoryReward {
   readonly experience: number;
@@ -11,7 +12,60 @@ export interface VictoryReward {
   readonly powerUpsGranted: number;
 }
 
+function assertPowerUpState(player: PlayerState): void {
+  const powerUps = player.powerUps;
+  if (
+    !powerUps ||
+    typeof powerUps !== 'object' ||
+    !powerUps.history ||
+    typeof powerUps.history !== 'object'
+  ) {
+    throw new RangeError('Power-up state is malformed.');
+  }
+
+  const history = POWER_UP_TYPES.map((type) => powerUps.history[type]);
+  if (
+    !Number.isInteger(powerUps.pending) ||
+    powerUps.pending < 0 ||
+    powerUps.pending > MAX_POWER_UPS ||
+    history.some(
+      (count) => !Number.isInteger(count) || count < 0 || count > MAX_POWER_UPS_PER_STAT,
+    ) ||
+    powerUps.pending + history.reduce((sum, count) => sum + count, 0) > MAX_POWER_UPS
+  ) {
+    throw new RangeError('Power-up state exceeds its progression bounds.');
+  }
+}
+
+function assertPlayerStats(player: PlayerState): void {
+  if (
+    !Object.values(player.stats).every((value) => Number.isFinite(value) && value >= 0) ||
+    player.stats.health <= 0
+  ) {
+    throw new RangeError('Player stats must be finite and non-negative with positive health.');
+  }
+}
+
+function assertProgressionInputs(player: PlayerState, enemy: EnemyState): void {
+  if (!Number.isInteger(player.level) || player.level < 1) {
+    throw new RangeError('Player level must be a positive integer.');
+  }
+  if (!Number.isInteger(player.experience) || player.experience < 0 || player.experience >= 100) {
+    throw new RangeError('Player experience must be an integer between 0 and 99.');
+  }
+  if (!Number.isInteger(enemy.level) || enemy.level < 1) {
+    throw new RangeError('Enemy level must be a positive integer.');
+  }
+  if (!Number.isInteger(enemy.gold) || enemy.gold < 0) {
+    throw new RangeError('Enemy gold must be a non-negative integer.');
+  }
+  assertPlayerStats(player);
+
+  assertPowerUpState(player);
+}
+
 export function calculateVictoryReward(player: PlayerState, enemy: EnemyState): VictoryReward {
+  assertProgressionInputs(player, enemy);
   const experience = Number(((enemy.level / player.level) * 100).toFixed(0));
   const gold = enemy.gold;
   let level = player.level;
@@ -23,10 +77,9 @@ export function calculateVictoryReward(player: PlayerState, enemy: EnemyState): 
   }
 
   const levelsGained = level - player.level;
-  const usedPowerUps = Object.values(player.powerUps.history).reduce(
-    (sum, count) => sum + count,
-    0,
-  );
+  const usedPowerUps =
+    player.powerUps.pending +
+    Object.values(player.powerUps.history).reduce((sum, count) => sum + count, 0);
   const rawPowerUps =
     player.level % 2 !== 0 ? Math.trunc(levelsGained / 2) : Math.trunc(levelsGained / 2 + 0.5);
   const powerUpsGranted = Math.max(0, Math.min(rawPowerUps, MAX_POWER_UPS - usedPowerUps));
@@ -89,6 +142,11 @@ export function powerUpValue(type: PowerUpType, currentCount: number): number {
 }
 
 export function applyPowerUp(player: PlayerState, type: PowerUpType): PlayerState {
+  assertPlayerStats(player);
+  assertPowerUpState(player);
+  if (!Object.hasOwn(POWER_UP_VALUES, type)) {
+    throw new RangeError('Unknown power-up type.');
+  }
   const count = player.powerUps.history[type];
   if (!player.powerUps.pending || count >= MAX_POWER_UPS_PER_STAT) return player;
 

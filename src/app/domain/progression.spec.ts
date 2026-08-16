@@ -54,6 +54,18 @@ describe('progression rules', () => {
     expect(() => powerUpValue('health', Number.NaN)).toThrow(RangeError);
     expect(() => powerUpValue('health', 1.5)).toThrow(RangeError);
     expect(() => powerUpValue('health', Number.POSITIVE_INFINITY)).toThrow(RangeError);
+    expect(() => calculateVictoryReward({ ...player, level: 0 }, generateEnemy(4, 0, 0))).toThrow(
+      RangeError,
+    );
+    expect(() =>
+      calculateVictoryReward({ ...player, experience: Number.NaN }, generateEnemy(4, 0, 0)),
+    ).toThrow(RangeError);
+    expect(() =>
+      applyPowerUp(
+        { ...player, powerUps: { pending: -1, history: { health: 0, ad: 0, ap: 0, speed: 0 } } },
+        'health',
+      ),
+    ).toThrow(RangeError);
   });
 
   it('records sequential boss progress in the player run', () => {
@@ -85,6 +97,12 @@ describe('progression rules', () => {
     };
 
     expect(calculateVictoryReward(nearlyCappedPlayer, enemy).powerUpsGranted).toBe(1);
+
+    const pendingNearlyCappedPlayer = {
+      ...nearlyCappedPlayer,
+      powerUps: { pending: 1, history: nearlyCappedPlayer.powerUps.history },
+    };
+    expect(calculateVictoryReward(pendingNearlyCappedPlayer, enemy).powerUpsGranted).toBe(0);
   });
 
   it('records the defeated enemy and level for the game-over history', () => {
