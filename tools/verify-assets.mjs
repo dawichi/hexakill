@@ -2,7 +2,9 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 const projectRoot = resolve(new URL('..', import.meta.url).pathname);
-const assetRoot = resolve(projectRoot, process.argv[2] ?? 'static');
+const artifactArgument = process.argv[2];
+const assetRoot = resolve(projectRoot, artifactArgument ?? 'static');
+const sourceAssetRoot = resolve(projectRoot, 'static');
 
 function listFiles(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -156,6 +158,25 @@ if (undeclaredSourceAssets.length > 0 || missingSourceDeclarations.length > 0) {
     );
   }
   process.exit(1);
+}
+
+if (artifactArgument) {
+  const sourceStaticPaths = new Set(
+    listFiles(sourceAssetRoot).map((path) => relative(sourceAssetRoot, path).split('\\').join('/')),
+  );
+  const artifactStaticPaths = new Set(
+    listFiles(assetRoot).map((path) => relative(assetRoot, path).split('\\').join('/')),
+  );
+  const missingCopiedAssets = [...sourceStaticPaths].filter(
+    (asset) => !artifactStaticPaths.has(asset),
+  );
+  if (missingCopiedAssets.length > 0) {
+    console.error('The publishable artifact is missing retained static assets:');
+    console.error(missingCopiedAssets.map((asset) => `- ${asset}`).join('\n'));
+    process.exit(1);
+  }
+
+  console.log(`Verified complete retained static tree parity for ${sourceStaticPaths.size} files.`);
 }
 
 console.log(
