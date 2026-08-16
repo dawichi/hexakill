@@ -50,7 +50,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** `Store.svelte`, `StoreItem.svelte`, `CharacterModel.addItem`, inventory/stat display
-- **Evidence:** Legacy offers and bonuses were characterized. The active Angular app has a documented provisional contract and pure purchase rules with immediate stat application, repeatable potion offers, one-time items, and immutable failure paths; product acceptance is still missing.
+- **Evidence:** Legacy offers and bonuses were characterized. The archived `CharacterModel.addItem` stores bonuses in `inventory.totalBonus` without mutating entity stat fields, while the active Angular app has a documented provisional contract and pure purchase rules with immediate stat application, repeatable potion offers, one-time items, and immutable failure paths; this effect-model divergence and product acceptance are still open.
 - **Risk:** Rewriting the store without a product contract preserves or removes progression accidentally.
 - **Next action:** Review [the provisional store contract](architecture/rewrite-store.md), decide item effect timing, restocking, persistence, and final balance, then record an ADR.
 - **Dependencies:** TODO-004

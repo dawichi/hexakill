@@ -49,6 +49,7 @@ Final persistence acceptance, deployment, and gameplay balancing remain unresolv
 - Combat resistance reduction and victory experience likewise preserve the archived `toFixed(0)` rounding rules; these boundaries have deterministic regression fixtures.
 - Progression now rejects malformed player/enemy reward inputs and unknown runtime power-up identifiers, counts pending power-up choices toward the global maximum, and preserves the observed reward formulas for valid runs.
 - Store purchases now reject malformed gold, potion, inventory, and stat state before applying the provisional item/potion contract; valid repeatable potion and one-time item behavior is unchanged.
+- Store item effects remain intentionally provisional: archived `CharacterModel.addItem` maintained `inventory.totalBonus` separately, while the active Angular purchase rule applies bonuses directly to `player.stats`. See [the provisional store contract](architecture/rewrite-store.md) and [TODO-005](TODO.md#todo-005-high-decide-store-contract-and-item-effects) before changing balance or health semantics.
 - Legacy enemy stat scaling for levels below 10 does not apply enemy modifiers; the active app preserves that behavior intentionally as a characterization point, not as an approved balance decision.
 - The legacy enemy catalog contains a broken `presets.easy` reference; the active app keeps the complete observed roster explicit and treats the three Gold Slime encounters as a separate sequential boss schedule.
 
