@@ -231,6 +231,7 @@ function isRestorableCombatState(value: unknown): value is CombatState {
     phases.includes(value['phase']) &&
     (enemy === null || isRestorableEnemy(enemy)) &&
     isNonNegativeInteger(value['playerDamageTaken']) &&
+    (enemy !== null || value['playerDamageTaken'] === 0) &&
     value['pendingAction'] === null &&
     coherentLastResult
   );

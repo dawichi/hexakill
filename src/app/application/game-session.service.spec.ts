@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { CHARACTER_DEFINITIONS } from '../domain/characters';
+import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
 import { GameSessionService } from './game-session.service';
 import { CLOCK, Clock } from './clock';
 import { RANDOM_SOURCE } from './random';
@@ -261,6 +261,41 @@ describe('GameSessionService', () => {
         pendingAction: null,
         lastResult: null,
       },
+    });
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        GameSessionService,
+        {
+          provide: SESSION_STORAGE,
+          useValue: {
+            read: () => sessionValue,
+            write: () => undefined,
+            clear: () => (sessionValue = null),
+          },
+        },
+        {
+          provide: RECORDS_STORAGE,
+          useValue: { read: () => null, write: () => undefined, clear: () => undefined },
+        },
+      ],
+    });
+    const restored = TestBed.inject(GameSessionService);
+
+    expect(restored.screen()).toBe('welcome');
+    expect(sessionValue).toBeNull();
+  });
+
+  it('discards nonzero combat damage when a saved run has no enemy', () => {
+    const player = createInitialPlayer('David', CHARACTER_DEFINITIONS[0]);
+    sessionValue = JSON.stringify({
+      version: 1,
+      screen: 'combat-ready',
+      playerName: 'David',
+      selectedCharacterId: 'wizard',
+      player,
+      combatState: { ...INITIAL_COMBAT_STATE, playerDamageTaken: 1 },
     });
 
     TestBed.resetTestingModule();
