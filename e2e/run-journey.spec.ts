@@ -52,7 +52,7 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
     'aria-valuemin',
     '0',
   );
-  const playerIdle = page.getByRole('img', { name: 'Wizard idle animation' });
+  const playerIdle = page.getByRole('img', { name: 'Wizard idle animation', exact: true });
   await expect(playerIdle).toBeVisible();
   await expect(playerIdle).toHaveCSS('background-image', /wizard\/sprites\/Idle/);
   await expect(playerIdle).toHaveCSS('background-size', /600% 100%/);
