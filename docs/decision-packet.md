@@ -2,7 +2,7 @@
 
 **Status:** Open owner decisions required before final product acceptance. Reviewed 2026-08-16.
 
-This packet is the short decision surface for the finalization session. It does not replace the detailed characterization documents or create product decisions by implication. Each item below is either an explicit owner choice or an acceptance review with evidence already collected.
+This packet is the short decision surface for the finalization session. It does not replace the detailed characterization documents or create product decisions by implication. Each item below is either an explicit owner choice or an acceptance review with evidence already collected. The [recommendation guide](finalization-recommendations.md) explains a safe resolution order without accepting any choice on the owner's behalf.
 
 ## Decision matrix
 

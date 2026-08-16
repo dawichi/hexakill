@@ -23,6 +23,7 @@ This directory is the local operating manual for Hexakill and future AI develope
 - [Accessibility review](accessibility-review.md) — automated/static evidence and the remaining manual review matrix.
 - [Standards assessment](standards-assessment.md) — rule-level evidence and compliance states.
 - [Finalization decision packet](decision-packet.md) — owner decisions and acceptance evidence required before calling the rewrite complete.
+- [Finalization recommendation guide](finalization-recommendations.md) — evidence-backed resolution order and agent guardrails; recommendations are not accepted decisions.
 
 ## Future rewrite
 
