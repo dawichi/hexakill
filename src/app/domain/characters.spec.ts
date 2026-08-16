@@ -99,9 +99,16 @@ describe('character asset contracts', () => {
     expect(CHARACTER_DEFINITIONS.find((character) => character.id === 'warrior')?.defeatAsset).toBe(
       undefined,
     );
+  });
 
+  it('keeps the unresolved level-4 baseline explicit', () => {
     const player = createInitialPlayer('David', CHARACTER_DEFINITIONS[0]);
+    const legacyScaledStats = Object.fromEntries(
+      Object.entries(BASE_STATS).map(([stat, value]) => [stat, value * 4]),
+    );
+
     expect(player.level).toBe(4);
     expect(player.stats).toEqual(BASE_STATS);
+    expect(player.stats).not.toEqual(legacyScaledStats);
   });
 });
