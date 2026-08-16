@@ -22,6 +22,7 @@ This directory is the local operating manual for Hexakill and future AI develope
 - [Asset provenance register](assets-provenance.md) — evidence, unknown ownership/licensing, and release requirements.
 - [Accessibility review](accessibility-review.md) — automated/static evidence and the remaining manual review matrix.
 - [Standards assessment](standards-assessment.md) — rule-level evidence and compliance states.
+- [Finalization decision packet](decision-packet.md) — owner decisions and acceptance evidence required before calling the rewrite complete.
 
 ## Future rewrite
 

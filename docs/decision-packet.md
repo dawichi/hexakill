@@ -1,0 +1,34 @@
+# Finalization Decision Packet
+
+**Status:** Open owner decisions required before final product acceptance. Reviewed 2026-08-16.
+
+This packet is the short decision surface for the finalization session. It does not replace the detailed characterization documents or create product decisions by implication. Each item below is either an explicit owner choice or an acceptance review with evidence already collected.
+
+## Decision matrix
+
+| ID    | Decision or acceptance                                                                                                                                                             | Evidence already available                                                                                                                                           | What remains blocked                                                                                           |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| D-001 | Choose level-4 player initialization: legacy-scaled stats or current Angular unscaled base stats.                                                                                  | [Initial stat parity](architecture/initial-player-stat-parity.md), source fixture, and current browser balance fixtures.                                             | Final combat balance, enemy difficulty, reward pacing, and the corresponding characterization test.            |
+| D-002 | Define equipment and potion semantics: direct stats versus derived inventory bonuses, current/max health behavior, restocking, duplicates, persistence, refunds, and final prices. | [Store contract](architecture/rewrite-store.md), archived offer values, active pure purchase rules, store journeys.                                                  | Production-ready store implementation and acceptance tests.                                                    |
+| D-003 | Decide whether to migrate `hxkllPersonalRecords`, `musicVolume`, and `effectsVolume`, or deliberately abandon them.                                                                | [Persistence contract](architecture/rewrite-persistence.md), archived key readers, versioned Angular envelopes, malformed-input tests.                               | Migration code/fixtures or an explicit abandonment ADR and release note.                                       |
+| D-004 | Complete manual accessibility acceptance.                                                                                                                                          | [Accessibility review](accessibility-review.md), static contrast calculations, direct DOM/semantic inspection, keyboard/reduced-motion journeys.                     | Screen-reader, zoom, high-contrast, focus-visibility, and animation review by a person.                        |
+| D-005 | Confirm rights and provenance for retained media; decide the disposition of the 42 deferred sprite sources.                                                                        | [Asset provenance register](assets-provenance.md), [sprite-source catalog](assets-sprite-sources.md), 81 active paths, 33 typed strips, and production asset parity. | Owner/source confirmation, attribution or replacement plan, and any additional typed mappings.                 |
+| D-006 | Select and authorize a hosting provider/project; approve rollback and external verification.                                                                                       | [Deployment contract](architecture/rewrite-deployment.md), local static preview/security checks, candidate `vercel.json`.                                            | Authorized preview deployment, external headers/404/asset verification, rollback evidence, and deployment ADR. |
+| D-007 | Choose the presentation strategy for the final UI (CSS, icon, animation, and any allowed exceptions).                                                                              | [Standards assessment](standards-assessment.md), root Angular CSS, archived dependency inventory.                                                                    | Design-system decision and any cleanup/migration work.                                                         |
+| D-008 | Confirm whether the product remains a local single-player browser game or needs backend/accounts/leaderboards.                                                                     | [Rewrite evaluation](architecture/rewrite-evaluation.md), [deployment contract](architecture/rewrite-deployment.md), no current API/database/account integrations.   | Scope boundary for future architecture and any new standards profiles.                                         |
+
+## Current implementation boundary
+
+The Angular root is ready for engineering smoke play, not final product acceptance. The latest verified implementation revision is `2b3ecfa3b7cbef39f54b32ea3644737a7a3842ad`: Node 24.19.0/npm 11.17.0, 85 unit/component tests, 26 production Chromium journeys, 81 active asset paths, 42 exact deferred image sources, 33 typed sprite strips, clean production build, static artifact parity, security/preview checks, and zero high-severity audit findings.
+
+The green baseline proves reproducibility and safety boundaries. It does not settle D-001 through D-008. A future agent must not mark the rewrite complete while any owner decision or acceptance review remains open.
+
+## Finalization sequence
+
+1. Resolve D-001 and D-002 together because stats and store effects change the combat and progression fixtures.
+2. Resolve D-003 and D-008 before retaining or expanding persistence or introducing any service boundary.
+3. Complete D-004 and D-005 before publishing the media-heavy UI.
+4. Resolve D-006 and D-007 before promoting a release candidate.
+5. Record accepted outcomes as ADRs, update the affected characterization fixtures, rerun `npm run verify:release`, and only then schedule owner manual play as final acceptance.
+
+Until then, unresolved items remain visible in [TODO.md](TODO.md), and agents should continue safe characterization work without silently selecting among the alternatives.
