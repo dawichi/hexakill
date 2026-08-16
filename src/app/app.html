@@ -288,6 +288,16 @@
                       [alt]="player.character.name"
                     />
                   }
+                } @else if (session.playerIdleSpriteAsset(); as idleAsset) {
+                  <span
+                    class="entity-sprite combat-sprite sprite-strip"
+                    role="img"
+                    [attr.aria-label]="player.character.name + ' idle animation'"
+                    [style.background-image]="'url(' + idleAsset.src + ')'"
+                    [style.background-size]="spriteBackgroundSize(idleAsset)"
+                    [style.aspect-ratio]="idleAsset.frameWidth + ' / ' + idleAsset.frameHeight"
+                    [style.animation]="spriteAnimation(idleAsset, 900)"
+                  ></span>
                 } @else {
                   <img
                     class="entity-sprite combat-sprite"

@@ -46,6 +46,7 @@ export interface CharacterDefinition {
   readonly modifiers: Stats;
   readonly accent: 'blue' | 'red' | 'amber';
   readonly idleAsset: string;
+  readonly idleSpriteAsset?: SpriteStripAsset;
   readonly actionAsset?: SpriteStripAsset;
   readonly magicAsset?: SpriteStripAsset;
   readonly hitAsset?: SpriteStripAsset;

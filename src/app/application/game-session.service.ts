@@ -296,6 +296,9 @@ export class GameSessionService {
     }
     return player.character.actionAsset ?? null;
   });
+  readonly playerIdleSpriteAsset = computed<SpriteStripAsset | null>(
+    () => this.player()?.character.idleSpriteAsset ?? null,
+  );
   readonly playerHitAsset = computed<SpriteStripAsset | null>(
     () => this.player()?.character.hitAsset ?? null,
   );

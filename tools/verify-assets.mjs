@@ -59,6 +59,7 @@ const requiredAssets = [
   'images/evil-wizard/sprites/Death.png',
   'images/evil-wizard/sprites/Attack1.png',
   'images/evil-wizard/sprites/Attack2.png',
+  'images/evil-wizard/sprites/Idle.png',
   'images/evil-wizard/sprites/Take hit.png',
   'images/wizard/sprites/Attack2.png',
   'images/wizard/sprites/Hit.png',
@@ -67,13 +68,17 @@ const requiredAssets = [
   'images/fire-worm/Sprites/Worm/Death.png',
   'images/fire-worm/Sprites/Worm/Attack.png',
   'images/fire-worm/Sprites/Worm/Get Hit.png',
+  'images/fire-worm/Sprites/Worm/Idle.png',
   'images/martial-hero/Sprite/Death.png',
   'images/martial-hero/Sprite/Attack1.png',
   'images/martial-hero/Sprite/Take Hit.png',
+  'images/martial-hero/Sprite/Idle.png',
   'images/samurai/Sprites/Death.png',
+  'images/samurai/Sprites/Idle.png',
   'images/wild-huntress/sprites/Death.png',
   'images/wild-huntress/sprites/Attack1.png',
   'images/wild-huntress/sprites/Take hit.png',
+  'images/wild-huntress/sprites/Idle.png',
   'images/witch-blue/assets/B_witch_attack.png',
   'images/witch-blue/assets/B_witch_charge.png',
   'images/witch-blue/assets/B_witch_idle.png',
@@ -81,6 +86,7 @@ const requiredAssets = [
   'images/witch-blue/assets/B_witch_death.png',
   'images/wizard/sprites/Attack1.png',
   'images/wizard/sprites/Death.png',
+  'images/wizard/sprites/Idle.png',
   'images/samurai/Sprites/Attack1.png',
   'images/items/orb.png',
   'images/items/sword.png',
@@ -111,9 +117,9 @@ const allImagePaths = listFiles(resolve(assetRoot, 'images')).map((path) =>
   relative(assetRoot, path).split('\\').join('/'),
 );
 const deferredImageCount = allImagePaths.filter((asset) => !activeImagePaths.has(asset)).length;
-if (deferredImageCount !== 49) {
+if (deferredImageCount !== 43) {
   console.error(
-    `Expected 49 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
+    `Expected 43 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
   );
   process.exit(1);
 }

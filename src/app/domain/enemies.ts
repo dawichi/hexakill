@@ -44,6 +44,13 @@ const EVIL_WIZARD_DEFEAT_SPRITE: SpriteStripAsset = {
   frameCount: 7,
 };
 
+const EVIL_WIZARD_IDLE_SPRITE: SpriteStripAsset = {
+  src: '/images/evil-wizard/sprites/Idle.png',
+  frameWidth: 250,
+  frameHeight: 250,
+  frameCount: 8,
+};
+
 const EVIL_WIZARD_ATTACK_SPRITE: SpriteStripAsset = {
   src: '/images/evil-wizard/sprites/Attack1.png',
   frameWidth: 250,
@@ -93,6 +100,13 @@ const FIRE_WORM_DEFEAT_SPRITE: SpriteStripAsset = {
   frameCount: 8,
 };
 
+const FIRE_WORM_IDLE_SPRITE: SpriteStripAsset = {
+  src: '/images/fire-worm/Sprites/Worm/Idle.png',
+  frameWidth: 90,
+  frameHeight: 90,
+  frameCount: 9,
+};
+
 const FIRE_WORM_ATTACK_SPRITE: SpriteStripAsset = {
   src: '/images/fire-worm/Sprites/Worm/Attack.png',
   frameWidth: 90,
@@ -112,6 +126,13 @@ const MARTIAL_HERO_DEFEAT_SPRITE: SpriteStripAsset = {
   frameWidth: 126,
   frameHeight: 126,
   frameCount: 11,
+};
+
+const MARTIAL_HERO_IDLE_SPRITE: SpriteStripAsset = {
+  src: '/images/martial-hero/Sprite/Idle.png',
+  frameWidth: 126,
+  frameHeight: 126,
+  frameCount: 10,
 };
 
 const MARTIAL_HERO_ATTACK_SPRITE: SpriteStripAsset = {
@@ -135,6 +156,13 @@ const WITCH_BLUE_ATTACK_SPRITE: SpriteStripAsset = {
   frameCount: 4,
   orientation: 'vertical',
   trailingPixels: 2,
+};
+
+const WILD_HUNTRESS_IDLE_SPRITE: SpriteStripAsset = {
+  src: '/images/wild-huntress/sprites/Idle.png',
+  frameWidth: 150,
+  frameHeight: 150,
+  frameCount: 8,
 };
 
 const WITCH_BLUE_IDLE_SPRITE: SpriteStripAsset = {
@@ -213,6 +241,7 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     defeatAsset: '/images/evil-tree/die.gif',
   }),
   enemy('evil-wizard', 'Evil Wizard', 'ap', '/images/evil-wizard/idle.gif', AP_MODIFIERS, {
+    idleSpriteAsset: EVIL_WIZARD_IDLE_SPRITE,
     attackSpriteAsset: EVIL_WIZARD_ATTACK_SPRITE,
     magicSpriteAsset: EVIL_WIZARD_MAGIC_SPRITE,
     hitSpriteAsset: EVIL_WIZARD_HIT_SPRITE,
@@ -220,12 +249,14 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
   }),
   enemy('fire-knight', 'Fire knight', 'tank', '/images/fire-knight/idle.gif', TANK_MODIFIERS),
   enemy('fire-worm', 'Fire worm', 'ap', '/images/fire-worm/idle.gif', AP_MODIFIERS, {
+    idleSpriteAsset: FIRE_WORM_IDLE_SPRITE,
     attackSpriteAsset: FIRE_WORM_ATTACK_SPRITE,
     hitSpriteAsset: FIRE_WORM_HIT_SPRITE,
     defeatSpriteAsset: FIRE_WORM_DEFEAT_SPRITE,
   }),
   enemy('knight', 'Knight', 'tank', '/images/knight/idle.gif', TANK_MODIFIERS),
   enemy('martial-hero', 'Martial Hero', 'ad', '/images/martial-hero/idle.gif', AD_MODIFIERS, {
+    idleSpriteAsset: MARTIAL_HERO_IDLE_SPRITE,
     attackSpriteAsset: MARTIAL_HERO_ATTACK_SPRITE,
     hitSpriteAsset: MARTIAL_HERO_HIT_SPRITE,
     defeatSpriteAsset: MARTIAL_HERO_DEFEAT_SPRITE,
@@ -262,6 +293,7 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     AP_MODIFIERS,
   ),
   enemy('wild-huntress', 'Wild Huntress', 'ad', '/images/wild-huntress/idle.gif', AD_MODIFIERS, {
+    idleSpriteAsset: WILD_HUNTRESS_IDLE_SPRITE,
     attackSpriteAsset: WILD_HUNTRESS_ATTACK_SPRITE,
     hitSpriteAsset: WILD_HUNTRESS_HIT_SPRITE,
     defeatSpriteAsset: WILD_HUNTRESS_DEFEAT_SPRITE,

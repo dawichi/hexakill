@@ -55,7 +55,12 @@ describe('enemy generation', () => {
     expect(enemyAssetFor('slime-blue', 'defeat')).toBe('/images/slime-blue/die.gif');
     expect(enemyAssetFor('knight', 'attack')).toBe('/images/knight/idle.gif');
     expect(enemyAssetFor('unknown', 'idle')).toBeUndefined();
-    expect(enemySpriteAssetFor('evil-wizard', 'idle')).toBeUndefined();
+    expect(enemySpriteAssetFor('evil-wizard', 'idle')).toEqual({
+      src: '/images/evil-wizard/sprites/Idle.png',
+      frameWidth: 250,
+      frameHeight: 250,
+      frameCount: 8,
+    });
   });
 
   it('maps only observed single-row enemy defeat strips', () => {
@@ -146,6 +151,27 @@ describe('enemy generation', () => {
       frameWidth: 150,
       frameHeight: 150,
       frameCount: 3,
+    });
+  });
+
+  it('maps the explicitly named single-row enemy idle strips', () => {
+    expect(enemySpriteAssetFor('fire-worm', 'idle')).toEqual({
+      src: '/images/fire-worm/Sprites/Worm/Idle.png',
+      frameWidth: 90,
+      frameHeight: 90,
+      frameCount: 9,
+    });
+    expect(enemySpriteAssetFor('martial-hero', 'idle')).toEqual({
+      src: '/images/martial-hero/Sprite/Idle.png',
+      frameWidth: 126,
+      frameHeight: 126,
+      frameCount: 10,
+    });
+    expect(enemySpriteAssetFor('wild-huntress', 'idle')).toEqual({
+      src: '/images/wild-huntress/sprites/Idle.png',
+      frameWidth: 150,
+      frameHeight: 150,
+      frameCount: 8,
     });
   });
 

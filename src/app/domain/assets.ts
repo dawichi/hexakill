@@ -44,6 +44,22 @@ export const PLAYER_ACTION_ASSETS: Readonly<Partial<Record<CharacterId, SpriteSt
   },
 };
 
+/** Observed single-row player idle strips, rendered provisionally in combat. */
+export const PLAYER_IDLE_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
+  wizard: {
+    src: '/images/wizard/sprites/Idle.png',
+    frameWidth: 231,
+    frameHeight: 190,
+    frameCount: 6,
+  },
+  samurai: {
+    src: '/images/samurai/Sprites/Idle.png',
+    frameWidth: 200,
+    frameHeight: 200,
+    frameCount: 8,
+  },
+};
+
 /** Provisional single-row player Magic strips, selected only for the Magic action. */
 export const PLAYER_MAGIC_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
   wizard: {

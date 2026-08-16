@@ -52,6 +52,10 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
     'aria-valuemin',
     '0',
   );
+  const playerIdle = page.getByRole('img', { name: 'Wizard idle animation' });
+  await expect(playerIdle).toBeVisible();
+  await expect(playerIdle).toHaveCSS('background-image', /wizard\/sprites\/Idle/);
+  await expect(playerIdle).toHaveCSS('background-size', /600% 100%/);
   const attackButton = page.getByRole('button', { name: 'Attack' });
   await expect(attackButton).toBeEnabled();
   await attackButton.click();
@@ -144,6 +148,10 @@ test('mapped enemy attack strips render during the enemy turn', async ({ page })
   });
   await page.reload();
 
+  const enemyIdle = page.getByRole('img', { name: 'Evil Wizard idle animation' });
+  await expect(enemyIdle).toBeVisible();
+  await expect(enemyIdle).toHaveCSS('background-image', /evil-wizard\/sprites\/Idle/);
+  await expect(enemyIdle).toHaveCSS('background-size', /800% 100%/);
   await page.getByRole('button', { name: 'Potion' }).click();
   const enemyAttack = page.getByRole('img', { name: 'Evil Wizard attack animation' });
   await expect(enemyAttack).toBeVisible();
