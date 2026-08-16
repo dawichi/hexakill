@@ -416,6 +416,9 @@ export function generateEnemy(
   const minLevel = Math.max(1, Math.floor(playerLevel / 2));
   const maxLevel = playerLevel * 1.75;
   const level = Math.floor(levelRoll * (maxLevel - minLevel + 1)) + minLevel;
+  if (!Number.isSafeInteger(level)) {
+    throw new RangeError('Generated enemy level must be a safe integer.');
+  }
   const definition = regularEnemies[Math.floor(definitionRoll * regularEnemies.length)];
   return {
     definition,

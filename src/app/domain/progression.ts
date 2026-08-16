@@ -109,15 +109,20 @@ function levelStats(player: PlayerState, levelsGained: number): Stats {
 
 export function applyVictoryReward(player: PlayerState, enemy: EnemyState): PlayerState {
   const reward = calculateVictoryReward(player, enemy);
+  const nextLevel = player.level + reward.levelsGained;
+  const nextGold = player.gold + reward.gold;
+  if (!Number.isSafeInteger(nextLevel) || !Number.isSafeInteger(nextGold)) {
+    throw new RangeError('Victory reward must keep player level and gold safe integers.');
+  }
   let experience = player.experience + reward.experience;
   while (experience >= 100) experience -= 100;
 
   return {
     ...player,
-    level: player.level + reward.levelsGained,
+    level: nextLevel,
     experience,
     stats: levelStats(player, reward.levelsGained),
-    gold: player.gold + reward.gold,
+    gold: nextGold,
     powerUps: {
       ...player.powerUps,
       pending: player.powerUps.pending + reward.powerUpsGranted,

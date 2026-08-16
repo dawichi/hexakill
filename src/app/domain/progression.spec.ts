@@ -71,6 +71,9 @@ describe('progression rules', () => {
       }),
     ).toThrow(RangeError);
     expect(() =>
+      applyVictoryReward({ ...player, gold: Number.MAX_SAFE_INTEGER }, generateEnemy(4, 0, 0)),
+    ).toThrow(RangeError);
+    expect(() =>
       calculateVictoryReward({ ...player, experience: Number.NaN }, generateEnemy(4, 0, 0)),
     ).toThrow(RangeError);
     expect(() => powerUpValue('health', Number.MAX_SAFE_INTEGER + 1)).toThrow(RangeError);

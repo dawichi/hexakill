@@ -56,6 +56,7 @@ describe('enemy generation', () => {
     expect(() => generateEnemy(Number.POSITIVE_INFINITY, 0.5, 0.5)).toThrow(RangeError);
     expect(() => generateEnemy(1.5, 0.5, 0.5)).toThrow(RangeError);
     expect(() => generateEnemy(Number.MAX_SAFE_INTEGER + 1, 0.5, 0.5)).toThrow(RangeError);
+    expect(() => generateEnemy(Number.MAX_SAFE_INTEGER, 0.5, 0.99, 3)).toThrow(RangeError);
     expect(() => generateEnemy(10, 0.5, 0.5, 0.5)).toThrow(RangeError);
   });
 
