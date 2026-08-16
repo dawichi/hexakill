@@ -32,6 +32,10 @@ for (const [key, value] of Object.entries(expected)) {
 
 const requiredHeaders = new Map([
   ['Cross-Origin-Opener-Policy', 'same-origin'],
+  [
+    'Content-Security-Policy',
+    "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; media-src 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'",
+  ],
   ['Permissions-Policy', 'camera=(), microphone=(), geolocation=()'],
   ['Referrer-Policy', 'strict-origin-when-cross-origin'],
   ['X-Content-Type-Options', 'nosniff'],

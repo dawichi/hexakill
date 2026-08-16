@@ -31,6 +31,8 @@ function sendText(response, status, body) {
 
 const securityHeaders = {
   'cross-origin-opener-policy': 'same-origin',
+  'content-security-policy':
+    "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; media-src 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'",
   'permissions-policy': 'camera=(), microphone=(), geolocation=()',
   'referrer-policy': 'strict-origin-when-cross-origin',
   'x-content-type-options': 'nosniff',
