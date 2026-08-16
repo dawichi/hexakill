@@ -12,6 +12,7 @@ const checks = [
   { label: 'documentation', args: ['run', 'verify:docs'] },
   { label: 'deployment contract', args: ['run', 'verify:deployment'] },
   { label: 'assets', args: ['run', 'verify:assets'] },
+  { label: 'asset geometry', args: ['run', 'inspect:assets', '--', '--json'] },
   { label: 'unit tests', args: ['test', '--', '--watch=false', '--no-progress'] },
   { label: 'dependency audit', args: ['audit', '--audit-level=high'] },
   { label: 'production build', args: ['run', 'build'] },

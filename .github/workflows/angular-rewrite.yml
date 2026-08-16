@@ -75,6 +75,8 @@ jobs:
         run: E2E_PRODUCTION=1 npm run test:e2e
       - name: Verify active asset paths
         run: npm run verify:assets
+      - name: Inspect retained asset geometry
+        run: npm run inspect:assets -- --json
       - name: Verify representative migrated assets
         run: |
           test -f dist/hexakill/browser/images/wizard/idle.gif
