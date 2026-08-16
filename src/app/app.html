@@ -297,7 +297,9 @@
                     [attr.aria-label]="
                       enemy.definition.name +
                       (session.enemyAnimation() === 'attack'
-                        ? ' attack animation'
+                        ? session.enemyActionKind() === 'magic'
+                          ? ' magic animation'
+                          : ' attack animation'
                         : ' defeat animation')
                     "
                     [style.background-image]="'url(' + enemySpriteAsset.src + ')'"

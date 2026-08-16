@@ -103,6 +103,14 @@ const WITCH_BLUE_ATTACK_SPRITE: SpriteStripAsset = {
   trailingPixels: 2,
 };
 
+const WITCH_BLUE_MAGIC_SPRITE: SpriteStripAsset = {
+  src: '/images/witch-blue/assets/B_witch_charge.png',
+  frameWidth: 48,
+  frameHeight: 48,
+  frameCount: 5,
+  orientation: 'vertical',
+};
+
 const WITCH_BLUE_DEFEAT_SPRITE: SpriteStripAsset = {
   src: '/images/witch-blue/assets/B_witch_death.png',
   frameWidth: 32,
@@ -205,6 +213,7 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
   }),
   enemy('witch-blue', 'Witch Blue', 'ap', '/images/witch-blue/idle.gif', AP_MODIFIERS, {
     attackSpriteAsset: WITCH_BLUE_ATTACK_SPRITE,
+    magicSpriteAsset: WITCH_BLUE_MAGIC_SPRITE,
     defeatSpriteAsset: WITCH_BLUE_DEFEAT_SPRITE,
   }),
 ];

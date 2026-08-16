@@ -183,7 +183,7 @@ test('mapped enemy magic strips render during a magic enemy turn', async ({ page
   await page.reload();
 
   await page.getByRole('button', { name: 'Potion' }).click();
-  const enemyMagic = page.getByRole('img', { name: 'Evil Wizard attack animation' });
+  const enemyMagic = page.getByRole('img', { name: 'Evil Wizard magic animation' });
   await expect(enemyMagic).toBeVisible();
   await expect(enemyMagic).toHaveCSS('background-image', /evil-wizard\/sprites\/Attack2/);
 });
@@ -229,6 +229,25 @@ test('vertical Witch Blue attack and defeat strips render in their states', asyn
   const enemyAttack = page.getByRole('img', { name: 'Witch Blue attack animation' });
   await expect(enemyAttack).toBeVisible();
   await expect(enemyAttack).toHaveCSS('background-size', /100% 400%/);
+
+  const magicSnapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  magicSnapshot.combatState.enemy.stats.health = 100;
+  magicSnapshot.combatState.enemy.damageTaken = 0;
+  magicSnapshot.combatState.playerDamageTaken = 20;
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, magicSnapshot);
+  await page.addInitScript(() => {
+    Math.random = () => 0.75;
+  });
+  await page.reload();
+  await page.getByRole('button', { name: 'Potion' }).click();
+  const enemyMagic = page.getByRole('img', { name: 'Witch Blue magic animation' });
+  await expect(enemyMagic).toBeVisible();
+  await expect(enemyMagic).toHaveCSS('background-image', /witch-blue\/assets\/B_witch_charge/);
+  await expect(enemyMagic).toHaveCSS('background-size', /100% 500%/);
 
   await expect
     .poll(() =>

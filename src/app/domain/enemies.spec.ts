@@ -141,5 +141,12 @@ describe('enemy generation', () => {
       frameCount: 15,
       orientation: 'vertical',
     });
+    expect(enemySpriteAssetFor('witch-blue', 'attack', 'magic')).toEqual({
+      src: '/images/witch-blue/assets/B_witch_charge.png',
+      frameWidth: 48,
+      frameHeight: 48,
+      frameCount: 5,
+      orientation: 'vertical',
+    });
   });
 });
