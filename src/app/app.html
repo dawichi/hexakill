@@ -270,6 +270,24 @@
                       [alt]="player.character.name"
                     />
                   }
+                } @else if (session.playerAnimation() === 'hit') {
+                  @if (session.playerHitAsset(); as hitAsset) {
+                    <span
+                      class="entity-sprite combat-sprite sprite-strip"
+                      role="img"
+                      [attr.aria-label]="player.character.name + ' hit animation'"
+                      [style.background-image]="'url(' + hitAsset.src + ')'"
+                      [style.background-size]="spriteBackgroundSize(hitAsset)"
+                      [style.aspect-ratio]="hitAsset.frameWidth + ' / ' + hitAsset.frameHeight"
+                      [style.animation]="spriteAnimation(hitAsset, 600)"
+                    ></span>
+                  } @else {
+                    <img
+                      class="entity-sprite combat-sprite"
+                      [src]="player.character.idleAsset"
+                      [alt]="player.character.name"
+                    />
+                  }
                 } @else {
                   <img
                     class="entity-sprite combat-sprite"
@@ -300,7 +318,9 @@
                         ? session.enemyActionKind() === 'magic'
                           ? ' magic animation'
                           : ' attack animation'
-                        : ' defeat animation')
+                        : session.enemyAnimation() === 'hit'
+                          ? ' hit animation'
+                          : ' defeat animation')
                     "
                     [style.background-image]="'url(' + enemySpriteAsset.src + ')'"
                     [style.background-size]="spriteBackgroundSize(enemySpriteAsset)"

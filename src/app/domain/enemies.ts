@@ -20,7 +20,12 @@ function enemy(
   enemyModifiers: Stats,
   animationAssets: Pick<
     EnemyDefinition,
-    'attackAsset' | 'attackSpriteAsset' | 'magicSpriteAsset' | 'defeatAsset' | 'defeatSpriteAsset'
+    | 'attackAsset'
+    | 'attackSpriteAsset'
+    | 'magicSpriteAsset'
+    | 'hitSpriteAsset'
+    | 'defeatAsset'
+    | 'defeatSpriteAsset'
   > = {},
 ): EnemyDefinition {
   return { id, name, archetype, modifiers: enemyModifiers, idleAsset, ...animationAssets };
@@ -52,6 +57,13 @@ const EVIL_WIZARD_MAGIC_SPRITE: SpriteStripAsset = {
   frameCount: 8,
 };
 
+const EVIL_WIZARD_HIT_SPRITE: SpriteStripAsset = {
+  src: '/images/evil-wizard/sprites/Take hit.png',
+  frameWidth: 250,
+  frameHeight: 250,
+  frameCount: 3,
+};
+
 const WILD_HUNTRESS_DEFEAT_SPRITE: SpriteStripAsset = {
   src: '/images/wild-huntress/sprites/Death.png',
   frameWidth: 150,
@@ -64,6 +76,13 @@ const WILD_HUNTRESS_ATTACK_SPRITE: SpriteStripAsset = {
   frameWidth: 150,
   frameHeight: 150,
   frameCount: 5,
+};
+
+const WILD_HUNTRESS_HIT_SPRITE: SpriteStripAsset = {
+  src: '/images/wild-huntress/sprites/Take hit.png',
+  frameWidth: 150,
+  frameHeight: 150,
+  frameCount: 3,
 };
 
 const FIRE_WORM_DEFEAT_SPRITE: SpriteStripAsset = {
@@ -80,6 +99,13 @@ const FIRE_WORM_ATTACK_SPRITE: SpriteStripAsset = {
   frameCount: 16,
 };
 
+const FIRE_WORM_HIT_SPRITE: SpriteStripAsset = {
+  src: '/images/fire-worm/Sprites/Worm/Get Hit.png',
+  frameWidth: 90,
+  frameHeight: 90,
+  frameCount: 3,
+};
+
 const MARTIAL_HERO_DEFEAT_SPRITE: SpriteStripAsset = {
   src: '/images/martial-hero/Sprite/Death.png',
   frameWidth: 126,
@@ -92,6 +118,13 @@ const MARTIAL_HERO_ATTACK_SPRITE: SpriteStripAsset = {
   frameWidth: 126,
   frameHeight: 126,
   frameCount: 7,
+};
+
+const MARTIAL_HERO_HIT_SPRITE: SpriteStripAsset = {
+  src: '/images/martial-hero/Sprite/Take Hit.png',
+  frameWidth: 126,
+  frameHeight: 126,
+  frameCount: 3,
 };
 
 const WITCH_BLUE_ATTACK_SPRITE: SpriteStripAsset = {
@@ -109,6 +142,15 @@ const WITCH_BLUE_MAGIC_SPRITE: SpriteStripAsset = {
   frameHeight: 48,
   frameCount: 5,
   orientation: 'vertical',
+};
+
+const WITCH_BLUE_HIT_SPRITE: SpriteStripAsset = {
+  src: '/images/witch-blue/assets/B_witch_take_damage.png',
+  frameWidth: 32,
+  frameHeight: 32,
+  frameCount: 5,
+  orientation: 'vertical',
+  trailingPixels: 16,
 };
 
 const WITCH_BLUE_DEFEAT_SPRITE: SpriteStripAsset = {
@@ -164,16 +206,19 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
   enemy('evil-wizard', 'Evil Wizard', 'ap', '/images/evil-wizard/idle.gif', AP_MODIFIERS, {
     attackSpriteAsset: EVIL_WIZARD_ATTACK_SPRITE,
     magicSpriteAsset: EVIL_WIZARD_MAGIC_SPRITE,
+    hitSpriteAsset: EVIL_WIZARD_HIT_SPRITE,
     defeatSpriteAsset: EVIL_WIZARD_DEFEAT_SPRITE,
   }),
   enemy('fire-knight', 'Fire knight', 'tank', '/images/fire-knight/idle.gif', TANK_MODIFIERS),
   enemy('fire-worm', 'Fire worm', 'ap', '/images/fire-worm/idle.gif', AP_MODIFIERS, {
     attackSpriteAsset: FIRE_WORM_ATTACK_SPRITE,
+    hitSpriteAsset: FIRE_WORM_HIT_SPRITE,
     defeatSpriteAsset: FIRE_WORM_DEFEAT_SPRITE,
   }),
   enemy('knight', 'Knight', 'tank', '/images/knight/idle.gif', TANK_MODIFIERS),
   enemy('martial-hero', 'Martial Hero', 'ad', '/images/martial-hero/idle.gif', AD_MODIFIERS, {
     attackSpriteAsset: MARTIAL_HERO_ATTACK_SPRITE,
+    hitSpriteAsset: MARTIAL_HERO_HIT_SPRITE,
     defeatSpriteAsset: MARTIAL_HERO_DEFEAT_SPRITE,
   }),
   enemy(
@@ -209,11 +254,13 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
   ),
   enemy('wild-huntress', 'Wild Huntress', 'ad', '/images/wild-huntress/idle.gif', AD_MODIFIERS, {
     attackSpriteAsset: WILD_HUNTRESS_ATTACK_SPRITE,
+    hitSpriteAsset: WILD_HUNTRESS_HIT_SPRITE,
     defeatSpriteAsset: WILD_HUNTRESS_DEFEAT_SPRITE,
   }),
   enemy('witch-blue', 'Witch Blue', 'ap', '/images/witch-blue/idle.gif', AP_MODIFIERS, {
     attackSpriteAsset: WITCH_BLUE_ATTACK_SPRITE,
     magicSpriteAsset: WITCH_BLUE_MAGIC_SPRITE,
+    hitSpriteAsset: WITCH_BLUE_HIT_SPRITE,
     defeatSpriteAsset: WITCH_BLUE_DEFEAT_SPRITE,
   }),
 ];
@@ -239,18 +286,19 @@ export function findEnemyDefinition(id: string): EnemyDefinition | undefined {
 
 export function enemyAssetFor(
   id: string,
-  animation: 'idle' | 'attack' | 'defeat',
+  animation: 'idle' | 'attack' | 'hit' | 'defeat',
 ): string | undefined {
   const definition = findEnemyDefinition(id);
   if (!definition) return undefined;
   if (animation === 'attack') return definition.attackAsset ?? definition.idleAsset;
+  if (animation === 'hit') return definition.idleAsset;
   if (animation === 'defeat') return definition.defeatAsset ?? definition.idleAsset;
   return definition.idleAsset;
 }
 
 export function enemySpriteAssetFor(
   id: string,
-  animation: 'idle' | 'attack' | 'defeat',
+  animation: 'idle' | 'attack' | 'hit' | 'defeat',
   action: 'attack' | 'magic' = 'attack',
 ): SpriteStripAsset | undefined {
   const definition = findEnemyDefinition(id);
@@ -260,6 +308,7 @@ export function enemySpriteAssetFor(
       ? (definition.magicSpriteAsset ?? definition.attackSpriteAsset)
       : definition.attackSpriteAsset;
   }
+  if (animation === 'hit') return definition.hitSpriteAsset;
   if (animation === 'defeat') return definition.defeatSpriteAsset;
   return undefined;
 }

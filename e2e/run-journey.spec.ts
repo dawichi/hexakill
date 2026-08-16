@@ -146,6 +146,9 @@ test('mapped enemy attack strips render during the enemy turn', async ({ page })
   const enemyAttack = page.getByRole('img', { name: 'Evil Wizard attack animation' });
   await expect(enemyAttack).toBeVisible();
   await expect(enemyAttack).toHaveCSS('background-image', /evil-wizard/);
+  const playerHit = page.getByRole('img', { name: 'Wizard hit animation' });
+  await expect(playerHit).toBeVisible();
+  await expect(playerHit).toHaveCSS('background-image', /wizard\/sprites\/Hit/);
 });
 
 test('mapped enemy magic strips render during a magic enemy turn', async ({ page }) => {

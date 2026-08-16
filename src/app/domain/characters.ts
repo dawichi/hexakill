@@ -1,5 +1,10 @@
 import { CharacterDefinition, CharacterId, PlayerState, Stats } from './game-types';
-import { PLAYER_ACTION_ASSETS, PLAYER_DEFEAT_ASSETS, PLAYER_MAGIC_ASSETS } from './assets';
+import {
+  PLAYER_ACTION_ASSETS,
+  PLAYER_DEFEAT_ASSETS,
+  PLAYER_HIT_ASSETS,
+  PLAYER_MAGIC_ASSETS,
+} from './assets';
 
 export const BASE_STATS: Stats = {
   health: 200,
@@ -21,6 +26,7 @@ export const CHARACTER_DEFINITIONS: readonly CharacterDefinition[] = [
     idleAsset: '/images/wizard/idle.gif',
     actionAsset: PLAYER_ACTION_ASSETS.wizard,
     magicAsset: PLAYER_MAGIC_ASSETS.wizard,
+    hitAsset: PLAYER_HIT_ASSETS.wizard,
     defeatAsset: PLAYER_DEFEAT_ASSETS.wizard,
   },
   {
@@ -33,6 +39,7 @@ export const CHARACTER_DEFINITIONS: readonly CharacterDefinition[] = [
     idleAsset: '/images/samurai/idle.gif',
     actionAsset: PLAYER_ACTION_ASSETS.samurai,
     magicAsset: PLAYER_MAGIC_ASSETS.samurai,
+    hitAsset: PLAYER_HIT_ASSETS.samurai,
     defeatAsset: PLAYER_DEFEAT_ASSETS.samurai,
   },
   {

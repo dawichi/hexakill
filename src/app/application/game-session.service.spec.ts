@@ -85,9 +85,11 @@ describe('GameSessionService', () => {
     expect(service.combatState().phase).toBe('awaiting-player-action');
     expect(service.playerRemainingHealth()).toBeLessThan(200);
     expect(service.enemyAnimation()).toBe('attack');
+    expect(service.playerAnimation()).toBe('hit');
 
     scheduledTask?.();
     expect(service.enemyAnimation()).toBe('idle');
+    expect(service.playerAnimation()).toBe('idle');
 
     service.usePotion();
     expect(service.player()?.potions).toBe(4);

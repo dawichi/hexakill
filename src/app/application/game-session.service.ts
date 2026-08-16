@@ -282,9 +282,9 @@ export class GameSessionService {
   readonly player = signal<PlayerState | null>(null);
   readonly combatState = signal<CombatState>(INITIAL_COMBAT_STATE);
   readonly enemy = computed(() => this.combatState().enemy);
-  readonly enemyAnimation = signal<'idle' | 'attack' | 'defeat'>('idle');
+  readonly enemyAnimation = signal<'idle' | 'attack' | 'hit' | 'defeat'>('idle');
   readonly enemyActionKind = signal<DamageKind | null>(null);
-  readonly playerAnimation = signal<'idle' | 'action' | 'defeat'>('idle');
+  readonly playerAnimation = signal<'idle' | 'action' | 'hit' | 'defeat'>('idle');
   readonly playerActionKind = signal<DamageKind | null>(null);
   readonly playerActionAsset = computed<SpriteStripAsset | null>(() => {
     const player = this.player();
@@ -294,6 +294,9 @@ export class GameSessionService {
     }
     return player.character.actionAsset ?? null;
   });
+  readonly playerHitAsset = computed<SpriteStripAsset | null>(
+    () => this.player()?.character.hitAsset ?? null,
+  );
   readonly enemyAsset = computed(
     () => enemyAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? '',
   );
@@ -512,6 +515,8 @@ export class GameSessionService {
     if (result.missed) {
       this.combatMessage.set(`Your ${kind} missed.`);
     } else {
+      this.enemyAnimation.set('hit');
+      this.enemyActionKind.set(null);
       const criticalMessage = result.critical ? ' Critical hit.' : '';
       this.combatMessage.set(
         `Your ${kind} dealt ${result.damageAfterResistance} damage.${criticalMessage}${
@@ -656,7 +661,8 @@ export class GameSessionService {
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
     } else {
       this.scheduleEnemyAnimationReset();
-      this.playerAnimation.set('idle');
+      const playerWasHit = isDamageAction && !('action' in result) && !result.missed;
+      this.playerAnimation.set(playerWasHit ? 'hit' : 'idle');
     }
   }
 
@@ -691,6 +697,7 @@ export class GameSessionService {
       }
       this.enemyAnimation.set('idle');
       this.enemyActionKind.set(null);
+      this.playerAnimation.set('idle');
     }, 600);
   }
 

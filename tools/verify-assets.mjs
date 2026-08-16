@@ -59,17 +59,24 @@ const requiredAssets = [
   'images/evil-wizard/sprites/Death.png',
   'images/evil-wizard/sprites/Attack1.png',
   'images/evil-wizard/sprites/Attack2.png',
+  'images/evil-wizard/sprites/Take hit.png',
   'images/wizard/sprites/Attack2.png',
+  'images/wizard/sprites/Hit.png',
   'images/samurai/Sprites/Attack2.png',
+  'images/samurai/Sprites/Take Hit.png',
   'images/fire-worm/Sprites/Worm/Death.png',
   'images/fire-worm/Sprites/Worm/Attack.png',
+  'images/fire-worm/Sprites/Worm/Get Hit.png',
   'images/martial-hero/Sprite/Death.png',
   'images/martial-hero/Sprite/Attack1.png',
+  'images/martial-hero/Sprite/Take Hit.png',
   'images/samurai/Sprites/Death.png',
   'images/wild-huntress/sprites/Death.png',
   'images/wild-huntress/sprites/Attack1.png',
+  'images/wild-huntress/sprites/Take hit.png',
   'images/witch-blue/assets/B_witch_attack.png',
   'images/witch-blue/assets/B_witch_charge.png',
+  'images/witch-blue/assets/B_witch_take_damage.png',
   'images/witch-blue/assets/B_witch_death.png',
   'images/wizard/sprites/Attack1.png',
   'images/wizard/sprites/Death.png',
@@ -103,9 +110,9 @@ const allImagePaths = listFiles(resolve(assetRoot, 'images')).map((path) =>
   relative(assetRoot, path).split('\\').join('/'),
 );
 const deferredImageCount = allImagePaths.filter((asset) => !activeImagePaths.has(asset)).length;
-if (deferredImageCount !== 57) {
+if (deferredImageCount !== 50) {
   console.error(
-    `Expected 57 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
+    `Expected 50 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
   );
   process.exit(1);
 }
@@ -145,7 +152,7 @@ if (missingFromSourceRegister.length > 0 || staleInSourceRegister.length > 0) {
 const sourceAssetPaths = new Set();
 for (const sourcePath of listFiles(resolve(projectRoot, 'src/app'))) {
   const source = readFileSync(sourcePath, 'utf8');
-  for (const match of source.matchAll(/["'`](\/(?:images|music|sounds)\/[^"'`\s)]+)["'`]/g)) {
+  for (const match of source.matchAll(/["'`](\/(?:images|music|sounds)\/[^"'`)]*)["'`]/g)) {
     sourceAssetPaths.add(match[1].slice(1));
   }
 }

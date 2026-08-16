@@ -39,6 +39,7 @@ export interface CharacterDefinition {
   readonly idleAsset: string;
   readonly actionAsset?: SpriteStripAsset;
   readonly magicAsset?: SpriteStripAsset;
+  readonly hitAsset?: SpriteStripAsset;
   readonly defeatAsset?: SpriteStripAsset;
 }
 
@@ -51,6 +52,7 @@ export interface EnemyDefinition {
   readonly attackAsset?: string;
   readonly attackSpriteAsset?: SpriteStripAsset;
   readonly magicSpriteAsset?: SpriteStripAsset;
+  readonly hitSpriteAsset?: SpriteStripAsset;
   readonly defeatAsset?: string;
   readonly defeatSpriteAsset?: SpriteStripAsset;
 }

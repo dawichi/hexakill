@@ -60,6 +60,22 @@ export const PLAYER_MAGIC_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStr
   },
 };
 
+/** Provisional single-row player hit-reaction strips. */
+export const PLAYER_HIT_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
+  wizard: {
+    src: '/images/wizard/sprites/Hit.png',
+    frameWidth: 231,
+    frameHeight: 190,
+    frameCount: 4,
+  },
+  samurai: {
+    src: '/images/samurai/Sprites/Take Hit.png',
+    frameWidth: 200,
+    frameHeight: 200,
+    frameCount: 4,
+  },
+};
+
 /** Provisional single-row player defeat strips with observed frame geometry. */
 export const PLAYER_DEFEAT_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
   wizard: {

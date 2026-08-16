@@ -123,6 +123,30 @@ describe('enemy generation', () => {
       frameHeight: 250,
       frameCount: 8,
     });
+    expect(enemySpriteAssetFor('evil-wizard', 'hit')).toEqual({
+      src: '/images/evil-wizard/sprites/Take hit.png',
+      frameWidth: 250,
+      frameHeight: 250,
+      frameCount: 3,
+    });
+    expect(enemySpriteAssetFor('fire-worm', 'hit')).toEqual({
+      src: '/images/fire-worm/Sprites/Worm/Get Hit.png',
+      frameWidth: 90,
+      frameHeight: 90,
+      frameCount: 3,
+    });
+    expect(enemySpriteAssetFor('martial-hero', 'hit')).toEqual({
+      src: '/images/martial-hero/Sprite/Take Hit.png',
+      frameWidth: 126,
+      frameHeight: 126,
+      frameCount: 3,
+    });
+    expect(enemySpriteAssetFor('wild-huntress', 'hit')).toEqual({
+      src: '/images/wild-huntress/sprites/Take hit.png',
+      frameWidth: 150,
+      frameHeight: 150,
+      frameCount: 3,
+    });
   });
 
   it('maps the observed Witch Blue vertical attack and defeat strips', () => {
@@ -147,6 +171,14 @@ describe('enemy generation', () => {
       frameHeight: 48,
       frameCount: 5,
       orientation: 'vertical',
+    });
+    expect(enemySpriteAssetFor('witch-blue', 'hit')).toEqual({
+      src: '/images/witch-blue/assets/B_witch_take_damage.png',
+      frameWidth: 32,
+      frameHeight: 32,
+      frameCount: 5,
+      orientation: 'vertical',
+      trailingPixels: 16,
     });
   });
 });
