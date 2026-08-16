@@ -75,6 +75,19 @@ test('the Samurai uses its mapped player action strip', async ({ page }) => {
   await expect(playerAction).toHaveCSS('background-image', /samurai/);
 });
 
+test('Magic uses the mapped secondary player action strip', async ({ page }) => {
+  await startRun(page);
+
+  await page.getByRole('button', { name: 'Find an enemy' }).click();
+  const magicButton = page.getByRole('button', { name: 'Magic' });
+  await expect(magicButton).toBeEnabled();
+  await magicButton.click();
+
+  const playerAction = page.getByRole('img', { name: 'Wizard action animation' });
+  await expect(playerAction).toBeVisible();
+  await expect(playerAction).toHaveCSS('background-image', /wizard\/sprites\/Attack2/);
+});
+
 test('mapped enemy attack strips render during the enemy turn', async ({ page }) => {
   await startRun(page);
   const snapshot = await page.evaluate(() =>

@@ -251,7 +251,7 @@
                 <p class="eyebrow">You · level {{ player.level }}</p>
                 <h3>{{ player.name }} the {{ player.character.name }}</h3>
                 @if (session.playerAnimation() === 'action') {
-                  @if (player.character.actionAsset; as actionAsset) {
+                  @if (session.playerActionAsset(); as actionAsset) {
                     <span
                       class="entity-sprite combat-sprite sprite-strip"
                       role="img"

@@ -272,6 +272,15 @@ export class GameSessionService {
   readonly enemy = computed(() => this.combatState().enemy);
   readonly enemyAnimation = signal<'idle' | 'attack' | 'defeat'>('idle');
   readonly playerAnimation = signal<'idle' | 'action' | 'defeat'>('idle');
+  readonly playerActionKind = signal<DamageKind | null>(null);
+  readonly playerActionAsset = computed<SpriteStripAsset | null>(() => {
+    const player = this.player();
+    if (!player) return null;
+    if (this.playerActionKind() === 'magic') {
+      return player.character.magicAsset ?? player.character.actionAsset ?? null;
+    }
+    return player.character.actionAsset ?? null;
+  });
   readonly enemyAsset = computed(
     () => enemyAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? '',
   );
@@ -368,6 +377,7 @@ export class GameSessionService {
     this.combatState.set(INITIAL_COMBAT_STATE);
     this.enemyAnimation.set('idle');
     this.playerAnimation.set('idle');
+    this.playerActionKind.set(null);
     this.combatMessage.set('Find an enemy to begin combat.');
     this.screen.set('combat-ready');
     this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
@@ -452,6 +462,7 @@ export class GameSessionService {
     if (!this.applyCombatEvent({ type: 'player-action-started', kind })) {
       return;
     }
+    this.playerActionKind.set(kind);
     this.playerAnimation.set('action');
     this.lastActionAt.set(this.clock.now());
     this.audio?.playSound(
@@ -550,6 +561,7 @@ export class GameSessionService {
     this.applyCombatEvent({ type: 'reset' });
     this.enemyAnimation.set('idle');
     this.playerAnimation.set('idle');
+    this.playerActionKind.set(null);
     this.lastActionAt.set(null);
     this.combatMessage.set('');
     this.storage?.clear();

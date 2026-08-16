@@ -89,7 +89,9 @@ jobs:
         run: |
           test -f dist/hexakill/browser/images/wizard/idle.gif
           test -f dist/hexakill/browser/images/wizard/sprites/Attack1.png
+          test -f dist/hexakill/browser/images/wizard/sprites/Attack2.png
           test -f dist/hexakill/browser/images/samurai/Sprites/Attack1.png
+          test -f dist/hexakill/browser/images/samurai/Sprites/Attack2.png
           test -f dist/hexakill/browser/images/slime-blue/attack.gif
           test -f dist/hexakill/browser/images/slime-blue/die.gif
           test -f dist/hexakill/browser/images/evil-wizard/sprites/Attack1.png

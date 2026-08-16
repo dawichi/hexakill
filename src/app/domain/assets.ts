@@ -44,6 +44,22 @@ export const PLAYER_ACTION_ASSETS: Readonly<Partial<Record<CharacterId, SpriteSt
   },
 };
 
+/** Provisional single-row player Magic strips, selected only for the Magic action. */
+export const PLAYER_MAGIC_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
+  wizard: {
+    src: '/images/wizard/sprites/Attack2.png',
+    frameWidth: 231,
+    frameHeight: 190,
+    frameCount: 8,
+  },
+  samurai: {
+    src: '/images/samurai/Sprites/Attack2.png',
+    frameWidth: 200,
+    frameHeight: 200,
+    frameCount: 6,
+  },
+};
+
 /** Provisional single-row player defeat strips with observed frame geometry. */
 export const PLAYER_DEFEAT_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
   wizard: {

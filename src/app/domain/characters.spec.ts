@@ -19,6 +19,22 @@ describe('character asset contracts', () => {
       frameHeight: 200,
       frameCount: 6,
     });
+    expect(
+      CHARACTER_DEFINITIONS.find((character) => character.id === 'wizard')?.magicAsset,
+    ).toEqual({
+      src: '/images/wizard/sprites/Attack2.png',
+      frameWidth: 231,
+      frameHeight: 190,
+      frameCount: 8,
+    });
+    expect(
+      CHARACTER_DEFINITIONS.find((character) => character.id === 'samurai')?.magicAsset,
+    ).toEqual({
+      src: '/images/samurai/Sprites/Attack2.png',
+      frameWidth: 200,
+      frameHeight: 200,
+      frameCount: 6,
+    });
     expect(CHARACTER_DEFINITIONS.find((character) => character.id === 'warrior')?.actionAsset).toBe(
       undefined,
     );
