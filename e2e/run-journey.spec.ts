@@ -64,6 +64,16 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
 test('the Samurai uses its mapped player action strip', async ({ page }) => {
   await startRun(page, 'Samurai');
 
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.player.stats.speed = 100;
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
+
   await page.getByRole('button', { name: 'Find an enemy' }).click();
   const attackButton = page.getByRole('button', { name: 'Attack' });
   await expect(attackButton).toBeEnabled();
@@ -127,6 +137,9 @@ test('mapped enemy attack strips render during the enemy turn', async ({ page })
   await page.evaluate((value) => {
     localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
   }, snapshot);
+  await page.addInitScript(() => {
+    Math.random = () => 0.5;
+  });
   await page.reload();
 
   await page.getByRole('button', { name: 'Potion' }).click();
