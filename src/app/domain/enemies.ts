@@ -386,8 +386,8 @@ export function generateEnemy(
   levelRoll: number,
   bossesDefeated = 0,
 ): EnemyState {
-  if (!Number.isInteger(playerLevel) || playerLevel < 1) {
-    throw new RangeError('Player level must be a positive integer.');
+  if (!Number.isSafeInteger(playerLevel) || playerLevel < 1) {
+    throw new RangeError('Player level must be a positive safe integer.');
   }
   if (
     !Number.isInteger(bossesDefeated) ||
