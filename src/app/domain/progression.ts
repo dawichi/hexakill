@@ -130,6 +130,9 @@ const POWER_UP_VALUES: Record<PowerUpType, number> = {
 };
 
 export function powerUpValue(type: PowerUpType, currentCount: number): number {
+  if (!Object.hasOwn(POWER_UP_VALUES, type)) {
+    throw new RangeError('Unknown power-up type.');
+  }
   if (
     !Number.isInteger(currentCount) ||
     currentCount < 0 ||

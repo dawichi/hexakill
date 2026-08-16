@@ -47,7 +47,7 @@ Final persistence acceptance, deployment, and gameplay balancing remain unresolv
 - Enemy levels preserve the archived pre-boss calculation: `minLevel = floor(playerLevel / 2)`, `maxLevel = playerLevel * 1.75`, then `floor(random * (maxLevel - minLevel + 1)) + minLevel`. The upper bound is intentionally fractional before the final level conversion; for example, player level 3 with a `0.99` roll produces enemy level 6.
 - Enemy gold preserves the archived `Number(((enemyLevel / playerLevel) * 250).toFixed(0))` rule, including its numeric rounding behavior.
 - Combat resistance reduction and victory experience likewise preserve the archived `toFixed(0)` rounding rules; these boundaries have deterministic regression fixtures.
-- Progression now rejects malformed player/enemy reward inputs and counts pending power-up choices toward the global maximum, while preserving the observed reward formulas for valid runs.
+- Progression now rejects malformed player/enemy reward inputs and unknown runtime power-up identifiers, counts pending power-up choices toward the global maximum, and preserves the observed reward formulas for valid runs.
 - Store purchases now reject malformed gold, potion, inventory, and stat state before applying the provisional item/potion contract; valid repeatable potion and one-time item behavior is unchanged.
 - Legacy enemy stat scaling for levels below 10 does not apply enemy modifiers; the active app preserves that behavior intentionally as a characterization point, not as an approved balance decision.
 - The legacy enemy catalog contains a broken `presets.easy` reference; the active app keeps the complete observed roster explicit and treats the three Gold Slime encounters as a separate sequential boss schedule.

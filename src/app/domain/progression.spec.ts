@@ -51,6 +51,7 @@ describe('progression rules', () => {
   });
 
   it('rejects non-integer power-up counts', () => {
+    expect(() => powerUpValue('unknown' as never, 0)).toThrow(RangeError);
     expect(() => powerUpValue('health', Number.NaN)).toThrow(RangeError);
     expect(() => powerUpValue('health', 1.5)).toThrow(RangeError);
     expect(() => powerUpValue('health', Number.POSITIVE_INFINITY)).toThrow(RangeError);
