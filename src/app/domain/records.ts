@@ -51,7 +51,7 @@ function isPersonalRecord(value: unknown): value is PersonalRecord {
     record.name.trim().length >= 3 &&
     record.name.length <= 14 &&
     typeof record.level === 'number' &&
-    Number.isInteger(record.level) &&
+    Number.isSafeInteger(record.level) &&
     record.level >= 1
   );
 }

@@ -27,7 +27,7 @@ The combat slice also characterizes legacy speed ordering, enemy attack/magic/he
 
 The combat boundaries reject malformed attacker/defender stats, invalid resistance or damage values, impossible damage totals, invalid opening-turn speeds, and malformed enemy potion state before applying legacy rules. These are input-safety constraints, not gameplay rebalance decisions.
 
-Defeat now writes a validated, versioned local personal-record envelope through a separate storage port. The active contract preserves the legacy top-five descending-level behavior, shows records on welcome and game-over, and keeps them when a run is reset. The old `hxkllPersonalRecords` key is not auto-migrated; that is an explicit unresolved data decision in [the persistence contract](architecture/rewrite-persistence.md).
+Defeat now writes a validated, versioned local personal-record envelope through a separate storage port. The active contract preserves the legacy top-five descending-level behavior, validates known characters, the existing 3–14 character name contract, and safe-integer levels, shows records on welcome and game-over, and keeps them when a run is reset. The old `hxkllPersonalRecords` key is not auto-migrated; that is an explicit unresolved data decision in [the persistence contract](architecture/rewrite-persistence.md).
 
 Victory now also appends a typed defeated-enemy history entry to the run. Game over groups those entries by enemy, displays the retained idle art, count, and defeated levels, and restores older v1 sessions without history as an empty list.
 

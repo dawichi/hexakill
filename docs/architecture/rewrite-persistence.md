@@ -15,14 +15,14 @@ The root application separates the active run from personal records:
 - Audio preferences use `hexakill.angular.preferences.v1` through `PREFERENCES_STORAGE`.
 - The records envelope is `{ version: 1, records: [...] }`.
 - Each record uses the stable `characterId`, the player `name`, and the reached `level`.
-- Records are validated on restore, sorted descending by level, and capped at five entries.
+- Records are validated on restore, including known characters, the existing 3–14 character name contract, positive safe-integer levels, and the five-entry limit; valid records are sorted descending by level.
 - Invalid or malformed records are discarded safely.
 - Restored run snapshots must match a coherent screen/phase shape: character selection has no player or enemy, a ready screen has an idle player with no enemy, combat has an undamaged enemy awaiting action or a defeated enemy showing victory, and game-over has an enemy with a defeat phase and lethal player damage.
 - Restored players reject duplicate one-time inventory IDs and reject power-up snapshots whose pending plus spent total exceeds the global 24-point cap; valid inventory entries are hydrated from the canonical store catalog.
 - Durable v1 snapshots reject transient `pendingAction` values and malformed `lastResult` values; the application never resumes an in-flight action or delayed enemy turn after reload.
 - Defeat writes one record; resetting a run preserves the records list.
 - The welcome and game-over views expose the list and a clear action.
-- Music and effects volumes use the observed `0.05` and `0.2` defaults, an accessible `0`–`0.5` range, and persist independently from the run.
+- Music and effects volumes use the observed `0.05` and `0.2` defaults, finite values in the accessible `0`–`0.5` range, and persist independently from the run. Runtime volume inputs clamp invalid or out-of-range values to a safe value before application.
 
 The browser adapter is deliberately non-fatal when storage is blocked or full. Records are local-only and are not an account, leaderboard, analytics, or remote persistence feature.
 

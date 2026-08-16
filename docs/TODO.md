@@ -72,7 +72,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** `legacy/svelte/src/lib/services/storage.service.ts`, root Angular storage adapter, and volume preference handling
-- **Evidence:** The active Angular app has versioned `hexakill.angular.session.v1`, `hexakill.angular.records.v1`, and `hexakill.angular.preferences.v1` envelopes, injectable storage boundaries, structural validation for player/enemy/progression/record/preference data, coherent screen/phase validation, rejection of transient combat actions and malformed damage results at the durable-session boundary, canonical character/item hydration, invalid-record clearing, accessible volume controls, and non-fatal browser storage failure handling. Migration from legacy keys remains missing.
+- **Evidence:** The active Angular app has versioned `hexakill.angular.session.v1`, `hexakill.angular.records.v1`, and `hexakill.angular.preferences.v1` envelopes, injectable storage boundaries, structural validation for player/enemy/progression/record/preference data, safe-integer record-level validation, coherent screen/phase validation, rejection of transient combat actions and malformed damage results at the durable-session boundary, canonical character/item hydration, invalid-record clearing, accessible volume controls, and non-fatal browser storage failure handling. Migration from legacy keys remains missing.
 - **Risk:** Old/corrupt local storage can crash or create invalid records and preferences.
 - **Next action:** Decide migration policy for legacy keys/preferences, record the decision in an ADR, and extend malformed-input fixtures as the schemas evolve.
 - **Dependencies:** TODO-006

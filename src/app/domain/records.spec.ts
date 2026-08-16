@@ -49,5 +49,11 @@ describe('personal records', () => {
         records: [{ characterId: 'wizard', name: 'Agent', level: 1.5 }],
       }),
     ).toBe(false);
+    expect(
+      isStoredRecordsSnapshot({
+        version: 1,
+        records: [{ characterId: 'wizard', name: 'Agent', level: Number.MAX_SAFE_INTEGER + 1 }],
+      }),
+    ).toBe(false);
   });
 });
