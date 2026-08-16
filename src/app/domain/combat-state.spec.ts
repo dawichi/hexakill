@@ -133,6 +133,22 @@ describe('combat state transitions', () => {
       if (transition.accepted) throw new Error('Expected invalid payload to be rejected.');
       expect(transition.reason).toContain('valid player health');
     }
+
+    const alreadyDamagedEnemyTurn = { ...enemyTurn, playerDamageTaken: 12 };
+    for (const payload of [
+      { playerDamageTaken: 11, playerHealth: 200 },
+      { playerDamageTaken: 201, playerHealth: 200 },
+    ]) {
+      const transition = transitionCombat(alreadyDamagedEnemyTurn, {
+        type: 'enemy-action-resolved',
+        ...payload,
+      });
+
+      expect(transition.accepted).toBe(false);
+      if (transition.accepted)
+        throw new Error('Expected an incoherent damage total to be rejected.');
+      expect(transition.reason).toContain('valid player health');
+    }
   });
 
   it('rejects actions outside the player-action phase', () => {

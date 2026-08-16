@@ -126,7 +126,9 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
       !Number.isFinite(event.playerDamageTaken) ||
       event.playerDamageTaken < 0 ||
       !Number.isFinite(event.playerHealth) ||
-      event.playerHealth <= 0
+      event.playerHealth <= 0 ||
+      event.playerDamageTaken < state.playerDamageTaken ||
+      event.playerDamageTaken > event.playerHealth
     ) {
       return rejected(state, 'An enemy action requires valid player health values.');
     }
