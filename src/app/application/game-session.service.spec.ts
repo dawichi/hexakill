@@ -6,6 +6,7 @@ import { CLOCK, Clock } from './clock';
 import { RANDOM_SOURCE } from './random';
 import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
 import { AUDIO, AudioPort } from './audio';
+import { PREFERENCES_STORAGE, PreferencesStoragePort } from './preferences-storage';
 import { SESSION_STORAGE, SessionStoragePort } from './storage';
 import { INITIAL_COMBAT_STATE } from '../domain/combat-state';
 
@@ -320,6 +321,46 @@ describe('GameSessionService', () => {
 
     expect(restored.screen()).toBe('welcome');
     expect(sessionValue).toBeNull();
+  });
+
+  it('resets the audio adapter when saved preferences are malformed', () => {
+    let preferencesValue: string | null = '{"version":1,"musicVolume":"loud","effectsVolume":0.4}';
+    const appliedMusicVolumes: number[] = [];
+    const appliedEffectsVolumes: number[] = [];
+    const preferencesStorage: PreferencesStoragePort = {
+      read: () => preferencesValue,
+      write: () => undefined,
+      clear: () => (preferencesValue = null),
+    };
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        GameSessionService,
+        { provide: PREFERENCES_STORAGE, useValue: preferencesStorage },
+        {
+          provide: AUDIO,
+          useValue: {
+            playSound: () => undefined,
+            playMusic: () => undefined,
+            stopMusic: () => undefined,
+            setMusicVolume: (volume: number) => appliedMusicVolumes.push(volume),
+            setEffectsVolume: (volume: number) => appliedEffectsVolumes.push(volume),
+          } satisfies AudioPort,
+        },
+        {
+          provide: RECORDS_STORAGE,
+          useValue: { read: () => null, write: () => undefined, clear: () => undefined },
+        },
+      ],
+    });
+    const restored = TestBed.inject(GameSessionService);
+
+    expect(restored.musicVolume()).toBe(0.05);
+    expect(restored.effectsVolume()).toBe(0.2);
+    expect(appliedMusicVolumes).toContain(0.05);
+    expect(appliedEffectsVolumes).toContain(0.2);
+    expect(preferencesValue).toBeNull();
   });
 
   it('lets a faster enemy take the opening turn', () => {

@@ -852,10 +852,18 @@ export class GameSessionService {
   }
 
   private restorePreferences(): void {
+    const applyPreferences = (preferences: AudioPreferences): void => {
+      this.musicVolume.set(preferences.musicVolume);
+      this.effectsVolume.set(preferences.effectsVolume);
+      this.audio?.setMusicVolume(preferences.musicVolume);
+      this.audio?.setEffectsVolume(preferences.effectsVolume);
+    };
     const raw = this.preferencesStorage?.read();
     if (!raw) {
-      this.audio?.setMusicVolume(DEFAULT_MUSIC_VOLUME);
-      this.audio?.setEffectsVolume(DEFAULT_EFFECTS_VOLUME);
+      applyPreferences({
+        musicVolume: DEFAULT_MUSIC_VOLUME,
+        effectsVolume: DEFAULT_EFFECTS_VOLUME,
+      });
       return;
     }
 
@@ -863,15 +871,20 @@ export class GameSessionService {
       const snapshot: unknown = JSON.parse(raw);
       if (!isStoredPreferencesSnapshot(snapshot)) {
         this.preferencesStorage?.clear();
+        applyPreferences({
+          musicVolume: DEFAULT_MUSIC_VOLUME,
+          effectsVolume: DEFAULT_EFFECTS_VOLUME,
+        });
         return;
       }
 
-      this.musicVolume.set(snapshot.musicVolume);
-      this.effectsVolume.set(snapshot.effectsVolume);
-      this.audio?.setMusicVolume(snapshot.musicVolume);
-      this.audio?.setEffectsVolume(snapshot.effectsVolume);
+      applyPreferences(snapshot);
     } catch {
       this.preferencesStorage?.clear();
+      applyPreferences({
+        musicVolume: DEFAULT_MUSIC_VOLUME,
+        effectsVolume: DEFAULT_EFFECTS_VOLUME,
+      });
     }
   }
 
