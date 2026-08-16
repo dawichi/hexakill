@@ -1139,12 +1139,98 @@ h3 {
   text-transform: uppercase;
 }
 
+.battle-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 4.5rem;
+  margin: 1.25rem 0;
+  border: 1px solid rgb(103 200 219 / 45%);
+  border-left: 4px solid #67c8db;
+  background: linear-gradient(90deg, rgb(20 57 64 / 72%), rgb(18 23 25 / 85%));
+  padding: 0.85rem 1rem;
+}
+
+.battle-banner.enemy-turn {
+  border-color: rgb(229 170 89 / 45%);
+  border-left-color: #e5aa59;
+  background: linear-gradient(90deg, rgb(74 52 28 / 72%), rgb(25 22 19 / 85%));
+}
+
+.battle-banner.victory {
+  border-color: rgb(85 194 113 / 52%);
+  border-left-color: #55c271;
+  background: linear-gradient(90deg, rgb(27 70 42 / 72%), rgb(18 24 20 / 85%));
+}
+
+.battle-banner-icon {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: #67c8db;
+}
+
+.battle-banner.enemy-turn .battle-banner-icon {
+  color: #e5aa59;
+}
+
+.battle-banner.victory .battle-banner-icon {
+  color: #55c271;
+}
+
+.battle-banner-text {
+  margin-top: 0.28rem;
+  color: var(--ink);
+  font-family: Georgia, serif;
+  font-size: clamp(0.95rem, 2vw, 1.12rem);
+  line-height: 1.35;
+}
+
+.combat-actions {
+  border-top: 1px solid var(--line-soft);
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+}
+
+.action-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.action-heading h3 {
+  margin-top: 0.3rem;
+  color: var(--ink);
+  font-family: Georgia, serif;
+  font-size: 1.35rem;
+}
+
+.action-turn {
+  border: 1px solid #55c271;
+  padding: 0.3rem 0.45rem;
+  color: #55c271;
+  font-family: 'Courier New', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.action-turn.enemy-turn {
+  border-color: #e5aa59;
+  color: #e5aa59;
+}
+
 .health-bar {
   height: 0.7rem;
-  margin-top: 1.25rem;
   overflow: hidden;
   border-radius: 999px;
-  background: #52525b;
+  background: #342f2c;
 }
 
 .health-bar span {
@@ -1152,8 +1238,63 @@ h3 {
   height: 100%;
   min-width: 0;
   border-radius: inherit;
-  background: #fb7185;
   transition: width 200ms ease;
+}
+
+.health-bar.healthy span {
+  background: #55c271;
+}
+
+.health-bar.wounded span {
+  background: #e5aa59;
+}
+
+.health-bar.critical span {
+  background: #db6a62;
+}
+
+.combatant-experience {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.62rem;
+}
+
+.progress-heading span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.progress-heading svg {
+  color: #67c8db;
+}
+
+.progress-heading strong {
+  color: #67c8db;
+  font-size: 0.68rem;
+}
+
+.experience-bar {
+  height: 0.35rem;
+  overflow: hidden;
+  border: 1px solid rgb(103 200 219 / 35%);
+  background: #182e35;
+}
+
+.experience-bar span {
+  display: block;
+  height: 100%;
+  background: #67c8db;
+  transition: width 250ms ease;
 }
 
 .health-label {

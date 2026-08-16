@@ -54,6 +54,9 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
     'aria-valuemin',
     '0',
   );
+  await expect(page.getByRole('meter', { name: 'Your health' })).toBeVisible();
+  await expect(page.getByRole('progressbar', { name: 'Experience to next level' })).toBeVisible();
+  await expect(page.locator('.player-combatant .health-bar')).toHaveClass(/healthy/);
   const playerIdle = page.getByRole('img', { name: 'Wizard idle animation', exact: true });
   await expect(playerIdle).toBeVisible();
   await expect(playerIdle).toHaveCSS('background-image', /wizard\/sprites\/Idle/);
@@ -65,8 +68,9 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await expect(playerAction).toBeVisible();
   await expect(playerAction).toHaveAttribute('aria-label', 'Wizard action animation');
   await expect(playerAction).toHaveCSS('background-image', /wizard/);
-  await expect(page.getByRole('heading', { name: 'Battle log' })).toBeVisible();
-  await expect(page.getByRole('list', { name: 'Your combat actions' })).toContainText('Agent');
+  await expect(page.getByText('Battle callout')).toBeVisible();
+  await expect(page.locator('.battle-banner')).toContainText('dealt');
+  await expect(page.locator('.combat-log')).toHaveCount(0);
 });
 
 test('music starts on the welcome screen and follows screen transitions', async ({ page }) => {
@@ -864,12 +868,7 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   await expect(attackButton).toBeFocused();
   await attackButton.press('Enter');
   await expect(page.getByText(/gained 100 exp and 100 gold/)).toBeVisible();
-  await expect(page.getByRole('list', { name: 'Enemy combat actions' })).toContainText(
-    'has been defeated',
-  );
-  await expect(page.getByRole('list', { name: 'Your combat actions' })).toContainText(
-    'gained 100 exp',
-  );
+  await expect(page.locator('.battle-banner')).toContainText('Wild Huntress was defeated');
   await expect(page.getByRole('img', { name: 'Wizard action animation' })).toHaveCSS(
     'animation-name',
     'none',

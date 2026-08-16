@@ -453,6 +453,7 @@
                   </div>
                   <div
                     class="health-bar"
+                    [class]="healthTone(session.playerRemainingHealth(), player.stats.health)"
                     role="meter"
                     aria-label="Your health"
                     [attr.aria-valuenow]="session.playerRemainingHealth()"
@@ -464,6 +465,22 @@
                         (session.playerRemainingHealth() / player.stats.health) * 100
                       "
                     ></span>
+                  </div>
+                </div>
+                <div class="combatant-experience">
+                  <div class="progress-heading">
+                    <span><svg lucideSparkles size="13" aria-hidden="true"></svg> Experience</span>
+                    <strong>{{ player.experience }} / 100</strong>
+                  </div>
+                  <div
+                    class="experience-bar"
+                    role="progressbar"
+                    aria-label="Experience to next level"
+                    [attr.aria-valuenow]="player.experience"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  >
+                    <span [style.width.%]="player.experience"></span>
                   </div>
                 </div>
               </article>
@@ -535,6 +552,7 @@
                   </div>
                   <div
                     class="health-bar"
+                    [class]="healthTone(enemy.stats.health - enemy.damageTaken, enemy.stats.health)"
                     role="meter"
                     aria-label="Enemy health"
                     [attr.aria-valuenow]="enemy.stats.health - enemy.damageTaken"
@@ -550,6 +568,37 @@
                 </div>
               </article>
             </div>
+
+            <section
+              class="battle-banner"
+              [class.enemy-turn]="session.combatState().phase === 'enemy-turn'"
+              [class.victory]="session.combatState().phase === 'victory'"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <span class="battle-banner-icon" aria-hidden="true">
+                @if (session.combatState().phase === 'victory') {
+                  <svg lucideTrophy size="22"></svg>
+                } @else if (session.combatState().phase === 'enemy-turn') {
+                  <svg lucideShield size="22"></svg>
+                } @else if (
+                  session.playerActionKind() === 'magic' || session.enemyActionKind() === 'magic'
+                ) {
+                  <svg lucideWandSparkles size="22"></svg>
+                } @else if (
+                  session.playerActionKind() === 'attack' || session.enemyActionKind() === 'attack'
+                ) {
+                  <svg lucideSword size="22"></svg>
+                } @else {
+                  <svg lucideHeartPulse size="22"></svg>
+                }
+              </span>
+              <div>
+                <p class="eyebrow">Battle callout</p>
+                <p class="battle-banner-text">{{ session.combatMessage() }}</p>
+              </div>
+            </section>
 
             @if (player.inventory.length) {
               <section class="inventory-panel" aria-labelledby="combat-inventory-title">
@@ -568,102 +617,51 @@
               </section>
             }
 
-            <p class="combat-message" role="status" aria-atomic="true">
-              {{ session.combatMessage() }}
-            </p>
-
-            <section class="combat-log records-panel" aria-labelledby="combat-log-title">
-              <h3 id="combat-log-title">Battle log</h3>
-              <div class="combat-log-grid">
-                <div>
-                  <h4>You</h4>
-                  @if (session.playerCombatLog().length) {
-                    <ol aria-label="Your combat actions">
-                      @for (entry of session.playerCombatLog(); track $index) {
-                        <li>
-                          <strong>{{ entry.title }}</strong>
-                          {{ entry.message }}
-                          @if (entry.value !== undefined) {
-                            <span>did {{ entry.value }} damage!</span>
-                          }
-                          @if (entry.icon) {
-                            @if (entry.icon === '🔪') {
-                              <svg lucideSword size="14" aria-hidden="true"></svg>
-                            } @else if (entry.icon === '☄') {
-                              <svg lucideWandSparkles size="14" aria-hidden="true"></svg>
-                            } @else {
-                              <svg lucideHeartPulse size="14" aria-hidden="true"></svg>
-                            }
-                          }
-                        </li>
-                      }
-                    </ol>
-                  } @else {
-                    <p class="empty-records">No actions yet.</p>
-                  }
+            @if (session.combatStatus() === 'ready') {
+              <section class="combat-actions" aria-labelledby="combat-actions-title">
+                <div class="action-heading">
+                  <div>
+                    <p class="eyebrow">Your move</p>
+                    <h3 id="combat-actions-title">Choose an action</h3>
+                  </div>
+                  <span class="action-turn" [class.enemy-turn]="!session.canAct()">
+                    {{ session.canAct() ? 'Your turn' : 'Enemy turn' }}
+                  </span>
                 </div>
-                <div>
-                  <h4>Enemy</h4>
-                  @if (session.enemyCombatLog().length) {
-                    <ol aria-label="Enemy combat actions">
-                      @for (entry of session.enemyCombatLog(); track $index) {
-                        <li>
-                          <strong>{{ entry.title }}</strong>
-                          {{ entry.message }}
-                          @if (entry.value !== undefined) {
-                            <span>did {{ entry.value }} damage!</span>
-                          }
-                          @if (entry.icon) {
-                            @if (entry.icon === '🔪') {
-                              <svg lucideSword size="14" aria-hidden="true"></svg>
-                            } @else if (entry.icon === '☄') {
-                              <svg lucideWandSparkles size="14" aria-hidden="true"></svg>
-                            } @else {
-                              <svg lucideHeartPulse size="14" aria-hidden="true"></svg>
-                            }
-                          }
-                        </li>
-                      }
-                    </ol>
-                  } @else {
-                    <p class="empty-records">No actions yet.</p>
-                  }
+                <div class="action-grid" role="group" aria-label="Combat actions">
+                  <button
+                    class="action-button attack"
+                    type="button"
+                    [disabled]="!session.canAct()"
+                    (click)="session.attack('attack')"
+                  >
+                    <svg lucideSword size="17" aria-hidden="true"></svg>
+                    Attack
+                    <span>Physical damage · 80–140%</span>
+                  </button>
+                  <button
+                    class="action-button magic"
+                    type="button"
+                    [disabled]="!session.canAct()"
+                    (click)="session.attack('magic')"
+                  >
+                    <svg lucideWandSparkles size="17" aria-hidden="true"></svg>
+                    Magic
+                    <span>Magic damage · 30–200%</span>
+                  </button>
+                  <button
+                    class="action-button potion"
+                    type="button"
+                    [disabled]="!session.canAct() || !player.potions"
+                    (click)="session.usePotion()"
+                  >
+                    <svg lucideHeartPulse size="17" aria-hidden="true"></svg>
+                    Potion
+                    <span>Heal 20% of damage received · {{ player.potions }} left</span>
+                  </button>
                 </div>
-              </div>
-            </section>
-
-            <div class="action-grid" role="group" aria-label="Combat actions">
-              <button
-                class="action-button attack"
-                type="button"
-                [disabled]="!session.canAct()"
-                (click)="session.attack('attack')"
-              >
-                <svg lucideSword size="17" aria-hidden="true"></svg>
-                Attack
-                <span>Physical damage · 80–140%</span>
-              </button>
-              <button
-                class="action-button magic"
-                type="button"
-                [disabled]="!session.canAct()"
-                (click)="session.attack('magic')"
-              >
-                <svg lucideWandSparkles size="17" aria-hidden="true"></svg>
-                Magic
-                <span>Magic damage · 30–200%</span>
-              </button>
-              <button
-                class="action-button potion"
-                type="button"
-                [disabled]="!session.canAct() || !player.potions"
-                (click)="session.usePotion()"
-              >
-                <svg lucideHeartPulse size="17" aria-hidden="true"></svg>
-                Potion
-                <span>Heal 20% of damage received · {{ player.potions }} left</span>
-              </button>
-            </div>
+              </section>
+            }
 
             @if (session.combatStatus() === 'defeated') {
               @if (session.combatState().phase === 'victory') {

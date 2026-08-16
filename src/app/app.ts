@@ -128,6 +128,13 @@ export class App {
     return stat === 'health' && currentHealth !== undefined ? currentHealth : stats[stat];
   }
 
+  protected healthTone(current: number, maximum: number): 'healthy' | 'wounded' | 'critical' {
+    const ratio = maximum > 0 ? current / maximum : 0;
+    if (ratio > 0.6) return 'healthy';
+    if (ratio > 0.3) return 'wounded';
+    return 'critical';
+  }
+
   protected statHighlights(character: CharacterDefinition): ReadonlyArray<{
     stat: Stat;
     value: number;
