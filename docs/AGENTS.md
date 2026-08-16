@@ -50,7 +50,7 @@ The archived Svelte source is not reproducible and is not the active application
 - Formatting: `npm run format:check`
 - TypeScript: `npm run verify:types`
 - Documentation contract: `npm run verify:docs`
-- Asset manifest: `npm run verify:assets`
+- Asset manifest: `npm run verify:assets` (pass a built artifact path after `--` to verify copied assets)
 - Asset geometry inventory: `npm run inspect:assets` (add `--json` for machine-readable output)
 - Production preview contract: `npm run verify:preview`
 - Deployment contract: `npm run verify:deployment`

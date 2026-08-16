@@ -20,6 +20,10 @@ const checks = [
     label: 'publishable artifact contract',
     args: ['run', 'verify:deployment', '--', 'dist/hexakill/browser'],
   },
+  {
+    label: 'publishable asset tree',
+    args: ['run', 'verify:assets', '--', 'dist/hexakill/browser'],
+  },
   { label: 'preview contract', args: ['run', 'verify:preview'] },
   { label: 'production browser journeys', args: ['run', 'test:e2e:production'] },
 ];

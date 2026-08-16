@@ -69,6 +69,8 @@ jobs:
         run: npm run build
       - name: Verify publishable artifact contract
         run: npm run verify:deployment -- dist/hexakill/browser
+      - name: Verify complete publishable asset tree
+        run: npm run verify:assets -- dist/hexakill/browser
       - name: Verify production preview contract
         run: npm run verify:preview
       - name: Run browser journeys against production artifact
