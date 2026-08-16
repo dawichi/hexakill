@@ -54,4 +54,15 @@ describe('store rules', () => {
     expect(potionResult.purchased).toBe(false);
     expect(potionResult.player).toBe(player);
   });
+
+  it('rejects malformed player state at the store boundary', () => {
+    expect(() => purchaseItem({ ...player, gold: -1 }, 'orb')).toThrow(RangeError);
+    expect(() => purchasePotions({ ...player, potions: Number.NaN }, 'potion')).toThrow(RangeError);
+    expect(() =>
+      purchaseItem({ ...player, stats: { ...player.stats, ap: Number.NaN } }, 'orb'),
+    ).toThrow(RangeError);
+    expect(() =>
+      purchaseItem({ ...player, inventory: [{ ...player.inventory[0], id: 'unknown' }] }, 'orb'),
+    ).toThrow(RangeError);
+  });
 });

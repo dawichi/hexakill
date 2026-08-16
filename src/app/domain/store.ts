@@ -36,7 +36,7 @@ export type PurchaseResult =
   | { readonly purchased: false; readonly player: PlayerState; readonly reason: string };
 
 function addStats(stats: Stats, bonus: Stats): Stats {
-  return {
+  const nextStats = {
     health: stats.health + bonus.health,
     ad: stats.ad + bonus.ad,
     ap: stats.ap + bonus.ap,
@@ -44,9 +44,45 @@ function addStats(stats: Stats, bonus: Stats): Stats {
     mr: stats.mr + bonus.mr,
     speed: stats.speed + bonus.speed,
   };
+
+  assertStats(nextStats);
+  return nextStats;
+}
+
+function assertStats(stats: Stats): void {
+  if (
+    !Object.values(stats).every((value) => Number.isFinite(value) && value >= 0) ||
+    stats.health <= 0
+  ) {
+    throw new RangeError('Player stats must be finite and non-negative with positive health.');
+  }
+}
+
+function assertStorePlayer(player: PlayerState): void {
+  if (!Number.isSafeInteger(player.gold) || player.gold < 0) {
+    throw new RangeError('Player gold must be a non-negative safe integer.');
+  }
+  if (!Number.isSafeInteger(player.potions) || player.potions < 0) {
+    throw new RangeError('Player potions must be a non-negative safe integer.');
+  }
+  assertStats(player.stats);
+  if (
+    !Array.isArray(player.inventory) ||
+    player.inventory.some(
+      (item) =>
+        !item ||
+        !STORE_ITEMS.some((candidate) => candidate.id === item.id) ||
+        !Number.isSafeInteger(item.price) ||
+        item.price < 0,
+    ) ||
+    new Set(player.inventory.map((item) => item.id)).size !== player.inventory.length
+  ) {
+    throw new RangeError('Player inventory must contain unique known items.');
+  }
 }
 
 export function purchaseItem(player: PlayerState, itemId: string): PurchaseResult {
+  assertStorePlayer(player);
   const item = STORE_ITEMS.find((candidate) => candidate.id === itemId);
   if (!item) return { purchased: false, player, reason: 'That item is not available.' };
   if (player.inventory.some((owned) => owned.id === item.id)) {
@@ -69,6 +105,7 @@ export function purchaseItem(player: PlayerState, itemId: string): PurchaseResul
 }
 
 export function purchasePotions(player: PlayerState, offerId: string): PurchaseResult {
+  assertStorePlayer(player);
   const offer = STORE_POTIONS.find((candidate) => candidate.id === offerId);
   if (!offer) return { purchased: false, player, reason: 'That potion offer is not available.' };
   if (player.gold < offer.price)
