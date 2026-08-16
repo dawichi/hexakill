@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: legacy unfinished browser game; rewrite preparation
   current_branch: main
-  current_revision: 63d45d43aebb66a0cc2fd959cd5044ab35809171
+  current_revision: 45b83763e775394d57bbb62aab893b1eff532745
 
 standards:
   - documentation
@@ -72,7 +72,7 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: 'Active Angular baseline: 72 tests and 20 Playwright journeys, including invalid numeric reducer payload rejection, strict legacy critical/miss-threshold boundaries, name-field validation semantics, terminal-phase action rejection, impossible terminal-session rejection, skip-link keyboard access, malformed-preference/personal-record recovery, Witch Blue vertical-strip mapping, durable transient/malformed-result rejection, and store/progression edge cases; broader gameplay/accessibility coverage remains incomplete.'
+      evidence: 'Active Angular baseline: 74 tests and 20 Playwright journeys, including invalid numeric reducer payload rejection, finite random-roll boundary rejection, strict legacy critical/miss-threshold boundaries, name-field validation semantics, terminal-phase action rejection, impossible terminal-session rejection, skip-link keyboard access, malformed-preference/personal-record recovery, Witch Blue vertical-strip mapping, durable transient/malformed-result rejection, and store/progression edge cases; broader gameplay/accessibility coverage remains incomplete.'
       priority: high
       next_action: Retain the automated focus/responsive assertions and add manual accessibility evidence before release.
     - id: TS-001
