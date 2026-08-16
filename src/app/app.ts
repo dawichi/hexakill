@@ -1,11 +1,44 @@
 import { afterRenderEffect, Component, DOCUMENT, inject } from '@angular/core';
+import {
+  LucideArrowRight,
+  LucideCheck,
+  LucideChevronDown,
+  LucideCircleHelp,
+  LucideFootprints,
+  LucideHeartPulse,
+  LucideScrollText,
+  LucideShield,
+  LucideSparkles,
+  LucideSword,
+  LucideSwords,
+  LucideTrophy,
+  LucideVolume2,
+  LucideWandSparkles,
+} from '@lucide/angular';
 import { GameSessionService } from './application/game-session.service';
-import { CharacterDefinition, ItemState, SpriteStripAsset } from './domain/game-types';
+import { StatChipComponent } from './components/stat-chip/stat-chip';
+import { CharacterDefinition, ItemState, SpriteStripAsset, Stat } from './domain/game-types';
 import { PersonalRecord } from './domain/records';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [
+    LucideArrowRight,
+    LucideCheck,
+    LucideChevronDown,
+    LucideCircleHelp,
+    LucideFootprints,
+    LucideHeartPulse,
+    LucideScrollText,
+    LucideShield,
+    LucideSparkles,
+    LucideSword,
+    LucideSwords,
+    LucideTrophy,
+    LucideVolume2,
+    LucideWandSparkles,
+    StatChipComponent,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -98,5 +131,16 @@ export class App {
     const animationName =
       asset.orientation === 'vertical' ? 'sprite-strip-play-vertical' : 'sprite-strip-play';
     return `${animationName} ${duration}ms steps(${asset.frameCount}) 1 both`;
+  }
+
+  protected statHighlights(character: CharacterDefinition): ReadonlyArray<{
+    stat: Stat;
+    value: number;
+  }> {
+    return (['health', 'ad', 'ap', 'armor', 'mr', 'speed'] as Stat[])
+      .map((stat) => ({ stat, value: character.modifiers[stat] }))
+      .filter(({ value }) => value !== 1)
+      .sort((left, right) => Math.abs(right.value - 1) - Math.abs(left.value - 1))
+      .slice(0, 3);
   }
 }

@@ -2,14 +2,15 @@
 
 <main id="game-content" class="shell" tabindex="-1">
   <header class="topbar">
-    <div>
-      <p class="eyebrow">Hexakill · Angular edition</p>
+    <div class="brand-lockup">
+      <p class="eyebrow">The dungeon chronicles</p>
       <h1>HEXAKILL</h1>
-      <p class="status">First playable slice · typed combat rules</p>
+      <p class="status">A pixel dungeon run</p>
     </div>
     <section class="audio-controls" aria-label="Audio controls">
+      <p class="audio-title"><svg lucideVolume2 size="14" aria-hidden="true"></svg> Sound relics</p>
       <label>
-        Music
+        <span>Music</span>
         <input
           aria-label="Music volume"
           [attr.aria-valuetext]="volumeLabel(session.musicVolume())"
@@ -22,7 +23,7 @@
         />
       </label>
       <label>
-        Effects
+        <span>Effects</span>
         <input
           aria-label="Effects volume"
           [attr.aria-valuetext]="volumeLabel(session.effectsVolume())"
@@ -40,80 +41,132 @@
   @switch (session.screen()) {
     @case ('welcome') {
       <section class="panel welcome" data-screen="welcome" aria-labelledby="welcome-title">
-        <p class="eyebrow">A new run begins here</p>
-        <h2 id="welcome-title" data-screen-heading tabindex="-1">Survive the dungeon.</h2>
-        <p class="lead">
-          Choose a champion, learn the combat rules, and build a run one decision at a time.
-        </p>
-        <button class="primary-button" type="button" (click)="session.beginCharacterSelection()">
-          Choose your champion
-        </button>
-        <details class="records-panel how-to-play">
-          <summary>How to play</summary>
-          <div class="how-to-play-content">
-            <p>Choose a champion, find enemies, and survive as many encounters as possible.</p>
-            <ul>
-              <li>Attack uses physical damage; Magic uses magic damage.</li>
-              <li>Armor and magic resistance reduce incoming damage.</li>
-              <li>Use Potions between enemy turns, then choose upgrades after victories.</li>
-              <li>Speed determines who opens an encounter.</li>
-            </ul>
+        <div class="welcome-layout">
+          <div class="welcome-copy">
+            <p class="eyebrow">A new run begins here · floor 01</p>
+            <h2 id="welcome-title" data-screen-heading tabindex="-1">Survive the dungeon.</h2>
+            <p class="lead">
+              The dark is full of teeth. Choose a champion, take the first step, and leave your mark
+              in the stone.
+            </p>
+            <button
+              class="primary-button"
+              type="button"
+              (click)="session.beginCharacterSelection()"
+            >
+              Enter the dungeon <svg lucideArrowRight size="16" aria-hidden="true"></svg>
+            </button>
+            <p class="button-note">No save slots. Every run writes its own legend.</p>
           </div>
-        </details>
-        <section class="records-panel" aria-labelledby="records-title">
-          <div class="records-heading">
-            <h3 id="records-title">Personal records</h3>
-            @if (session.personalRecords().length) {
-              <button class="quiet-button" type="button" (click)="session.clearPersonalRecords()">
-                Clear records
-              </button>
-            }
+
+          <div class="welcome-visual" aria-hidden="true">
+            <div class="dungeon-gate">
+              <svg class="gate-rune rune-top" lucideSparkles size="18" aria-hidden="true"></svg>
+              <svg class="gate-rune rune-left" lucideSparkles size="12" aria-hidden="true"></svg>
+              <svg class="gate-rune rune-right" lucideSparkles size="12" aria-hidden="true"></svg>
+              <div class="hero-characters">
+                @for (character of session.characters; track character.id; let index = $index) {
+                  <img
+                    class="hero-character"
+                    [class.hero-character-back]="index !== 1"
+                    [class.hero-character-front]="index === 1"
+                    [src]="character.idleAsset"
+                    alt=""
+                  />
+                }
+              </div>
+              <div class="gate-floor"></div>
+            </div>
+            <p class="visual-caption"><span></span> The depths are waiting <span></span></p>
           </div>
-          @if (session.personalRecords().length) {
-            <ol class="records-list">
-              @for (record of session.personalRecords(); track $index) {
-                <li [class]="'record-row ' + recordCharacter(record).accent">
-                  <span>{{ record.name }} · {{ recordCharacter(record).name }}</span>
-                  <strong>Level {{ record.level }}</strong>
-                </li>
+        </div>
+
+        <div class="welcome-tools">
+          <details class="records-panel how-to-play">
+            <summary>
+              <svg lucideCircleHelp size="16" aria-hidden="true"></svg> How to play
+              <svg lucideChevronDown size="16" aria-hidden="true"></svg>
+            </summary>
+            <div class="how-to-play-content">
+              <p>Choose a champion, find enemies, and survive as many encounters as possible.</p>
+              <ul>
+                <li>Attack uses physical damage; Magic uses magic damage.</li>
+                <li>Armor and magic resistance reduce incoming damage.</li>
+                <li>Use Potions between enemy turns, then choose upgrades after victories.</li>
+                <li>Speed determines who opens an encounter.</li>
+              </ul>
+            </div>
+          </details>
+          <section class="records-panel" aria-labelledby="records-title">
+            <div class="records-heading">
+              <h3 id="records-title">
+                <svg lucideTrophy size="16" aria-hidden="true"></svg> Personal records
+              </h3>
+              @if (session.personalRecords().length) {
+                <button class="quiet-button" type="button" (click)="session.clearPersonalRecords()">
+                  Clear records
+                </button>
               }
-            </ol>
-          } @else {
-            <p class="empty-records">No records yet.</p>
-          }
-        </section>
+            </div>
+            @if (session.personalRecords().length) {
+              <ol class="records-list">
+                @for (record of session.personalRecords(); track $index) {
+                  <li [class]="'record-row ' + recordCharacter(record).accent">
+                    <span>{{ record.name }} · {{ recordCharacter(record).name }}</span>
+                    <strong>Level {{ record.level }}</strong>
+                  </li>
+                }
+              </ol>
+            } @else {
+              <p class="empty-records">No records yet. Be the first name on the wall.</p>
+            }
+          </section>
+        </div>
         <p class="prototype-note">
-          Current scope: combat, progression, power-ups, store, persistence, and audio are active;
-          balance and final release behavior remain provisional.
+          Angular first playable · combat, progression, store and audio are active
         </p>
       </section>
     }
 
     @case ('character-select') {
-      <section class="panel" data-screen="character-select" aria-labelledby="select-title">
+      <section
+        class="panel character-select-panel"
+        data-screen="character-select"
+        aria-labelledby="select-title"
+      >
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Step 1 · your run</p>
-            <h2 id="select-title" data-screen-heading tabindex="-1">Choose a champion</h2>
+            <p class="eyebrow">The first chamber · choose wisely</p>
+            <h2 id="select-title" data-screen-heading tabindex="-1">Choose your champion</h2>
+            <p class="section-lead">Every legend starts with a single name and a loaded blade.</p>
           </div>
-          <button class="quiet-button" type="button" (click)="session.reset()">Start over</button>
+          <div class="step-marker" aria-label="Step 1 of 3">
+            <span>01</span><small>of 03</small>
+          </div>
         </div>
 
-        <label class="field-label" for="player-name">Player name</label>
-        <input
-          id="player-name"
-          class="name-input"
-          type="text"
-          required
-          aria-required="true"
-          maxlength="14"
-          autocomplete="nickname"
-          placeholder="3–14 characters"
-          [attr.aria-invalid]="nameValidationMessage() ? 'true' : null"
-          [attr.aria-describedby]="nameValidationMessageId()"
-          [value]="session.playerName()"
-          (input)="onNameInput($event)"
-        />
+        <div class="name-altar">
+          <div class="altar-mark" aria-hidden="true"><svg lucideScrollText size="22"></svg></div>
+          <div>
+            <label class="field-label" for="player-name">Inscription</label>
+            <p class="field-help">What shall the dungeon remember?</p>
+          </div>
+          <input
+            id="player-name"
+            class="name-input"
+            type="text"
+            aria-label="Player name"
+            required
+            aria-required="true"
+            maxlength="14"
+            autocomplete="nickname"
+            placeholder="Enter your name · 3–14 characters"
+            [attr.aria-invalid]="nameValidationMessage() ? 'true' : null"
+            [attr.aria-describedby]="nameValidationMessageId()"
+            [value]="session.playerName()"
+            (input)="onNameInput($event)"
+          />
+        </div>
 
         <div class="character-grid" role="group" aria-label="Available champions">
           @for (character of session.characters; track character.id) {
@@ -127,28 +180,74 @@
               [attr.aria-pressed]="session.selectedCharacter()?.id === character.id"
               (click)="selectCharacter(character)"
             >
-              <img class="character-art" [src]="character.idleAsset" alt="" aria-hidden="true" />
-              <span class="character-name">{{ character.name }}</span>
-              <span>{{ character.description }}</span>
-              <span class="weakness">{{ character.weakness }}</span>
+              <span class="character-card-header">
+                <span class="character-index">0{{ $index + 1 }}</span>
+                @if (character.id === 'wizard') {
+                  <svg lucideWandSparkles size="18" aria-hidden="true"></svg>
+                } @else if (character.id === 'samurai') {
+                  <svg lucideSwords size="18" aria-hidden="true"></svg>
+                } @else {
+                  <svg lucideShield size="18" aria-hidden="true"></svg>
+                }
+                @if (session.selectedCharacter()?.id === character.id) {
+                  <span class="selected-mark"
+                    ><svg lucideCheck size="14" aria-hidden="true"></svg> Selected</span
+                  >
+                }
+              </span>
+              <span class="character-art-frame">
+                <img class="character-art" [src]="character.idleAsset" alt="" aria-hidden="true" />
+                <span class="art-ground"></span>
+              </span>
+              <span class="character-card-copy">
+                <span class="character-name">{{ character.name }}</span>
+                <span class="character-role">{{ character.description }}</span>
+                <span class="weakness">{{ character.weakness }}</span>
+                <span class="stat-highlights" aria-label="Character stat modifiers">
+                  @for (highlight of statHighlights(character); track highlight.stat) {
+                    <app-stat-chip
+                      [stat]="highlight.stat"
+                      [value]="highlight.value"
+                      format="modifier"
+                    />
+                  }
+                </span>
+              </span>
             </button>
           }
         </div>
 
-        @if (session.validationMessage(); as validationMessage) {
-          <p class="validation" [id]="nameValidationMessageId()" role="status" aria-atomic="true">
-            {{ validationMessage }}
-          </p>
-        }
-
-        <button
-          class="primary-button"
-          type="button"
-          [disabled]="!session.canStartRun()"
-          (click)="session.startRun()"
-        >
-          Start game
-        </button>
+        <div class="selection-footer">
+          <div>
+            @if (session.validationMessage(); as validationMessage) {
+              <p
+                class="validation"
+                [id]="nameValidationMessageId()"
+                role="status"
+                aria-atomic="true"
+              >
+                {{ validationMessage }}
+              </p>
+            } @else {
+              <p class="selection-hint">
+                <svg lucideSwords size="16" aria-hidden="true"></svg> Select a champion to continue
+              </p>
+            }
+          </div>
+          <div class="selection-actions">
+            <button class="quiet-button" type="button" (click)="session.reset()">
+              Return to title
+            </button>
+            <button
+              class="primary-button"
+              type="button"
+              [disabled]="!session.canStartRun()"
+              (click)="session.startRun()"
+            >
+              Begin the run <svg lucideArrowRight size="16" aria-hidden="true"></svg>
+            </button>
+          </div>
+        </div>
       </section>
     }
 
@@ -406,7 +505,13 @@
                             <span>did {{ entry.value }} damage!</span>
                           }
                           @if (entry.icon) {
-                            <span aria-hidden="true">{{ entry.icon }}</span>
+                            @if (entry.icon === '🔪') {
+                              <svg lucideSword size="14" aria-hidden="true"></svg>
+                            } @else if (entry.icon === '☄') {
+                              <svg lucideWandSparkles size="14" aria-hidden="true"></svg>
+                            } @else {
+                              <svg lucideHeartPulse size="14" aria-hidden="true"></svg>
+                            }
                           }
                         </li>
                       }
@@ -427,7 +532,13 @@
                             <span>did {{ entry.value }} damage!</span>
                           }
                           @if (entry.icon) {
-                            <span aria-hidden="true">{{ entry.icon }}</span>
+                            @if (entry.icon === '🔪') {
+                              <svg lucideSword size="14" aria-hidden="true"></svg>
+                            } @else if (entry.icon === '☄') {
+                              <svg lucideWandSparkles size="14" aria-hidden="true"></svg>
+                            } @else {
+                              <svg lucideHeartPulse size="14" aria-hidden="true"></svg>
+                            }
                           }
                         </li>
                       }
@@ -484,28 +595,32 @@
                           class="action-button"
                           (click)="session.choosePowerUp('health')"
                         >
-                          Health <span>+500</span>
+                          <svg lucideHeartPulse size="16" aria-hidden="true"></svg> Health
+                          <span>+500</span>
                         </button>
                         <button
                           type="button"
                           class="action-button"
                           (click)="session.choosePowerUp('ad')"
                         >
-                          Attack <span>+40</span>
+                          <svg lucideSword size="16" aria-hidden="true"></svg> Attack
+                          <span>+40</span>
                         </button>
                         <button
                           type="button"
                           class="action-button"
                           (click)="session.choosePowerUp('ap')"
                         >
-                          Magic <span>+50</span>
+                          <svg lucideWandSparkles size="16" aria-hidden="true"></svg> Magic
+                          <span>+50</span>
                         </button>
                         <button
                           type="button"
                           class="action-button"
                           (click)="session.choosePowerUp('speed')"
                         >
-                          Speed <span>+10</span>
+                          <svg lucideFootprints size="16" aria-hidden="true"></svg> Speed
+                          <span>+10</span>
                         </button>
                       </div>
                       <p class="health-label">Pending: {{ rewardedPlayer.powerUps.pending }}</p>
@@ -562,7 +677,9 @@
                 [disabled]="player.gold < offer.price"
                 (click)="session.buyPotions(offer.id)"
               >
-                <span class="item-sprite potion-icon" aria-hidden="true">♥</span>
+                <span class="item-sprite potion-icon" aria-hidden="true"
+                  ><svg lucideHeartPulse size="28"></svg
+                ></span>
                 <strong>{{ offer.name }}</strong>
                 <span
                   >{{ offer.quantity }} potion{{ offer.quantity === 1 ? '' : 's' }} ·

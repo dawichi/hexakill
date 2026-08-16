@@ -1,0 +1,44 @@
+:host {
+  display: inline-flex;
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  border: 1px solid currentColor;
+  border-radius: 0.1rem;
+  padding: 0.25rem 0.35rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.stat-chip strong {
+  font-size: 0.62rem;
+}
+
+.stat-chip.health {
+  color: #ef817a;
+}
+
+.stat-chip.ad {
+  color: #e5aa59;
+}
+
+.stat-chip.ap {
+  color: #67c8db;
+}
+
+.stat-chip.armor {
+  color: #a6b9c2;
+}
+
+.stat-chip.mr {
+  color: #b99ce0;
+}
+
+.stat-chip.speed {
+  color: #8ecf91;
+}

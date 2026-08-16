@@ -8,11 +8,11 @@ async function startRun(
   await expect(
     page.getByText('Choose a champion, find enemies, and survive as many encounters as possible.'),
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Choose your champion' }).click();
+  await page.getByRole('button', { name: 'Enter the dungeon' }).click();
   await page.getByLabel('Player name').fill('Agent');
   await expect(page.locator('.character-art')).toHaveCount(3);
   await page.getByRole('button', { name: new RegExp(characterName) }).click();
-  await page.getByRole('button', { name: 'Start game' }).click();
+  await page.getByRole('button', { name: 'Begin the run' }).click();
   await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
 }
 
@@ -409,7 +409,7 @@ test('reduced motion and a narrow viewport remain usable', async ({ page }) => {
   await page.reload();
 
   await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Choose your champion' })).toHaveCSS(
+  await expect(page.getByRole('button', { name: 'Enter the dungeon' })).toHaveCSS(
     'transition-duration',
     '1e-05s',
   );
@@ -419,10 +419,10 @@ test('reduced motion and a narrow viewport remain usable', async ({ page }) => {
   }));
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
 
-  await page.getByRole('button', { name: 'Choose your champion' }).click();
+  await page.getByRole('button', { name: 'Enter the dungeon' }).click();
   await page.getByLabel('Player name').fill('Agent');
   await page.getByRole('button', { name: /Wizard/ }).click();
-  await page.getByRole('button', { name: 'Start game' }).click();
+  await page.getByRole('button', { name: 'Begin the run' }).click();
   await page.getByRole('button', { name: 'Find an enemy' }).click();
 
   const combatDimensions = await page.evaluate(() => ({
@@ -690,11 +690,11 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   await skipLink.press('Enter');
   await expect(page.locator('main#game-content')).toBeFocused();
 
-  const chooseButton = page.getByRole('button', { name: 'Choose your champion' });
+  const chooseButton = page.getByRole('button', { name: 'Enter the dungeon' });
   await chooseButton.focus();
   await expect(chooseButton).toBeFocused();
   await page.keyboard.press('Enter');
-  const selectHeading = page.getByRole('heading', { name: 'Choose a champion' });
+  const selectHeading = page.getByRole('heading', { name: 'Choose your champion' });
   await expect(selectHeading).toBeVisible();
   await expect(selectHeading).toBeFocused();
 
@@ -702,7 +702,7 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   const wizardButton = page.getByRole('button', { name: /Wizard/ });
   await wizardButton.focus();
   await page.keyboard.press('Enter');
-  const startButton = page.getByRole('button', { name: 'Start game' });
+  const startButton = page.getByRole('button', { name: 'Begin the run' });
   await expect(startButton).toBeEnabled();
   await startButton.focus();
   await expect(startButton).toBeFocused();
