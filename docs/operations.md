@@ -65,7 +65,7 @@ The Angular output mode is now documented as static in [the deployment contract]
 
 ## Remote repository evidence
 
-A read-only ref check on 2026-08-16 found `origin/main` at `d441a661f8381feb48996746f2f284a6d0a51b56`, `origin/develop` at `342e8b8`, and local `main` at `8fd822d`, 296 commits ahead of `origin/main`. No push was performed in this preparation session. Local commits and green checks therefore do not prove that the Angular rewrite or its workflow has reached the remote repository; remote workflow execution, required checks, and branch protection remain unverified.
+A read-only ref check on 2026-08-16 found `origin/main` at `d441a661f8381feb48996746f2f284a6d0a51b56`, `origin/develop` at `342e8b8f68499759d5377d22a492ef85a93e3953`, and local `main` at `9f2143ab108a4c53a99499309661d861f0dba091`, 305 commits ahead of `origin/main`. No push was performed in this preparation session. Local commits and green checks therefore do not prove that the Angular rewrite or its workflow has reached the remote repository; remote workflow execution, required checks, and branch protection remain unverified.
 
 ## Troubleshooting order
 
