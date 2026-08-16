@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: legacy unfinished browser game; rewrite preparation
   current_branch: main
-  current_revision: 2a27c38b27600eaa5f6c8e452921169676672c96
+  current_revision: 24431ab454a94784690164a2e8f4e974790073d3
 
 standards:
   - documentation
@@ -72,7 +72,7 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: 'Active Angular baseline: 77 tests and 20 Playwright journeys, including invalid numeric reducer payload rejection, finite random-roll boundary rejection, non-finite level/boss-progress rejection, invalid heal-input rejection, integer power-up-count rejection, strict legacy critical/miss-threshold boundaries, name-field validation semantics, terminal-phase action rejection, impossible terminal-session rejection, skip-link keyboard access, malformed-preference/personal-record recovery, Witch Blue vertical-strip mapping, durable transient/malformed-result rejection, and store/progression edge cases; broader gameplay/accessibility coverage remains incomplete.'
+      evidence: 'Active Angular baseline: 77 tests and 21 Playwright journeys, including invalid numeric reducer payload rejection, finite random-roll boundary rejection, non-finite level/boss-progress rejection, invalid heal-input rejection, integer power-up-count rejection, strict legacy critical/miss-threshold boundaries, name-field validation semantics, terminal-phase action rejection, impossible terminal-session rejection, skip-link keyboard access, malformed-preference/personal-record recovery, Wizard Attack1/Attack2 provisional player-action mapping, Witch Blue vertical-strip mapping, durable transient/malformed-result rejection, and store/progression edge cases; broader gameplay/accessibility coverage remains incomplete.'
       priority: high
       next_action: Retain the automated focus/responsive assertions and add manual accessibility evidence before release.
     - id: TS-001
