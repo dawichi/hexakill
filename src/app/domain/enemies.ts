@@ -107,6 +107,13 @@ const FIRE_WORM_IDLE_SPRITE: SpriteStripAsset = {
   frameCount: 9,
 };
 
+const KNIGHT_IDLE_SPRITE: SpriteStripAsset = {
+  src: '/images/knight/idle.png',
+  frameWidth: 42,
+  frameHeight: 42,
+  frameCount: 4,
+};
+
 const FIRE_WORM_ATTACK_SPRITE: SpriteStripAsset = {
   src: '/images/fire-worm/Sprites/Worm/Attack.png',
   frameWidth: 90,
@@ -254,7 +261,9 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     hitSpriteAsset: FIRE_WORM_HIT_SPRITE,
     defeatSpriteAsset: FIRE_WORM_DEFEAT_SPRITE,
   }),
-  enemy('knight', 'Knight', 'tank', '/images/knight/idle.gif', TANK_MODIFIERS),
+  enemy('knight', 'Knight', 'tank', '/images/knight/idle.gif', TANK_MODIFIERS, {
+    idleSpriteAsset: KNIGHT_IDLE_SPRITE,
+  }),
   enemy('martial-hero', 'Martial Hero', 'ad', '/images/martial-hero/idle.gif', AD_MODIFIERS, {
     idleSpriteAsset: MARTIAL_HERO_IDLE_SPRITE,
     attackSpriteAsset: MARTIAL_HERO_ATTACK_SPRITE,

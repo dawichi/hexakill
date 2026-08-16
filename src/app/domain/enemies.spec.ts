@@ -89,6 +89,12 @@ describe('enemy generation', () => {
       frameCount: 11,
     });
     expect(enemySpriteAssetFor('knight', 'defeat')).toBeUndefined();
+    expect(enemySpriteAssetFor('knight', 'idle')).toEqual({
+      src: '/images/knight/idle.png',
+      frameWidth: 42,
+      frameHeight: 42,
+      frameCount: 4,
+    });
   });
 
   it('maps observed single-row enemy attack strips', () => {

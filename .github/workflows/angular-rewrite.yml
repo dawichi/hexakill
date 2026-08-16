@@ -103,6 +103,7 @@ jobs:
           test -f dist/hexakill/browser/images/fire-worm/Sprites/Worm/Attack.png
           test -f dist/hexakill/browser/images/fire-worm/Sprites/Worm/Get\ Hit.png
           test -f dist/hexakill/browser/images/fire-worm/Sprites/Worm/Death.png
+          test -f dist/hexakill/browser/images/knight/idle.png
           test -f dist/hexakill/browser/images/martial-hero/Sprite/Attack1.png
           test -f dist/hexakill/browser/images/martial-hero/Sprite/Take\ Hit.png
           test -f dist/hexakill/browser/images/martial-hero/Sprite/Death.png

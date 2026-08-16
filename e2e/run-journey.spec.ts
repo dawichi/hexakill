@@ -91,6 +91,43 @@ test('the Samurai uses its mapped player action strip', async ({ page }) => {
   await expect(playerAction).toHaveCSS('background-image', /samurai/);
 });
 
+test('the Knight uses its mapped idle strip in combat', async ({ page }) => {
+  await startRun(page);
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.screen = 'combat';
+  snapshot.combatState = {
+    phase: 'awaiting-player-action',
+    enemy: {
+      definition: {
+        id: 'knight',
+        name: 'Knight',
+        archetype: 'tank',
+        modifiers: { health: 1.75, ad: 0.5, ap: 0.5, armor: 1.75, mr: 1.75, speed: 0.75 },
+        idleAsset: '/images/knight/idle.gif',
+      },
+      level: 4,
+      stats: { health: 100, ad: 1, ap: 1, armor: 1, mr: 1, speed: 1 },
+      damageTaken: 0,
+      potions: 0,
+      gold: 100,
+    },
+    playerDamageTaken: 0,
+    pendingAction: null,
+    lastResult: null,
+  };
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+  await page.reload();
+
+  const knightIdle = page.getByRole('img', { name: 'Knight idle animation' });
+  await expect(knightIdle).toBeVisible();
+  await expect(knightIdle).toHaveCSS('background-image', /knight\/idle\.png/);
+  await expect(knightIdle).toHaveCSS('background-size', /400% 100%/);
+});
+
 test('Magic uses the mapped secondary player action strip', async ({ page }) => {
   await startRun(page);
 

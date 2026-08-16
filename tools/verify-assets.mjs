@@ -69,6 +69,7 @@ const requiredAssets = [
   'images/fire-worm/Sprites/Worm/Attack.png',
   'images/fire-worm/Sprites/Worm/Get Hit.png',
   'images/fire-worm/Sprites/Worm/Idle.png',
+  'images/knight/idle.png',
   'images/martial-hero/Sprite/Death.png',
   'images/martial-hero/Sprite/Attack1.png',
   'images/martial-hero/Sprite/Take Hit.png',
@@ -117,9 +118,9 @@ const allImagePaths = listFiles(resolve(assetRoot, 'images')).map((path) =>
   relative(assetRoot, path).split('\\').join('/'),
 );
 const deferredImageCount = allImagePaths.filter((asset) => !activeImagePaths.has(asset)).length;
-if (deferredImageCount !== 43) {
+if (deferredImageCount !== 42) {
   console.error(
-    `Expected 43 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
+    `Expected 42 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
   );
   process.exit(1);
 }
