@@ -92,7 +92,7 @@ compliance:
       next_action: Retain the root Angular baseline and remove/archive legacy package metadata when the historical audit is complete.
     - id: CI-001
       status: partial
-      evidence: .github/workflows/angular-rewrite.yml validates active root/docs changes with frozen install, formatting, TypeScript, docs, deployment-contract, publishable-artifact, tests, preview-contract checks, dev-server and production-artifact browser journeys, build, asset checks, and configured validation-artifact retention; the root also exposes a local aggregate release gate; archived Svelte is intentionally out of scope.
+      evidence: .github/workflows/angular-rewrite.yml validates active root/docs changes with frozen install, formatting, TypeScript, docs, deployment-contract, publishable-artifact, source and artifact asset-path/SHA parity, source and artifact typed sprite-geometry checks, tests, preview-contract checks, dev-server and production-artifact browser journeys, build, and configured validation-artifact retention; the root also exposes a local aggregate release gate; archived Svelte is intentionally out of scope.
       priority: high
       next_action: Verify the remote workflow and keep the gates aligned with top-level promotion.
     - id: A11Y-002
