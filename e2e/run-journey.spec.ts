@@ -1,13 +1,12 @@
 import { expect, test } from '@playwright/test';
 
+type MusicWindow = Window & { __hexakillMusicAttempts?: string[] };
+
 async function startRun(
   page: import('@playwright/test').Page,
   characterName = 'Wizard',
 ): Promise<void> {
-  await page.getByText('How to play', { exact: true }).click();
-  await expect(
-    page.getByText('Choose a champion, find enemies, and survive as many encounters as possible.'),
-  ).toBeVisible();
+  await expect(page.locator('.how-to-play-intro')).toBeVisible();
   await page.getByRole('button', { name: 'Enter the dungeon' }).click();
   await page.getByLabel('Player name').fill('Agent');
   await expect(page.locator('.character-art')).toHaveCount(3);
@@ -65,6 +64,28 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await expect(playerAction).toHaveCSS('background-image', /wizard/);
   await expect(page.getByRole('heading', { name: 'Battle log' })).toBeVisible();
   await expect(page.getByRole('list', { name: 'Your combat actions' })).toContainText('Agent');
+});
+
+test('music starts on the welcome screen and follows screen transitions', async ({ page }) => {
+  await page.addInitScript(() => {
+    const attempts: string[] = [];
+    Object.defineProperty(window, '__hexakillMusicAttempts', { value: attempts });
+    const originalPlay = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      if (this.src.includes('/music/')) attempts.push(this.src);
+      return originalPlay.call(this);
+    };
+  });
+
+  await page.goto('/');
+  await expect
+    .poll(() => page.evaluate(() => (window as MusicWindow).__hexakillMusicAttempts ?? []))
+    .toEqual(expect.arrayContaining([expect.stringContaining('/music/welcome.mp3')]));
+
+  await page.getByRole('button', { name: 'Enter the dungeon' }).click();
+  await expect
+    .poll(() => page.evaluate(() => (window as MusicWindow).__hexakillMusicAttempts ?? []))
+    .toEqual(expect.arrayContaining([expect.stringContaining('/music/champSelect.mp3')]));
 });
 
 test('the Samurai uses its mapped player action strip', async ({ page }) => {

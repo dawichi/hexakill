@@ -14,7 +14,7 @@ This record separates evidence that can be verified from source and automated br
 - The suite verifies reduced-motion behavior and no horizontal overflow at a 360px viewport across welcome, character selection, and combat.
 - Character-selection art is decorative in context and is hidden from the accessibility tree; character, enemy, item, and history art that conveys entity identity has text alternatives.
 - Character-selection stat modifiers use a shared icon-and-color chip component; each chip exposes its full stat name and value through an accessible label, so the compact visual language does not rely on color or icon recognition alone.
-- A native `<details>` disclosure provides the current “How to play” content without a custom dialog or pointer-only interaction.
+- The welcome screen keeps its “How to play” field manual visible by default; stat chips expose their full labels and values through accessible text rather than relying on color or icon recognition alone.
 
 ## Static contrast evidence
 

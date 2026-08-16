@@ -2,7 +2,6 @@ import { afterRenderEffect, Component, DOCUMENT, inject } from '@angular/core';
 import {
   LucideArrowRight,
   LucideCheck,
-  LucideChevronDown,
   LucideCircleHelp,
   LucideFootprints,
   LucideHeartPulse,
@@ -25,7 +24,6 @@ import { PersonalRecord } from './domain/records';
   imports: [
     LucideArrowRight,
     LucideCheck,
-    LucideChevronDown,
     LucideCircleHelp,
     LucideFootprints,
     LucideHeartPulse,

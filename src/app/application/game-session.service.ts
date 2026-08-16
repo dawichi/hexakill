@@ -371,6 +371,7 @@ export class GameSessionService {
     this.restorePreferences();
     this.restorePersonalRecords();
     this.restore();
+    this.syncMusicToScreen();
     effect(() => this.persist());
   }
   readonly validationMessage = computed(() => {
@@ -647,6 +648,21 @@ export class GameSessionService {
     this.combatMessage.set('');
     this.storage?.clear();
     this.audio?.stopMusic();
+    this.audio?.playMusic(ASSET_MANIFEST.music.welcome);
+  }
+
+  private syncMusicToScreen(): void {
+    const asset =
+      this.screen() === 'welcome'
+        ? ASSET_MANIFEST.music.welcome
+        : this.screen() === 'character-select'
+          ? ASSET_MANIFEST.music.characterSelect
+          : this.screen() === 'store'
+            ? ASSET_MANIFEST.music.store
+            : this.screen() === 'combat' && this.enemy()?.definition.archetype === 'boss'
+              ? ASSET_MANIFEST.music.boss
+              : ASSET_MANIFEST.music.dungeon;
+    this.audio?.playMusic(asset);
   }
 
   private applyCombatEvent(event: Parameters<typeof transitionCombat>[1]): boolean {

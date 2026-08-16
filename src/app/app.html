@@ -82,21 +82,116 @@
         </div>
 
         <div class="welcome-tools">
-          <details class="records-panel how-to-play">
-            <summary>
-              <svg lucideCircleHelp size="16" aria-hidden="true"></svg> How to play
-              <svg lucideChevronDown size="16" aria-hidden="true"></svg>
-            </summary>
-            <div class="how-to-play-content">
-              <p>Choose a champion, find enemies, and survive as many encounters as possible.</p>
-              <ul>
-                <li>Attack uses physical damage; Magic uses magic damage.</li>
-                <li>Armor and magic resistance reduce incoming damage.</li>
-                <li>Use Potions between enemy turns, then choose upgrades after victories.</li>
-                <li>Speed determines who opens an encounter.</li>
-              </ul>
+          <section class="records-panel how-to-play" aria-labelledby="how-to-play-title">
+            <div class="how-to-play-heading">
+              <h3 id="how-to-play-title">
+                <svg lucideCircleHelp size="16" aria-hidden="true"></svg> How to play
+              </h3>
+              <span class="guide-tag">Field manual</span>
             </div>
-          </details>
+            <div class="how-to-play-content">
+              <p class="how-to-play-intro">
+                Choose a champion, read the enemy, and make each turn count. Your run ends when your
+                <app-stat-chip stat="health" [value]="0" [showLabel]="false" /> reaches zero.
+              </p>
+
+              <div class="guide-sections">
+                <section class="guide-block" aria-labelledby="guide-actions-title">
+                  <h4 id="guide-actions-title">
+                    <svg lucideFootprints size="15" aria-hidden="true"></svg> Make your move
+                  </h4>
+                  <p>When it is your turn, choose the tool that matches the enemy’s weakness.</p>
+                  <div class="guide-action-list">
+                    <div class="guide-action physical">
+                      <svg lucideSword size="16" aria-hidden="true"></svg>
+                      <span
+                        ><strong>Attack</strong> deals physical damage, checked against Armor.</span
+                      >
+                    </div>
+                    <div class="guide-action arcane">
+                      <svg lucideWandSparkles size="16" aria-hidden="true"></svg>
+                      <span
+                        ><strong>Magic</strong> deals magic damage, checked against Magic
+                        resist.</span
+                      >
+                    </div>
+                    <div class="guide-action recovery">
+                      <svg lucideHeartPulse size="16" aria-hidden="true"></svg>
+                      <span
+                        ><strong>Potion</strong> restores health, but gives the enemy the next
+                        turn.</span
+                      >
+                    </div>
+                  </div>
+                </section>
+
+                <section class="guide-block" aria-labelledby="guide-stats-title">
+                  <h4 id="guide-stats-title">
+                    <svg lucideShield size="15" aria-hidden="true"></svg> Read the battlefield
+                  </h4>
+                  <p>Every icon has a job. The same colors and symbols follow you into combat.</p>
+                  <div class="guide-stat-list">
+                    <div class="guide-stat-row">
+                      <app-stat-chip stat="health" [value]="200" [showLabel]="false" />
+                      <span
+                        ><strong>Health</strong> is your life total. Reach zero and the run is
+                        over.</span
+                      >
+                    </div>
+                    <div class="guide-stat-row">
+                      <app-stat-chip stat="ad" [value]="16" [showLabel]="false" />
+                      <span><strong>Attack</strong> powers physical strikes.</span>
+                    </div>
+                    <div class="guide-stat-row">
+                      <app-stat-chip stat="ap" [value]="20" [showLabel]="false" />
+                      <span><strong>Magic</strong> powers arcane strikes.</span>
+                    </div>
+                    <div class="guide-stat-row">
+                      <app-stat-chip stat="armor" [value]="12" [showLabel]="false" />
+                      <span><strong>Armor</strong> reduces physical damage received.</span>
+                    </div>
+                    <div class="guide-stat-row">
+                      <app-stat-chip stat="mr" [value]="12" [showLabel]="false" />
+                      <span><strong>Magic resist</strong> reduces magic damage received.</span>
+                    </div>
+                    <div class="guide-stat-row">
+                      <app-stat-chip stat="speed" [value]="4" [showLabel]="false" />
+                      <span><strong>Speed</strong> decides who opens the encounter.</span>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="guide-block guide-run" aria-labelledby="guide-run-title">
+                  <h4 id="guide-run-title">
+                    <svg lucideSparkles size="15" aria-hidden="true"></svg> Build the run
+                  </h4>
+                  <ol class="guide-step-list">
+                    <li>
+                      <strong>Find an enemy.</strong> Compare speed, then trade turns until someone
+                      falls.
+                    </li>
+                    <li>
+                      <strong>Claim the victory.</strong> Earn experience and gold; level-ups
+                      improve your stats.
+                    </li>
+                    <li>
+                      <strong>Choose your power-up.</strong> Pending upgrades must be selected
+                      before the next encounter.
+                    </li>
+                    <li>
+                      <strong>Spend with intent.</strong> The store sells repeatable potions and
+                      one-time equipment.
+                    </li>
+                  </ol>
+                  <p class="guide-tip">
+                    <svg lucideTrophy size="14" aria-hidden="true"></svg>
+                    Survive deeper floors, defeat the Gold Slimes at milestone levels, and leave a
+                    record on the wall.
+                  </p>
+                </section>
+              </div>
+            </div>
+          </section>
           <section class="records-panel" aria-labelledby="records-title">
             <div class="records-heading">
               <h3 id="records-title">

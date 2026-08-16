@@ -21,6 +21,19 @@ describe('App', () => {
     expect(compiled.querySelector('h2')?.textContent).toContain('Survive the dungeon');
   });
 
+  it('keeps the field manual visible with shared stat chips', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.querySelector('details.how-to-play')).toBeNull();
+    expect(compiled.querySelector('.how-to-play-content')).toBeTruthy();
+    expect(compiled.querySelectorAll('.guide-stat-row app-stat-chip')).toHaveLength(6);
+    expect(compiled.querySelector('.guide-action-list')?.textContent).toContain('Attack');
+    expect(compiled.querySelector('.guide-action-list')?.textContent).toContain('Magic');
+    expect(compiled.querySelector('.guide-action-list')?.textContent).toContain('Potion');
+  });
+
   it('provides a keyboard skip link to the game content landmark', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
