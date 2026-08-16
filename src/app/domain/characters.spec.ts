@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CHARACTER_DEFINITIONS } from './characters';
+import { BASE_STATS, CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
 
 describe('character asset contracts', () => {
   it('records observed action-strip geometry for supported player animations', () => {
@@ -77,5 +77,9 @@ describe('character asset contracts', () => {
     expect(CHARACTER_DEFINITIONS.find((character) => character.id === 'warrior')?.defeatAsset).toBe(
       undefined,
     );
+
+    const player = createInitialPlayer('David', CHARACTER_DEFINITIONS[0]);
+    expect(player.level).toBe(4);
+    expect(player.stats).toEqual(BASE_STATS);
   });
 });
