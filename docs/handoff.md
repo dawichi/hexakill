@@ -63,6 +63,7 @@ npm run verify:toolchain
 npm run format:check
 npm run verify:types
 npm run verify:docs
+npm run verify:migration
 npm run verify:assets
 npm run verify:deployment
 npm test -- --watch=false --no-progress
