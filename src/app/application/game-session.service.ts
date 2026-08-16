@@ -28,6 +28,7 @@ import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters
 import { ASSET_MANIFEST } from '../domain/assets';
 import {
   CharacterDefinition,
+  CombatLogEntry,
   DefeatedEnemy,
   EnemyState,
   PlayerState,
@@ -346,6 +347,8 @@ export class GameSessionService {
   readonly personalRecords = signal<readonly PersonalRecord[]>([]);
   readonly musicVolume = signal(DEFAULT_MUSIC_VOLUME);
   readonly effectsVolume = signal(DEFAULT_EFFECTS_VOLUME);
+  readonly playerCombatLog = signal<readonly CombatLogEntry[]>([]);
+  readonly enemyCombatLog = signal<readonly CombatLogEntry[]>([]);
 
   constructor() {
     this.restorePreferences();
@@ -400,6 +403,7 @@ export class GameSessionService {
     this.enemyActionKind.set(null);
     this.playerAnimation.set('idle');
     this.playerActionKind.set(null);
+    this.clearCombatLogs();
     this.combatMessage.set('Find an enemy to begin combat.');
     this.screen.set('combat-ready');
     this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
@@ -424,6 +428,10 @@ export class GameSessionService {
     });
     this.enemyAnimation.set('idle');
     this.playerAnimation.set('idle');
+    this.addCombatLog('enemy', {
+      title: spawnedEnemy.definition.name,
+      message: 'has appeared!',
+    });
     this.screen.set('combat');
     this.audio?.playMusic(
       spawnedEnemy.definition.archetype === 'boss'
@@ -433,9 +441,14 @@ export class GameSessionService {
 
     if (determineFirstActor(player.stats.speed, spawnedEnemy.stats.speed) === 'enemy') {
       this.combatMessage.set(`${spawnedEnemy.definition.name} attacks first.`);
+      this.addCombatLog('enemy', {
+        title: spawnedEnemy.definition.name,
+        message: 'attacks first!',
+      });
       this.startEnemyTurn();
     } else {
       this.combatMessage.set('The enemy has appeared. Choose an action.');
+      this.addCombatLog('player', { title: 'You', message: 'attack first!' });
     }
   }
 
@@ -498,6 +511,12 @@ export class GameSessionService {
     const defeated = result.damageTaken >= enemy.stats.health;
 
     this.applyCombatEvent({ type: 'player-action-resolved', result });
+    this.addCombatLog('player', {
+      title: player.name,
+      message: result.missed ? `${kind} missed.` : '',
+      value: result.damageAfterResistance,
+      icon: kind === 'attack' ? '🔪' : '☄',
+    });
 
     if (defeated) {
       this.enemyAnimation.set('defeat');
@@ -545,6 +564,11 @@ export class GameSessionService {
       playerDamageTaken: Math.max(0, state.playerDamageTaken - healed),
     }));
     this.combatMessage.set(`You used a potion and healed ${healed} HP.`);
+    this.addCombatLog('player', {
+      title: player.name,
+      message: `healed ${healed} HP.`,
+      icon: '❤',
+    });
     this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
     this.scheduleEnemyTurn();
   }
@@ -587,6 +611,7 @@ export class GameSessionService {
     this.enemyActionKind.set(null);
     this.playerAnimation.set('idle');
     this.playerActionKind.set(null);
+    this.clearCombatLogs();
     this.lastActionAt.set(null);
     this.combatMessage.set('');
     this.storage?.clear();
@@ -638,8 +663,19 @@ export class GameSessionService {
           : null,
       }));
       this.combatMessage.set(`${enemy.definition.name} healed ${result.healed} HP.`);
+      this.addCombatLog('enemy', {
+        title: enemy.definition.name,
+        message: `healed ${result.healed} HP.`,
+        icon: '❤',
+      });
       this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
     } else {
+      this.addCombatLog('enemy', {
+        title: enemy.definition.name,
+        message: result.missed ? `${action} missed.` : '',
+        value: result.damageAfterResistance,
+        icon: action === 'attack' ? '🔪' : '☄',
+      });
       this.combatMessage.set(
         result.missed
           ? `${enemy.definition.name}'s ${action} missed.`
@@ -704,6 +740,16 @@ export class GameSessionService {
   private cancelPendingEnemyAnimationReset(): void {
     this.pendingEnemyAnimationReset?.cancel();
     this.pendingEnemyAnimationReset = null;
+  }
+
+  private addCombatLog(side: 'player' | 'enemy', entry: CombatLogEntry): void {
+    const log = side === 'player' ? this.playerCombatLog : this.enemyCombatLog;
+    log.update((entries) => [...entries, entry]);
+  }
+
+  private clearCombatLogs(): void {
+    this.playerCombatLog.set([]);
+    this.enemyCombatLog.set([]);
   }
 
   get characters(): readonly CharacterDefinition[] {

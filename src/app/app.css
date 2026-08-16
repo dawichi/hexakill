@@ -492,6 +492,60 @@ h3 {
   color: #cffafe;
 }
 
+.combat-log {
+  margin-bottom: 1rem;
+  border: 1px solid #3f3f46;
+  border-radius: 0.75rem;
+  background: #18181b;
+  padding: 1rem;
+}
+
+.combat-log h3 {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.combat-log-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.combat-log h4 {
+  margin: 0 0 0.4rem;
+  color: #a1a1aa;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.combat-log ol {
+  display: grid;
+  gap: 0.35rem;
+  max-height: 8rem;
+  overflow-y: auto;
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #d4d4d8;
+  font-size: 0.85rem;
+}
+
+.combat-log li {
+  padding-left: 0.15rem;
+}
+
+.combat-log li strong {
+  color: #f4f4f5;
+}
+
+.combat-log li span {
+  margin-left: 0.25rem;
+}
+
+.combat-log .log-muted {
+  opacity: 0.35;
+}
+
 .action-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -617,6 +671,7 @@ h3 {
   .character-grid,
   .stats-grid,
   .combat-grid,
+  .combat-log-grid,
   .action-grid,
   .power-up-grid,
   .store-grid {

@@ -79,6 +79,12 @@ describe('GameSessionService', () => {
     expect(service.combatState().phase).toBe('enemy-turn');
     expect(service.combatMessage()).toContain('dealt 17 damage');
     expect(service.lastActionAt()).toBe(1234);
+    expect(service.playerCombatLog()[1]).toEqual({
+      title: 'David',
+      message: '',
+      value: 17,
+      icon: '🔪',
+    });
 
     scheduledTask?.();
 
@@ -86,6 +92,11 @@ describe('GameSessionService', () => {
     expect(service.playerRemainingHealth()).toBeLessThan(200);
     expect(service.enemyAnimation()).toBe('attack');
     expect(service.playerAnimation()).toBe('hit');
+    expect(service.enemyCombatLog()[1]).toMatchObject({
+      title: 'Adventurer',
+      value: expect.any(Number),
+      icon: expect.stringMatching(/🔪|☄/),
+    });
 
     scheduledTask?.();
     expect(service.enemyAnimation()).toBe('idle');

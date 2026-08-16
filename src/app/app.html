@@ -379,6 +379,54 @@
               {{ session.combatMessage() }}
             </p>
 
+            <section class="combat-log" aria-labelledby="combat-log-title">
+              <h3 id="combat-log-title">Battle log</h3>
+              <div class="combat-log-grid">
+                <div>
+                  <h4>You</h4>
+                  @if (session.playerCombatLog().length) {
+                    <ol aria-label="Your combat actions">
+                      @for (entry of session.playerCombatLog(); track $index) {
+                        <li [class.log-muted]="$index < session.playerCombatLog().length - 4">
+                          <strong>{{ entry.title }}</strong>
+                          {{ entry.message }}
+                          @if (entry.value !== undefined) {
+                            <span>did {{ entry.value }} damage!</span>
+                          }
+                          @if (entry.icon) {
+                            <span aria-hidden="true">{{ entry.icon }}</span>
+                          }
+                        </li>
+                      }
+                    </ol>
+                  } @else {
+                    <p class="empty-records">No actions yet.</p>
+                  }
+                </div>
+                <div>
+                  <h4>Enemy</h4>
+                  @if (session.enemyCombatLog().length) {
+                    <ol aria-label="Enemy combat actions">
+                      @for (entry of session.enemyCombatLog(); track $index) {
+                        <li [class.log-muted]="$index < session.enemyCombatLog().length - 4">
+                          <strong>{{ entry.title }}</strong>
+                          {{ entry.message }}
+                          @if (entry.value !== undefined) {
+                            <span>did {{ entry.value }} damage!</span>
+                          }
+                          @if (entry.icon) {
+                            <span aria-hidden="true">{{ entry.icon }}</span>
+                          }
+                        </li>
+                      }
+                    </ol>
+                  } @else {
+                    <p class="empty-records">No actions yet.</p>
+                  }
+                </div>
+              </div>
+            </section>
+
             <div class="action-grid" aria-label="Combat actions">
               <button
                 class="action-button attack"

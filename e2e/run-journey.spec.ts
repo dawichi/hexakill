@@ -59,6 +59,8 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await expect(playerAction).toBeVisible();
   await expect(playerAction).toHaveAttribute('aria-label', 'Wizard action animation');
   await expect(playerAction).toHaveCSS('background-image', /wizard/);
+  await expect(page.getByRole('heading', { name: 'Battle log' })).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Your combat actions' })).toContainText('Agent');
 });
 
 test('the Samurai uses its mapped player action strip', async ({ page }) => {

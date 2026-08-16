@@ -29,6 +29,13 @@ export interface ItemState {
   readonly asset: string;
 }
 
+export interface CombatLogEntry {
+  readonly title: string;
+  readonly message: string;
+  readonly value?: number;
+  readonly icon?: string;
+}
+
 export interface CharacterDefinition {
   readonly id: CharacterId;
   readonly name: string;
