@@ -260,6 +260,25 @@ test('vertical Witch Blue attack and defeat strips render in their states', asyn
       ),
     )
     .toBe('awaiting-player-action');
+  const hitSnapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  hitSnapshot.combatState.enemy.stats.health = 100;
+  hitSnapshot.combatState.enemy.damageTaken = 0;
+  hitSnapshot.combatState.playerDamageTaken = 0;
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, hitSnapshot);
+  await page.addInitScript(() => {
+    Math.random = () => 0.5;
+  });
+  await page.reload();
+  await page.getByRole('button', { name: 'Attack' }).click();
+  const enemyHit = page.getByRole('img', { name: 'Witch Blue hit animation' });
+  await expect(enemyHit).toBeVisible();
+  await expect(enemyHit).toHaveCSS('background-image', /witch-blue\/assets\/B_witch_take_damage/);
+  await expect(enemyHit).toHaveCSS('background-size', /100% 500%/);
+
   const defeatSnapshot = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
   );
