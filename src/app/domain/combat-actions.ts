@@ -78,6 +78,9 @@ export function resolveAction(
   action: CombatAction,
   rolls: { readonly damageRoll: number; readonly chanceRoll: number },
 ): ActionResult {
+  if (action !== 'attack' && action !== 'magic' && action !== 'heal') {
+    throw new RangeError('Combat action must be attack, magic, or heal.');
+  }
   return action === 'heal'
     ? resolveHeal(attackerDamageTaken)
     : resolveDamage(attacker, defender, action, rolls);

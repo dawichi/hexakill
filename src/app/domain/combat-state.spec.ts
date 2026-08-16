@@ -56,6 +56,17 @@ describe('combat state transitions', () => {
     expect(transition.state.pendingAction).toBe('attack');
   });
 
+  it('rejects an unknown player action before storing it in state', () => {
+    const transition = transitionCombat(activeState(), {
+      type: 'player-action-started',
+      kind: 'unknown' as never,
+    });
+
+    expect(transition.accepted).toBe(false);
+    if (transition.accepted) throw new Error('Expected the transition to be rejected.');
+    expect(transition.reason).toContain('not available');
+  });
+
   it('returns to the player turn after a non-lethal action', () => {
     const started = transitionCombat(activeState(), {
       type: 'player-action-started',

@@ -68,6 +68,10 @@ function isLiveEnemy(enemy: EnemyState): boolean {
   return !isDefeatedEnemy(enemy);
 }
 
+function isDamageKind(value: unknown): value is DamageKind {
+  return value === 'attack' || value === 'magic';
+}
+
 export function transitionCombat(state: CombatState, event: CombatEvent): CombatTransition {
   if (event.type === 'reset') {
     return { accepted: true, state: INITIAL_COMBAT_STATE };
@@ -98,7 +102,12 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
   }
 
   if (event.type === 'player-action-started') {
-    if (state.phase !== 'awaiting-player-action' || !state.enemy || !isLiveEnemy(state.enemy)) {
+    if (
+      !isDamageKind(event.kind) ||
+      state.phase !== 'awaiting-player-action' ||
+      !state.enemy ||
+      !isLiveEnemy(state.enemy)
+    ) {
       return rejected(state, 'A player action is not available in the current combat phase.');
     }
 

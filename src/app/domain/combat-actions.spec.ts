@@ -77,4 +77,13 @@ describe('combat action policy', () => {
     if ('action' in result) throw new Error('Expected a damage result.');
     expect(result.damageAfterResistance).toBeGreaterThan(0);
   });
+
+  it('rejects an unknown action at the runtime boundary', () => {
+    expect(() =>
+      resolveAction({ stats }, 0, { stats, damageTaken: 0 }, 'unknown' as never, {
+        damageRoll: 0.5,
+        chanceRoll: 0.5,
+      }),
+    ).toThrow(RangeError);
+  });
 });
