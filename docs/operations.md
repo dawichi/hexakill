@@ -25,7 +25,7 @@ The archived Svelte commands below are historical evidence only. They are not pa
 | Asset geometry inventory  | `npm run inspect:assets`                         | Reports retained PNG/GIF dimensions for frame-geometry review; `--json` emits machine-readable output and makes no semantic or licensing claim.                                             |
 | Deployment contract       | `npm run verify:deployment`                      | Verifies the committed Angular/Vercel install, build, output, Content Security Policy, and required security-header contract.                                                               |
 | Release gate              | `npm run verify:release`                         | Runs the reproducible toolchain, formatting, TypeScript, docs, assets, unit, audit, build, publishable-artifact, preview, and production-artifact browser checks.                           |
-| Preview contract          | `npm run verify:preview`                         | Verifies the built static root, Content Security Policy, security headers, representative asset caching, and 404 behavior.                                                                  |
+| Preview contract          | `npm run verify:preview`                         | Verifies the built static root, Content Security Policy, security headers, representative asset caching, 404 behavior, HEAD handling, unsupported-method rejection, path-traversal rejection, and malformed-URL handling. |
 
 The archived Svelte findings are recorded in [TODO-003](TODO.md#todo-003-high-clear-current-type-and-accessibility-errors); they are not active root blockers.
 

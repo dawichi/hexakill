@@ -38,4 +38,4 @@ The publishable artifact is `dist/hexakill/browser/`. It includes the applicatio
 
 ## Release gate
 
-The root Angular migration now has local gates for clean-install/build, preview HTTP behavior (security headers, asset caching, and 404), browser journeys against the production-like output, and representative assets. Release still requires owner-approved deployment target/ownership, rollback, and external verification in an ADR.
+The root Angular migration now has local gates for clean-install/build, preview HTTP behavior (security headers, asset caching, 404, HEAD, unsupported methods, path traversal, and malformed URL encoding), browser journeys against the production-like output, and representative assets. Release still requires owner-approved deployment target/ownership, rollback, and external verification in an ADR.

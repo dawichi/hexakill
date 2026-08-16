@@ -27,10 +27,10 @@ function fail(message) {
   process.exitCode = 1;
 }
 
-async function request(path) {
+async function request(path, method = 'GET') {
   for (let attempt = 0; attempt < 30; attempt += 1) {
     try {
-      return await fetch(`${baseUrl}${path}`);
+      return await fetch(`${baseUrl}${path}`, { method });
     } catch {
       await new Promise((resolvePromise) => setTimeout(resolvePromise, 100));
     }
@@ -63,9 +63,25 @@ try {
   if (missing.status !== 404)
     fail(`expected unknown path to return 404, received ${missing.status}`);
 
+  const head = await request('/index.html', 'HEAD');
+  if (head.status !== 200) fail(`expected HEAD /index.html to return 200, received ${head.status}`);
+  if ((await head.text()) !== '') fail('HEAD /index.html returned a response body');
+
+  const unsupportedMethod = await request('/', 'POST');
+  if (unsupportedMethod.status !== 405)
+    fail(`expected POST / to return 405, received ${unsupportedMethod.status}`);
+
+  const traversal = await request('/..%2F..%2Fetc/passwd');
+  if (traversal.status !== 403)
+    fail(`expected path traversal to return 403, received ${traversal.status}`);
+
+  const malformedUrl = await request('/%E0%A4%A');
+  if (malformedUrl.status !== 400)
+    fail(`expected malformed URL encoding to return 400, received ${malformedUrl.status}`);
+
   if (process.exitCode !== 1) {
     console.log(
-      'Verified production preview root, security headers, asset caching, and 404 behavior.',
+      'Verified production preview root, security headers, asset caching, 404, method, traversal, and malformed-URL behavior.',
     );
   }
 } catch (error) {

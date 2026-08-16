@@ -1,7 +1,7 @@
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
-import { extname, join, normalize, resolve } from 'node:path';
+import { extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const projectRoot = resolve(fileURLToPath(new URL('..', import.meta.url)));
@@ -45,9 +45,15 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  const requestPath = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+  let requestPath;
+  try {
+    requestPath = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+  } catch {
+    sendText(response, 400, 'Bad request\n');
+    return;
+  }
   const relativePath = requestPath === '/' ? '/index.html' : requestPath;
-  const filePath = resolve(join(publicRoot, normalize(relativePath)));
+  const filePath = resolve(publicRoot, `.${relativePath}`);
 
   if (filePath !== publicRoot && !filePath.startsWith(`${publicRoot}/`)) {
     sendText(response, 403, 'Forbidden\n');
