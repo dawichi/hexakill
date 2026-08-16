@@ -235,9 +235,6 @@
             <h2 id="select-title" data-screen-heading tabindex="-1">Choose your champion</h2>
             <p class="section-lead">Every legend starts with a single name and a loaded blade.</p>
           </div>
-          <div class="step-marker" aria-label="Step 1 of 3">
-            <span>01</span><small>of 03</small>
-          </div>
         </div>
 
         <div class="name-altar">
@@ -297,7 +294,6 @@
               <span class="character-card-copy">
                 <span class="character-name">{{ character.name }}</span>
                 <span class="character-role">{{ character.description }}</span>
-                <span class="weakness">{{ character.weakness }}</span>
                 <span class="stat-highlights" aria-label="Character stat modifiers">
                   @for (highlight of statHighlights(character); track highlight.stat) {
                     <app-stat-chip
@@ -339,84 +335,11 @@
               [disabled]="!session.canStartRun()"
               (click)="session.startRun()"
             >
-              Begin the run <svg lucideArrowRight size="16" aria-hidden="true"></svg>
+              Start run <svg lucideArrowRight size="16" aria-hidden="true"></svg>
             </button>
           </div>
         </div>
       </section>
-    }
-
-    @case ('combat-ready') {
-      @if (session.player(); as player) {
-        <section class="panel" data-screen="combat-ready" aria-labelledby="combat-title">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Step 2 · run ready</p>
-              <h2 id="combat-title" data-screen-heading tabindex="-1">
-                Welcome, {{ player.name }}.
-              </h2>
-            </div>
-            <div class="button-row">
-              <button class="quiet-button" type="button" (click)="session.openStore()">
-                Store
-              </button>
-              <button class="quiet-button" type="button" (click)="session.reset()">New run</button>
-            </div>
-          </div>
-
-          <div
-            class="player-card"
-            [class.blue]="player.character.accent === 'blue'"
-            [class.red]="player.character.accent === 'red'"
-            [class.amber]="player.character.accent === 'amber'"
-          >
-            <div>
-              <p class="eyebrow">Level {{ player.level }} {{ player.character.name }}</p>
-              <h3>Ready for the first enemy.</h3>
-              <p>{{ player.character.description }} {{ player.character.weakness }}</p>
-            </div>
-            <img
-              class="entity-sprite"
-              [src]="player.character.idleAsset"
-              [alt]="player.character.name"
-            />
-          </div>
-
-          <dl class="stats-grid">
-            @for (stat of statLabels; track stat[0]) {
-              <div>
-                <dt>{{ stat[1] }}</dt>
-                <dd>{{ player.stats[stat[0]] }}</dd>
-              </div>
-            }
-          </dl>
-
-          @if (player.inventory.length) {
-            <section class="inventory-panel" aria-labelledby="ready-inventory-title">
-              <h3 id="ready-inventory-title">Equipment</h3>
-              <div class="inventory-grid">
-                @for (item of player.inventory; track item.id) {
-                  <article class="inventory-item">
-                    <img class="item-sprite" [src]="item.asset" [alt]="item.name" />
-                    <span>
-                      <strong>{{ item.name }}</strong>
-                      <small>{{ itemBonusLabel(item) }}</small>
-                    </span>
-                  </article>
-                }
-              </div>
-            </section>
-          }
-
-          <div class="next-step">
-            <p class="eyebrow">Next action</p>
-            <p>Generate a typed enemy and test the first combat decision.</p>
-            <button class="primary-button" type="button" (click)="session.findEnemy()">
-              Find an enemy
-            </button>
-          </div>
-        </section>
-      }
     }
 
     @case ('combat') {
@@ -425,10 +348,12 @@
           <section class="panel" data-screen="combat" aria-labelledby="combat-screen-title">
             <div class="section-heading">
               <div>
-                <p class="eyebrow">Step 3 · combat</p>
                 <h2 id="combat-screen-title" data-screen-heading tabindex="-1">
-                  {{ enemy.definition.name }} appears.
+                  Face {{ enemy.definition.name }}
                 </h2>
+                <p class="section-lead">
+                  Read the enemy, choose your attack, and survive the turn.
+                </p>
               </div>
               <div class="button-row">
                 <button class="quiet-button" type="button" (click)="session.openStore()">
@@ -442,125 +367,187 @@
 
             <div class="combat-grid">
               <article class="combatant-card player-combatant">
-                <p class="eyebrow">You · level {{ player.level }}</p>
-                <h3>{{ player.name }} the {{ player.character.name }}</h3>
-                @if (session.playerAnimation() === 'action') {
-                  @if (session.playerActionAsset(); as actionAsset) {
+                <div class="combatant-header">
+                  <div>
+                    <p class="eyebrow">You · level {{ player.level }}</p>
+                    <h3>{{ player.name }} the {{ player.character.name }}</h3>
+                  </div>
+                  <span class="combatant-badge">Hero</span>
+                </div>
+                <div class="combatant-body">
+                  <div class="combat-stat-rail" role="group" aria-label="Your combat stats">
+                    @for (stat of statKeys; track stat) {
+                      <app-stat-chip
+                        [stat]="stat"
+                        [value]="
+                          combatStatValue(player.stats, stat, session.playerRemainingHealth())
+                        "
+                        [showLabel]="false"
+                      />
+                    }
+                  </div>
+                  <div class="combatant-visual">
+                    @if (session.playerAnimation() === 'action') {
+                      @if (session.playerActionAsset(); as actionAsset) {
+                        <span
+                          class="entity-sprite combat-sprite sprite-strip"
+                          role="img"
+                          [attr.aria-label]="player.character.name + ' action animation'"
+                          [style.background-image]="'url(' + actionAsset.src + ')'"
+                          [style.background-size]="spriteBackgroundSize(actionAsset)"
+                          [style.aspect-ratio]="
+                            actionAsset.frameWidth + ' / ' + actionAsset.frameHeight
+                          "
+                          [style.animation]="spriteAnimation(actionAsset, 600)"
+                        ></span>
+                      } @else {
+                        <img
+                          class="entity-sprite combat-sprite"
+                          [src]="player.character.idleAsset"
+                          [alt]="player.character.name"
+                        />
+                      }
+                    } @else if (session.playerAnimation() === 'hit') {
+                      @if (session.playerHitAsset(); as hitAsset) {
+                        <span
+                          class="entity-sprite combat-sprite sprite-strip"
+                          role="img"
+                          [attr.aria-label]="player.character.name + ' hit animation'"
+                          [style.background-image]="'url(' + hitAsset.src + ')'"
+                          [style.background-size]="spriteBackgroundSize(hitAsset)"
+                          [style.aspect-ratio]="hitAsset.frameWidth + ' / ' + hitAsset.frameHeight"
+                          [style.animation]="spriteAnimation(hitAsset, 600)"
+                        ></span>
+                      } @else {
+                        <img
+                          class="entity-sprite combat-sprite"
+                          [src]="player.character.idleAsset"
+                          [alt]="player.character.name"
+                        />
+                      }
+                    } @else if (session.playerIdleSpriteAsset(); as idleAsset) {
+                      <span
+                        class="entity-sprite combat-sprite sprite-strip"
+                        role="img"
+                        [attr.aria-label]="player.character.name + ' idle animation'"
+                        [style.background-image]="'url(' + idleAsset.src + ')'"
+                        [style.background-size]="spriteBackgroundSize(idleAsset)"
+                        [style.aspect-ratio]="idleAsset.frameWidth + ' / ' + idleAsset.frameHeight"
+                        [style.animation]="spriteAnimation(idleAsset, 900)"
+                      ></span>
+                    } @else {
+                      <img
+                        class="entity-sprite combat-sprite"
+                        [src]="player.character.idleAsset"
+                        [alt]="player.character.name"
+                      />
+                    }
+                  </div>
+                </div>
+                <div class="combatant-health">
+                  <div class="health-heading">
+                    <span><svg lucideHeartPulse size="14" aria-hidden="true"></svg> Health</span>
+                    <strong
+                      >{{ session.playerRemainingHealth() }} / {{ player.stats.health }}</strong
+                    >
+                  </div>
+                  <div
+                    class="health-bar"
+                    role="meter"
+                    aria-label="Your health"
+                    [attr.aria-valuenow]="session.playerRemainingHealth()"
+                    aria-valuemin="0"
+                    [attr.aria-valuemax]="player.stats.health"
+                  >
                     <span
-                      class="entity-sprite combat-sprite sprite-strip"
-                      role="img"
-                      [attr.aria-label]="player.character.name + ' action animation'"
-                      [style.background-image]="'url(' + actionAsset.src + ')'"
-                      [style.background-size]="spriteBackgroundSize(actionAsset)"
-                      [style.aspect-ratio]="
-                        actionAsset.frameWidth + ' / ' + actionAsset.frameHeight
+                      [style.width.%]="
+                        (session.playerRemainingHealth() / player.stats.health) * 100
                       "
-                      [style.animation]="spriteAnimation(actionAsset, 600)"
                     ></span>
-                  } @else {
-                    <img
-                      class="entity-sprite combat-sprite"
-                      [src]="player.character.idleAsset"
-                      [alt]="player.character.name"
-                    />
-                  }
-                } @else if (session.playerAnimation() === 'hit') {
-                  @if (session.playerHitAsset(); as hitAsset) {
-                    <span
-                      class="entity-sprite combat-sprite sprite-strip"
-                      role="img"
-                      [attr.aria-label]="player.character.name + ' hit animation'"
-                      [style.background-image]="'url(' + hitAsset.src + ')'"
-                      [style.background-size]="spriteBackgroundSize(hitAsset)"
-                      [style.aspect-ratio]="hitAsset.frameWidth + ' / ' + hitAsset.frameHeight"
-                      [style.animation]="spriteAnimation(hitAsset, 600)"
-                    ></span>
-                  } @else {
-                    <img
-                      class="entity-sprite combat-sprite"
-                      [src]="player.character.idleAsset"
-                      [alt]="player.character.name"
-                    />
-                  }
-                } @else if (session.playerIdleSpriteAsset(); as idleAsset) {
-                  <span
-                    class="entity-sprite combat-sprite sprite-strip"
-                    role="img"
-                    [attr.aria-label]="player.character.name + ' idle animation'"
-                    [style.background-image]="'url(' + idleAsset.src + ')'"
-                    [style.background-size]="spriteBackgroundSize(idleAsset)"
-                    [style.aspect-ratio]="idleAsset.frameWidth + ' / ' + idleAsset.frameHeight"
-                    [style.animation]="spriteAnimation(idleAsset, 900)"
-                  ></span>
-                } @else {
-                  <img
-                    class="entity-sprite combat-sprite"
-                    [src]="player.character.idleAsset"
-                    [alt]="player.character.name"
-                  />
-                }
-                <p>
-                  {{ session.playerRemainingHealth() }} / {{ player.stats.health }} health ·
-                  {{ player.stats.ad }} attack · {{ player.stats.ap }} magic
-                </p>
+                  </div>
+                </div>
               </article>
 
-              <p class="versus" aria-hidden="true">VS</p>
+              <div class="versus" aria-hidden="true"><span>VS</span><small>encounter</small></div>
 
               <article class="combatant-card enemy-combatant">
-                <p class="eyebrow">
-                  {{ enemy.definition.archetype }} enemy · level {{ enemy.level }}
-                </p>
-                <h3>{{ enemy.definition.name }}</h3>
-                @if (session.enemySpriteAsset(); as enemySpriteAsset) {
-                  <span
-                    class="entity-sprite combat-sprite sprite-strip enemy-sprite-strip"
-                    role="img"
-                    [attr.aria-label]="
-                      enemy.definition.name +
-                      (session.enemyAnimation() === 'attack'
-                        ? session.enemyActionKind() === 'magic'
-                          ? ' magic animation'
-                          : ' attack animation'
-                        : session.enemyAnimation() === 'hit'
-                          ? ' hit animation'
-                          : session.enemyAnimation() === 'defeat'
-                            ? ' defeat animation'
-                            : ' idle animation')
-                    "
-                    [style.background-image]="'url(' + enemySpriteAsset.src + ')'"
-                    [style.background-size]="spriteBackgroundSize(enemySpriteAsset)"
-                    [style.aspect-ratio]="
-                      enemySpriteAsset.frameWidth + ' / ' + enemySpriteAsset.frameHeight
-                    "
-                    [style.animation]="spriteAnimation(enemySpriteAsset, 600)"
-                  ></span>
-                } @else {
-                  <img
-                    class="entity-sprite combat-sprite"
-                    [src]="session.enemyAsset()"
-                    [alt]="enemy.definition.name"
-                  />
-                }
-                <p>
-                  {{ enemy.stats.ad }} attack · {{ enemy.stats.ap }} magic ·
-                  {{ enemy.stats.speed }} speed
-                </p>
-                <div
-                  class="health-bar"
-                  role="meter"
-                  aria-label="Enemy health"
-                  [attr.aria-valuenow]="enemy.stats.health - enemy.damageTaken"
-                  aria-valuemin="0"
-                  [attr.aria-valuemax]="enemy.stats.health"
-                >
-                  <span
-                    [style.width.%]="100 - (enemy.damageTaken / enemy.stats.health) * 100"
-                  ></span>
+                <div class="combatant-header">
+                  <div>
+                    <p class="eyebrow">
+                      {{ enemy.definition.archetype }} enemy · level {{ enemy.level }}
+                    </p>
+                    <h3>{{ enemy.definition.name }}</h3>
+                  </div>
+                  <span class="combatant-badge">Foe</span>
                 </div>
-                <p class="health-label">
-                  {{ enemy.stats.health - enemy.damageTaken }} / {{ enemy.stats.health }} health
-                </p>
+                <div class="combatant-body">
+                  <div class="combatant-visual">
+                    @if (session.enemySpriteAsset(); as enemySpriteAsset) {
+                      <span
+                        class="entity-sprite combat-sprite sprite-strip enemy-sprite-strip"
+                        role="img"
+                        [attr.aria-label]="
+                          enemy.definition.name +
+                          (session.enemyAnimation() === 'attack'
+                            ? session.enemyActionKind() === 'magic'
+                              ? ' magic animation'
+                              : ' attack animation'
+                            : session.enemyAnimation() === 'hit'
+                              ? ' hit animation'
+                              : session.enemyAnimation() === 'defeat'
+                                ? ' defeat animation'
+                                : ' idle animation')
+                        "
+                        [style.background-image]="'url(' + enemySpriteAsset.src + ')'"
+                        [style.background-size]="spriteBackgroundSize(enemySpriteAsset)"
+                        [style.aspect-ratio]="
+                          enemySpriteAsset.frameWidth + ' / ' + enemySpriteAsset.frameHeight
+                        "
+                        [style.animation]="spriteAnimation(enemySpriteAsset, 600)"
+                      ></span>
+                    } @else {
+                      <img
+                        class="entity-sprite combat-sprite"
+                        [src]="session.enemyAsset()"
+                        [alt]="enemy.definition.name"
+                      />
+                    }
+                  </div>
+                  <div class="combat-stat-rail" role="group" aria-label="Enemy combat stats">
+                    @for (stat of statKeys; track stat) {
+                      <app-stat-chip
+                        [stat]="stat"
+                        [value]="
+                          combatStatValue(enemy.stats, stat, enemy.stats.health - enemy.damageTaken)
+                        "
+                        [showLabel]="false"
+                      />
+                    }
+                  </div>
+                </div>
+                <div class="combatant-health">
+                  <div class="health-heading">
+                    <span><svg lucideHeartPulse size="14" aria-hidden="true"></svg> Health</span>
+                    <strong
+                      >{{ enemy.stats.health - enemy.damageTaken }} /
+                      {{ enemy.stats.health }}</strong
+                    >
+                  </div>
+                  <div
+                    class="health-bar"
+                    role="meter"
+                    aria-label="Enemy health"
+                    [attr.aria-valuenow]="enemy.stats.health - enemy.damageTaken"
+                    aria-valuemin="0"
+                    [attr.aria-valuemax]="enemy.stats.health"
+                  >
+                    <span
+                      [style.width.%]="
+                        ((enemy.stats.health - enemy.damageTaken) / enemy.stats.health) * 100
+                      "
+                    ></span>
+                  </div>
+                </div>
               </article>
             </div>
 
@@ -652,6 +639,7 @@
                 [disabled]="!session.canAct()"
                 (click)="session.attack('attack')"
               >
+                <svg lucideSword size="17" aria-hidden="true"></svg>
                 Attack
                 <span>Physical damage · 80–140%</span>
               </button>
@@ -661,6 +649,7 @@
                 [disabled]="!session.canAct()"
                 (click)="session.attack('magic')"
               >
+                <svg lucideWandSparkles size="17" aria-hidden="true"></svg>
                 Magic
                 <span>Magic damage · 30–200%</span>
               </button>
@@ -670,6 +659,7 @@
                 [disabled]="!session.canAct() || !player.potions"
                 (click)="session.usePotion()"
               >
+                <svg lucideHeartPulse size="17" aria-hidden="true"></svg>
                 Potion
                 <span>Heal 20% of damage received · {{ player.potions }} left</span>
               </button>

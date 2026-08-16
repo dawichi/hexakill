@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
+import { GameSessionService } from './application/game-session.service';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -45,7 +46,7 @@ describe('App', () => {
     expect(main?.getAttribute('tabindex')).toBe('-1');
   });
 
-  it('moves through character selection into a ready run', async () => {
+  it('moves through character selection directly into the first combat', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
@@ -63,7 +64,8 @@ describe('App', () => {
     compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
     fixture.detectChanges();
 
-    expect(compiled.querySelector('h2')?.textContent).toContain('Welcome, David');
+    expect(compiled.querySelector('h2')?.textContent).toContain('Face');
+    expect(compiled.querySelector('[data-screen="combat"]')).toBeTruthy();
   });
 
   it('exposes name validation semantics before character selection', async () => {
@@ -113,6 +115,10 @@ describe('App', () => {
     compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
     fixture.detectChanges();
 
+    const session = TestBed.inject(GameSessionService);
+    session.combatState.update((state) => ({ ...state, phase: 'awaiting-player-action' }));
+    fixture.detectChanges();
+
     const storeButton = Array.from(
       compiled.querySelectorAll<HTMLButtonElement>('.quiet-button'),
     ).find((button) => button.textContent?.includes('Store'));
@@ -125,8 +131,6 @@ describe('App', () => {
       compiled.querySelectorAll<HTMLButtonElement>('.quiet-button'),
     ).find((button) => button.textContent?.includes('Close store'));
     closeStoreButton?.click();
-    fixture.detectChanges();
-    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
     fixture.detectChanges();
     expect(compiled.querySelector('[role="group"][aria-label="Combat actions"]')).toBeTruthy();
   });
@@ -147,13 +151,8 @@ describe('App', () => {
     compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
     fixture.detectChanges();
 
-    const findEnemyButton = Array.from(compiled.querySelectorAll('button')).find((button) =>
-      button.textContent?.includes('Find an enemy'),
-    );
-    findEnemyButton?.click();
-    fixture.detectChanges();
-
-    expect(compiled.querySelector('h2')?.textContent).toContain('appears');
+    expect(compiled.querySelector('h2')?.textContent).toContain('Face');
+    expect(compiled.querySelector('[data-screen="combat"]')).toBeTruthy();
     expect(compiled.querySelector('.action-button.attack')).toBeTruthy();
     expect(compiled.querySelector('.action-button.magic')).toBeTruthy();
   });

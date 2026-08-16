@@ -54,8 +54,7 @@ import {
   isStoredPreferencesSnapshot,
 } from '../domain/preferences';
 
-export type GameScreen =
-  'welcome' | 'character-select' | 'combat-ready' | 'combat' | 'store' | 'game-over';
+export type GameScreen = 'welcome' | 'character-select' | 'combat' | 'store' | 'game-over';
 
 export interface DefeatedEnemySummary {
   readonly enemyId: string;
@@ -250,10 +249,6 @@ function hasCoherentSessionState(snapshot: Partial<StoredSessionSnapshot>): bool
     );
   }
 
-  if (snapshot.screen === 'combat-ready') {
-    return phase === 'idle' && !hasEnemy;
-  }
-
   if (snapshot.screen === 'combat') {
     if (!hasEnemy || !snapshot.combatState?.enemy) return false;
 
@@ -422,9 +417,9 @@ export class GameSessionService {
     this.playerAnimation.set('idle');
     this.playerActionKind.set(null);
     this.clearCombatLogs();
-    this.combatMessage.set('Find an enemy to begin combat.');
-    this.screen.set('combat-ready');
+    this.combatMessage.set('The first enemy is approaching.');
     this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
+    this.findEnemy();
   }
 
   findEnemy(): void {
@@ -478,7 +473,7 @@ export class GameSessionService {
   }
 
   closeStore(): void {
-    this.screen.set(this.enemy() ? 'combat' : 'combat-ready');
+    this.screen.set('combat');
     this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
   }
 
@@ -823,8 +818,7 @@ export class GameSessionService {
     this.storage.write(
       JSON.stringify({
         version: 1,
-        screen:
-          this.screen() === 'store' ? (this.enemy() ? 'combat' : 'combat-ready') : this.screen(),
+        screen: this.screen() === 'store' ? 'combat' : this.screen(),
         playerName: this.playerName(),
         selectedCharacterId: this.selectedCharacter()?.id ?? null,
         player: this.player(),
@@ -923,9 +917,7 @@ export class GameSessionService {
         snapshot.version !== 1 ||
         typeof snapshot.playerName !== 'string' ||
         snapshot.selectedCharacterId === undefined ||
-        !['welcome', 'character-select', 'combat-ready', 'combat', 'game-over'].includes(
-          String(snapshot.screen),
-        ) ||
+        !['welcome', 'character-select', 'combat', 'game-over'].includes(String(snapshot.screen)) ||
         !isRestorableCombatState(snapshot.combatState) ||
         (snapshot.player !== null && !isRestorablePlayer(snapshot.player)) ||
         (snapshot.selectedCharacterId !== null && !selectedCharacter) ||
@@ -968,13 +960,7 @@ export class GameSessionService {
             ? 'defeat'
             : 'idle',
         );
-        this.screen.set(
-          snapshot.screen === 'combat'
-            ? 'combat'
-            : snapshot.screen === 'game-over'
-              ? 'game-over'
-              : 'combat-ready',
-        );
+        this.screen.set(snapshot.screen === 'combat' ? 'combat' : 'game-over');
         this.combatMessage.set('Your saved run was restored.');
       } else {
         this.screen.set(snapshot.screen === 'character-select' ? 'character-select' : 'welcome');

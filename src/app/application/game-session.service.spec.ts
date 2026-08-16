@@ -63,12 +63,10 @@ describe('GameSessionService', () => {
   });
 
   it('generates an enemy and applies the first attack action', () => {
-    service.setPlayerName('David');
-    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
-    service.startRun();
-    service.player.update((player) =>
-      player ? { ...player, stats: { ...player.stats, speed: 100 } } : player,
-    );
+    service.player.set({
+      ...createInitialPlayer('David', CHARACTER_DEFINITIONS[0]),
+      stats: { ...createInitialPlayer('David', CHARACTER_DEFINITIONS[0]).stats, speed: 100 },
+    });
     service.findEnemy();
 
     expect(service.screen()).toBe('combat');

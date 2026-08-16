@@ -8,10 +8,9 @@ The root Angular application uses these screens:
 
 1. `welcome` displays the entry point, an always-visible “How to play” field manual with shared stat chips, local personal records, and persistent audio controls.
 2. `character-select` accepts a trimmed name of 3–14 characters, renders Wizard, Samurai, and Warrior idle art, presents the character modifier vocabulary through reusable icon-and-color stat chips, and starts a level-4 player.
-3. `combat-ready` displays the player, stats, owned equipment, store access, and enemy generation.
-4. `combat` displays the current enemy, idle/attack/hit/defeat art where an asset is characterized, health, combat messages, a non-persistent player/enemy battle log, actions, power-ups, and reset/store controls.
-5. `store` displays repeatable potion offers and one-time item offers. Purchased item art and bonuses are shown in the owned-equipment panel.
-6. `game-over` displays the defeat message, grouped defeated-enemy history, local personal records, and a new-run action.
+3. `combat` begins immediately after character selection with a generated enemy. It displays both combatants' icon-only stat chips, idle/attack/hit/defeat art where an asset is characterized, health, combat messages, a non-persistent player/enemy battle log, actions, power-ups, and reset/store controls.
+4. `store` displays repeatable potion offers and one-time item offers. Purchased item art and bonuses are shown in the owned-equipment panel.
+5. `game-over` displays the defeat message, grouped defeated-enemy history, local personal records, and a new-run action.
 
 The active UI relies on native buttons, inputs, and range controls. Legacy global keyboard shortcuts (`Space`, `P`, `A`, `S`, `D`, and power-up number keys) are not part of the current Angular contract; keyboard operation is currently characterized through native activation and browser journeys.
 
@@ -28,10 +27,10 @@ The active UI relies on native buttons, inputs, and range controls. Legacy globa
 
 ## Active store behavior
 
-- The store is reachable from a ready run or while an active combat is awaiting the player's action.
+- The store is reachable while an active combat is awaiting the player's action.
 - Items are one-time purchases and apply their provisional stat bonus immediately. The item remains represented in the player's inventory and is disabled in later store views.
 - Potion offers are repeatable while the player can afford them.
-- Closing the store returns to `combat-ready` when no enemy exists, otherwise to `combat`.
+- Closing the store returns to the active `combat` encounter.
 - Store balance, item timing, health semantics, restocking, selling, and final acceptance remain open in [the provisional store contract](../architecture/rewrite-store.md).
 
 ## Legacy observations retained for comparison

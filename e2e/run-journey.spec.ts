@@ -11,11 +11,18 @@ async function startRun(
   await page.getByLabel('Player name').fill('Agent');
   await expect(page.locator('.character-art')).toHaveCount(3);
   await page.getByRole('button', { name: new RegExp(characterName) }).click();
-  await page.getByRole('button', { name: 'Begin the run' }).click();
-  await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
+  await page.getByRole('button', { name: 'Start run' }).click();
+  await expect(page.getByRole('heading', { name: /Face/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Attack' })).toBeEnabled();
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')))
+    .toContain('Agent');
 }
 
 test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    Math.random = () => 0.5;
+  });
   await page.goto('/');
   await page.evaluate(() => localStorage.clear());
   await page.reload();
@@ -40,13 +47,9 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   const closeStoreButton = page.getByRole('button', { name: 'Close store' });
   await closeStoreButton.focus();
   await closeStoreButton.press('Enter');
-  await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeFocused();
-  const findEnemyButton = page.getByRole('button', { name: 'Find an enemy' });
-  await findEnemyButton.focus();
-  await findEnemyButton.press('Enter');
-  await expect(page.getByRole('heading', { name: /appears/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Face/ })).toBeFocused();
   await expect(page.locator('.inventory-item').getByRole('img', { name: 'Sword' })).toBeVisible();
-  await expect(page.getByText(/216 attack/)).toBeVisible();
+  await expect(page.getByRole('img', { name: /Attack: 216/ })).toBeVisible();
   await expect(page.getByRole('meter', { name: 'Enemy health' })).toHaveAttribute(
     'aria-valuemin',
     '0',
@@ -99,9 +102,7 @@ test('the Samurai uses its mapped player action strip', async ({ page }) => {
     localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
   }, snapshot);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
-
-  await page.getByRole('button', { name: 'Find an enemy' }).click();
+  await expect(page.getByRole('heading', { name: /Face/ })).toBeVisible();
   const attackButton = page.getByRole('button', { name: 'Attack' });
   await expect(attackButton).toBeEnabled();
   await attackButton.click();
@@ -160,9 +161,7 @@ test('Magic uses the mapped secondary player action strip', async ({ page }) => 
     localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
   }, snapshot);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
-
-  await page.getByRole('button', { name: 'Find an enemy' }).click();
+  await expect(page.getByRole('heading', { name: /Face/ })).toBeVisible();
   const magicButton = page.getByRole('button', { name: 'Magic' });
   await expect(magicButton).toBeEnabled();
   await magicButton.click();
@@ -371,8 +370,8 @@ test('a run is restored after a browser reload', async ({ page }) => {
     .toContain('Agent');
 
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Welcome, Agent.' })).toBeVisible();
-  await expect(page.getByText('LEVEL 4 WIZARD')).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Face/ })).toBeVisible();
+  await expect(page.locator('.player-combatant .eyebrow')).toContainText('level 4');
 });
 
 test('audio preferences are keyboard-accessible and restored independently', async ({ page }) => {
@@ -443,8 +442,7 @@ test('reduced motion and a narrow viewport remain usable', async ({ page }) => {
   await page.getByRole('button', { name: 'Enter the dungeon' }).click();
   await page.getByLabel('Player name').fill('Agent');
   await page.getByRole('button', { name: /Wizard/ }).click();
-  await page.getByRole('button', { name: 'Begin the run' }).click();
-  await page.getByRole('button', { name: 'Find an enemy' }).click();
+  await page.getByRole('button', { name: 'Start run' }).click();
 
   const combatDimensions = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,
@@ -539,8 +537,7 @@ test('a restored transient combat action is discarded safely', async ({ page }) 
 test('restored resolving and enemy-turn phases are discarded safely', async ({ page }) => {
   for (const phase of ['resolving-player-action', 'enemy-turn'] as const) {
     await startRun(page);
-    await page.getByRole('button', { name: 'Find an enemy' }).click();
-    await expect(page.getByRole('heading', { name: /appears/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Face/ })).toBeVisible();
 
     const snapshot = await page.evaluate(() =>
       JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
@@ -561,8 +558,7 @@ test('restored resolving and enemy-turn phases are discarded safely', async ({ p
 
 test('a restored malformed combat result is discarded safely', async ({ page }) => {
   await startRun(page);
-  await page.getByRole('button', { name: 'Find an enemy' }).click();
-  await expect(page.getByRole('heading', { name: /appears/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Face/ })).toBeVisible();
   const snapshot = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
   );
@@ -585,8 +581,7 @@ test('a restored malformed combat result is discarded safely', async ({ page }) 
   ).resolves.toBeNull();
 
   await startRun(page);
-  await page.getByRole('button', { name: 'Find an enemy' }).click();
-  await expect(page.getByRole('heading', { name: /appears/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Face/ })).toBeVisible();
   const incoherentSnapshot = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
   );
@@ -723,14 +718,14 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   const wizardButton = page.getByRole('button', { name: /Wizard/ });
   await wizardButton.focus();
   await page.keyboard.press('Enter');
-  const startButton = page.getByRole('button', { name: 'Begin the run' });
+  const startButton = page.getByRole('button', { name: 'Start run' });
   await expect(startButton).toBeEnabled();
   await startButton.focus();
   await expect(startButton).toBeFocused();
   await startButton.press('Enter');
-  const readyHeading = page.getByRole('heading', { name: 'Welcome, Agent.' });
-  await expect(readyHeading).toBeVisible();
-  await expect(readyHeading).toBeFocused();
+  const combatHeading = page.getByRole('heading', { name: /Face/ });
+  await expect(combatHeading).toBeVisible();
+  await expect(combatHeading).toBeFocused();
 });
 
 test('a player can use a potion and reach the defeat screen', async ({ page }) => {
@@ -786,7 +781,7 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
     localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
   }, snapshot);
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Knight appears.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Face Knight' })).toBeVisible();
 
   const potionButton = page.getByRole('button', { name: 'Potion' });
   await potionButton.focus();
@@ -939,10 +934,10 @@ test('boss encounters advance in sequence after level ten', async ({ page }) => 
   });
   await page.reload();
 
-  await expect(page.getByRole('heading', { name: 'Gold Slime 1 appears.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Face Gold Slime 1' })).toBeVisible();
   await page.getByRole('button', { name: /Attack Physical damage/ }).click();
   await expect(page.getByText(/gained 150 exp and 1000 gold/)).toBeVisible();
   await page.locator('.power-up-panel').getByRole('button', { name: 'Attack' }).click();
   await page.getByRole('button', { name: 'Find another enemy' }).click();
-  await expect(page.getByRole('heading', { name: 'Gold Slime 2 appears.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Face Gold Slime 2' })).toBeVisible();
 });

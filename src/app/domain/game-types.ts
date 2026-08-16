@@ -42,7 +42,6 @@ export interface CharacterDefinition {
   readonly id: CharacterId;
   readonly name: string;
   readonly description: string;
-  readonly weakness: string;
   readonly modifiers: Stats;
   readonly accent: 'blue' | 'red' | 'amber';
   readonly idleAsset: string;

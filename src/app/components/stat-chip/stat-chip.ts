@@ -18,6 +18,15 @@ const STAT_LABELS: Record<Stat, string> = {
   speed: 'Speed',
 };
 
+const STAT_DESCRIPTIONS: Record<Stat, string> = {
+  health: 'Your remaining life. Reach zero and the run ends.',
+  ad: 'Physical damage dealt by Attack.',
+  ap: 'Magic damage dealt by Magic.',
+  armor: 'Reduces physical damage received.',
+  mr: 'Reduces magic damage received.',
+  speed: 'Determines who acts first in an encounter.',
+};
+
 @Component({
   selector: 'app-stat-chip',
   imports: [
@@ -32,8 +41,10 @@ const STAT_LABELS: Record<Stat, string> = {
     <span
       class="stat-chip"
       [class]="'stat-chip ' + stat()"
-      [attr.aria-label]="label() + ': ' + valueLabel()"
-      [title]="label()"
+      role="img"
+      [attr.tabindex]="showLabel() ? null : '0'"
+      [attr.aria-label]="label() + ': ' + valueLabel() + '. ' + description()"
+      [title]="label() + ': ' + description()"
     >
       @switch (stat()) {
         @case ('health') {
@@ -70,6 +81,7 @@ export class StatChipComponent {
   readonly format = input<'number' | 'modifier'>('number');
 
   protected readonly label = computed(() => STAT_LABELS[this.stat()]);
+  protected readonly description = computed(() => STAT_DESCRIPTIONS[this.stat()]);
   protected readonly valueLabel = computed(() =>
     this.format() === 'modifier' ? `×${this.value()}` : this.value().toLocaleString(),
   );

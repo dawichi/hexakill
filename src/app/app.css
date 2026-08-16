@@ -104,8 +104,7 @@ p {
 
 .eyebrow,
 .status,
-.prototype-note,
-.weakness {
+.prototype-note {
   color: var(--muted);
   font-size: 0.75rem;
   letter-spacing: 0.12em;
@@ -584,25 +583,6 @@ h3 {
   line-height: 1.45;
 }
 
-.step-marker {
-  display: grid;
-  justify-items: end;
-  color: var(--ember);
-  font-family: 'Courier New', monospace;
-  line-height: 1;
-}
-
-.step-marker span {
-  font-size: 2.25rem;
-  font-weight: 700;
-}
-
-.step-marker small {
-  color: var(--muted);
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-}
-
 .button-row {
   display: flex;
   gap: 0.6rem;
@@ -700,18 +680,20 @@ h3 {
   border-color: #8c654b;
 }
 
-.character-card.selected.blue,
-.player-card.blue {
+.character-card.selected.blue {
   border-color: #38bdf8;
 }
 
 .character-card.selected.red,
-.player-card.red {
+.enemy-combatant {
   border-color: #fb7185;
 }
 
-.character-card.selected.amber,
-.player-card.amber {
+.player-combatant {
+  border-color: #38bdf8;
+}
+
+.character-card.selected.amber {
   border-color: var(--amber);
 }
 
@@ -858,64 +840,9 @@ h3 {
 }
 
 .combat-sprite {
-  height: 4.5rem;
-  margin: 0.8rem 0;
-}
-
-.validation {
-  min-height: 1.5rem;
-  margin-bottom: 1rem;
-  color: #fbbf24;
-}
-
-.player-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border: 1px solid #52525b;
-  border-radius: 0.75rem;
-  background: #27272a;
-  padding: 1.25rem;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin: 1.5rem 0;
-}
-
-.stats-grid div {
-  border-radius: 0.5rem;
-  background: #27272a;
-  padding: 0.8rem;
-}
-
-.stats-grid dt {
-  color: #a1a1aa;
-  font-size: 0.75rem;
-}
-
-.stats-grid dd {
-  margin: 0.35rem 0 0;
-  font-size: 1.3rem;
-  font-weight: 800;
-}
-
-.next-step {
-  border-left: 3px solid #06b6d4;
-  background: #164e63;
-  padding: 1rem;
-}
-
-.next-step p:last-child {
-  margin-top: 0.4rem;
-  color: #cffafe;
-}
-
-.next-step .primary-button {
-  margin-top: 1rem;
+  width: min(100%, 12rem);
+  height: 10rem;
+  margin: 0;
 }
 
 .records-panel {
@@ -1059,33 +986,157 @@ h3 {
 
 .combat-grid {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 1rem;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
 }
 
 .combatant-card {
-  min-height: 11rem;
-  border: 1px solid #52525b;
-  border-radius: 0.75rem;
-  background: #27272a;
-  padding: 1.25rem;
+  display: grid;
+  min-height: 27rem;
+  align-content: space-between;
+  gap: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.2rem;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 2%) 25%, transparent 25%) 0 0 / 8px 8px,
+    linear-gradient(315deg, rgb(0 0 0 / 12%) 25%, transparent 25%) 0 0 / 8px 8px,
+    var(--stone-0);
+  padding: 1rem;
 }
 
-.enemy-combatant {
+.combatant-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.combatant-header h3 {
+  max-width: 14ch;
+  margin-top: 0.3rem;
+  color: var(--ink);
+  font-family: Georgia, serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.55rem);
+  line-height: 1.05;
+}
+
+.combatant-badge {
+  border: 1px solid var(--line-soft);
+  padding: 0.25rem 0.35rem;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.player-combatant .combatant-badge {
+  border-color: #38bdf8;
+  color: #67c8db;
+}
+
+.enemy-combatant .combatant-badge {
   border-color: #fb7185;
+  color: #fb7185;
 }
 
-.combatant-card p:last-child {
-  color: #d4d4d8;
-  line-height: 1.5;
+.combatant-body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 14rem;
+}
+
+.enemy-combatant .combatant-body {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.combat-stat-rail {
+  display: grid;
+  align-content: center;
+  gap: 0.42rem;
+}
+
+.combat-stat-rail app-stat-chip {
+  justify-self: start;
+}
+
+.enemy-combatant .combat-stat-rail app-stat-chip {
+  justify-self: end;
+}
+
+.combatant-visual {
+  display: grid;
+  min-width: 0;
+  min-height: 12rem;
+  place-items: center;
+  border: 1px solid var(--line-soft);
+  background: radial-gradient(circle at 50% 45%, rgb(105 197 211 / 9%), transparent 48%), #141316;
+}
+
+.enemy-combatant .combatant-visual {
+  background: radial-gradient(circle at 50% 45%, rgb(219 106 98 / 10%), transparent 48%), #141316;
+}
+
+.combatant-health {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.health-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+}
+
+.health-heading span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.health-heading svg {
+  color: #ef817a;
+}
+
+.health-heading strong {
+  color: var(--ink);
+  font-size: 0.72rem;
 }
 
 .versus {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
   color: #fbbf24;
-  font-size: 0.8rem;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
   font-weight: 900;
   letter-spacing: 0.12em;
+}
+
+.versus span {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border: 1px solid #fbbf24;
+  border-radius: 50%;
+  background: var(--stone-0);
+  box-shadow: 0 0 1.5rem rgb(251 191 36 / 15%);
+}
+
+.versus small {
+  color: var(--muted);
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .health-bar {
@@ -1126,6 +1177,8 @@ h3 {
 
 .action-button {
   display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
   gap: 0.35rem;
   cursor: pointer;
   border: 1px solid #52525b;
@@ -1135,6 +1188,10 @@ h3 {
   padding: 0.9rem 1rem;
   text-align: left;
   font-weight: 800;
+}
+
+.action-button > svg {
+  grid-row: 1 / span 2;
 }
 
 .action-button span {
@@ -1233,8 +1290,7 @@ h3 {
 
 @media (max-width: 700px) {
   .topbar,
-  .section-heading,
-  .player-card {
+  .section-heading {
     align-items: stretch;
     flex-direction: column;
   }
@@ -1290,7 +1346,6 @@ h3 {
   }
 
   .character-grid,
-  .stats-grid,
   .combat-grid,
   .action-grid,
   .power-up-grid,
@@ -1302,10 +1357,16 @@ h3 {
     text-align: center;
   }
 
-  .stats-grid div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  .combatant-card {
+    min-height: 23rem;
+  }
+
+  .combatant-body {
+    min-height: 11rem;
+  }
+
+  .combatant-visual {
+    min-height: 10rem;
   }
 }
 

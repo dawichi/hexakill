@@ -16,7 +16,7 @@ import {
 } from '@lucide/angular';
 import { GameSessionService } from './application/game-session.service';
 import { StatChipComponent } from './components/stat-chip/stat-chip';
-import { CharacterDefinition, ItemState, SpriteStripAsset, Stat } from './domain/game-types';
+import { CharacterDefinition, ItemState, SpriteStripAsset, Stat, Stats } from './domain/game-types';
 import { PersonalRecord } from './domain/records';
 
 @Component({
@@ -43,14 +43,7 @@ import { PersonalRecord } from './domain/records';
 export class App {
   protected readonly session = inject(GameSessionService);
   private readonly document = inject(DOCUMENT);
-  protected readonly statLabels = [
-    ['health', 'Health'],
-    ['ad', 'Attack'],
-    ['ap', 'Magic'],
-    ['armor', 'Armor'],
-    ['mr', 'Magic resist'],
-    ['speed', 'Speed'],
-  ] as const;
+  protected readonly statKeys: readonly Stat[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed'];
 
   constructor() {
     afterRenderEffect(() => {
@@ -129,6 +122,10 @@ export class App {
     const animationName =
       asset.orientation === 'vertical' ? 'sprite-strip-play-vertical' : 'sprite-strip-play';
     return `${animationName} ${duration}ms steps(${asset.frameCount}) 1 both`;
+  }
+
+  protected combatStatValue(stats: Stats, stat: Stat, currentHealth?: number): number {
+    return stat === 'health' && currentHealth !== undefined ? currentHealth : stats[stat];
   }
 
   protected statHighlights(character: CharacterDefinition): ReadonlyArray<{
