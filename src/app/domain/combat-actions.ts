@@ -9,7 +9,7 @@ export function determineFirstActor(playerSpeed: number, enemySpeed: number): 'p
 
 /** Preserves the legacy enemy action policy until gameplay balance is reviewed. */
 export function chooseEnemyAction(enemy: EnemyState, roll: number): CombatAction {
-  if (roll < 0 || roll >= 1) {
+  if (!Number.isFinite(roll) || roll < 0 || roll >= 1) {
     throw new RangeError('Random rolls must be in the range [0, 1).');
   }
 

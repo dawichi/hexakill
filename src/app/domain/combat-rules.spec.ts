@@ -105,4 +105,25 @@ describe('combat rules', () => {
     expect(magicAtThreshold.missed).toBe(false);
     expect(magicBelowThreshold.missed).toBe(true);
   });
+
+  it('rejects non-finite random rolls at the combat boundary', () => {
+    expect(() =>
+      resolveDamage({ stats: attackerStats }, defender, 'attack', {
+        damageRoll: Number.NaN,
+        chanceRoll: 0.5,
+      }),
+    ).toThrow(RangeError);
+    expect(() =>
+      resolveDamage({ stats: attackerStats }, defender, 'attack', {
+        damageRoll: 0.5,
+        chanceRoll: Number.NaN,
+      }),
+    ).toThrow(RangeError);
+    expect(() =>
+      resolveDamage({ stats: attackerStats }, defender, 'attack', {
+        damageRoll: Number.POSITIVE_INFINITY,
+        chanceRoll: 0.5,
+      }),
+    ).toThrow(RangeError);
+  });
 });

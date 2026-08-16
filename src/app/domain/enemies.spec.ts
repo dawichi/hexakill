@@ -40,6 +40,8 @@ describe('enemy generation', () => {
   it('rejects invalid random rolls', () => {
     expect(() => generateEnemy(4, 1, 0.5)).toThrow(RangeError);
     expect(() => generateEnemy(4, 0.5, -0.1)).toThrow(RangeError);
+    expect(() => generateEnemy(4, Number.NaN, 0.5)).toThrow(RangeError);
+    expect(() => generateEnemy(4, 0.5, Number.POSITIVE_INFINITY)).toThrow(RangeError);
   });
 
   it('uses observed attack and defeat assets, with idle fallback for other enemies', () => {

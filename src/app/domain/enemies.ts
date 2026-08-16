@@ -242,7 +242,9 @@ export function enemySpriteAssetFor(
 }
 
 function assertRoll(roll: number): void {
-  if (roll < 0 || roll >= 1) throw new RangeError('Random rolls must be in the range [0, 1).');
+  if (!Number.isFinite(roll) || roll < 0 || roll >= 1) {
+    throw new RangeError('Random rolls must be in the range [0, 1).');
+  }
 }
 
 function calculateStats(level: number, definition: EnemyDefinition): Stats {

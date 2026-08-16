@@ -37,7 +37,7 @@ export interface DamageResult {
 }
 
 function integerBetween(min: number, max: number, roll: number): number {
-  if (roll < 0 || roll >= 1) {
+  if (!Number.isFinite(roll) || roll < 0 || roll >= 1) {
     throw new RangeError('Random rolls must be in the range [0, 1).');
   }
 
@@ -54,6 +54,10 @@ export function resolveDamage(
   kind: DamageKind,
   rolls: DamageRoll,
 ): DamageResult {
+  if (!Number.isFinite(rolls.chanceRoll) || rolls.chanceRoll < 0 || rolls.chanceRoll >= 1) {
+    throw new RangeError('Random rolls must be in the range [0, 1).');
+  }
+
   const rule = COMBAT_RULES[kind === 'attack' ? 'ad' : 'ap'];
   const attackPower = attacker.stats[kind === 'attack' ? 'ad' : 'ap'];
   const [minimum, maximum] = rule.hitRange;
