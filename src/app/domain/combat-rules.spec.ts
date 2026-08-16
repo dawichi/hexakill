@@ -47,6 +47,30 @@ describe('combat rules', () => {
     expect(result.rawDamage).toBeGreaterThan(100);
   });
 
+  it('preserves the legacy strict critical thresholds for physical and magic damage', () => {
+    const physicalAtThreshold = resolveDamage({ stats: attackerStats }, defender, 'attack', {
+      damageRoll: 0.5,
+      chanceRoll: 0.9,
+    });
+    const physicalAboveThreshold = resolveDamage({ stats: attackerStats }, defender, 'attack', {
+      damageRoll: 0.5,
+      chanceRoll: 0.9001,
+    });
+    const magicAtThreshold = resolveDamage({ stats: attackerStats }, defender, 'magic', {
+      damageRoll: 0.5,
+      chanceRoll: 0.6,
+    });
+    const magicAboveThreshold = resolveDamage({ stats: attackerStats }, defender, 'magic', {
+      damageRoll: 0.5,
+      chanceRoll: 0.6001,
+    });
+
+    expect(physicalAtThreshold.critical).toBe(false);
+    expect(physicalAboveThreshold.critical).toBe(true);
+    expect(magicAtThreshold.critical).toBe(false);
+    expect(magicAboveThreshold.critical).toBe(true);
+  });
+
   it('resolves a missed attack without changing damage taken', () => {
     const result = resolveDamage({ stats: attackerStats }, defender, 'attack', {
       damageRoll: 0.5,
