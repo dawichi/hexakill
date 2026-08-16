@@ -99,6 +99,7 @@ const requiredCommands = [
   'verify:docs',
   'verify:preview',
   'verify:deployment',
+  'verify:migration',
   'verify:types',
   'verify:toolchain',
   'verify:release',

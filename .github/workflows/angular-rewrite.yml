@@ -57,6 +57,8 @@ jobs:
         run: npm run verify:types
       - name: Verify project documentation contract
         run: npm run verify:docs
+      - name: Verify root Angular migration contract
+        run: npm run verify:migration
       - name: Verify deployment contract
         run: npm run verify:deployment
       - name: Run tests
