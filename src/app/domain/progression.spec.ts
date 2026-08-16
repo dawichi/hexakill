@@ -59,8 +59,21 @@ describe('progression rules', () => {
       RangeError,
     );
     expect(() =>
+      calculateVictoryReward(
+        { ...player, level: Number.MAX_SAFE_INTEGER + 1 },
+        generateEnemy(4, 0, 0),
+      ),
+    ).toThrow(RangeError);
+    expect(() =>
+      calculateVictoryReward(player, {
+        ...generateEnemy(4, 0, 0),
+        level: Number.MAX_SAFE_INTEGER + 1,
+      }),
+    ).toThrow(RangeError);
+    expect(() =>
       calculateVictoryReward({ ...player, experience: Number.NaN }, generateEnemy(4, 0, 0)),
     ).toThrow(RangeError);
+    expect(() => powerUpValue('health', Number.MAX_SAFE_INTEGER + 1)).toThrow(RangeError);
     expect(() =>
       applyPowerUp(
         { ...player, powerUps: { pending: -1, history: { health: 0, ad: 0, ap: 0, speed: 0 } } },

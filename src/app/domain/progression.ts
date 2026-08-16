@@ -5,6 +5,10 @@ export const MAX_POWER_UPS = 24;
 export const MAX_POWER_UPS_PER_STAT = 6;
 const POWER_UP_TYPES: readonly PowerUpType[] = ['health', 'ad', 'ap', 'speed'];
 
+function isSafeNonNegativeInteger(value: number): boolean {
+  return Number.isSafeInteger(value) && value >= 0;
+}
+
 export interface VictoryReward {
   readonly experience: number;
   readonly gold: number;
@@ -25,12 +29,9 @@ function assertPowerUpState(player: PlayerState): void {
 
   const history = POWER_UP_TYPES.map((type) => powerUps.history[type]);
   if (
-    !Number.isInteger(powerUps.pending) ||
-    powerUps.pending < 0 ||
+    !isSafeNonNegativeInteger(powerUps.pending) ||
     powerUps.pending > MAX_POWER_UPS ||
-    history.some(
-      (count) => !Number.isInteger(count) || count < 0 || count > MAX_POWER_UPS_PER_STAT,
-    ) ||
+    history.some((count) => !isSafeNonNegativeInteger(count) || count > MAX_POWER_UPS_PER_STAT) ||
     powerUps.pending + history.reduce((sum, count) => sum + count, 0) > MAX_POWER_UPS
   ) {
     throw new RangeError('Power-up state exceeds its progression bounds.');
@@ -47,17 +48,24 @@ function assertPlayerStats(player: PlayerState): void {
 }
 
 function assertProgressionInputs(player: PlayerState, enemy: EnemyState): void {
-  if (!Number.isInteger(player.level) || player.level < 1) {
-    throw new RangeError('Player level must be a positive integer.');
+  if (!Number.isSafeInteger(player.level) || player.level < 1) {
+    throw new RangeError('Player level must be a positive safe integer.');
   }
-  if (!Number.isInteger(player.experience) || player.experience < 0 || player.experience >= 100) {
+  if (
+    !Number.isSafeInteger(player.experience) ||
+    player.experience < 0 ||
+    player.experience >= 100
+  ) {
     throw new RangeError('Player experience must be an integer between 0 and 99.');
   }
-  if (!Number.isInteger(enemy.level) || enemy.level < 1) {
-    throw new RangeError('Enemy level must be a positive integer.');
+  if (!Number.isSafeInteger(enemy.level) || enemy.level < 1) {
+    throw new RangeError('Enemy level must be a positive safe integer.');
   }
-  if (!Number.isInteger(enemy.gold) || enemy.gold < 0) {
+  if (!isSafeNonNegativeInteger(enemy.gold)) {
     throw new RangeError('Enemy gold must be a non-negative integer.');
+  }
+  if (!isSafeNonNegativeInteger(player.gold) || !isSafeNonNegativeInteger(player.potions)) {
+    throw new RangeError('Player gold and potions must be non-negative safe integers.');
   }
   assertPlayerStats(player);
 
@@ -134,7 +142,7 @@ export function powerUpValue(type: PowerUpType, currentCount: number): number {
     throw new RangeError('Unknown power-up type.');
   }
   if (
-    !Number.isInteger(currentCount) ||
+    !Number.isSafeInteger(currentCount) ||
     currentCount < 0 ||
     currentCount >= MAX_POWER_UPS_PER_STAT
   ) {
