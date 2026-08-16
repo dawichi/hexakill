@@ -379,7 +379,7 @@
               {{ session.combatMessage() }}
             </p>
 
-            <section class="combat-log" aria-labelledby="combat-log-title">
+            <section class="combat-log records-panel" aria-labelledby="combat-log-title">
               <h3 id="combat-log-title">Battle log</h3>
               <div class="combat-log-grid">
                 <div>
@@ -387,7 +387,7 @@
                   @if (session.playerCombatLog().length) {
                     <ol aria-label="Your combat actions">
                       @for (entry of session.playerCombatLog(); track $index) {
-                        <li [class.log-muted]="$index < session.playerCombatLog().length - 4">
+                        <li>
                           <strong>{{ entry.title }}</strong>
                           {{ entry.message }}
                           @if (entry.value !== undefined) {
@@ -408,7 +408,7 @@
                   @if (session.enemyCombatLog().length) {
                     <ol aria-label="Enemy combat actions">
                       @for (entry of session.enemyCombatLog(); track $index) {
-                        <li [class.log-muted]="$index < session.enemyCombatLog().length - 4">
+                        <li>
                           <strong>{{ entry.title }}</strong>
                           {{ entry.message }}
                           @if (entry.value !== undefined) {
