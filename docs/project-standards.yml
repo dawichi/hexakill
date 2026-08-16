@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: legacy unfinished browser game; rewrite preparation
   current_branch: main
-  current_revision: 984908f984b1de6fde6825d06bf66382a0a990e2
+  current_revision: 3f0a04c917c3c1c2efe43b6cc2701381c35975f8
 
 standards:
   - documentation
@@ -72,7 +72,7 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: 'Active Angular baseline: 85 tests and 25 Playwright journeys, including invalid numeric reducer payload rejection, finite random-roll boundary rejection, non-finite and unsafe-integer enemy-generation/progression level and boss-progress rejection, safe-integer personal-record and restored-session counter validation, positive restored health validation, invalid heal-input rejection, integer power-up-count and unknown power-up identifier rejection, malformed store gold/potion/inventory/stat-state rejection, strict legacy critical/miss-threshold boundaries, name-field validation semantics, terminal-phase action rejection, impossible terminal-session rejection, skip-link keyboard access, malformed-preference/personal-record recovery, over-cap-power-up and duplicate-inventory persistence rejection, Wizard Idle/Attack1/Attack2/hit provisional player-action mapping, physical/Magic/hit/idle Evil Wizard, Knight, and Witch Blue animation mapping including Witch Blue Magic charge, durable transient/malformed-result rejection, bounded eight-entry combat-log lifecycle, and store/progression edge cases; production journeys explicitly start the repository static server rather than reusing a stale port occupant; broader gameplay/accessibility coverage remains incomplete.'
+      evidence: 'Active Angular baseline: 85 tests and 25 Playwright journeys, including invalid numeric reducer payload rejection, finite random-roll boundary rejection, non-finite and unsafe-integer enemy-generation/progression level and boss-progress rejection, safe-integer player/enemy potion transition validation, safe-integer personal-record and restored-session counter validation, positive restored health validation, invalid heal-input rejection, integer power-up-count and unknown power-up identifier rejection, malformed store gold/potion/inventory/stat-state rejection, strict legacy critical/miss-threshold boundaries, name-field validation semantics, terminal-phase action rejection, impossible terminal-session rejection, skip-link keyboard access, malformed-preference/personal-record recovery, over-cap-power-up and duplicate-inventory persistence rejection, Wizard Idle/Attack1/Attack2/hit provisional player-action mapping, physical/Magic/hit/idle Evil Wizard, Knight, and Witch Blue animation mapping including Witch Blue Magic charge, durable transient/malformed-result rejection, bounded eight-entry combat-log lifecycle, and store/progression edge cases; production journeys explicitly start the repository static server rather than reusing a stale port occupant; broader gameplay/accessibility coverage remains incomplete.'
       priority: high
       next_action: Retain the automated focus/responsive assertions and add manual accessibility evidence before release.
     - id: TS-001
