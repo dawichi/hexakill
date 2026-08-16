@@ -20,7 +20,7 @@ function enemy(
   enemyModifiers: Stats,
   animationAssets: Pick<
     EnemyDefinition,
-    'attackAsset' | 'attackSpriteAsset' | 'defeatAsset' | 'defeatSpriteAsset'
+    'attackAsset' | 'attackSpriteAsset' | 'magicSpriteAsset' | 'defeatAsset' | 'defeatSpriteAsset'
   > = {},
 ): EnemyDefinition {
   return { id, name, archetype, modifiers: enemyModifiers, idleAsset, ...animationAssets };
@@ -40,6 +40,13 @@ const EVIL_WIZARD_DEFEAT_SPRITE: SpriteStripAsset = {
 
 const EVIL_WIZARD_ATTACK_SPRITE: SpriteStripAsset = {
   src: '/images/evil-wizard/sprites/Attack1.png',
+  frameWidth: 250,
+  frameHeight: 250,
+  frameCount: 8,
+};
+
+const EVIL_WIZARD_MAGIC_SPRITE: SpriteStripAsset = {
+  src: '/images/evil-wizard/sprites/Attack2.png',
   frameWidth: 250,
   frameHeight: 250,
   frameCount: 8,
@@ -148,6 +155,7 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
   }),
   enemy('evil-wizard', 'Evil Wizard', 'ap', '/images/evil-wizard/idle.gif', AP_MODIFIERS, {
     attackSpriteAsset: EVIL_WIZARD_ATTACK_SPRITE,
+    magicSpriteAsset: EVIL_WIZARD_MAGIC_SPRITE,
     defeatSpriteAsset: EVIL_WIZARD_DEFEAT_SPRITE,
   }),
   enemy('fire-knight', 'Fire knight', 'tank', '/images/fire-knight/idle.gif', TANK_MODIFIERS),
@@ -234,10 +242,15 @@ export function enemyAssetFor(
 export function enemySpriteAssetFor(
   id: string,
   animation: 'idle' | 'attack' | 'defeat',
+  action: 'attack' | 'magic' = 'attack',
 ): SpriteStripAsset | undefined {
   const definition = findEnemyDefinition(id);
   if (!definition) return undefined;
-  if (animation === 'attack') return definition.attackSpriteAsset;
+  if (animation === 'attack') {
+    return action === 'magic'
+      ? (definition.magicSpriteAsset ?? definition.attackSpriteAsset)
+      : definition.attackSpriteAsset;
+  }
   if (animation === 'defeat') return definition.defeatSpriteAsset;
   return undefined;
 }

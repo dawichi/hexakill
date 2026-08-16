@@ -50,6 +50,7 @@ export interface EnemyDefinition {
   readonly idleAsset: string;
   readonly attackAsset?: string;
   readonly attackSpriteAsset?: SpriteStripAsset;
+  readonly magicSpriteAsset?: SpriteStripAsset;
   readonly defeatAsset?: string;
   readonly defeatSpriteAsset?: SpriteStripAsset;
 }

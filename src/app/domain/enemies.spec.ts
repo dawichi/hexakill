@@ -111,6 +111,18 @@ describe('enemy generation', () => {
       frameHeight: 150,
       frameCount: 5,
     });
+    expect(enemySpriteAssetFor('evil-wizard', 'attack', 'magic')).toEqual({
+      src: '/images/evil-wizard/sprites/Attack2.png',
+      frameWidth: 250,
+      frameHeight: 250,
+      frameCount: 8,
+    });
+    expect(enemySpriteAssetFor('evil-wizard', 'attack', 'attack')).toEqual({
+      src: '/images/evil-wizard/sprites/Attack1.png',
+      frameWidth: 250,
+      frameHeight: 250,
+      frameCount: 8,
+    });
   });
 
   it('maps the observed Witch Blue vertical attack and defeat strips', () => {

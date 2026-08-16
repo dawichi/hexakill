@@ -281,6 +281,7 @@ export class GameSessionService {
   readonly combatState = signal<CombatState>(INITIAL_COMBAT_STATE);
   readonly enemy = computed(() => this.combatState().enemy);
   readonly enemyAnimation = signal<'idle' | 'attack' | 'defeat'>('idle');
+  readonly enemyActionKind = signal<DamageKind | null>(null);
   readonly playerAnimation = signal<'idle' | 'action' | 'defeat'>('idle');
   readonly playerActionKind = signal<DamageKind | null>(null);
   readonly playerActionAsset = computed<SpriteStripAsset | null>(() => {
@@ -295,7 +296,12 @@ export class GameSessionService {
     () => enemyAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? '',
   );
   readonly enemySpriteAsset = computed<SpriteStripAsset | null>(
-    () => enemySpriteAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? null,
+    () =>
+      enemySpriteAssetFor(
+        this.enemy()?.definition.id ?? '',
+        this.enemyAnimation(),
+        this.enemyActionKind() ?? 'attack',
+      ) ?? null,
   );
   readonly defeatedEnemySummary = computed<readonly DefeatedEnemySummary[]>(() => {
     const history = this.player()?.defeatedEnemies ?? [];
@@ -386,6 +392,7 @@ export class GameSessionService {
     this.player.set(createInitialPlayer(name, character));
     this.combatState.set(INITIAL_COMBAT_STATE);
     this.enemyAnimation.set('idle');
+    this.enemyActionKind.set(null);
     this.playerAnimation.set('idle');
     this.playerActionKind.set(null);
     this.combatMessage.set('Find an enemy to begin combat.');
@@ -570,6 +577,7 @@ export class GameSessionService {
     this.player.set(null);
     this.applyCombatEvent({ type: 'reset' });
     this.enemyAnimation.set('idle');
+    this.enemyActionKind.set(null);
     this.playerAnimation.set('idle');
     this.playerActionKind.set(null);
     this.lastActionAt.set(null);
@@ -600,6 +608,7 @@ export class GameSessionService {
 
     this.cancelPendingEnemyAnimationReset();
     const action: CombatAction = chooseEnemyAction(enemy, this.random());
+    this.enemyActionKind.set(action === 'magic' || action === 'attack' ? action : null);
     this.enemyAnimation.set('attack');
     const result = resolveAction(
       { stats: enemy.stats },
@@ -678,6 +687,7 @@ export class GameSessionService {
         return;
       }
       this.enemyAnimation.set('idle');
+      this.enemyActionKind.set(null);
     }, 600);
   }
 
@@ -830,6 +840,7 @@ export class GameSessionService {
             : null,
         });
         this.enemyAnimation.set('idle');
+        this.enemyActionKind.set(null);
         this.playerAnimation.set(
           snapshot.screen === 'game-over' && snapshot.combatState.phase === 'defeat'
             ? 'defeat'
