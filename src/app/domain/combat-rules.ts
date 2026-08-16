@@ -67,6 +67,9 @@ export function resolveDamage(
   kind: DamageKind,
   rolls: DamageRoll,
 ): DamageResult {
+  if (kind !== 'attack' && kind !== 'magic') {
+    throw new RangeError('Damage kind must be attack or magic.');
+  }
   assertStats(attacker.stats, 'Attacker');
   assertStats(defender.stats, 'Defender');
   if (

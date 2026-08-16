@@ -145,4 +145,13 @@ describe('combat rules', () => {
       ),
     ).toThrow(RangeError);
   });
+
+  it('rejects an unknown damage kind at the runtime boundary', () => {
+    expect(() =>
+      resolveDamage({ stats: attackerStats }, defender, 'unknown' as never, {
+        damageRoll: 0.5,
+        chanceRoll: 0.5,
+      }),
+    ).toThrow(RangeError);
+  });
 });
