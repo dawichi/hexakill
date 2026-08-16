@@ -93,7 +93,7 @@ function isStats(value: unknown): value is Stats {
 }
 
 function isNonNegativeInteger(value: unknown): value is number {
-  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 }
 
 function isRestorablePlayer(value: unknown): value is PlayerState {
@@ -107,6 +107,7 @@ function isRestorablePlayer(value: unknown): value is PlayerState {
     !isNonNegativeInteger(value['experience']) ||
     value['experience'] >= 100 ||
     !isStats(value['stats']) ||
+    value['stats']['health'] <= 0 ||
     !isNonNegativeInteger(value['potions']) ||
     !isNonNegativeInteger(value['gold']) ||
     !isNonNegativeInteger(value['bossesDefeated']) ||
@@ -178,6 +179,7 @@ function isRestorableEnemy(value: unknown): value is EnemyState {
     isNonNegativeInteger(value['level']) &&
     value['level'] >= 1 &&
     isStats(value['stats']) &&
+    value['stats']['health'] > 0 &&
     isNonNegativeInteger(value['damageTaken']) &&
     value['damageTaken'] <= value['stats']['health'] &&
     isNonNegativeInteger(value['potions']) &&

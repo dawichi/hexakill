@@ -17,6 +17,7 @@ The root application separates the active run from personal records:
 - Each record uses the stable `characterId`, the player `name`, and the reached `level`.
 - Records are validated on restore, including known characters, the existing 3–14 character name contract, positive safe-integer levels, and the five-entry limit; valid records are sorted descending by level.
 - Invalid or malformed records are discarded safely.
+- Restored player and enemy counters use non-negative safe integers, and both player and enemy health must remain positive; malformed numeric state is discarded safely before hydration.
 - Restored run snapshots must match a coherent screen/phase shape: character selection has no player or enemy, a ready screen has an idle player with no enemy, combat has an undamaged enemy awaiting action or a defeated enemy showing victory, and game-over has an enemy with a defeat phase and lethal player damage.
 - Restored players reject duplicate one-time inventory IDs and reject power-up snapshots whose pending plus spent total exceeds the global 24-point cap; valid inventory entries are hydrated from the canonical store catalog.
 - Durable v1 snapshots reject transient `pendingAction` values and malformed `lastResult` values; the application never resumes an in-flight action or delayed enemy turn after reload.

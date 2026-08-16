@@ -344,25 +344,27 @@ test('reduced motion and a narrow viewport remain usable', async ({ page }) => {
 });
 
 test('an invalid saved session is discarded safely', async ({ page }) => {
-  await page.evaluate(() => {
-    localStorage.setItem(
-      'hexakill.angular.session.v1',
-      JSON.stringify({
-        version: 1,
-        screen: 'combat',
-        playerName: 'Agent',
-        selectedCharacterId: 'wizard',
-        player: { name: 'Agent', level: 0 },
-        combatState: { phase: 'idle', enemy: null, playerDamageTaken: 0 },
-      }),
-    );
-  });
+  for (const level of [0, Number.MAX_SAFE_INTEGER + 1]) {
+    await page.evaluate((invalidLevel) => {
+      localStorage.setItem(
+        'hexakill.angular.session.v1',
+        JSON.stringify({
+          version: 1,
+          screen: 'combat',
+          playerName: 'Agent',
+          selectedCharacterId: 'wizard',
+          player: { name: 'Agent', level: invalidLevel },
+          combatState: { phase: 'idle', enemy: null, playerDamageTaken: 0 },
+        }),
+      );
+    }, level);
 
-  await page.reload();
-  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
-  await expect(
-    page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
-  ).resolves.toBeNull();
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+    await expect(
+      page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
+    ).resolves.toBeNull();
+  }
 });
 
 test('an incoherent restored screen is discarded safely', async ({ page }) => {
@@ -477,16 +479,18 @@ test('negative restored stats are discarded safely', async ({ page }) => {
   const snapshot = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
   );
-  snapshot.player.stats.health = -1;
-  await page.evaluate((value) => {
-    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
-  }, snapshot);
+  for (const health of [-1, 0]) {
+    snapshot.player.stats.health = health;
+    await page.evaluate((value) => {
+      localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+    }, snapshot);
 
-  await page.reload();
-  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
-  await expect(
-    page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
-  ).resolves.toBeNull();
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+    await expect(
+      page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
+    ).resolves.toBeNull();
+  }
 });
 
 test('restored power-up totals above the global cap are discarded safely', async ({ page }) => {
