@@ -206,6 +206,18 @@ function isRestorableDamageResult(value: unknown): value is DamageResult {
 function isRestorableCombatState(value: unknown): value is CombatState {
   if (!isRecord(value)) return false;
 
+  const enemy = value['enemy'];
+  const lastResult = value['lastResult'];
+  const coherentLastResult =
+    lastResult === null ||
+    (isRecord(enemy) &&
+      isRestorableDamageResult(lastResult) &&
+      typeof enemy['damageTaken'] === 'number' &&
+      isRecord(enemy['stats']) &&
+      typeof enemy['stats']['health'] === 'number' &&
+      lastResult.damageTaken === enemy['damageTaken'] &&
+      lastResult.damageTaken <= enemy['stats']['health']);
+
   const phases = [
     'idle',
     'awaiting-player-action',
@@ -217,10 +229,10 @@ function isRestorableCombatState(value: unknown): value is CombatState {
   return (
     typeof value['phase'] === 'string' &&
     phases.includes(value['phase']) &&
-    (value['enemy'] === null || isRestorableEnemy(value['enemy'])) &&
+    (enemy === null || isRestorableEnemy(enemy)) &&
     isNonNegativeInteger(value['playerDamageTaken']) &&
     value['pendingAction'] === null &&
-    (value['lastResult'] === null || isRestorableDamageResult(value['lastResult']))
+    coherentLastResult
   );
 }
 
