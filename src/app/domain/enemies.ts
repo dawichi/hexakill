@@ -21,6 +21,7 @@ function enemy(
   animationAssets: Pick<
     EnemyDefinition,
     | 'attackAsset'
+    | 'idleSpriteAsset'
     | 'attackSpriteAsset'
     | 'magicSpriteAsset'
     | 'hitSpriteAsset'
@@ -134,6 +135,14 @@ const WITCH_BLUE_ATTACK_SPRITE: SpriteStripAsset = {
   frameCount: 4,
   orientation: 'vertical',
   trailingPixels: 2,
+};
+
+const WITCH_BLUE_IDLE_SPRITE: SpriteStripAsset = {
+  src: '/images/witch-blue/assets/B_witch_idle.png',
+  frameWidth: 32,
+  frameHeight: 32,
+  frameCount: 9,
+  orientation: 'vertical',
 };
 
 const WITCH_BLUE_MAGIC_SPRITE: SpriteStripAsset = {
@@ -258,6 +267,7 @@ export const ENEMY_DEFINITIONS: readonly EnemyDefinition[] = [
     defeatSpriteAsset: WILD_HUNTRESS_DEFEAT_SPRITE,
   }),
   enemy('witch-blue', 'Witch Blue', 'ap', '/images/witch-blue/idle.gif', AP_MODIFIERS, {
+    idleSpriteAsset: WITCH_BLUE_IDLE_SPRITE,
     attackSpriteAsset: WITCH_BLUE_ATTACK_SPRITE,
     magicSpriteAsset: WITCH_BLUE_MAGIC_SPRITE,
     hitSpriteAsset: WITCH_BLUE_HIT_SPRITE,
@@ -310,7 +320,7 @@ export function enemySpriteAssetFor(
   }
   if (animation === 'hit') return definition.hitSpriteAsset;
   if (animation === 'defeat') return definition.defeatSpriteAsset;
-  return undefined;
+  return definition.idleSpriteAsset;
 }
 
 function assertRoll(roll: number): void {

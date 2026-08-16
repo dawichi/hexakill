@@ -58,6 +58,7 @@ export interface EnemyDefinition {
   readonly archetype: 'basic' | 'ad' | 'ap' | 'tank' | 'boss';
   readonly modifiers: Stats;
   readonly idleAsset: string;
+  readonly idleSpriteAsset?: SpriteStripAsset;
   readonly attackAsset?: string;
   readonly attackSpriteAsset?: SpriteStripAsset;
   readonly magicSpriteAsset?: SpriteStripAsset;

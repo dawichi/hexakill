@@ -320,7 +320,9 @@
                           : ' attack animation'
                         : session.enemyAnimation() === 'hit'
                           ? ' hit animation'
-                          : ' defeat animation')
+                          : session.enemyAnimation() === 'defeat'
+                            ? ' defeat animation'
+                            : ' idle animation')
                     "
                     [style.background-image]="'url(' + enemySpriteAsset.src + ')'"
                     [style.background-size]="spriteBackgroundSize(enemySpriteAsset)"

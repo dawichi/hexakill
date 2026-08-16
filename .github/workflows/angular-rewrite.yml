@@ -111,6 +111,7 @@ jobs:
           test -f dist/hexakill/browser/images/wild-huntress/sprites/Death.png
           test -f dist/hexakill/browser/images/witch-blue/assets/B_witch_attack.png
           test -f dist/hexakill/browser/images/witch-blue/assets/B_witch_charge.png
+          test -f dist/hexakill/browser/images/witch-blue/assets/B_witch_idle.png
           test -f dist/hexakill/browser/images/witch-blue/assets/B_witch_take_damage.png
           test -f dist/hexakill/browser/images/witch-blue/assets/B_witch_death.png
           test -f dist/hexakill/browser/images/wizard/sprites/Death.png

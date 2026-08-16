@@ -76,6 +76,7 @@ const requiredAssets = [
   'images/wild-huntress/sprites/Take hit.png',
   'images/witch-blue/assets/B_witch_attack.png',
   'images/witch-blue/assets/B_witch_charge.png',
+  'images/witch-blue/assets/B_witch_idle.png',
   'images/witch-blue/assets/B_witch_take_damage.png',
   'images/witch-blue/assets/B_witch_death.png',
   'images/wizard/sprites/Attack1.png',
@@ -110,9 +111,9 @@ const allImagePaths = listFiles(resolve(assetRoot, 'images')).map((path) =>
   relative(assetRoot, path).split('\\').join('/'),
 );
 const deferredImageCount = allImagePaths.filter((asset) => !activeImagePaths.has(asset)).length;
-if (deferredImageCount !== 50) {
+if (deferredImageCount !== 49) {
   console.error(
-    `Expected 50 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
+    `Expected 49 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
   );
   process.exit(1);
 }

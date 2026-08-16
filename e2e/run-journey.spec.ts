@@ -227,8 +227,9 @@ test('vertical Witch Blue attack and defeat strips render in their states', asyn
   });
   await page.reload();
 
-  const idleEnemy = page.getByRole('img', { name: 'Witch Blue' });
-  await expect(idleEnemy).toHaveAttribute('src', '/images/witch-blue/idle.gif');
+  const idleEnemy = page.getByRole('img', { name: 'Witch Blue idle animation' });
+  await expect(idleEnemy).toHaveCSS('background-image', /witch-blue\/assets\/B_witch_idle/);
+  await expect(idleEnemy).toHaveCSS('background-size', /100% 900%/);
 
   await page.getByRole('button', { name: 'Potion' }).click();
   const enemyAttack = page.getByRole('img', { name: 'Witch Blue attack animation' });

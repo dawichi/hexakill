@@ -150,6 +150,13 @@ describe('enemy generation', () => {
   });
 
   it('maps the observed Witch Blue vertical attack and defeat strips', () => {
+    expect(enemySpriteAssetFor('witch-blue', 'idle')).toEqual({
+      src: '/images/witch-blue/assets/B_witch_idle.png',
+      frameWidth: 32,
+      frameHeight: 32,
+      frameCount: 9,
+      orientation: 'vertical',
+    });
     expect(enemySpriteAssetFor('witch-blue', 'attack')).toEqual({
       src: '/images/witch-blue/assets/B_witch_attack.png',
       frameWidth: 104,
