@@ -121,24 +121,34 @@ function isRestorablePlayer(value: unknown): value is PlayerState {
   const character = value['character'];
   const powerUps = value['powerUps'];
   const history = isRecord(powerUps) ? powerUps['history'] : null;
-  return (
-    isRecord(character) &&
-    CHARACTER_DEFINITIONS.some((candidate) => candidate.id === character['id']) &&
-    Array.isArray(value['inventory']) &&
-    value['inventory'].every(
+  const inventory = value['inventory'];
+  const powerUpTypes = ['health', 'ad', 'ap', 'speed'] as const;
+
+  if (
+    !isRecord(character) ||
+    !CHARACTER_DEFINITIONS.some((candidate) => candidate.id === character['id']) ||
+    !Array.isArray(inventory) ||
+    !inventory.every(
       (item) =>
         isRecord(item) &&
         typeof item['id'] === 'string' &&
         STORE_ITEMS.some((candidate) => candidate.id === item['id']),
-    ) &&
-    isRecord(powerUps) &&
-    isNonNegativeInteger(powerUps['pending']) &&
-    powerUps['pending'] <= MAX_POWER_UPS &&
-    isRecord(history) &&
-    (['health', 'ad', 'ap', 'speed'] as const).every(
+    ) ||
+    new Set(inventory.map((item) => (item as Record<string, unknown>)['id'])).size !==
+      inventory.length ||
+    !isRecord(powerUps) ||
+    !isNonNegativeInteger(powerUps['pending']) ||
+    powerUps['pending'] > MAX_POWER_UPS ||
+    !isRecord(history) ||
+    !powerUpTypes.every(
       (type) => isNonNegativeInteger(history[type]) && history[type] <= MAX_POWER_UPS_PER_STAT,
     )
-  );
+  ) {
+    return false;
+  }
+
+  const historyTotal = powerUpTypes.reduce((total, type) => total + Number(history[type]), 0);
+  return Number(powerUps['pending']) + historyTotal <= MAX_POWER_UPS;
 }
 
 function isRestorableDefeatedEnemy(value: unknown): value is DefeatedEnemy {

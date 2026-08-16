@@ -436,6 +436,43 @@ test('negative restored stats are discarded safely', async ({ page }) => {
   ).resolves.toBeNull();
 });
 
+test('restored power-up totals above the global cap are discarded safely', async ({ page }) => {
+  await startRun(page);
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.player.powerUps = {
+    pending: 1,
+    history: { health: 6, ad: 6, ap: 6, speed: 6 },
+  };
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
+  ).resolves.toBeNull();
+});
+
+test('restored duplicate one-time inventory items are discarded safely', async ({ page }) => {
+  await startRun(page);
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.player.inventory = [{ id: 'sword' }, { id: 'sword' }];
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
+  await expect(
+    page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')),
+  ).resolves.toBeNull();
+});
+
 test('a restored run with unbound character metadata is discarded safely', async ({ page }) => {
   await startRun(page);
   const snapshot = await page.evaluate(() =>
