@@ -66,6 +66,7 @@ npm run verify:docs
 npm run verify:migration
 npm run verify:assets
 npm run verify:deployment
+npm run verify:preview
 npm test -- --watch=false --no-progress
 npm run build
 npm run verify:release
