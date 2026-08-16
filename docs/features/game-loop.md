@@ -23,7 +23,7 @@ The active UI relies on native buttons, inputs, and range controls. Legacy globa
 - Enemy actions use the observed attack/magic/heal policy. Damage actions select their typed attack or Magic animation; healing restores the enemy without presenting an attack strip. A non-miss enemy damage result selects the typed player hit-reaction strip when the chosen character has one; a non-miss player damage result selects the typed enemy hit-reaction strip when the enemy has one. Misses and unsupported mappings fall back to idle presentation. The pure combat transition rejects malformed player damage results before updating enemy damage or entering a terminal phase. The provisional animation reset is scheduler-backed through the injected `Clock` port.
 - Reset cancels pending delayed enemy work and guards stale callbacks with a run-generation token.
 - Victory applies provisional experience, gold, level, boss, power-up, and defeated-enemy-history updates. Pending power-ups must be chosen before another enemy can be generated.
-- Enemy level generation retains the archived fractional upper-bound calculation, while gold and experience retain their archived `toFixed(0)` rounding rules. These numeric boundaries have deterministic fixtures; broader balance acceptance remains open.
+- Enemy level generation retains the archived fractional upper-bound calculation and normalizes the invalid level-1 lower bound to a positive enemy level, while gold and experience retain their archived `toFixed(0)` rounding rules. These numeric boundaries have deterministic fixtures; broader balance acceptance remains open.
 - Defeat writes a versioned local personal-record envelope and changes the screen to `game-over` after the enemy turn resolves.
 
 ## Active store behavior
