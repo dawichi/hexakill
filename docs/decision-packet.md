@@ -19,7 +19,7 @@ This packet is the short decision surface for the finalization session. It does 
 
 ## Current implementation boundary
 
-The Angular root is ready for engineering smoke play, not final product acceptance. The latest verified implementation revision is `2b3ecfa3b7cbef39f54b32ea3644737a7a3842ad`: Node 24.19.0/npm 11.17.0, 85 unit/component tests, 26 production Chromium journeys, 81 active asset paths, 42 exact deferred image sources, 33 typed sprite strips, clean production build, static artifact parity, security/preview checks, and zero high-severity audit findings.
+The Angular root is ready for engineering smoke play, not final product acceptance. The latest verified implementation revision is `8fa07af75f726a1078b2d593f7e3439a6b1e2992`: Node 24.19.0/npm 11.17.0, 86 unit/component tests, 26 production Chromium journeys, 81 active asset paths, 42 exact deferred image sources, 33 typed sprite strips, clean production build, static artifact parity, security/preview checks, and zero high-severity audit findings. The automated accessibility contract now exposes labeled groups for champion selection, combat actions, power-up choices, and store offers.
 
 The green baseline proves reproducibility and safety boundaries. It does not settle D-001 through D-008. A future agent must not mark the rewrite complete while any owner decision or acceptance review remains open.
 
