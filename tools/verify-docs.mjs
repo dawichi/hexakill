@@ -95,6 +95,7 @@ const requiredCommands = [
   'test:e2e',
   'test:e2e:production',
   'verify:assets',
+  'inspect:assets',
   'verify:docs',
   'verify:preview',
   'verify:deployment',

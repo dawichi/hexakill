@@ -9,6 +9,7 @@
     "verify:preview": "node tools/verify-preview.mjs dist/hexakill/browser",
     "preview": "npm run build && npm run serve:dist",
     "verify:assets": "node tools/verify-assets.mjs",
+    "inspect:assets": "node tools/inspect-assets.mjs",
     "verify:deployment": "node tools/verify-deployment.mjs",
     "verify:release": "node tools/verify-release.mjs",
     "verify:toolchain": "node tools/verify-toolchain.mjs",
