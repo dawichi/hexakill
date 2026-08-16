@@ -7,6 +7,7 @@ This record separates evidence that can be verified from source and automated br
 ## Verified in the active Angular root
 
 - Core actions use native buttons, the player name uses a label, volume controls use labels, and status/error feedback uses `role="status"` or `role="alert"`.
+- The document has a keyboard skip link targeting the focusable game-content main landmark; the component and browser suites verify its target contract and keyboard activation.
 - Music and effects sliders expose a human-readable `aria-valuetext` and retain their values through the versioned preferences envelope.
 - Dynamic validation, combat, store, and game-over messages use atomic status/alert regions so assistive technology receives the complete updated message.
 - Screen headings have programmatic focus targets. The browser suite verifies focus after welcome navigation, store entry/return, combat entry, power-up selection, game-over, reset, and keyboard activation.
@@ -18,14 +19,14 @@ This record separates evidence that can be verified from source and automated br
 
 The following foreground/background pairs were calculated from the active CSS using the WCAG relative-luminance contrast formula. They are representative of the rendered text roles, not a substitute for a rendered visual review.
 
-| Role | Foreground | Background | Contrast |
-| ---- | ---------- | ---------- | -------: |
-| Body text | `#f4f4f5` | `#09090b` | 18.10:1 |
-| Muted/supporting text | `#a1a1aa` | `#27272a` | 5.81:1 |
-| Primary-button text | `#fafafa` | `#0891b2` | 4.81:1 |
-| Combat/status message | `#cffafe` | `#164e63` | 8.14:1 |
-| Power-up/store emphasis | `#fde68a` | `#422006` | 11.70:1 |
-| Keyboard focus outline | `#67e8f9` | `#09090b` | 13.73:1 |
+| Role                    | Foreground | Background | Contrast |
+| ----------------------- | ---------- | ---------- | -------: |
+| Body text               | `#f4f4f5`  | `#09090b`  |  18.10:1 |
+| Muted/supporting text   | `#a1a1aa`  | `#27272a`  |   5.81:1 |
+| Primary-button text     | `#fafafa`  | `#0891b2`  |   4.81:1 |
+| Combat/status message   | `#cffafe`  | `#164e63`  |   8.14:1 |
+| Power-up/store emphasis | `#fde68a`  | `#422006`  |  11.70:1 |
+| Keyboard focus outline  | `#67e8f9`  | `#09090b`  |  13.73:1 |
 
 Disabled controls use reduced opacity and must be reviewed separately for discoverability and whether the disabled state is understandable without relying on color.
 
