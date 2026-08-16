@@ -178,7 +178,10 @@ describe('combat state transitions', () => {
     const victory = transitionCombat(
       transitionCombat(
         transitionCombat(activeState(), { type: 'player-action-started', kind: 'magic' }).state,
-        { type: 'player-action-resolved', result: { ...result, kind: 'magic', damageTaken: 999 } },
+        {
+          type: 'player-action-resolved',
+          result: { ...result, kind: 'magic', damageTaken: enemy.stats.health },
+        },
       ).state,
       { type: 'player-action-started', kind: 'attack' },
     );
@@ -192,6 +195,30 @@ describe('combat state transitions', () => {
 
     expect(victory.accepted).toBe(false);
     expect(transitionCombat(defeat, { type: 'player-potion-used' }).accepted).toBe(false);
+  });
+
+  it('rejects malformed player damage results at the transition boundary', () => {
+    const started = transitionCombat(activeState(), {
+      type: 'player-action-started',
+      kind: 'attack',
+    }).state;
+
+    for (const malformed of [
+      { ...result, rawDamage: -1 },
+      { ...result, damageAfterResistance: Number.NaN },
+      { ...result, critical: 'yes' as never },
+      { ...result, damageTaken: -1 },
+      { ...result, damageTaken: enemy.stats.health + 1 },
+    ]) {
+      const transition = transitionCombat(started, {
+        type: 'player-action-resolved',
+        result: malformed,
+      });
+
+      expect(transition.accepted).toBe(false);
+      if (transition.accepted) throw new Error('Expected malformed damage to be rejected.');
+      expect(transition.reason).toContain('valid damage result');
+    }
   });
 
   it('rejects an active-combat spawn and resets to the idle boundary', () => {

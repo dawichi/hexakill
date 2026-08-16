@@ -46,6 +46,20 @@ function rejected(state: CombatState, reason: string): CombatTransition {
   return { accepted: false, state, reason };
 }
 
+function isValidDamageResult(result: DamageResult, enemy: EnemyState): boolean {
+  return (
+    Number.isFinite(result.rawDamage) &&
+    result.rawDamage >= 0 &&
+    Number.isFinite(result.damageAfterResistance) &&
+    result.damageAfterResistance >= 0 &&
+    typeof result.critical === 'boolean' &&
+    typeof result.missed === 'boolean' &&
+    Number.isFinite(result.damageTaken) &&
+    result.damageTaken >= enemy.damageTaken &&
+    result.damageTaken <= enemy.stats.health
+  );
+}
+
 export function transitionCombat(state: CombatState, event: CombatEvent): CombatTransition {
   if (event.type === 'reset') {
     return { accepted: true, state: INITIAL_COMBAT_STATE };
@@ -133,6 +147,10 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
 
   if (event.result.kind !== state.pendingAction) {
     return rejected(state, 'The resolved action does not match the pending action.');
+  }
+
+  if (!isValidDamageResult(event.result, state.enemy)) {
+    return rejected(state, 'A player action requires a valid damage result.');
   }
 
   const defeated = event.result.damageTaken >= state.enemy.stats.health;
