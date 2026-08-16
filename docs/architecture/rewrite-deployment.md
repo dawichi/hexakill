@@ -25,6 +25,7 @@ The publishable artifact is `dist/hexakill/browser/`. It includes the applicatio
 - If Angular routes are added later, configure an explicit fallback to `index.html` and test direct navigation/refresh for every public route.
 - Do not expose source maps or development server output in the production artifact unless intentionally approved.
 - Preserve long-lived caching for hashed bundles while allowing HTML to revalidate.
+- Send a self-contained Content Security Policy; the current app has no external script, font, image, media, or connection requirement.
 - Configure security headers and remove the legacy external CDN dependency before release if it remains in the promoted application.
 
 ## Provider status
