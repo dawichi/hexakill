@@ -26,6 +26,20 @@ The 42 files below are present under `static/images/` but are not part of the ac
 | Witch Blue       |     2 | `witch-blue/assets/B_witch.gif`; `witch-blue/assets/B_witch_run.png`                                                                                                                                                                                     | `B_witch_idle.png` is active as a nine-frame vertical idle strip; `B_witch_attack.png`, `B_witch_take_damage.png`, and `B_witch_death.png` are active vertical provisional strips, and `B_witch_charge.png` is active provisionally for Magic; remaining states are deferred     |
 | Wizard           |     3 | `wizard/sprites/Fall.png`; `wizard/sprites/Jump.png`; `wizard/sprites/Run.png`                                                                                                                                                                           | `Idle.png` is active provisionally for idle combat; `Attack1.png`, `Hit.png`, and `Death.png` are active provisional strips, with `Attack2.png` active provisionally for Magic; remaining states are deferred                                                                    |
 
+## Review log
+
+The following files were inspected individually on 2026-08-16. Their observed geometry and visual semantics do not, by themselves, justify a new active mapping:
+
+| File                                | Observed geometry                          | Review result                                                                                 |
+| ----------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `martial-hero/Sprite/Attack2.png`   | 6 horizontal frames, 126 x 126 pixels each | Alternate physical attack sequence; no runtime variant-selection contract exists.             |
+| `martial-hero/Sprite/Attack3.png`   | 9 horizontal frames, 126 x 126 pixels each | Alternate physical attack sequence; no runtime variant-selection contract exists.             |
+| `wild-huntress/sprites/Attack2.png` | 5 horizontal frames, 150 x 150 pixels each | Alternate ranged attack sequence; the active action slot already has a characterized mapping. |
+| `wild-huntress/sprites/Attack3.png` | 7 horizontal frames, 150 x 150 pixels each | Alternate ranged attack sequence; the active action slot already has a characterized mapping. |
+| `fire-worm/Sprites/Worm/Walk.png`   | 9 horizontal frames, 90 x 90 pixels each   | Locomotion sequence; the current combat contract has no movement state.                       |
+
+These remain deferred rather than being rendered as full sheets or selected nondeterministically. Activating an alternate attack requires an explicit action-variant policy, timing, reduced-motion behavior, and browser coverage; activating locomotion requires a movement state in the domain and UI. The remaining catalog entries still require the same review before mapping.
+
 ## Mapping requirements
 
 Before a family becomes active, record:
