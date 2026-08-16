@@ -580,6 +580,9 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   await page.evaluate((value) => {
     localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
   }, snapshot);
+  await page.addInitScript(() => {
+    Math.random = () => 0.5;
+  });
   await page.reload();
 
   const attackButton = page.getByRole('button', { name: /Attack Physical damage/ });
@@ -644,6 +647,9 @@ test('boss encounters advance in sequence after level ten', async ({ page }) => 
   await page.evaluate((value) => {
     localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
   }, snapshot);
+  await page.addInitScript(() => {
+    Math.random = () => 0.5;
+  });
   await page.reload();
 
   await expect(page.getByRole('heading', { name: 'Gold Slime 1 appears.' })).toBeVisible();
