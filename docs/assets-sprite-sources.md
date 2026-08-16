@@ -30,13 +30,17 @@ The 42 files below are present under `static/images/` but are not part of the ac
 
 The following files were inspected individually on 2026-08-16. Their observed geometry and visual semantics do not, by themselves, justify a new active mapping:
 
-| File                                | Observed geometry                          | Review result                                                                                 |
-| ----------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| `martial-hero/Sprite/Attack2.png`   | 6 horizontal frames, 126 x 126 pixels each | Alternate physical attack sequence; no runtime variant-selection contract exists.             |
-| `martial-hero/Sprite/Attack3.png`   | 9 horizontal frames, 126 x 126 pixels each | Alternate physical attack sequence; no runtime variant-selection contract exists.             |
-| `wild-huntress/sprites/Attack2.png` | 5 horizontal frames, 150 x 150 pixels each | Alternate ranged attack sequence; the active action slot already has a characterized mapping. |
-| `wild-huntress/sprites/Attack3.png` | 7 horizontal frames, 150 x 150 pixels each | Alternate ranged attack sequence; the active action slot already has a characterized mapping. |
-| `fire-worm/Sprites/Worm/Walk.png`   | 9 horizontal frames, 90 x 90 pixels each   | Locomotion sequence; the current combat contract has no movement state.                       |
+| File                                             | Observed geometry                                | Review result                                                                                                                      |
+| ------------------------------------------------ | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `adventurer/adventurer-v1.5-Sheet.png`           | 385 x 592 pixels; dense multi-row packed sheet   | Contains multiple action/effect rows without a trustworthy state-row manifest; extraction would need an explicit roster/state map. |
+| `armored-huntress/Warrior_SheetnoEffect.png`     | 414 x 748 pixels; dense multi-row packed sheet   | Contains many combat poses and effects; no reliable row/state mapping or timing contract exists.                                   |
+| `fire-knight/FireKnight spritesheet.png`         | 6272 x 1456 pixels; dense multi-row packed sheet | Combines character poses and effects across a large grid; no trustworthy state segmentation is encoded by the file name.           |
+| `martial-hero/Sprite/Attack2.png`                | 6 horizontal frames, 126 x 126 pixels each       | Alternate physical attack sequence; no runtime variant-selection contract exists.                                                  |
+| `martial-hero/Sprite/Attack3.png`                | 9 horizontal frames, 126 x 126 pixels each       | Alternate physical attack sequence; no runtime variant-selection contract exists.                                                  |
+| `water-priestess/WaterPriestess_SpriteSheet.png` | 7168 x 1568 pixels; dense multi-row packed sheet | Contains many pose, attack, and effect sequences without a source state manifest; extraction would be speculative.                 |
+| `wild-huntress/sprites/Attack2.png`              | 5 horizontal frames, 150 x 150 pixels each       | Alternate ranged attack sequence; the active action slot already has a characterized mapping.                                      |
+| `wild-huntress/sprites/Attack3.png`              | 7 horizontal frames, 150 x 150 pixels each       | Alternate ranged attack sequence; the active action slot already has a characterized mapping.                                      |
+| `fire-worm/Sprites/Worm/Walk.png`                | 9 horizontal frames, 90 x 90 pixels each         | Locomotion sequence; the current combat contract has no movement state.                                                            |
 
 These remain deferred rather than being rendered as full sheets or selected nondeterministically. Activating an alternate attack requires an explicit action-variant policy, timing, reduced-motion behavior, and browser coverage; activating locomotion requires a movement state in the domain and UI. The remaining catalog entries still require the same review before mapping.
 
