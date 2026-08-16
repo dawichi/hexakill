@@ -244,4 +244,24 @@ describe('combat state transitions', () => {
     expect(rejected.accepted).toBe(false);
     expect(transitionCombat(active, { type: 'reset' }).state).toEqual(INITIAL_COMBAT_STATE);
   });
+
+  it('requires coherent live and defeated enemy boundaries', () => {
+    const defeatedEnemy = { ...enemy, damageTaken: enemy.stats.health };
+    const malformedIdle = { ...INITIAL_COMBAT_STATE, enemy };
+    const malformedAwaiting = { ...activeState(), enemy: defeatedEnemy };
+    const victory = transitionCombat(
+      transitionCombat(activeState(), { type: 'player-action-started', kind: 'magic' }).state,
+      {
+        type: 'player-action-resolved',
+        result: { ...result, kind: 'magic', damageTaken: enemy.stats.health },
+      },
+    ).state;
+
+    expect(transitionCombat(malformedIdle, { type: 'enemy-spawned', enemy }).accepted).toBe(false);
+    expect(
+      transitionCombat(malformedAwaiting, { type: 'player-action-started', kind: 'attack' })
+        .accepted,
+    ).toBe(false);
+    expect(transitionCombat(victory, { type: 'enemy-spawned', enemy }).accepted).toBe(true);
+  });
 });

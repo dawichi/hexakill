@@ -60,6 +60,14 @@ function isValidDamageResult(result: DamageResult, enemy: EnemyState): boolean {
   );
 }
 
+function isDefeatedEnemy(enemy: EnemyState): boolean {
+  return enemy.damageTaken >= enemy.stats.health;
+}
+
+function isLiveEnemy(enemy: EnemyState): boolean {
+  return !isDefeatedEnemy(enemy);
+}
+
 export function transitionCombat(state: CombatState, event: CombatEvent): CombatTransition {
   if (event.type === 'reset') {
     return { accepted: true, state: INITIAL_COMBAT_STATE };
@@ -68,6 +76,13 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
   if (event.type === 'enemy-spawned') {
     if (state.phase !== 'idle' && state.phase !== 'victory') {
       return rejected(state, 'An enemy cannot spawn during an active combat.');
+    }
+
+    if (
+      (state.phase === 'idle' && state.enemy !== null) ||
+      (state.phase === 'victory' && (!state.enemy || !isDefeatedEnemy(state.enemy)))
+    ) {
+      return rejected(state, 'An enemy can only spawn from a coherent terminal boundary.');
     }
 
     return {
@@ -83,7 +98,7 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
   }
 
   if (event.type === 'player-action-started') {
-    if (state.phase !== 'awaiting-player-action' || !state.enemy) {
+    if (state.phase !== 'awaiting-player-action' || !state.enemy || !isLiveEnemy(state.enemy)) {
       return rejected(state, 'A player action is not available in the current combat phase.');
     }
 
@@ -99,7 +114,7 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
   }
 
   if (event.type === 'enemy-turn-started') {
-    if (state.phase !== 'awaiting-player-action' || !state.enemy) {
+    if (state.phase !== 'awaiting-player-action' || !state.enemy || !isLiveEnemy(state.enemy)) {
       return rejected(state, 'The enemy turn is not available in the current combat phase.');
     }
 
@@ -107,7 +122,7 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
   }
 
   if (event.type === 'player-potion-used') {
-    if (state.phase !== 'awaiting-player-action' || !state.enemy) {
+    if (state.phase !== 'awaiting-player-action' || !state.enemy || !isLiveEnemy(state.enemy)) {
       return rejected(state, 'A potion cannot be used in the current combat phase.');
     }
 
@@ -118,7 +133,7 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
   }
 
   if (event.type === 'enemy-action-resolved') {
-    if (state.phase !== 'enemy-turn' || !state.enemy) {
+    if (state.phase !== 'enemy-turn' || !state.enemy || !isLiveEnemy(state.enemy)) {
       return rejected(state, 'An enemy action cannot be resolved in the current combat phase.');
     }
 
