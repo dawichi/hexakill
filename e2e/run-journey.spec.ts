@@ -755,6 +755,12 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   await expect(attackButton).toBeFocused();
   await attackButton.press('Enter');
   await expect(page.getByText(/gained 100 exp and 100 gold/)).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Enemy combat actions' })).toContainText(
+    'has been defeated',
+  );
+  await expect(page.getByRole('list', { name: 'Your combat actions' })).toContainText(
+    'gained 100 exp',
+  );
   await expect(page.getByRole('img', { name: 'Wizard action animation' })).toHaveCSS(
     'animation-name',
     'none',
