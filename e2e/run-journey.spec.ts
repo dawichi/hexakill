@@ -432,6 +432,11 @@ test('a restored run with unbound character metadata is discarded safely', async
 });
 
 test('the start journey is operable with keyboard activation', async ({ page }) => {
+  const skipLink = page.getByRole('link', { name: 'Skip to game content' });
+  await skipLink.focus();
+  await skipLink.press('Enter');
+  await expect(page.locator('main#game-content')).toBeFocused();
+
   const chooseButton = page.getByRole('button', { name: 'Choose your champion' });
   await chooseButton.focus();
   await expect(chooseButton).toBeFocused();

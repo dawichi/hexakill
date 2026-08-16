@@ -21,6 +21,17 @@ describe('App', () => {
     expect(compiled.querySelector('h2')?.textContent).toContain('Survive the dungeon');
   });
 
+  it('provides a keyboard skip link to the game content landmark', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    const skipLink = compiled.querySelector<HTMLAnchorElement>('.skip-link');
+    const main = compiled.querySelector<HTMLElement>('#game-content');
+    expect(skipLink?.getAttribute('href')).toBe('#game-content');
+    expect(main?.getAttribute('tabindex')).toBe('-1');
+  });
+
   it('moves through character selection into a ready run', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
