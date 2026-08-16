@@ -864,6 +864,8 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   await expect(enemyDefeat).toHaveCSS('background-image', /wild-huntress/);
   await expect(enemyDefeat).toHaveCSS('animation-name', 'none');
   await expect(page.getByText('Pending: 1')).toBeVisible();
+  const powerUpPanel = page.getByRole('group', { name: 'Power-up available' });
+  await expect(powerUpPanel).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Power-up available' })).toBeFocused();
   await expect(page.getByRole('button', { name: 'Find another enemy' })).toBeDisabled();
 

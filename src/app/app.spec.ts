@@ -82,6 +82,42 @@ describe('App', () => {
     );
   });
 
+  it('exposes labeled groups for character, combat, and store controls', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
+    fixture.detectChanges();
+    expect(compiled.querySelector('[role="group"][aria-label="Available champions"]')).toBeTruthy();
+
+    const nameInput = compiled.querySelector<HTMLInputElement>('#player-name');
+    if (!nameInput) throw new Error('Player name input was not rendered.');
+    nameInput.value = 'David';
+    nameInput.dispatchEvent(new Event('input'));
+    compiled.querySelector<HTMLButtonElement>('.character-card')?.click();
+    fixture.detectChanges();
+    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
+    fixture.detectChanges();
+
+    const storeButton = Array.from(
+      compiled.querySelectorAll<HTMLButtonElement>('.quiet-button'),
+    ).find((button) => button.textContent?.includes('Store'));
+    storeButton?.click();
+    fixture.detectChanges();
+    expect(compiled.querySelector('[role="group"][aria-label="Potion offers"]')).toBeTruthy();
+    expect(compiled.querySelector('[role="group"][aria-label="Equipment offers"]')).toBeTruthy();
+
+    const closeStoreButton = Array.from(
+      compiled.querySelectorAll<HTMLButtonElement>('.quiet-button'),
+    ).find((button) => button.textContent?.includes('Close store'));
+    closeStoreButton?.click();
+    fixture.detectChanges();
+    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
+    fixture.detectChanges();
+    expect(compiled.querySelector('[role="group"][aria-label="Combat actions"]')).toBeTruthy();
+  });
+
   it('moves from a ready run into combat with a generated enemy', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();

@@ -115,7 +115,7 @@
           (input)="onNameInput($event)"
         />
 
-        <div class="character-grid" aria-label="Available champions">
+        <div class="character-grid" role="group" aria-label="Available champions">
           @for (character of session.characters; track character.id) {
             <button
               class="character-card"
@@ -439,7 +439,7 @@
               </div>
             </section>
 
-            <div class="action-grid" aria-label="Combat actions">
+            <div class="action-grid" role="group" aria-label="Combat actions">
               <button
                 class="action-button attack"
                 type="button"
@@ -473,7 +473,7 @@
               @if (session.combatState().phase === 'victory') {
                 @if (session.player(); as rewardedPlayer) {
                   @if (rewardedPlayer.powerUps.pending > 0) {
-                    <div class="power-up-panel" aria-labelledby="power-up-title">
+                    <div class="power-up-panel" role="group" aria-labelledby="power-up-title">
                       <p class="eyebrow">Choose an upgrade</p>
                       <h3 id="power-up-title" data-focus-target="power-up" tabindex="-1">
                         Power-up available
@@ -554,7 +554,7 @@
           </p>
 
           <h3>Potions</h3>
-          <div class="store-grid">
+          <div class="store-grid" role="group" aria-label="Potion offers">
             @for (offer of session.storePotions; track offer.id) {
               <button
                 class="store-card"
@@ -573,7 +573,7 @@
           </div>
 
           <h3>Items</h3>
-          <div class="store-grid">
+          <div class="store-grid" role="group" aria-label="Equipment offers">
             @for (item of session.storeItems; track item.id) {
               <button
                 class="store-card"
