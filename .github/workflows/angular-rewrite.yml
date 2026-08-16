@@ -73,12 +73,16 @@ jobs:
         run: npm run verify:deployment -- dist/hexakill/browser
       - name: Verify complete publishable asset tree
         run: npm run verify:assets -- dist/hexakill/browser
+      - name: Verify publishable sprite frame geometry
+        run: npm run verify:asset-geometry -- dist/hexakill/browser
       - name: Verify production preview contract
         run: npm run verify:preview
       - name: Run browser journeys against production artifact
         run: E2E_PRODUCTION=1 npm run test:e2e
       - name: Verify active asset paths
         run: npm run verify:assets
+      - name: Verify active sprite frame geometry
+        run: npm run verify:asset-geometry
       - name: Inspect retained asset geometry
         run: npm run inspect:assets -- --json
       - name: Verify representative migrated assets

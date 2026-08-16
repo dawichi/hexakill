@@ -12,6 +12,8 @@ export interface SpriteStripAsset {
   readonly frameHeight: number;
   readonly frameCount: number;
   readonly orientation?: 'horizontal' | 'vertical';
+  /** Pixels cropped from the source edge after the final frame in a legacy export. */
+  readonly trailingPixels?: number;
 }
 
 export interface PowerUpState {

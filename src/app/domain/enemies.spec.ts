@@ -120,6 +120,7 @@ describe('enemy generation', () => {
       frameHeight: 104,
       frameCount: 4,
       orientation: 'vertical',
+      trailingPixels: 2,
     });
     expect(enemySpriteAssetFor('witch-blue', 'defeat')).toEqual({
       src: '/images/witch-blue/assets/B_witch_death.png',

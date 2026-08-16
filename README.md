@@ -21,6 +21,7 @@ npm run verify:types
 npm run verify:docs
 npm run verify:migration
 npm run verify:assets
+npm run verify:asset-geometry
 npm run verify:deployment
 npm test -- --watch=false --no-progress
 npm run test:e2e

@@ -13,7 +13,8 @@ const checks = [
   { label: 'root migration', args: ['run', 'verify:migration'] },
   { label: 'deployment contract', args: ['run', 'verify:deployment'] },
   { label: 'assets', args: ['run', 'verify:assets'] },
-  { label: 'asset geometry', args: ['run', 'inspect:assets', '--', '--json'] },
+  { label: 'asset geometry contract', args: ['run', 'verify:asset-geometry'] },
+  { label: 'asset geometry inventory', args: ['run', 'inspect:assets', '--', '--json'] },
   { label: 'unit tests', args: ['test', '--', '--watch=false', '--no-progress'] },
   { label: 'dependency audit', args: ['audit', '--audit-level=high'] },
   { label: 'production build', args: ['run', 'build'] },
@@ -24,6 +25,10 @@ const checks = [
   {
     label: 'publishable asset tree',
     args: ['run', 'verify:assets', '--', 'dist/hexakill/browser'],
+  },
+  {
+    label: 'publishable asset geometry',
+    args: ['run', 'verify:asset-geometry', '--', 'dist/hexakill/browser'],
   },
   { label: 'preview contract', args: ['run', 'verify:preview'] },
   { label: 'production browser journeys', args: ['run', 'test:e2e:production'] },

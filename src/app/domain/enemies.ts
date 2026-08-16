@@ -93,6 +93,7 @@ const WITCH_BLUE_ATTACK_SPRITE: SpriteStripAsset = {
   frameHeight: 104,
   frameCount: 4,
   orientation: 'vertical',
+  trailingPixels: 2,
 };
 
 const WITCH_BLUE_DEFEAT_SPRITE: SpriteStripAsset = {
