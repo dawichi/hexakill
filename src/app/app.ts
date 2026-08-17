@@ -5,11 +5,15 @@ import {
   LucideCircleHelp,
   LucideFootprints,
   LucideHeartPulse,
+  LucideMap,
+  LucideMapPin,
   LucideScrollText,
   LucideShield,
   LucideSparkles,
+  LucideStore,
   LucideSword,
   LucideSwords,
+  LucideTentTree,
   LucideTrophy,
   LucideVolume2,
   LucideWandSparkles,
@@ -27,11 +31,15 @@ import { PersonalRecord } from './domain/records';
     LucideCircleHelp,
     LucideFootprints,
     LucideHeartPulse,
+    LucideMap,
+    LucideMapPin,
     LucideScrollText,
     LucideShield,
     LucideSparkles,
+    LucideStore,
     LucideSword,
     LucideSwords,
+    LucideTentTree,
     LucideTrophy,
     LucideVolume2,
     LucideWandSparkles,
@@ -53,7 +61,7 @@ export class App {
         screen === 'combat' && pendingPowerUps > 0
           ? '[data-focus-target="power-up"]'
           : screen === 'combat' && pendingPowerUps === 0
-            ? '[data-focus-target="next-enemy"]'
+            ? '[data-focus-target="route-map"]'
             : `[data-screen="${screen}"] [data-screen-heading]`;
       const target =
         this.document.querySelector<HTMLElement>(selector) ??

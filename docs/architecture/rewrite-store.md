@@ -23,7 +23,7 @@ The legacy code displays and adds items, but the complete interaction between in
 - Equipment offers are one-time per in-memory run.
 - Purchases require sufficient gold and otherwise leave state unchanged.
 - Equipment bonuses are applied immediately to player stats and the item is added to inventory.
-- Closing the store returns to the ready or active combat screen; refreshing or starting a new run clears the in-memory store state.
+- The store is entered from a merchant node on the route map; closing it returns to the next route map rather than directly to combat. Refreshing or starting a new run clears the in-memory store state.
 - All purchase and reward rules are pure functions; Angular only coordinates them.
 
 ## Confirmed parity boundary

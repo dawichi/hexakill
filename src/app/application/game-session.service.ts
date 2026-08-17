@@ -27,6 +27,13 @@ import { INITIAL_COMBAT_STATE, CombatState, transitionCombat } from '../domain/c
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
 import { ASSET_MANIFEST } from '../domain/assets';
 import {
+  createRouteMap,
+  findRouteNode,
+  isRouteMapState,
+  RouteMapState,
+  RouteNodeKind,
+} from '../domain/route-map';
+import {
   CharacterDefinition,
   CombatLogEntry,
   DefeatedEnemy,
@@ -54,7 +61,7 @@ import {
   isStoredPreferencesSnapshot,
 } from '../domain/preferences';
 
-export type GameScreen = 'welcome' | 'character-select' | 'combat' | 'store' | 'game-over';
+export type GameScreen = 'welcome' | 'character-select' | 'map' | 'combat' | 'store' | 'game-over';
 
 export interface DefeatedEnemySummary {
   readonly enemyId: string;
@@ -71,6 +78,8 @@ interface StoredSessionSnapshot {
   readonly selectedCharacterId: string | null;
   readonly player: PlayerState | null;
   readonly combatState: CombatState;
+  readonly routeFloor?: number;
+  readonly routeMap?: RouteMapState | null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -236,6 +245,18 @@ function isRestorableCombatState(value: unknown): value is CombatState {
   );
 }
 
+function isRestorableRouteFloor(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 1;
+}
+
+function strengthenEliteEnemy(enemy: EnemyState): EnemyState {
+  const stats = { ...enemy.stats };
+  (Object.keys(stats) as (keyof Stats)[]).forEach((stat) => {
+    stats[stat] = Math.round(stats[stat] * 1.3);
+  });
+  return { ...enemy, stats, gold: Math.round(enemy.gold * 1.5) };
+}
+
 function hasCoherentSessionState(snapshot: Partial<StoredSessionSnapshot>): boolean {
   const hasPlayer = snapshot.player !== null && snapshot.player !== undefined;
   const hasEnemy = snapshot.combatState?.enemy !== null;
@@ -257,6 +278,28 @@ function hasCoherentSessionState(snapshot: Partial<StoredSessionSnapshot>): bool
     return (
       (phase === 'awaiting-player-action' && !enemyDefeated) ||
       (phase === 'victory' && enemyDefeated)
+    );
+  }
+
+  if (snapshot.screen === 'map') {
+    const mapEnemy = snapshot.combatState?.enemy;
+    return (
+      phase === 'victory' &&
+      mapEnemy !== null &&
+      mapEnemy !== undefined &&
+      mapEnemy.damageTaken >= mapEnemy.stats.health &&
+      isRouteMapState(snapshot.routeMap)
+    );
+  }
+
+  if (snapshot.screen === 'store') {
+    const storeEnemy = snapshot.combatState?.enemy;
+    return (
+      phase === 'victory' &&
+      storeEnemy !== null &&
+      storeEnemy !== undefined &&
+      storeEnemy.damageTaken >= storeEnemy.stats.health &&
+      (snapshot.routeMap === null || snapshot.routeMap === undefined)
     );
   }
 
@@ -291,11 +334,14 @@ export class GameSessionService {
   readonly selectedCharacter = signal<CharacterDefinition | null>(null);
   readonly player = signal<PlayerState | null>(null);
   readonly combatState = signal<CombatState>(INITIAL_COMBAT_STATE);
+  readonly routeFloor = signal(1);
+  readonly routeMap = signal<RouteMapState | null>(null);
   readonly enemy = computed(() => this.combatState().enemy);
   readonly enemyAnimation = signal<'idle' | 'attack' | 'hit' | 'defeat'>('idle');
   readonly enemyActionKind = signal<DamageKind | null>(null);
   readonly playerAnimation = signal<'idle' | 'action' | 'hit' | 'defeat'>('idle');
   readonly playerActionKind = signal<DamageKind | null>(null);
+  readonly actionReady = signal(false);
   readonly playerActionAsset = computed<SpriteStripAsset | null>(() => {
     const player = this.player();
     if (!player) return null;
@@ -351,7 +397,9 @@ export class GameSessionService {
     const player = this.player();
     return player ? Math.max(0, player.stats.health - this.combatState().playerDamageTaken) : 0;
   });
-  readonly canAct = computed(() => this.combatState().phase === 'awaiting-player-action');
+  readonly canAct = computed(
+    () => this.combatState().phase === 'awaiting-player-action' && this.actionReady(),
+  );
   readonly storeItems = STORE_ITEMS;
   readonly storePotions = STORE_POTIONS;
   readonly lastActionAt = signal<number | null>(null);
@@ -412,6 +460,9 @@ export class GameSessionService {
 
     this.player.set(createInitialPlayer(name, character));
     this.combatState.set(INITIAL_COMBAT_STATE);
+    this.routeFloor.set(1);
+    this.routeMap.set(null);
+    this.actionReady.set(false);
     this.enemyAnimation.set('idle');
     this.enemyActionKind.set(null);
     this.playerAnimation.set('idle');
@@ -419,28 +470,36 @@ export class GameSessionService {
     this.clearCombatLogs();
     this.combatMessage.set('The first enemy is approaching.');
     this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
-    this.findEnemy();
+    this.findEnemy('battle');
   }
 
-  findEnemy(): void {
+  findEnemy(routeKind: Extract<RouteNodeKind, 'battle' | 'elite'> = 'battle'): void {
     const player = this.player();
 
     if (!player || player.powerUps.pending > 0) {
       return;
     }
 
-    const spawnedEnemy = generateEnemy(
+    const generatedEnemy = generateEnemy(
       player.level,
       this.random(),
       this.random(),
       player.bossesDefeated,
     );
-    this.applyCombatEvent({
-      type: 'enemy-spawned',
-      enemy: spawnedEnemy,
-    });
+    const spawnedEnemy =
+      routeKind === 'elite' ? strengthenEliteEnemy(generatedEnemy) : generatedEnemy;
+    if (
+      !this.applyCombatEvent({
+        type: 'enemy-spawned',
+        enemy: spawnedEnemy,
+      })
+    ) {
+      return;
+    }
+    this.routeMap.set(null);
     this.enemyAnimation.set('idle');
     this.playerAnimation.set('idle');
+    this.actionReady.set(false);
     this.addCombatLog('enemy', {
       title: spawnedEnemy.definition.name,
       message: 'has appeared!',
@@ -460,21 +519,66 @@ export class GameSessionService {
       });
       this.startEnemyTurn();
     } else {
+      this.actionReady.set(true);
       this.combatMessage.set('The enemy has appeared. Choose an action.');
       this.addCombatLog('player', { title: 'You', message: 'attack first!' });
     }
   }
 
   openStore(): void {
-    if (!this.player() || (this.screen() === 'combat' && !this.canAct())) return;
+    if (!this.player() || this.screen() !== 'map' || this.combatState().phase !== 'victory') return;
     this.screen.set('store');
     this.combatMessage.set('');
     this.audio?.playMusic(ASSET_MANIFEST.music.store);
   }
 
   closeStore(): void {
-    this.screen.set('combat');
+    if (this.screen() !== 'store') return;
+    this.openRouteMap();
+  }
+
+  openRouteMap(): void {
+    const player = this.player();
+    if (!player || this.combatState().phase !== 'victory' || player.powerUps.pending > 0) return;
+    if (!this.routeMap()) {
+      this.routeMap.set(createRouteMap(this.routeFloor(), this.random()));
+    }
+    this.screen.set('map');
+    this.actionReady.set(false);
     this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
+  }
+
+  chooseRouteNode(nodeId: string): void {
+    const player = this.player();
+    const map = this.routeMap();
+    const node = map ? findRouteNode(map, nodeId) : undefined;
+    if (!player || !map || !node || this.screen() !== 'map') return;
+
+    this.routeMap.set(null);
+    this.routeFloor.set(map.floor + 1);
+
+    if (node.kind === 'store') {
+      this.openStore();
+      return;
+    }
+
+    if (node.kind === 'rest') {
+      const damageTaken = this.combatState().playerDamageTaken;
+      const healed = Math.trunc(damageTaken * 0.25);
+      this.combatState.update((state) => ({
+        ...state,
+        playerDamageTaken: Math.max(0, state.playerDamageTaken - healed),
+      }));
+      this.combatMessage.set(
+        healed > 0
+          ? `The campfire restored ${healed} HP for the next encounter.`
+          : 'The campfire found you at full health. The next route awaits.',
+      );
+      this.openRouteMap();
+      return;
+    }
+
+    this.findEnemy(node.kind);
   }
 
   buyItem(itemId: string): void {
@@ -510,6 +614,7 @@ export class GameSessionService {
     if (!this.applyCombatEvent({ type: 'player-action-started', kind })) {
       return;
     }
+    this.actionReady.set(false);
     this.playerActionKind.set(kind);
     this.playerAnimation.set('action');
     this.lastActionAt.set(this.clock.now());
@@ -585,6 +690,7 @@ export class GameSessionService {
     const healed = Math.trunc(this.combatState().playerDamageTaken * 0.2);
     if (!this.applyCombatEvent({ type: 'player-potion-used' })) return;
 
+    this.actionReady.set(false);
     this.player.set({ ...player, potions: player.potions - 1 });
     this.combatState.update((state) => ({
       ...state,
@@ -633,6 +739,9 @@ export class GameSessionService {
     this.playerName.set('');
     this.selectedCharacter.set(null);
     this.player.set(null);
+    this.routeFloor.set(1);
+    this.routeMap.set(null);
+    this.actionReady.set(false);
     this.applyCombatEvent({ type: 'reset' });
     this.enemyAnimation.set('idle');
     this.enemyActionKind.set(null);
@@ -749,6 +858,7 @@ export class GameSessionService {
   }
 
   private startEnemyTurn(): void {
+    this.actionReady.set(false);
     if (!this.applyCombatEvent({ type: 'enemy-turn-started' })) return;
     this.scheduleEnemyTurn();
   }
@@ -759,7 +869,7 @@ export class GameSessionService {
     this.pendingEnemyTurn = this.clock.schedule(() => {
       if (generation !== this.runGeneration) return;
       this.resolveEnemyTurn();
-    }, 300);
+    }, 1_100);
   }
 
   private cancelPendingEnemyTurn(): void {
@@ -780,7 +890,8 @@ export class GameSessionService {
       this.enemyAnimation.set('idle');
       this.enemyActionKind.set(null);
       this.playerAnimation.set('idle');
-    }, 600);
+      this.actionReady.set(true);
+    }, 900);
   }
 
   private cancelPendingEnemyAnimationReset(): void {
@@ -818,11 +929,13 @@ export class GameSessionService {
     this.storage.write(
       JSON.stringify({
         version: 1,
-        screen: this.screen() === 'store' ? 'combat' : this.screen(),
+        screen: this.screen(),
         playerName: this.playerName(),
         selectedCharacterId: this.selectedCharacter()?.id ?? null,
         player: this.player(),
         combatState: this.combatState(),
+        routeFloor: this.routeFloor(),
+        routeMap: this.routeMap(),
       }),
     );
   }
@@ -913,11 +1026,18 @@ export class GameSessionService {
       const playerHealth = isRestorablePlayer(snapshot.player)
         ? snapshot.player.stats.health
         : null;
+      const routeFloor = snapshot.routeFloor ?? 1;
       if (
         snapshot.version !== 1 ||
         typeof snapshot.playerName !== 'string' ||
         snapshot.selectedCharacterId === undefined ||
-        !['welcome', 'character-select', 'combat', 'game-over'].includes(String(snapshot.screen)) ||
+        !['welcome', 'character-select', 'map', 'combat', 'store', 'game-over'].includes(
+          String(snapshot.screen),
+        ) ||
+        !isRestorableRouteFloor(routeFloor) ||
+        (snapshot.routeMap !== undefined &&
+          snapshot.routeMap !== null &&
+          !isRouteMapState(snapshot.routeMap)) ||
         !isRestorableCombatState(snapshot.combatState) ||
         (snapshot.player !== null && !isRestorablePlayer(snapshot.player)) ||
         (snapshot.selectedCharacterId !== null && !selectedCharacter) ||
@@ -932,6 +1052,8 @@ export class GameSessionService {
       const character = selectedCharacter;
       if (character) this.selectedCharacter.set(character);
       this.playerName.set(snapshot.playerName.slice(0, 14));
+      this.routeFloor.set(routeFloor);
+      this.routeMap.set(snapshot.routeMap ?? null);
       if (snapshot.player) {
         const inventory = snapshot.player.inventory.map(
           (item) => STORE_ITEMS.find((candidate) => candidate.id === item.id) ?? item,
@@ -960,7 +1082,10 @@ export class GameSessionService {
             ? 'defeat'
             : 'idle',
         );
-        this.screen.set(snapshot.screen === 'combat' ? 'combat' : 'game-over');
+        this.screen.set(snapshot.screen as GameScreen);
+        this.actionReady.set(
+          snapshot.screen === 'combat' && snapshot.combatState.phase === 'awaiting-player-action',
+        );
         this.combatMessage.set('Your saved run was restored.');
       } else {
         this.screen.set(snapshot.screen === 'character-select' ? 'character-select' : 'welcome');

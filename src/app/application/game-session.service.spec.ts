@@ -15,13 +15,15 @@ describe('GameSessionService', () => {
   let rolls: number[];
   let recordsValue: string | null;
   let scheduledTask: (() => void) | undefined;
+  let scheduledDelays: number[];
   let cancelled = false;
   let playedSounds: string[];
   let sessionValue: string | null;
   const testClock: Clock = {
     now: () => 1234,
-    schedule: (task) => {
+    schedule: (task, delayMs) => {
       scheduledTask = task;
+      scheduledDelays.push(delayMs);
       cancelled = false;
       return { cancel: () => (cancelled = true) };
     },
@@ -32,6 +34,7 @@ describe('GameSessionService', () => {
     recordsValue = null;
     sessionValue = null;
     playedSounds = [];
+    scheduledDelays = [];
     const recordsStorage: RecordsStoragePort = {
       read: () => recordsValue,
       write: (value) => (recordsValue = value),
@@ -79,6 +82,7 @@ describe('GameSessionService', () => {
     expect(service.combatState().phase).toBe('enemy-turn');
     expect(service.combatMessage()).toContain('dealt 17 damage');
     expect(service.lastActionAt()).toBe(1234);
+    expect(scheduledDelays).toContain(1100);
     expect(service.playerCombatLog()[1]).toEqual({
       title: 'David',
       message: '',
@@ -97,6 +101,7 @@ describe('GameSessionService', () => {
       value: expect.any(Number),
       icon: expect.stringMatching(/🔪|☄/),
     });
+    expect(scheduledDelays).toContain(900);
 
     scheduledTask?.();
     expect(service.enemyAnimation()).toBe('idle');
@@ -135,6 +140,7 @@ describe('GameSessionService', () => {
       pendingAction: null,
       lastResult: null,
     });
+    service.actionReady.set(true);
 
     service.usePotion();
     scheduledTask?.();

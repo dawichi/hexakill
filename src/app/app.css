@@ -984,6 +984,206 @@ h3 {
   color: #a1a1aa;
 }
 
+.route-panel {
+  min-height: 34rem;
+}
+
+.route-heading {
+  align-items: start;
+}
+
+.route-summary {
+  display: grid;
+  gap: 0.35rem;
+  border: 1px solid var(--line-soft);
+  padding: 0.55rem 0.7rem;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.route-summary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.route-summary svg {
+  color: var(--ember-bright);
+}
+
+.route-origin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 2rem auto 0;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.route-origin-mark {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid var(--ember);
+  border-radius: 50%;
+  color: var(--ember-bright);
+}
+
+.route-map {
+  position: relative;
+  margin-top: 0.75rem;
+}
+
+.route-branches {
+  position: absolute;
+  top: 0;
+  right: 16.5%;
+  left: 16.5%;
+  display: grid;
+  height: 2rem;
+  grid-template-columns: repeat(3, 1fr);
+  pointer-events: none;
+}
+
+.route-branches::before {
+  position: absolute;
+  top: 0.25rem;
+  right: 16.5%;
+  left: 16.5%;
+  border-top: 1px solid var(--line);
+  content: '';
+}
+
+.route-branches span {
+  justify-self: center;
+  width: 1px;
+  height: 2rem;
+  background: var(--line);
+}
+
+.route-nodes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding-top: 2.25rem;
+}
+
+.route-node {
+  position: relative;
+  display: grid;
+  min-height: 14rem;
+  align-content: start;
+  gap: 0.65rem;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 0.2rem;
+  background: var(--stone-0);
+  color: var(--ink);
+  padding: 1rem;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease,
+    background 160ms ease;
+}
+
+.route-node:hover,
+.route-node:focus-visible {
+  transform: translateY(-0.2rem);
+  background: var(--stone-2);
+}
+
+.route-node.battle:hover,
+.route-node.battle:focus-visible {
+  border-color: var(--aether);
+}
+
+.route-node.elite:hover,
+.route-node.elite:focus-visible {
+  border-color: var(--ember-bright);
+}
+
+.route-node.store:hover,
+.route-node.store:focus-visible {
+  border-color: var(--amber);
+}
+
+.route-node.rest:hover,
+.route-node.rest:focus-visible {
+  border-color: #55c271;
+}
+
+.route-node-index {
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+
+.route-node-icon {
+  display: grid;
+  width: 2.7rem;
+  height: 2.7rem;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.route-node.battle .route-node-icon {
+  color: var(--aether);
+}
+
+.route-node.elite .route-node-icon {
+  color: var(--ember-bright);
+}
+
+.route-node.store .route-node-icon {
+  color: var(--amber);
+}
+
+.route-node.rest .route-node-icon {
+  color: #55c271;
+}
+
+.route-node-copy {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.route-node-copy strong {
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+}
+
+.route-node-copy span {
+  min-height: 2.5rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.route-node-copy small {
+  color: var(--ink);
+  font-family: 'Courier New', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+}
+
+.route-node-arrow {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  color: var(--muted);
+}
+
 .combat-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -1488,6 +1688,7 @@ h3 {
 
   .character-grid,
   .combat-grid,
+  .route-nodes,
   .action-grid,
   .power-up-grid,
   .store-grid {
@@ -1508,6 +1709,22 @@ h3 {
 
   .combatant-visual {
     min-height: 10rem;
+  }
+
+  .route-panel {
+    min-height: 0;
+  }
+
+  .route-summary {
+    width: 100%;
+  }
+
+  .route-branches {
+    display: none;
+  }
+
+  .route-nodes {
+    padding-top: 0;
   }
 }
 

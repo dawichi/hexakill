@@ -342,29 +342,83 @@
       </section>
     }
 
-    @case ('combat') {
+    @case ('map') {
       @if (session.player(); as player) {
-        @if (session.enemy(); as enemy) {
-          <section class="panel" data-screen="combat" aria-labelledby="combat-screen-title">
-            <div class="section-heading">
+        @if (session.routeMap(); as route) {
+          <section class="panel route-panel" data-screen="map" aria-labelledby="route-map-title">
+            <div class="section-heading route-heading">
               <div>
-                <h2 id="combat-screen-title" data-screen-heading tabindex="-1">
-                  Face {{ enemy.definition.name }}
-                </h2>
+                <p class="eyebrow">Floor {{ route.floor }} · choose your path</p>
+                <h2 id="route-map-title" data-screen-heading tabindex="-1">Where will you go?</h2>
                 <p class="section-lead">
-                  Read the enemy, choose your attack, and survive the turn.
+                  Every path changes the run. Choose your next stop, then prepare for what waits
+                  beyond it.
                 </p>
               </div>
-              <div class="button-row">
-                <button class="quiet-button" type="button" (click)="session.openStore()">
-                  Store
-                </button>
-                <button class="quiet-button" type="button" (click)="session.reset()">
-                  New run
-                </button>
+              <div class="route-summary" aria-label="Run summary">
+                <span
+                  ><svg lucideSparkles size="14" aria-hidden="true"></svg> Level
+                  {{ player.level }}</span
+                >
+                <span
+                  ><svg lucideStore size="14" aria-hidden="true"></svg> {{ player.gold }} gold</span
+                >
               </div>
             </div>
 
+            <div class="route-origin" aria-hidden="true">
+              <span class="route-origin-mark"><svg lucideMapPin size="17"></svg></span>
+              <span>Choose a branch</span>
+            </div>
+            <div class="route-map" role="group" aria-label="Available routes">
+              <div class="route-branches" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="route-nodes">
+                @for (node of route.nodes; track node.id; let index = $index) {
+                  <button
+                    class="route-node"
+                    [class]="'route-node ' + node.kind"
+                    type="button"
+                    [attr.aria-label]="node.title + ': ' + node.description"
+                    (click)="session.chooseRouteNode(node.id)"
+                  >
+                    <span class="route-node-index">0{{ index + 1 }}</span>
+                    <span class="route-node-icon" aria-hidden="true">
+                      @if (node.kind === 'battle') {
+                        <svg lucideSwords size="22"></svg>
+                      } @else if (node.kind === 'elite') {
+                        <svg lucideTrophy size="22"></svg>
+                      } @else if (node.kind === 'store') {
+                        <svg lucideStore size="22"></svg>
+                      } @else {
+                        <svg lucideTentTree size="22"></svg>
+                      }
+                    </span>
+                    <span class="route-node-copy">
+                      <strong>{{ node.title }}</strong>
+                      <span>{{ node.description }}</span>
+                      <small>{{ node.reward }}</small>
+                    </span>
+                    <svg
+                      class="route-node-arrow"
+                      lucideArrowRight
+                      size="16"
+                      aria-hidden="true"
+                    ></svg>
+                  </button>
+                }
+              </div>
+            </div>
+          </section>
+        }
+      }
+    }
+
+    @case ('combat') {
+      @if (session.player(); as player) {
+        @if (session.enemy(); as enemy) {
+          <section class="panel" data-screen="combat" aria-label="Combat">
             <div class="combat-grid">
               <article class="combatant-card player-combatant">
                 <div class="combatant-header">
@@ -712,12 +766,12 @@
                 }
                 <button
                   class="primary-button"
-                  data-focus-target="next-enemy"
+                  data-focus-target="route-map"
                   type="button"
                   [disabled]="player.powerUps.pending > 0"
-                  (click)="session.findEnemy()"
+                  (click)="session.openRouteMap()"
                 >
-                  Find another enemy
+                  View route map <svg lucideMap size="16" aria-hidden="true"></svg>
                 </button>
               } @else {
                 <p class="validation" role="alert">You have been defeated.</p>

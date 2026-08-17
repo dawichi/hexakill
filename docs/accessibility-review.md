@@ -10,8 +10,8 @@ This record separates evidence that can be verified from source and automated br
 - The document has a keyboard skip link targeting the focusable game-content main landmark; the component and browser suites verify its target contract and keyboard activation.
 - Music and effects sliders expose a human-readable `aria-valuetext` and retain their values through the versioned preferences envelope.
 - Dynamic validation, combat callouts, store, and game-over messages use atomic status/alert regions so assistive technology receives the complete updated message.
-- Screen headings have programmatic focus targets. The browser suite verifies focus after welcome navigation, store entry/return, combat entry, power-up selection, game-over, reset, and keyboard activation.
-- The suite verifies reduced-motion behavior and no horizontal overflow at a 360px viewport across welcome, character selection, and combat.
+- Screen headings have programmatic focus targets. The browser suite verifies focus after welcome navigation, store entry/return, route-map entry, combat entry, power-up selection, game-over, reset, and keyboard activation.
+- The suite verifies reduced-motion behavior and no horizontal overflow at a 360px viewport across welcome, character selection, route map, and combat.
 - Character-selection art is decorative in context and is hidden from the accessibility tree; character, enemy, item, and history art that conveys entity identity has text alternatives.
 - Character-selection stat modifiers use a shared icon-and-color chip component; each chip exposes its full stat name and value through an accessible label, so the compact visual language does not rely on color or icon recognition alone.
 - The welcome screen keeps its “How to play” field manual visible by default; stat chips expose their full labels and values through accessible text rather than relying on color or icon recognition alone.

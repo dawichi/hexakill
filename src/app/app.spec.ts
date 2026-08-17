@@ -64,8 +64,8 @@ describe('App', () => {
     compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
     fixture.detectChanges();
 
-    expect(compiled.querySelector('h2')?.textContent).toContain('Face');
     expect(compiled.querySelector('[data-screen="combat"]')).toBeTruthy();
+    expect(compiled.querySelector('.section-lead')).toBeNull();
   });
 
   it('exposes name validation semantics before character selection', async () => {
@@ -116,12 +116,43 @@ describe('App', () => {
     fixture.detectChanges();
 
     const session = TestBed.inject(GameSessionService);
-    session.combatState.update((state) => ({ ...state, phase: 'awaiting-player-action' }));
+    session.combatState.update((state) => ({
+      ...state,
+      phase: 'victory',
+      enemy: state.enemy ? { ...state.enemy, damageTaken: state.enemy.stats.health } : null,
+    }));
+    session.routeMap.set({
+      floor: 1,
+      nodes: [
+        {
+          id: 'store-node',
+          kind: 'store',
+          title: 'Merchant',
+          description: 'Trade your gold.',
+          reward: 'Shop',
+        },
+        {
+          id: 'battle-node',
+          kind: 'battle',
+          title: 'Skirmish',
+          description: 'Fight.',
+          reward: 'Gold',
+        },
+        {
+          id: 'rest-node',
+          kind: 'rest',
+          title: 'Campfire',
+          description: 'Rest.',
+          reward: 'Health',
+        },
+      ],
+    });
+    session.openRouteMap();
     fixture.detectChanges();
 
-    const storeButton = Array.from(
-      compiled.querySelectorAll<HTMLButtonElement>('.quiet-button'),
-    ).find((button) => button.textContent?.includes('Store'));
+    expect(compiled.querySelector('[data-screen="map"]')).toBeTruthy();
+    expect(compiled.querySelector('[data-screen="combat"] .button-row')).toBeNull();
+    const storeButton = compiled.querySelector<HTMLButtonElement>('.route-node.store');
     storeButton?.click();
     fixture.detectChanges();
     expect(compiled.querySelector('[role="group"][aria-label="Potion offers"]')).toBeTruthy();
@@ -132,7 +163,7 @@ describe('App', () => {
     ).find((button) => button.textContent?.includes('Close store'));
     closeStoreButton?.click();
     fixture.detectChanges();
-    expect(compiled.querySelector('[role="group"][aria-label="Combat actions"]')).toBeTruthy();
+    expect(compiled.querySelector('[data-screen="map"]')).toBeTruthy();
   });
 
   it('moves from a ready run into combat with a generated enemy', async () => {
@@ -151,7 +182,6 @@ describe('App', () => {
     compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
     fixture.detectChanges();
 
-    expect(compiled.querySelector('h2')?.textContent).toContain('Face');
     expect(compiled.querySelector('[data-screen="combat"]')).toBeTruthy();
     expect(compiled.querySelector('.action-button.attack')).toBeTruthy();
     expect(compiled.querySelector('.action-button.magic')).toBeTruthy();
