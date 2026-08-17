@@ -5,6 +5,7 @@ ADRs record durable, accepted project decisions. Accepted ADRs are not silently 
 ## Records
 
 - [ADR-0001: Use Angular for the Hexakill rewrite](0001-angular-rewrite.md) — accepted framework direction for the active root Angular application.
+- [ADR-0002: Scale level-4 player initialization](0002-level-4-player-initialization.md) — accepted opening-stat rule for new runs.
 
 ## Candidates for the next ADRs
 

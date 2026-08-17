@@ -16,6 +16,18 @@ export const BASE_STATS: Stats = {
   speed: 4,
 };
 
+export const INITIAL_PLAYER_LEVEL = 4;
+
+function statsAtLevel(level: number): Stats {
+  const stats = { ...BASE_STATS };
+
+  (Object.keys(BASE_STATS) as (keyof Stats)[]).forEach((stat) => {
+    stats[stat] = BASE_STATS[stat] * level;
+  });
+
+  return stats;
+}
+
 export const CHARACTER_DEFINITIONS: readonly CharacterDefinition[] = [
   {
     id: 'wizard',
@@ -67,9 +79,9 @@ export function createInitialPlayer(name: string, character: CharacterDefinition
   return {
     name,
     character,
-    level: 4,
+    level: INITIAL_PLAYER_LEVEL,
     experience: 0,
-    stats: { ...BASE_STATS },
+    stats: statsAtLevel(INITIAL_PLAYER_LEVEL),
     potions: 5,
     gold: 2000,
     inventory: [],

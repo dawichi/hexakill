@@ -88,7 +88,7 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await page.getByRole('button', { name: /Skirmish:/ }).click();
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
   await expect(page.locator('.inventory-item').getByRole('img', { name: 'Sword' })).toBeVisible();
-  await expect(page.getByRole('img', { name: /Attack: 216/ })).toBeVisible();
+  await expect(page.getByRole('img', { name: /Attack: 264/ })).toBeVisible();
   await expect(page.getByRole('meter', { name: 'Enemy health' })).toHaveAttribute(
     'aria-valuemin',
     '0',

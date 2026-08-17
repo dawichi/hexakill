@@ -78,22 +78,22 @@ describe('GameSessionService', () => {
 
     service.attack('attack');
 
-    expect(service.enemy()?.damageTaken).toBe(17);
+    expect(service.enemy()?.damageTaken).toBe(68);
     expect(service.combatState().phase).toBe('enemy-turn');
-    expect(service.combatMessage()).toContain('dealt 17 damage');
+    expect(service.combatMessage()).toContain('dealt 68 damage');
     expect(service.lastActionAt()).toBe(1234);
     expect(scheduledDelays).toContain(1100);
     expect(service.playerCombatLog()[1]).toEqual({
       title: 'David',
       message: '',
-      value: 17,
+      value: 68,
       icon: '🔪',
     });
 
     scheduledTask?.();
 
     expect(service.combatState().phase).toBe('awaiting-player-action');
-    expect(service.playerRemainingHealth()).toBeLessThan(200);
+    expect(service.playerRemainingHealth()).toBeLessThan(800);
     expect(service.enemyAnimation()).toBe('attack');
     expect(service.playerAnimation()).toBe('hit');
     expect(service.enemyCombatLog()[1]).toMatchObject({
@@ -370,11 +370,10 @@ describe('GameSessionService', () => {
   it('lets a faster enemy take the opening turn', () => {
     service.setPlayerName('David');
     service.selectCharacter(CHARACTER_DEFINITIONS[0]);
-    service.startRun();
-    const player = service.player();
-    if (!player) throw new Error('Expected a player.');
-
-    service.player.set({ ...player, stats: { ...player.stats, speed: 1 } });
+    service.player.set({
+      ...createInitialPlayer('David', CHARACTER_DEFINITIONS[0]),
+      stats: { ...createInitialPlayer('David', CHARACTER_DEFINITIONS[0]).stats, speed: 1 },
+    });
     service.findEnemy();
 
     expect(service.combatState().phase).toBe('enemy-turn');

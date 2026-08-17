@@ -101,14 +101,13 @@ describe('character asset contracts', () => {
     );
   });
 
-  it('keeps the unresolved level-4 baseline explicit', () => {
+  it('initializes a level-4 player with legacy-scaled stats', () => {
     const player = createInitialPlayer('David', CHARACTER_DEFINITIONS[0]);
     const legacyScaledStats = Object.fromEntries(
       Object.entries(BASE_STATS).map(([stat, value]) => [stat, value * 4]),
     );
 
     expect(player.level).toBe(4);
-    expect(player.stats).toEqual(BASE_STATS);
-    expect(player.stats).not.toEqual(legacyScaledStats);
+    expect(player.stats).toEqual(legacyScaledStats);
   });
 });

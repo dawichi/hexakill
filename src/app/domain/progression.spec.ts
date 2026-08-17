@@ -33,7 +33,7 @@ describe('progression rules', () => {
 
     expect(leveledPlayer.level).toBe(5);
     expect(leveledPlayer.experience).toBe(25);
-    expect(leveledPlayer.stats.ap).toBe(60);
+    expect(leveledPlayer.stats.ap).toBe(120);
   });
 
   it('applies power-ups with increasing legacy values', () => {
@@ -45,7 +45,7 @@ describe('progression rules', () => {
       'health',
     );
 
-    expect(poweredPlayer.stats.health).toBe(700);
+    expect(poweredPlayer.stats.health).toBe(1300);
     expect(poweredPlayer.powerUps.pending).toBe(0);
     expect(poweredPlayer.powerUps.history.health).toBe(1);
   });

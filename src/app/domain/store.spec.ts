@@ -11,8 +11,8 @@ describe('store rules', () => {
     expect(result.purchased).toBe(true);
     if (!result.purchased) return;
     expect(result.player.gold).toBe(1100);
-    expect(result.player.stats.ad).toBe(216);
-    expect(result.player.stats.speed).toBe(54);
+    expect(result.player.stats.ad).toBe(264);
+    expect(result.player.stats.speed).toBe(66);
     expect(result.player.inventory).toHaveLength(1);
     expect(purchaseItem(result.player, 'sword').purchased).toBe(false);
   });

@@ -56,7 +56,7 @@ The application may be played for engineering smoke checks before that gate, but
 
 ## Known characterization points
 
-- Player starts at level 4 with the current Angular prototype's unscaled base stats, 5 potions, and 2000 gold. This intentionally remains an unresolved divergence from the archived constructor, which initializes a level-4 entity with `level × base` stats; the exact values and decision gate are recorded in [the initial player-stat parity characterization](architecture/initial-player-stat-parity.md) and tracked by [TODO-016](TODO.md#todo-016-high-resolve-initial-player-stat-parity).
+- Player starts at level 4 with legacy-scaled stats (`800 / 64 / 80 / 48 / 48 / 16` for health, attack, magic, armor, magic resist, and speed), 5 potions, and 2000 gold. This opening-stat rule is accepted in [ADR-0002](adr/0002-level-4-player-initialization.md); opening combat and progression balance remain review items.
 - Enemy levels preserve the archived pre-boss calculation for valid level-2+ runs: `minLevel = floor(playerLevel / 2)`, `maxLevel = playerLevel * 1.75`, then `floor(random * (maxLevel - minLevel + 1)) + minLevel`. The active generator normalizes the lower bound to 1 so a lowest-valid-level input cannot create a zero-health enemy. The upper bound is intentionally fractional before the final level conversion; for example, player level 3 with a `0.99` roll produces enemy level 6.
 - Enemy gold preserves the archived `Number(((enemyLevel / playerLevel) * 250).toFixed(0))` rule, including its numeric rounding behavior.
 - Combat resistance reduction and victory experience likewise preserve the archived `toFixed(0)` rounding rules; these boundaries have deterministic regression fixtures.
