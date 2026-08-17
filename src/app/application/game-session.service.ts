@@ -5,6 +5,7 @@ import {
   chooseEnemyAction,
   CombatAction,
   determineFirstActor,
+  resolveHeal,
   resolveAction,
 } from '../domain/combat-actions';
 import {
@@ -14,7 +15,16 @@ import {
   MAX_POWER_UPS,
   MAX_POWER_UPS_PER_STAT,
 } from '../domain/progression';
-import { purchaseItem, purchasePotions, STORE_ITEMS, STORE_POTIONS } from '../domain/store';
+import {
+  purchaseItem,
+  purchasePotions,
+  relicDamageModifiers,
+  relicIncomingDamageModifiers,
+  relicPotionHealingFraction,
+  relicVictoryHealAmount,
+  STORE_ITEMS,
+  STORE_POTIONS,
+} from '../domain/store';
 import {
   enemyAssetFor,
   enemySpriteAssetFor,
@@ -564,14 +574,14 @@ export class GameSessionService {
 
     if (node.kind === 'rest') {
       const damageTaken = this.combatState().playerDamageTaken;
-      const healed = Math.trunc(damageTaken * 0.25);
+      const restResult = resolveHeal(damageTaken, player.stats.health, 0.3);
       this.combatState.update((state) => ({
         ...state,
-        playerDamageTaken: Math.max(0, state.playerDamageTaken - healed),
+        playerDamageTaken: Math.max(0, state.playerDamageTaken - restResult.healed),
       }));
       this.combatMessage.set(
-        healed > 0
-          ? `The campfire restored ${healed} HP for the next encounter.`
+        restResult.healed > 0
+          ? `The campfire restored ${restResult.healed} HP for the next encounter.`
           : 'The campfire found you at full health. The next route awaits.',
       );
       this.openRouteMap();
@@ -622,10 +632,13 @@ export class GameSessionService {
       kind === 'attack' ? ASSET_MANIFEST.sounds.attack : ASSET_MANIFEST.sounds.magic,
     );
 
-    const result = resolveDamage({ stats: player.stats }, enemy, kind, {
-      damageRoll: this.random(),
-      chanceRoll: this.random(),
-    });
+    const result = resolveDamage(
+      { stats: player.stats },
+      enemy,
+      kind,
+      { damageRoll: this.random(), chanceRoll: this.random() },
+      relicDamageModifiers(player, kind),
+    );
     const defeated = result.damageTaken >= enemy.stats.health;
 
     this.applyCombatEvent({ type: 'player-action-resolved', result });
@@ -639,7 +652,15 @@ export class GameSessionService {
     if (defeated) {
       this.enemyAnimation.set('defeat');
       const reward = calculateVictoryReward(player, enemy);
-      this.player.set(applyVictoryReward(player, enemy));
+      const rewardedPlayer = applyVictoryReward(player, enemy);
+      this.player.set(rewardedPlayer);
+      const victoryHeal = relicVictoryHealAmount(rewardedPlayer);
+      if (victoryHeal > 0) {
+        this.combatState.update((state) => ({
+          ...state,
+          playerDamageTaken: Math.max(0, state.playerDamageTaken - victoryHeal),
+        }));
+      }
       this.addCombatLog('enemy', {
         title: enemy.definition.name,
         message: `lv ${enemy.level} has been defeated! 🎉🎉`,
@@ -687,19 +708,23 @@ export class GameSessionService {
     const enemy = this.enemy();
     if (!player || !enemy || !this.canAct() || player.potions <= 0) return;
 
-    const healed = Math.trunc(this.combatState().playerDamageTaken * 0.2);
+    const healResult = resolveHeal(
+      this.combatState().playerDamageTaken,
+      player.stats.health,
+      relicPotionHealingFraction(player),
+    );
     if (!this.applyCombatEvent({ type: 'player-potion-used' })) return;
 
     this.actionReady.set(false);
     this.player.set({ ...player, potions: player.potions - 1 });
     this.combatState.update((state) => ({
       ...state,
-      playerDamageTaken: Math.max(0, state.playerDamageTaken - healed),
+      playerDamageTaken: Math.max(0, state.playerDamageTaken - healResult.healed),
     }));
-    this.combatMessage.set(`You used a potion and healed ${healed} HP.`);
+    this.combatMessage.set(`You used a potion and healed ${healResult.healed} HP.`);
     this.addCombatLog('player', {
       title: player.name,
-      message: `healed ${healed} HP.`,
+      message: `healed ${healResult.healed} HP.`,
       icon: '❤',
     });
     this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
@@ -800,6 +825,7 @@ export class GameSessionService {
       { stats: player.stats, damageTaken: this.combatState().playerDamageTaken },
       action,
       { damageRoll: this.random(), chanceRoll: this.random() },
+      relicIncomingDamageModifiers(player),
     );
 
     if ('action' in result) {

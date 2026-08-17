@@ -10,7 +10,7 @@ The root Angular application uses these screens:
 2. `character-select` accepts a trimmed name of 3–14 characters, renders Wizard, Samurai, and Warrior idle art, presents the character modifier vocabulary through reusable icon-and-color stat chips, and starts a level-4 player.
 3. `combat` begins immediately after character selection with a generated enemy. It displays both combatants' icon-only stat chips, idle/attack/hit/defeat art where an asset is characterized, color-coded health meters, the hero's experience progress, a live Pokémon-style battle callout, actions, and power-up choices. The detailed player/enemy combat logs remain internal state and are not rendered in the player-facing screen.
 4. `map` presents three generated route branches after victory: a regular battle, an elite battle, a merchant, a campfire, or a combination of those choices. Selecting a battle begins the next encounter; selecting a merchant opens the store; selecting a campfire restores 25% of damage received and presents the next branch.
-5. `store` is reachable only from a merchant route node. It displays repeatable potion offers and one-time item offers. Purchased item art and bonuses are shown in the owned-equipment panel; closing the store returns to the route map.
+5. `store` is reachable only from a merchant route node. It displays repeatable potion offers and one-time passive relic offers. Owned relics and their effects remain visible in combat; closing the store returns to the route map.
 6. `game-over` displays the defeat message, grouped defeated-enemy history, local personal records, and a new-run action.
 
 The active UI relies on native buttons, inputs, and range controls. Legacy global keyboard shortcuts (`Space`, `P`, `A`, `S`, `D`, and power-up number keys) are not part of the current Angular contract; keyboard operation is currently characterized through native activation and browser journeys.
@@ -18,23 +18,23 @@ The active UI relies on native buttons, inputs, and range controls. Legacy globa
 ## Active combat sequencing
 
 - `findEnemy` generates a regular enemy from the observed level range or the next Gold Slime boss at levels 10, 20, and 30.
-- The active service compares player and enemy speed. The faster actor opens the encounter; enemy turns are scheduler-backed with a 1.1-second announce-to-resolution pause and a 0.9-second result hold before the next player action is enabled.
-- Player Attack and Magic use the characterized random ranges, miss/critical rules, and resistance reduction. Critical thresholds preserve the archived strict comparisons: AD is critical only above `0.9`, and AP only above `0.6`; miss thresholds are strict below `0.1` for AD and `0.25` for AP. Exact threshold rolls are neither critical nor misses. Resistance reduction preserves the archived `toFixed(0)` rounding rule. Potion use heals the observed truncated 20% of damage received and then gives the enemy a turn.
+- The active service compares player and enemy speed. The faster actor opens the encounter; enemy turns are scheduler-backed with a 1.1-second announce-to-resolution pause and a 0.9-second result hold before the next player action is enabled. Player damage persists when the route advances.
+- Player Attack and Magic use bounded random ranges, lower miss rates, critical multipliers, and meaningful resistance reduction. Attack uses 85–115% power, 5% miss, and 1.5× criticals; Magic uses 75–125% power, 10% miss, and 1.75× criticals. Resistance uses `100 / (100 + resistance)`. Potion use restores 25% of maximum health, then gives the enemy a turn.
 - Enemy actions use the observed attack/magic/heal policy. Damage actions select their typed attack or Magic animation; healing restores the enemy without presenting an attack strip. A non-miss enemy damage result selects the typed player hit-reaction strip when the chosen character has one; a non-miss player damage result selects the typed enemy hit-reaction strip when the enemy has one. Misses and unsupported mappings fall back to idle presentation. The pure combat transition rejects malformed player damage results before updating enemy damage or entering a terminal phase. The provisional animation reset is scheduler-backed through the injected `Clock` port.
 - Combat feedback is presented through one atomic live callout that summarizes the latest action, with contextual Lucide icons for attacks, magic, healing, enemy turns, and victory. The player-facing screen hides the full combat log and keeps action selection grouped under an explicit turn indicator.
-- Route choices are deterministic under the injected random source. Elite nodes strengthen the generated enemy's stats and gold by a provisional 30% and 50%; this is a pacing/progression prototype, not final balance.
+- Route choices are deterministic under the injected random source. Elite nodes strengthen the generated enemy's stats and gold by a provisional 30% and 50%; this is a pacing/progression prototype, not final balance. Campfires restore 30% of maximum health.
 - Reset cancels pending delayed enemy work and guards stale callbacks with a run-generation token.
 - Victory applies provisional experience, gold, level, boss, power-up, and defeated-enemy-history updates. Pending power-ups must be chosen before another enemy can be generated.
-- Enemy level generation retains the archived fractional upper-bound calculation and normalizes the invalid level-1 lower bound to a positive enemy level, while gold and experience retain their archived `toFixed(0)` rounding rules. These numeric boundaries have deterministic fixtures; broader balance acceptance remains open.
+- Enemy levels use a tighter regular range from `floor(playerLevel / 2)` through `playerLevel + 1`; gold and experience retain their archived `toFixed(0)` rounding rules. These numeric boundaries have deterministic fixtures; broader balance acceptance remains open.
 - Defeat writes a versioned local personal-record envelope and changes the screen to `game-over` after the enemy turn resolves.
 
 ## Active store behavior
 
 - The store is reachable only through a merchant node on the route map, never as an in-combat navigation action.
-- Items are one-time purchases and apply their provisional stat bonus immediately. The item remains represented in the player's inventory and is disabled in later store views.
+- Relics are one-time purchases with typed passive effects. They remain represented in the player's inventory and are disabled in later store views; they never mutate the player's raw stats.
 - Potion offers are repeatable while the player can afford them.
 - Closing the store returns to the active `map` route.
-- Store balance, item timing, health semantics, restocking, selling, and final acceptance remain open in [the provisional store contract](../architecture/rewrite-store.md).
+- Store rotation, relic pricing, selling, and final balance remain open in [the relic shop contract](../architecture/rewrite-store.md).
 
 ## Legacy observations retained for comparison
 
@@ -45,10 +45,9 @@ The active UI relies on native buttons, inputs, and range controls. Legacy globa
 
 ## Product gaps to clarify
 
-- Whether the provisional stat and reward values are accepted balance.
+- Whether the prototype stat, relic, and reward values are accepted balance.
 - Whether the accepted level-4 `level × base` initialization needs further combat and reward tuning; see [ADR-0002](../adr/0002-level-4-player-initialization.md).
-- Whether item bonuses should change maximum/current health and every combat formula.
-- Whether the store should restock, persist purchases across runs, or become a progression system.
+- Whether the merchant should rotate a limited set of relic offers and gain rarity tiers.
 - Whether all historical sprite sheets and animation sources should be mapped into gameplay or explicitly deferred.
 - Whether personal records remain local-only or migrate from the legacy storage key/account-backed data.
 - Whether legacy shortcut keys should become an intentional accessibility/product contract.

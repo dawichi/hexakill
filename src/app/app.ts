@@ -113,11 +113,8 @@ export class App {
     );
   }
 
-  protected itemBonusLabel(item: ItemState): string {
-    return Object.entries(item.bonus)
-      .filter(([, value]) => value !== 0)
-      .map(([stat, value]) => `+${value} ${stat.toUpperCase()}`)
-      .join(' · ');
+  protected itemDescription(item: ItemState): string {
+    return item.description;
   }
 
   protected spriteBackgroundSize(asset: SpriteStripAsset): string {

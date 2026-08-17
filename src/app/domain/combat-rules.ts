@@ -1,16 +1,18 @@
 import { Stats } from './game-types';
 
 export const COMBAT_RULES = {
-  ad: {
+  attack: {
     criticalChance: 0.1,
-    missChance: 0.1,
-    hitRange: [0.8, 1.4] as const,
+    criticalMultiplier: 1.5,
+    missChance: 0.05,
+    hitRange: [0.85, 1.15] as const,
     resistance: 'armor' as const,
   },
-  ap: {
-    criticalChance: 0.4,
-    missChance: 0.25,
-    hitRange: [0.3, 2] as const,
+  magic: {
+    criticalChance: 0.2,
+    criticalMultiplier: 1.75,
+    missChance: 0.1,
+    hitRange: [0.75, 1.25] as const,
     resistance: 'mr' as const,
   },
 } as const;
@@ -25,6 +27,12 @@ export interface Combatant {
 export interface DamageRoll {
   readonly damageRoll: number;
   readonly chanceRoll: number;
+}
+
+export interface DamageModifiers {
+  readonly damageMultiplier?: number;
+  readonly resistancePenetration?: number;
+  readonly receivedDamageMultiplier?: number;
 }
 
 export interface DamageResult {
@@ -58,7 +66,7 @@ export function reduceDamage(damage: number, resistance: number): number {
     throw new RangeError('Damage and resistance must be finite and non-negative.');
   }
 
-  return Number(((damage * 600) / (600 + resistance)).toFixed(0));
+  return Number(((damage * 100) / (100 + resistance)).toFixed(0));
 }
 
 export function resolveDamage(
@@ -66,6 +74,7 @@ export function resolveDamage(
   defender: Combatant,
   kind: DamageKind,
   rolls: DamageRoll,
+  modifiers: DamageModifiers = {},
 ): DamageResult {
   if (kind !== 'attack' && kind !== 'magic') {
     throw new RangeError('Damage kind must be attack or magic.');
@@ -83,14 +92,34 @@ export function resolveDamage(
     throw new RangeError('Random rolls must be in the range [0, 1).');
   }
 
-  const rule = COMBAT_RULES[kind === 'attack' ? 'ad' : 'ap'];
+  const damageMultiplier = modifiers.damageMultiplier ?? 1;
+  const resistancePenetration = modifiers.resistancePenetration ?? 0;
+  const receivedDamageMultiplier = modifiers.receivedDamageMultiplier ?? 1;
+  if (
+    !Number.isFinite(damageMultiplier) ||
+    damageMultiplier < 0 ||
+    !Number.isFinite(resistancePenetration) ||
+    resistancePenetration < 0 ||
+    resistancePenetration > 1 ||
+    !Number.isFinite(receivedDamageMultiplier) ||
+    receivedDamageMultiplier < 0
+  ) {
+    throw new RangeError('Damage modifiers must be finite and within their valid ranges.');
+  }
+
+  const rule = COMBAT_RULES[kind];
   const attackPower = attacker.stats[kind === 'attack' ? 'ad' : 'ap'];
   const [minimum, maximum] = rule.hitRange;
   const baseDamage = integerBetween(attackPower * minimum, attackPower * maximum, rolls.damageRoll);
   const missed = rolls.chanceRoll < rule.missChance;
   const critical = !missed && rolls.chanceRoll > 1 - rule.criticalChance;
-  const rawDamage = missed ? 0 : critical ? baseDamage * 2 : baseDamage;
-  const damageAfterResistance = reduceDamage(rawDamage, defender.stats[rule.resistance]);
+  const rawDamage = missed
+    ? 0
+    : Math.trunc(baseDamage * (critical ? rule.criticalMultiplier : 1) * damageMultiplier);
+  const effectiveResistance = defender.stats[rule.resistance] * (1 - resistancePenetration);
+  const damageAfterResistance = Math.trunc(
+    reduceDamage(rawDamage, effectiveResistance) * receivedDamageMultiplier,
+  );
   const damageTaken = Math.min(defender.stats.health, defender.damageTaken + damageAfterResistance);
 
   return {

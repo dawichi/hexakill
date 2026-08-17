@@ -1,4 +1,10 @@
-import { Combatant, DamageKind, DamageResult, resolveDamage } from './combat-rules';
+import {
+  Combatant,
+  DamageKind,
+  DamageModifiers,
+  DamageResult,
+  resolveDamage,
+} from './combat-rules';
 import { EnemyState } from './game-types';
 
 export type CombatAction = DamageKind | 'heal';
@@ -59,13 +65,25 @@ export interface HealResult {
   readonly damageTaken: number;
 }
 
-/** The legacy implementation heals exactly 20% despite a 20–30% config range. */
-export function resolveHeal(damageTaken: number): HealResult {
-  if (!Number.isFinite(damageTaken) || damageTaken < 0) {
-    throw new RangeError('Damage taken must be a finite non-negative number.');
+/** Healing is capped at a percentage of maximum health and never exceeds missing health. */
+export function resolveHeal(
+  damageTaken: number,
+  maximumHealth: number,
+  healingFraction = 0.25,
+): HealResult {
+  if (
+    !Number.isFinite(damageTaken) ||
+    damageTaken < 0 ||
+    !Number.isFinite(maximumHealth) ||
+    maximumHealth <= 0 ||
+    !Number.isFinite(healingFraction) ||
+    healingFraction < 0 ||
+    healingFraction > 1
+  ) {
+    throw new RangeError('Healing inputs must be finite and within their valid ranges.');
   }
 
-  const healed = Math.trunc(damageTaken * 0.2);
+  const healed = Math.min(damageTaken, Math.trunc(maximumHealth * healingFraction));
   return { action: 'heal', healed, damageTaken: Math.max(0, damageTaken - healed) };
 }
 
@@ -77,11 +95,12 @@ export function resolveAction(
   defender: Combatant,
   action: CombatAction,
   rolls: { readonly damageRoll: number; readonly chanceRoll: number },
+  modifiers: DamageModifiers = {},
 ): ActionResult {
   if (action !== 'attack' && action !== 'magic' && action !== 'heal') {
     throw new RangeError('Combat action must be attack, magic, or heal.');
   }
   return action === 'heal'
-    ? resolveHeal(attackerDamageTaken)
-    : resolveDamage(attacker, defender, action, rolls);
+    ? resolveHeal(attackerDamageTaken, attacker.stats.health)
+    : resolveDamage(attacker, defender, action, rolls, modifiers);
 }

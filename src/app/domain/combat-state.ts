@@ -94,7 +94,7 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
       state: {
         phase: 'awaiting-player-action',
         enemy: event.enemy,
-        playerDamageTaken: 0,
+        playerDamageTaken: state.phase === 'victory' ? state.playerDamageTaken : 0,
         pendingAction: null,
         lastResult: null,
       },

@@ -48,11 +48,11 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 ### TODO-005 [High] Decide store contract and item effects
 
-- **Status:** Partially resolved
+- **Status:** Resolved for the gameplay prototype by [ADR-0003](adr/0003-combat-and-relic-balance.md)
 - **Affected area:** `Store.svelte`, `StoreItem.svelte`, `CharacterModel.addItem`, inventory/stat display
-- **Evidence:** Legacy offers and bonuses were characterized. The archived `CharacterModel.addItem` stores bonuses in `inventory.totalBonus` without mutating entity stat fields, while the active Angular app has a documented provisional contract and pure purchase rules with immediate stat application, repeatable potion offers, one-time items, and immutable failure paths; this effect-model divergence and product acceptance are still open.
+- **Evidence:** The active Angular app now models one-time relics as typed passive effects, keeps raw player stats unchanged after purchase, persists health between encounters, and applies potion, reward, and damage effects through pure helpers. The implementation is documented in [the relic shop contract](architecture/rewrite-store.md).
 - **Risk:** Rewriting the store without a product contract preserves or removes progression accidentally.
-- **Next action:** Review [the provisional store contract](architecture/rewrite-store.md), decide item effect timing, restocking, persistence, and final balance, then record an ADR.
+- **Next action:** Review relic pool rotation, pricing, merchant rarity, and final balance through manual runs.
 - **Dependencies:** TODO-004
 - **Owner:** Product owner / Tech Lead
 - **Target:** Before production migration

@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { enemyAssetFor, enemySpriteAssetFor, generateEnemy } from './enemies';
 
 describe('enemy generation', () => {
-  it('selects a typed enemy and keeps the legacy level range', () => {
+  it('selects a typed enemy within the tighter encounter range', () => {
     const enemy = generateEnemy(4, 0.51, 0.99);
 
     expect(enemy.definition.name).toBe('Martial Hero');
-    expect(enemy.level).toBe(7);
-    expect(enemy.stats.health).toBe(1050);
+    expect(enemy.level).toBe(5);
+    expect(enemy.stats.health).toBe(750);
     expect(enemy.damageTaken).toBe(0);
-    expect(enemy.gold).toBe(438);
+    expect(enemy.gold).toBe(313);
   });
 
   it('generates the lower bound for a low roll', () => {
@@ -20,10 +20,10 @@ describe('enemy generation', () => {
     expect(enemy.stats.health).toBe(300);
   });
 
-  it('preserves the legacy fractional upper-bound level calculation', () => {
+  it('keeps the upper encounter bound predictable', () => {
     const enemy = generateEnemy(3, 0, 0.99);
 
-    expect(enemy.level).toBe(6);
+    expect(enemy.level).toBe(4);
   });
 
   it('keeps the lowest valid player level from producing a zero-health enemy', () => {

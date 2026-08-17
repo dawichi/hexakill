@@ -1,27 +1,53 @@
-import { ItemState, PlayerState, Stats } from './game-types';
-
-const ZERO_BONUS: Stats = { health: 0, ad: 0, ap: 0, armor: 0, mr: 0, speed: 0 };
+import { DamageKind, DamageModifiers } from './combat-rules';
+import { ItemState, PlayerState } from './game-types';
 
 export const STORE_ITEMS: readonly ItemState[] = [
   {
-    id: 'orb',
-    name: 'Orb',
-    price: 500,
-    bonus: { ...ZERO_BONUS, health: 1000 },
-    asset: '/images/items/orb.png',
-  },
-  {
-    id: 'sword',
-    name: 'Sword',
-    price: 900,
-    bonus: { ...ZERO_BONUS, ad: 200, speed: 50 },
+    id: 'whetstone',
+    name: 'Whetstone',
+    price: 450,
+    description: 'Attack deals 15% more damage.',
+    effect: { kind: 'attack-damage', amount: 0.15 },
     asset: '/images/items/sword.png',
   },
   {
-    id: 'wand',
-    name: 'Wand',
-    price: 2000,
-    bonus: { ...ZERO_BONUS, ap: 500 },
+    id: 'arcane-lens',
+    name: 'Arcane Lens',
+    price: 550,
+    description: 'Magic deals 15% more damage.',
+    effect: { kind: 'magic-damage', amount: 0.15 },
+    asset: '/images/items/wand.png',
+  },
+  {
+    id: 'ironbark',
+    name: 'Ironbark',
+    price: 500,
+    description: 'Take 15% less damage from enemy attacks.',
+    effect: { kind: 'damage-reduction', amount: 0.15 },
+    asset: '/images/items/orb.png',
+  },
+  {
+    id: 'blood-chalice',
+    name: 'Blood Chalice',
+    price: 600,
+    description: 'After victory, recover 12% of your maximum health.',
+    effect: { kind: 'victory-heal', amount: 0.12 },
+    asset: '/images/items/orb.png',
+  },
+  {
+    id: 'gilded-eye',
+    name: 'Gilded Eye',
+    price: 500,
+    description: 'Earn 25% more gold from defeated enemies.',
+    effect: { kind: 'victory-gold', amount: 0.25 },
+    asset: '/images/items/orb.png',
+  },
+  {
+    id: 'alchemist-flask',
+    name: 'Alchemist Flask',
+    price: 450,
+    description: 'Potions restore 50% more health.',
+    effect: { kind: 'potion-heal', amount: 0.5 },
     asset: '/images/items/wand.png',
   },
 ];
@@ -35,21 +61,7 @@ export type PurchaseResult =
   | { readonly purchased: true; readonly player: PlayerState; readonly message: string }
   | { readonly purchased: false; readonly player: PlayerState; readonly reason: string };
 
-function addStats(stats: Stats, bonus: Stats): Stats {
-  const nextStats = {
-    health: stats.health + bonus.health,
-    ad: stats.ad + bonus.ad,
-    ap: stats.ap + bonus.ap,
-    armor: stats.armor + bonus.armor,
-    mr: stats.mr + bonus.mr,
-    speed: stats.speed + bonus.speed,
-  };
-
-  assertStats(nextStats);
-  return nextStats;
-}
-
-function assertStats(stats: Stats): void {
+function assertPlayerStats(stats: PlayerState['stats']): void {
   if (
     !Object.values(stats).every((value) => Number.isFinite(value) && value >= 0) ||
     stats.health <= 0
@@ -65,7 +77,7 @@ function assertStorePlayer(player: PlayerState): void {
   if (!Number.isSafeInteger(player.potions) || player.potions < 0) {
     throw new RangeError('Player potions must be a non-negative safe integer.');
   }
-  assertStats(player.stats);
+  assertPlayerStats(player.stats);
   if (
     !Array.isArray(player.inventory) ||
     player.inventory.some(
@@ -97,11 +109,39 @@ export function purchaseItem(player: PlayerState, itemId: string): PurchaseResul
     player: {
       ...player,
       gold: player.gold - item.price,
-      stats: addStats(player.stats, item.bonus),
       inventory: [...player.inventory, item],
     },
-    message: `${item.name} purchased. Its stats are active immediately.`,
+    message: `${item.name} acquired. Its passive effect is active.`,
   };
+}
+
+function effectTotal(player: PlayerState, kind: ItemState['effect']['kind']): number {
+  return player.inventory.reduce(
+    (total, item) => total + (item.effect.kind === kind ? item.effect.amount : 0),
+    0,
+  );
+}
+
+export function relicDamageModifiers(player: PlayerState, kind: DamageKind): DamageModifiers {
+  return {
+    damageMultiplier: 1 + effectTotal(player, kind === 'attack' ? 'attack-damage' : 'magic-damage'),
+  };
+}
+
+export function relicIncomingDamageModifiers(player: PlayerState): DamageModifiers {
+  return { receivedDamageMultiplier: Math.max(0.5, 1 - effectTotal(player, 'damage-reduction')) };
+}
+
+export function relicPotionHealingFraction(player: PlayerState): number {
+  return Math.min(1, 0.25 * (1 + effectTotal(player, 'potion-heal')));
+}
+
+export function relicVictoryHealAmount(player: PlayerState): number {
+  return Math.trunc(player.stats.health * effectTotal(player, 'victory-heal'));
+}
+
+export function relicVictoryGoldMultiplier(player: PlayerState): number {
+  return 1 + effectTotal(player, 'victory-gold');
 }
 
 export function purchasePotions(player: PlayerState, offerId: string): PurchaseResult {

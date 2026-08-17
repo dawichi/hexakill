@@ -414,7 +414,10 @@ export function generateEnemy(
 
   const regularEnemies = ENEMY_DEFINITIONS.filter((candidate) => candidate.archetype !== 'boss');
   const minLevel = Math.max(1, Math.floor(playerLevel / 2));
-  const maxLevel = playerLevel * 1.75;
+  const maxLevel = playerLevel + 1;
+  if (!Number.isSafeInteger(maxLevel)) {
+    throw new RangeError('Generated enemy level must be a safe integer.');
+  }
   const level = Math.floor(levelRoll * (maxLevel - minLevel + 1)) + minLevel;
   if (!Number.isSafeInteger(level)) {
     throw new RangeError('Generated enemy level must be a safe integer.');

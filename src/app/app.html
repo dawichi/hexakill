@@ -656,14 +656,14 @@
 
             @if (player.inventory.length) {
               <section class="inventory-panel" aria-labelledby="combat-inventory-title">
-                <h3 id="combat-inventory-title">Equipment</h3>
+                <h3 id="combat-inventory-title">Relics</h3>
                 <div class="inventory-grid">
                   @for (item of player.inventory; track item.id) {
                     <article class="inventory-item">
                       <img class="item-sprite" [src]="item.asset" [alt]="item.name" />
                       <span>
                         <strong>{{ item.name }}</strong>
-                        <small>{{ itemBonusLabel(item) }}</small>
+                        <small>{{ itemDescription(item) }}</small>
                       </span>
                     </article>
                   }
@@ -691,7 +691,7 @@
                   >
                     <svg lucideSword size="17" aria-hidden="true"></svg>
                     Attack
-                    <span>Physical damage · 80–140%</span>
+                    <span>Reliable physical damage · 85–115%</span>
                   </button>
                   <button
                     class="action-button magic"
@@ -701,7 +701,7 @@
                   >
                     <svg lucideWandSparkles size="17" aria-hidden="true"></svg>
                     Magic
-                    <span>Magic damage · 30–200%</span>
+                    <span>Arcane damage · 75–125%</span>
                   </button>
                   <button
                     class="action-button potion"
@@ -711,7 +711,7 @@
                   >
                     <svg lucideHeartPulse size="17" aria-hidden="true"></svg>
                     Potion
-                    <span>Heal 20% of damage received · {{ player.potions }} left</span>
+                    <span>Restore 25% max health · {{ player.potions }} left</span>
                   </button>
                 </div>
               </section>
@@ -826,8 +826,8 @@
             }
           </div>
 
-          <h3>Items</h3>
-          <div class="store-grid" role="group" aria-label="Equipment offers">
+          <h3>Relics</h3>
+          <div class="store-grid" role="group" aria-label="Relic offers">
             @for (item of session.storeItems; track item.id) {
               <button
                 class="store-card"
@@ -839,6 +839,7 @@
               >
                 <img class="item-sprite" [src]="item.asset" [alt]="item.name" />
                 <strong>{{ item.name }}</strong>
+                <span>{{ item.description }}</span>
                 <span>{{ item.price }} gold</span>
               </button>
             }

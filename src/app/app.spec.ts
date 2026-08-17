@@ -156,7 +156,7 @@ describe('App', () => {
     storeButton?.click();
     fixture.detectChanges();
     expect(compiled.querySelector('[role="group"][aria-label="Potion offers"]')).toBeTruthy();
-    expect(compiled.querySelector('[role="group"][aria-label="Equipment offers"]')).toBeTruthy();
+    expect(compiled.querySelector('[role="group"][aria-label="Relic offers"]')).toBeTruthy();
 
     const closeStoreButton = Array.from(
       compiled.querySelectorAll<HTMLButtonElement>('.quiet-button'),

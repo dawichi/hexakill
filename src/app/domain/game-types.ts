@@ -21,11 +21,20 @@ export interface PowerUpState {
   readonly history: Readonly<Record<PowerUpType, number>>;
 }
 
+export type RelicEffect =
+  | { readonly kind: 'attack-damage'; readonly amount: number }
+  | { readonly kind: 'magic-damage'; readonly amount: number }
+  | { readonly kind: 'damage-reduction'; readonly amount: number }
+  | { readonly kind: 'victory-heal'; readonly amount: number }
+  | { readonly kind: 'victory-gold'; readonly amount: number }
+  | { readonly kind: 'potion-heal'; readonly amount: number };
+
 export interface ItemState {
   readonly id: string;
   readonly name: string;
   readonly price: number;
-  readonly bonus: Stats;
+  readonly description: string;
+  readonly effect: RelicEffect;
   readonly asset: string;
 }
 

@@ -75,11 +75,11 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   const storeHeading = page.getByRole('heading', { name: 'Spend your gold.' });
   await expect(storeHeading).toBeVisible();
   await expect(storeHeading).toBeFocused();
-  const swordButton = page.getByRole('button', { name: /Sword/ });
-  await swordButton.focus();
-  await expect(swordButton).toBeFocused();
-  await swordButton.press('Enter');
-  await expect(page.getByText('Gold: 1100')).toBeVisible();
+  const relicButton = page.getByRole('button', { name: /Whetstone/ });
+  await relicButton.focus();
+  await expect(relicButton).toBeFocused();
+  await relicButton.press('Enter');
+  await expect(page.getByText('Gold: 1550')).toBeVisible();
 
   const closeStoreButton = page.getByRole('button', { name: 'Close store' });
   await closeStoreButton.focus();
@@ -87,8 +87,9 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await expect(page.getByRole('heading', { name: 'Where will you go?' })).toBeFocused();
   await page.getByRole('button', { name: /Skirmish:/ }).click();
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
-  await expect(page.locator('.inventory-item').getByRole('img', { name: 'Sword' })).toBeVisible();
-  await expect(page.getByRole('img', { name: /Attack: 264/ })).toBeVisible();
+  await expect(
+    page.locator('.inventory-item').getByRole('img', { name: 'Whetstone' }),
+  ).toBeVisible();
   await expect(page.getByRole('meter', { name: 'Enemy health' })).toHaveAttribute(
     'aria-valuemin',
     '0',
@@ -713,7 +714,7 @@ test('restored duplicate one-time inventory items are discarded safely', async (
   const snapshot = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
   );
-  snapshot.player.inventory = [{ id: 'sword' }, { id: 'sword' }];
+  snapshot.player.inventory = [{ id: 'whetstone' }, { id: 'whetstone' }];
   await page.evaluate((value) => {
     localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
   }, snapshot);
@@ -900,7 +901,7 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   });
   await page.reload();
 
-  const attackButton = page.getByRole('button', { name: /Attack Physical damage/ });
+  const attackButton = page.getByRole('button', { name: /Attack Reliable physical damage/ });
   await attackButton.focus();
   await expect(attackButton).toBeFocused();
   await attackButton.press('Enter');
@@ -971,7 +972,7 @@ test('boss encounters advance in sequence after level ten', async ({ page }) => 
   await page.reload();
 
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
-  await page.getByRole('button', { name: /Attack Physical damage/ }).click();
+  await page.getByRole('button', { name: /Attack Reliable physical damage/ }).click();
   await expect(page.getByText(/gained 150 exp and 1000 gold/)).toBeVisible();
   await page.locator('.power-up-panel').getByRole('button', { name: 'Attack' }).click();
   await page.getByRole('button', { name: /View route map/ }).click();

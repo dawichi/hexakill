@@ -1,41 +1,45 @@
-# Provisional Store and Progression Contract
+# Relic Shop and Consumable Contract
 
-**Status:** Characterization only; product acceptance pending.
+**Status:** Implemented gameplay contract; balance remains subject to manual play review.
 
-The legacy application exposes a store, but its completion and gameplay effects were not reliable enough to treat as an approved specification. This document records observed values and the narrower contract currently implemented in the active Angular app so future agents can distinguish evidence from decisions.
+Hexakill now uses two different kinds of run resources:
 
-## Observed legacy offers
+- **Relics** are one-time purchases with passive effects. They never inflate the player's raw
+  health, attack, magic, armor, resistance, or speed stats.
+- **Potions** are repeatable consumables. They restore a percentage of missing health and spend the
+  player's turn in combat.
 
-| Offer       | Price | Observed effect        |
-| ----------- | ----: | ---------------------- |
-| Potion      |   100 | +1 potion              |
-| Potion pack |   400 | +5 potions             |
-| Orb         |   500 | +1000 health bonus     |
-| Sword       |   900 | +200 attack, +50 speed |
-| Wand        |  2000 | +500 ability power     |
+## Relic pool
 
-The legacy code displays and adds items, but the complete interaction between inventory bonuses, current/max health, combat calculations, restocking, and persistence is not established. Those are open product questions.
+| Relic | Price | Passive |
+| --- | ---: | --- |
+| Whetstone | 450 | Attack deals 15% more damage. |
+| Arcane Lens | 550 | Magic deals 15% more damage. |
+| Ironbark | 500 | Incoming enemy damage is reduced by 15%. |
+| Blood Chalice | 600 | Recover 12% of maximum health after victory. |
+| Gilded Eye | 500 | Earn 25% more gold from defeated enemies. |
+| Alchemist Flask | 450 | Potions restore 50% more health. |
 
-## Current Angular behavior
+The current merchant presents the full pool, disables already-owned relics, and keeps potion
+offers repeatable. The pool can later become a rotating three-offer selection once route identity
+and merchant rarity are established.
 
-- The store is reachable from a ready run or between enemy turns.
-- Potion offers are repeatable while the player has enough gold.
-- Equipment offers are one-time per in-memory run.
-- Purchases require sufficient gold and otherwise leave state unchanged.
-- Equipment bonuses are applied immediately to player stats and the item is added to inventory.
-- The store is entered from a merchant node on the route map; closing it returns to the next route map rather than directly to combat. Refreshing or starting a new run clears the in-memory store state.
-- All purchase and reward rules are pure functions; Angular only coordinates them.
+## Health and timing
 
-## Confirmed parity boundary
+Health damage persists between encounters. A new enemy inherits the player's current damage, so
+route choices matter:
 
-The current item-effect rule is a deliberate provisional choice, not a recovered legacy contract:
+- A potion restores 25% of maximum health, capped at missing health, then yields the enemy turn.
+- Alchemist Flask raises that amount to 37.5%.
+- A campfire restores 30% of maximum health.
+- Blood Chalice restores 12% of maximum health immediately after victory.
 
-- The archived `CharacterModel.addItem` adds the item to `inventory.items` and recalculates `inventory.totalBonus`; it does not assign the bonus directly to the entity's `health`, `ad`, `ap`, `armor`, `mr`, or `speed` fields.
-- The archived store removes a purchased equipment item from `shop.items`, while potion offers remain available. The archived UI separately renders the inventory's accumulated bonus values.
-- The active Angular `purchaseItem` adds the item to the immutable inventory and applies its bonus immediately to `player.stats`; duplicate equipment is rejected by inventory identity.
+## Implementation boundary
 
-Consequently, the active stat values after an equipment purchase must not be treated as legacy parity. The owner decision must define whether bonuses are derived display/inventory effects, direct combat-stat effects, or a new explicit maximum/current-health model before the store is production-ready.
+`ItemState.effect` contains a typed passive effect. `purchaseItem` only spends gold and adds the
+relic to inventory. Combat, progression, and healing rules read the owned effects through pure
+helpers; no purchase mutates the player's base stats.
 
-## Unresolved before production migration
-
-Decide whether equipment changes maximum/current health, whether item bonuses affect every combat formula, shop restocking and duplicate rules, persistence across runs, sell/refund behavior, final prices and balance, and user-facing failure feedback. Add browser journey tests and a durable ADR after those decisions.
+Older Orb, Sword, and Wand stat-bonus offers are intentionally removed from the active contract.
+Existing saved sessions containing those identifiers are rejected by the current restore
+validation and should be restarted.

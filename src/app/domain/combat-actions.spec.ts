@@ -59,13 +59,14 @@ describe('combat action policy', () => {
   });
 
   it('reduces damage taken by the legacy fixed twenty percent heal', () => {
-    expect(resolveHeal(100)).toEqual({ action: 'heal', healed: 20, damageTaken: 80 });
+    expect(resolveHeal(100, 400)).toEqual({ action: 'heal', healed: 100, damageTaken: 0 });
   });
 
   it('rejects invalid damage input for healing', () => {
-    expect(() => resolveHeal(Number.NaN)).toThrow(RangeError);
-    expect(() => resolveHeal(Number.POSITIVE_INFINITY)).toThrow(RangeError);
-    expect(() => resolveHeal(-1)).toThrow(RangeError);
+    expect(() => resolveHeal(Number.NaN, 400)).toThrow(RangeError);
+    expect(() => resolveHeal(Number.POSITIVE_INFINITY, 400)).toThrow(RangeError);
+    expect(() => resolveHeal(-1, 400)).toThrow(RangeError);
+    expect(() => resolveHeal(10, 0)).toThrow(RangeError);
   });
 
   it('resolves a damage action through the shared combat rules', () => {

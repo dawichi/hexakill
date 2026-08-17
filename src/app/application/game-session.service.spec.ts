@@ -78,15 +78,15 @@ describe('GameSessionService', () => {
 
     service.attack('attack');
 
-    expect(service.enemy()?.damageTaken).toBe(68);
+    expect(service.enemy()?.damageTaken).toBe(54);
     expect(service.combatState().phase).toBe('enemy-turn');
-    expect(service.combatMessage()).toContain('dealt 68 damage');
+    expect(service.combatMessage()).toContain('dealt 54 damage');
     expect(service.lastActionAt()).toBe(1234);
     expect(scheduledDelays).toContain(1100);
     expect(service.playerCombatLog()[1]).toEqual({
       title: 'David',
       message: '',
-      value: 68,
+      value: 54,
       icon: '🔪',
     });
 

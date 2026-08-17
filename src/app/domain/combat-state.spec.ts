@@ -275,4 +275,18 @@ describe('combat state transitions', () => {
     ).toBe(false);
     expect(transitionCombat(victory, { type: 'enemy-spawned', enemy }).accepted).toBe(true);
   });
+
+  it('carries player damage between encounters after a victory', () => {
+    const victory = {
+      ...activeState(),
+      phase: 'victory' as const,
+      enemy: { ...enemy, damageTaken: enemy.stats.health },
+      playerDamageTaken: 120,
+    };
+    const nextEncounter = transitionCombat(victory, { type: 'enemy-spawned', enemy });
+
+    if (!nextEncounter.accepted) throw new Error(nextEncounter.reason);
+    expect(nextEncounter.accepted).toBe(true);
+    expect(nextEncounter.state.playerDamageTaken).toBe(120);
+  });
 });

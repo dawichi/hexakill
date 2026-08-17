@@ -1,20 +1,41 @@
 import { describe, expect, it } from 'vitest';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
-import { purchaseItem, purchasePotions } from './store';
+import {
+  purchaseItem,
+  purchasePotions,
+  relicDamageModifiers,
+  relicIncomingDamageModifiers,
+  relicPotionHealingFraction,
+  relicVictoryGoldMultiplier,
+} from './store';
 
 const player = createInitialPlayer('David', CHARACTER_DEFINITIONS[0]);
 
 describe('store rules', () => {
-  it('purchases an item once and applies its bonus immediately', () => {
-    const result = purchaseItem(player, 'sword');
+  it('purchases a relic once and keeps its passive separate from base stats', () => {
+    const result = purchaseItem(player, 'whetstone');
 
     expect(result.purchased).toBe(true);
     if (!result.purchased) return;
-    expect(result.player.gold).toBe(1100);
-    expect(result.player.stats.ad).toBe(264);
-    expect(result.player.stats.speed).toBe(66);
+    expect(result.player.gold).toBe(1550);
+    expect(result.player.stats).toEqual(player.stats);
     expect(result.player.inventory).toHaveLength(1);
-    expect(purchaseItem(result.player, 'sword').purchased).toBe(false);
+    expect(result.player.inventory[0].description).toContain('15% more damage');
+    expect(purchaseItem(result.player, 'whetstone').purchased).toBe(false);
+  });
+
+  it('exposes passive effects to the combat and reward rules', () => {
+    const whetstone = purchaseItem(player, 'whetstone');
+    if (!whetstone.purchased) return;
+    const ironbark = purchaseItem(whetstone.player, 'ironbark');
+    if (!ironbark.purchased) return;
+    const flask = purchaseItem(ironbark.player, 'alchemist-flask');
+
+    expect(relicDamageModifiers(whetstone.player, 'attack').damageMultiplier).toBe(1.15);
+    expect(relicIncomingDamageModifiers(ironbark.player).receivedDamageMultiplier).toBe(0.85);
+    if (!flask.purchased) return;
+    expect(relicPotionHealingFraction(flask.player)).toBe(0.375);
+    expect(relicVictoryGoldMultiplier(flask.player)).toBe(1);
   });
 
   it('rejects unaffordable purchases without changing the player', () => {

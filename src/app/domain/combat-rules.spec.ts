@@ -18,8 +18,8 @@ const defender = {
 
 describe('combat rules', () => {
   it('reduces physical damage using armor', () => {
-    expect(reduceDamage(1000, 100)).toBe(857);
-    expect(reduceDamage(100, 100)).toBe(86);
+    expect(reduceDamage(1000, 100)).toBe(500);
+    expect(reduceDamage(100, 100)).toBe(50);
   });
 
   it('resolves a normal attack and caps damage at remaining health', () => {
@@ -47,6 +47,25 @@ describe('combat rules', () => {
     expect(result.rawDamage).toBeGreaterThan(100);
   });
 
+  it('applies passive damage modifiers without changing base stats', () => {
+    const normal = resolveDamage({ stats: attackerStats }, defender, 'attack', {
+      damageRoll: 0.5,
+      chanceRoll: 0.5,
+    });
+    const modified = resolveDamage(
+      { stats: attackerStats },
+      defender,
+      'attack',
+      { damageRoll: 0.5, chanceRoll: 0.5 },
+      { damageMultiplier: 1.15, receivedDamageMultiplier: 0.85 },
+    );
+
+    expect(modified.rawDamage).toBeGreaterThan(normal.rawDamage);
+    expect(modified.damageAfterResistance).toBeLessThan(
+      reduceDamage(modified.rawDamage, defender.stats.armor),
+    );
+  });
+
   it('preserves the legacy strict critical thresholds for physical and magic damage', () => {
     const physicalAtThreshold = resolveDamage({ stats: attackerStats }, defender, 'attack', {
       damageRoll: 0.5,
@@ -58,11 +77,11 @@ describe('combat rules', () => {
     });
     const magicAtThreshold = resolveDamage({ stats: attackerStats }, defender, 'magic', {
       damageRoll: 0.5,
-      chanceRoll: 0.6,
+      chanceRoll: 0.8,
     });
     const magicAboveThreshold = resolveDamage({ stats: attackerStats }, defender, 'magic', {
       damageRoll: 0.5,
-      chanceRoll: 0.6001,
+      chanceRoll: 0.8001,
     });
 
     expect(physicalAtThreshold.critical).toBe(false);
@@ -85,19 +104,19 @@ describe('combat rules', () => {
   it('preserves strict legacy miss thresholds for physical and magic damage', () => {
     const physicalAtThreshold = resolveDamage({ stats: attackerStats }, defender, 'attack', {
       damageRoll: 0.5,
-      chanceRoll: 0.1,
+      chanceRoll: 0.05,
     });
     const physicalBelowThreshold = resolveDamage({ stats: attackerStats }, defender, 'attack', {
       damageRoll: 0.5,
-      chanceRoll: 0.0999,
+      chanceRoll: 0.0499,
     });
     const magicAtThreshold = resolveDamage({ stats: attackerStats }, defender, 'magic', {
       damageRoll: 0.5,
-      chanceRoll: 0.25,
+      chanceRoll: 0.1,
     });
     const magicBelowThreshold = resolveDamage({ stats: attackerStats }, defender, 'magic', {
       damageRoll: 0.5,
-      chanceRoll: 0.2499,
+      chanceRoll: 0.0999,
     });
 
     expect(physicalAtThreshold.missed).toBe(false);

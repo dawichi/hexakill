@@ -1,4 +1,5 @@
 import { BASE_STATS } from './characters';
+import { relicVictoryGoldMultiplier } from './store';
 import { EnemyState, PlayerState, PowerUpType, Stats } from './game-types';
 
 export const MAX_POWER_UPS = 24;
@@ -81,7 +82,7 @@ export function calculateVictoryReward(player: PlayerState, enemy: EnemyState): 
   if (!Number.isSafeInteger(experience) || experience < 0) {
     throw new RangeError('Victory experience must be a non-negative safe integer.');
   }
-  const gold = enemy.gold;
+  const gold = Math.trunc(enemy.gold * relicVictoryGoldMultiplier(player));
   const totalExperience = player.experience + experience;
   if (!Number.isSafeInteger(totalExperience)) {
     throw new RangeError('Total experience must remain a safe integer.');
