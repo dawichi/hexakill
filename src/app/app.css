@@ -2664,15 +2664,11 @@ h3 {
   }
 }
 
-/* Final mobile composition: each combatant is a complete, self-contained
-   status panel. Nothing is absolutely positioned inside the panel, so the
-   label, sprite, stats, health, and experience keep their own space. */
+/* Final mobile composition: the battlefield stays open in the middle. Each
+   actor HUD sizes to its content instead of taking half of the arena. */
 @media (max-width: 700px) {
   .combat-screen-panel .combat-grid {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 0.25rem;
+    display: block;
     padding: 0.45rem;
   }
 
@@ -2684,37 +2680,37 @@ h3 {
   }
 
   .combat-screen-panel .combatant-card {
-    position: relative;
+    position: absolute;
     inset: auto;
     z-index: 1;
     display: grid;
-    width: 100%;
-    height: calc(50% - 0.15rem);
+    width: calc(100% - 0.3rem);
+    height: auto;
     min-height: 0;
-    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    grid-template-rows: auto clamp(6rem, 15vh, 8rem) auto auto;
     gap: 0.2rem;
     overflow: hidden;
-    border: 1px solid var(--line-soft);
-    background: rgb(16 15 18 / 78%);
+    border: 0;
+    background: transparent;
     padding: 0.35rem;
   }
 
   .combat-screen-panel .enemy-combatant {
-    top: auto;
-    right: auto;
-    order: 1;
+    top: 0.35rem;
+    right: 0.15rem;
+    left: 0.15rem;
   }
 
   .combat-screen-panel .player-combatant {
-    bottom: auto;
-    left: auto;
-    order: 3;
+    right: 0.15rem;
+    bottom: 0.35rem;
+    left: 0.15rem;
   }
 
   .combat-screen-panel .combatant-header {
     position: static;
     z-index: auto;
-    width: auto;
+    width: 52%;
     grid-row: 1;
     border: 0;
     border-bottom: 1px solid var(--line-soft);
@@ -2727,7 +2723,11 @@ h3 {
   .combat-screen-panel .enemy-combatant .combatant-header {
     right: auto;
     left: auto;
-    text-align: left;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-header {
+    margin-left: auto;
+    text-align: right;
   }
 
   .combat-screen-panel .combatant-header .eyebrow {
@@ -2806,7 +2806,7 @@ h3 {
   .combat-screen-panel .combatant-health {
     position: static;
     z-index: auto;
-    width: auto;
+    width: 52%;
     grid-row: 3;
     border: 0;
     border-top: 1px solid var(--line-soft);
@@ -2820,10 +2820,15 @@ h3 {
     left: auto;
   }
 
+  .combat-screen-panel .player-combatant .combatant-health,
+  .combat-screen-panel .player-combatant .combatant-experience {
+    margin-left: auto;
+  }
+
   .combat-screen-panel .combatant-experience {
     position: static;
     z-index: auto;
-    width: auto;
+    width: 52%;
     grid-row: 4;
     gap: 0.12rem;
     padding: 0 0.15rem 0.05rem;
