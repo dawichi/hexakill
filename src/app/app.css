@@ -2470,7 +2470,6 @@ h3 {
     border: 1px solid var(--line);
     border-radius: 0.2rem;
     background:
-      linear-gradient(32deg, transparent 48%, rgb(231 138 61 / 7%) 48.3%, transparent 48.8%),
       radial-gradient(circle at 78% 20%, rgb(219 106 98 / 12%), transparent 34%),
       radial-gradient(circle at 20% 82%, rgb(105 197 211 / 12%), transparent 38%), var(--stone-0);
   }
@@ -2673,7 +2672,18 @@ h3 {
   }
 
   .combat-screen-panel .combat-grid::before {
-    display: none;
+    top: calc(47% + 0.35px);
+    right: -0.75rem;
+    left: -0.75rem;
+    display: block;
+    background: linear-gradient(
+      90deg,
+      transparent 5%,
+      rgb(231 138 61 / 18%) 20% 80%,
+      transparent 95%
+    );
+    transform: rotate(8deg);
+    transform-origin: center;
   }
 
   .combat-screen-panel .combatant-card {
