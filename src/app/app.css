@@ -2663,3 +2663,174 @@ h3 {
     display: none;
   }
 }
+
+/* Final mobile composition: each combatant is a complete, self-contained
+   status panel. Nothing is absolutely positioned inside the panel, so the
+   label, sprite, stats, health, and experience keep their own space. */
+@media (max-width: 700px) {
+  .combat-screen-panel .combat-grid {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.25rem;
+    padding: 0.45rem;
+  }
+
+  .combat-screen-panel .combat-grid::before {
+    top: 50%;
+    right: 1rem;
+    left: 1rem;
+    background: linear-gradient(90deg, transparent, rgb(231 138 61 / 22%), transparent);
+  }
+
+  .combat-screen-panel .combatant-card {
+    position: relative;
+    inset: auto;
+    z-index: 1;
+    display: grid;
+    width: 100%;
+    height: calc(50% - 0.15rem);
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    gap: 0.2rem;
+    overflow: hidden;
+    border: 1px solid var(--line-soft);
+    background: rgb(16 15 18 / 78%);
+    padding: 0.35rem;
+  }
+
+  .combat-screen-panel .enemy-combatant {
+    top: auto;
+    right: auto;
+    order: 1;
+  }
+
+  .combat-screen-panel .player-combatant {
+    bottom: auto;
+    left: auto;
+    order: 3;
+  }
+
+  .combat-screen-panel .combatant-header {
+    position: static;
+    z-index: auto;
+    width: auto;
+    grid-row: 1;
+    border: 0;
+    border-bottom: 1px solid var(--line-soft);
+    background: transparent;
+    padding: 0.05rem 0.15rem 0.25rem;
+    text-align: left;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-header,
+  .combat-screen-panel .enemy-combatant .combatant-header {
+    right: auto;
+    left: auto;
+    text-align: left;
+  }
+
+  .combat-screen-panel .combatant-header .eyebrow {
+    font-size: 0.46rem;
+  }
+
+  .combat-screen-panel .combatant-header h3 {
+    font-size: 0.82rem;
+  }
+
+  .combat-screen-panel .combatant-body,
+  .combat-screen-panel .enemy-combatant .combatant-body {
+    position: static;
+    inset: auto;
+    display: grid;
+    min-height: 0;
+    grid-row: 2;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 0.3rem;
+    overflow: hidden;
+  }
+
+  .combat-screen-panel .combatant-visual,
+  .combat-screen-panel .player-combatant .combatant-visual,
+  .combat-screen-panel .enemy-combatant .combatant-visual {
+    position: static;
+    inset: auto;
+    width: auto;
+    height: 100%;
+    min-height: 0;
+    grid-row: 1;
+    border: 0;
+    background: transparent;
+    order: initial;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-visual {
+    grid-column: 1;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-visual {
+    grid-column: 2;
+  }
+
+  .combat-screen-panel .combat-sprite {
+    width: min(100%, 7.25rem);
+    height: min(100%, 7.25rem);
+  }
+
+  .combat-screen-panel .combat-stat-rail,
+  .combat-screen-panel .player-combatant .combat-stat-rail,
+  .combat-screen-panel .enemy-combatant .combat-stat-rail {
+    position: static;
+    inset: auto;
+    width: auto;
+    grid-row: 1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: center;
+    gap: 0.15rem;
+  }
+
+  .combat-screen-panel .player-combatant .combat-stat-rail {
+    grid-column: 2;
+  }
+
+  .combat-screen-panel .enemy-combatant .combat-stat-rail {
+    grid-column: 1;
+  }
+
+  .combat-screen-panel .combat-stat-rail app-stat-chip,
+  .combat-screen-panel .enemy-combatant .combat-stat-rail app-stat-chip {
+    justify-self: stretch;
+  }
+
+  .combat-screen-panel .combatant-health {
+    position: static;
+    z-index: auto;
+    width: auto;
+    grid-row: 3;
+    border: 0;
+    border-top: 1px solid var(--line-soft);
+    background: transparent;
+    padding: 0.25rem 0.15rem 0;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-health,
+  .combat-screen-panel .enemy-combatant .combatant-health {
+    right: auto;
+    left: auto;
+  }
+
+  .combat-screen-panel .combatant-experience {
+    position: static;
+    z-index: auto;
+    width: auto;
+    grid-row: 4;
+    gap: 0.12rem;
+    padding: 0 0.15rem 0.05rem;
+  }
+
+  .combat-screen-panel .versus {
+    top: 50%;
+    left: 50%;
+  }
+}
