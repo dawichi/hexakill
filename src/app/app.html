@@ -1,6 +1,11 @@
 <a class="skip-link" href="#game-content">Skip to game content</a>
 
-<main id="game-content" class="shell" tabindex="-1">
+<main
+  id="game-content"
+  class="shell"
+  [class.game-active]="session.screen() !== 'welcome'"
+  tabindex="-1"
+>
   <header class="topbar">
     <div class="brand-lockup">
       <p class="eyebrow">The dungeon chronicles</p>
@@ -345,14 +350,18 @@
     @case ('map') {
       @if (session.player(); as player) {
         @if (session.routeMap(); as route) {
-          <section class="panel route-panel" data-screen="map" aria-labelledby="route-map-title">
+          <section
+            class="panel route-panel door-panel"
+            data-screen="map"
+            aria-labelledby="route-map-title"
+          >
             <div class="section-heading route-heading">
               <div>
-                <p class="eyebrow">Floor {{ route.floor }} · choose your path</p>
-                <h2 id="route-map-title" data-screen-heading tabindex="-1">Where will you go?</h2>
+                <p class="eyebrow">Floor {{ route.floor }} · room selection</p>
+                <h2 id="route-map-title" data-screen-heading tabindex="-1">Choose a door</h2>
                 <p class="section-lead">
-                  Every path changes the run. Choose your next stop, then prepare for what waits
-                  beyond it.
+                  Pick one room. Some doors show their purpose; others keep their secret until you
+                  enter.
                 </p>
               </div>
               <div class="route-summary" aria-label="Run summary">
@@ -368,38 +377,57 @@
 
             <div class="route-origin" aria-hidden="true">
               <span class="route-origin-mark"><svg lucideMapPin size="17"></svg></span>
-              <span>Choose a branch</span>
+              <span>Three doors · one choice</span>
             </div>
-            <div class="route-map" role="group" aria-label="Available routes">
+            <!-- Future room type: events will join battles, elites, stores, and camps here. -->
+            <div class="route-map door-stage" role="group" aria-label="Available doors">
               <div class="route-branches" aria-hidden="true">
                 <span></span><span></span><span></span>
               </div>
-              <div class="route-nodes">
+              <div class="route-nodes door-grid">
                 @for (node of route.nodes; track node.id; let index = $index) {
                   <button
-                    class="route-node"
-                    [class]="'route-node ' + node.kind"
+                    class="route-node door-card"
+                    [class]="'route-node door-card ' + (node.hidden ? 'door-hidden' : node.kind)"
                     type="button"
-                    [attr.aria-label]="node.title + ': ' + node.description"
+                    [attr.aria-label]="
+                      'Door ' +
+                      (index + 1) +
+                      ': ' +
+                      (node.hidden
+                        ? 'Unknown room. Reveal on entry.'
+                        : node.title + ': ' + node.description)
+                    "
                     (click)="session.chooseRouteNode(node.id)"
                   >
-                    <span class="route-node-index">0{{ index + 1 }}</span>
-                    <span class="route-node-icon" aria-hidden="true">
-                      @if (node.kind === 'battle') {
-                        <svg lucideSwords size="22"></svg>
-                      } @else if (node.kind === 'elite') {
-                        <svg lucideTrophy size="22"></svg>
-                      } @else if (node.kind === 'store') {
-                        <svg lucideStore size="22"></svg>
-                      } @else {
-                        <svg lucideTentTree size="22"></svg>
-                      }
-                    </span>
-                    <span class="route-node-copy">
-                      <strong>{{ node.title }}</strong>
-                      <span>{{ node.description }}</span>
-                      <small>{{ node.reward }}</small>
-                    </span>
+                    <span class="route-node-index">DOOR 0{{ index + 1 }}</span>
+                    @if (node.hidden) {
+                      <span class="route-node-icon door-question" aria-hidden="true">
+                        <svg lucideCircleHelp size="28"></svg>
+                      </span>
+                      <span class="route-node-copy">
+                        <strong>Unknown room</strong>
+                        <span>The dungeon keeps this chamber hidden.</span>
+                        <small>Reveal on entry</small>
+                      </span>
+                    } @else {
+                      <span class="route-node-icon" aria-hidden="true">
+                        @if (node.kind === 'battle') {
+                          <svg lucideSwords size="22"></svg>
+                        } @else if (node.kind === 'elite') {
+                          <svg lucideTrophy size="22"></svg>
+                        } @else if (node.kind === 'store') {
+                          <svg lucideStore size="22"></svg>
+                        } @else {
+                          <svg lucideTentTree size="22"></svg>
+                        }
+                      </span>
+                      <span class="route-node-copy">
+                        <strong>{{ node.title }}</strong>
+                        <span>{{ node.description }}</span>
+                        <small>{{ node.reward }}</small>
+                      </span>
+                    }
                     <svg
                       class="route-node-arrow"
                       lucideArrowRight
@@ -418,7 +446,7 @@
     @case ('combat') {
       @if (session.player(); as player) {
         @if (session.enemy(); as enemy) {
-          <section class="panel" data-screen="combat" aria-label="Combat">
+          <section class="panel combat-screen-panel" data-screen="combat" aria-label="Combat">
             <div class="combat-grid">
               <article class="combatant-card player-combatant">
                 <div class="combatant-header">
@@ -623,163 +651,168 @@
               </article>
             </div>
 
-            <section
-              class="battle-banner"
-              [class.enemy-turn]="session.combatState().phase === 'enemy-turn'"
-              [class.victory]="session.combatState().phase === 'victory'"
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              <span class="battle-banner-icon" aria-hidden="true">
-                @if (session.combatState().phase === 'victory') {
-                  <svg lucideTrophy size="22"></svg>
-                } @else if (session.combatState().phase === 'enemy-turn') {
-                  <svg lucideShield size="22"></svg>
-                } @else if (
-                  session.playerActionKind() === 'magic' || session.enemyActionKind() === 'magic'
-                ) {
-                  <svg lucideWandSparkles size="22"></svg>
-                } @else if (
-                  session.playerActionKind() === 'attack' || session.enemyActionKind() === 'attack'
-                ) {
-                  <svg lucideSword size="22"></svg>
-                } @else {
-                  <svg lucideHeartPulse size="22"></svg>
-                }
-              </span>
-              <div>
-                <p class="eyebrow">Battle callout</p>
-                <p class="battle-banner-text">{{ session.combatMessage() }}</p>
-              </div>
-            </section>
+            <div class="combat-dock">
+              <section
+                class="battle-banner"
+                [class.enemy-turn]="session.combatState().phase === 'enemy-turn'"
+                [class.victory]="session.combatState().phase === 'victory'"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <span class="battle-banner-icon" aria-hidden="true">
+                  @if (session.combatState().phase === 'victory') {
+                    <svg lucideTrophy size="22"></svg>
+                  } @else if (session.combatState().phase === 'enemy-turn') {
+                    <svg lucideShield size="22"></svg>
+                  } @else if (
+                    session.playerActionKind() === 'magic' || session.enemyActionKind() === 'magic'
+                  ) {
+                    <svg lucideWandSparkles size="22"></svg>
+                  } @else if (
+                    session.playerActionKind() === 'attack' ||
+                    session.enemyActionKind() === 'attack'
+                  ) {
+                    <svg lucideSword size="22"></svg>
+                  } @else {
+                    <svg lucideHeartPulse size="22"></svg>
+                  }
+                </span>
+                <div>
+                  <p class="eyebrow">Battle callout</p>
+                  <p class="battle-banner-text">{{ session.combatMessage() }}</p>
+                </div>
+              </section>
 
-            @if (player.inventory.length) {
               <section class="inventory-panel" aria-labelledby="combat-inventory-title">
                 <h3 id="combat-inventory-title">Relics</h3>
-                <div class="inventory-grid">
-                  @for (item of player.inventory; track item.id) {
-                    <article class="inventory-item">
-                      <img class="item-sprite" [src]="item.asset" [alt]="item.name" />
-                      <span>
-                        <strong>{{ item.name }}</strong>
-                        <small>{{ itemDescription(item) }}</small>
-                      </span>
-                    </article>
-                  }
-                </div>
-              </section>
-            }
-
-            @if (session.combatStatus() === 'ready') {
-              <section class="combat-actions" aria-labelledby="combat-actions-title">
-                <div class="action-heading">
-                  <div>
-                    <p class="eyebrow">Your move</p>
-                    <h3 id="combat-actions-title">Choose an action</h3>
+                @if (player.inventory.length) {
+                  <div class="inventory-grid">
+                    @for (item of player.inventory; track item.id) {
+                      <article class="inventory-item">
+                        <img class="item-sprite" [src]="item.asset" [alt]="item.name" />
+                        <span>
+                          <strong>{{ item.name }}</strong>
+                          <small>{{ itemDescription(item) }}</small>
+                        </span>
+                      </article>
+                    }
                   </div>
-                  <span class="action-turn" [class.enemy-turn]="!session.canAct()">
-                    {{ session.canAct() ? 'Your turn' : 'Enemy turn' }}
-                  </span>
-                </div>
-                <div class="action-grid" role="group" aria-label="Combat actions">
-                  <button
-                    class="action-button attack"
-                    type="button"
-                    [disabled]="!session.canAct()"
-                    (click)="session.attack('attack')"
-                  >
-                    <svg lucideSword size="17" aria-hidden="true"></svg>
-                    Attack
-                    <span>Reliable physical damage · 85–115%</span>
-                  </button>
-                  <button
-                    class="action-button magic"
-                    type="button"
-                    [disabled]="!session.canAct()"
-                    (click)="session.attack('magic')"
-                  >
-                    <svg lucideWandSparkles size="17" aria-hidden="true"></svg>
-                    Magic
-                    <span>Arcane damage · 75–125%</span>
-                  </button>
-                  <button
-                    class="action-button potion"
-                    type="button"
-                    [disabled]="!session.canAct() || !player.potions"
-                    (click)="session.usePotion()"
-                  >
-                    <svg lucideHeartPulse size="17" aria-hidden="true"></svg>
-                    Potion
-                    <span>Restore 25% max health · {{ player.potions }} left</span>
-                  </button>
-                </div>
-              </section>
-            }
-
-            @if (session.combatStatus() === 'defeated') {
-              @if (session.combatState().phase === 'victory') {
-                @if (session.player(); as rewardedPlayer) {
-                  @if (rewardedPlayer.powerUps.pending > 0) {
-                    <div class="power-up-panel" role="group" aria-labelledby="power-up-title">
-                      <p class="eyebrow">Choose an upgrade</p>
-                      <h3 id="power-up-title" data-focus-target="power-up" tabindex="-1">
-                        Power-up available
-                      </h3>
-                      <div class="power-up-grid">
-                        <button
-                          type="button"
-                          class="action-button"
-                          (click)="session.choosePowerUp('health')"
-                        >
-                          <svg lucideHeartPulse size="16" aria-hidden="true"></svg> Health
-                          <span>+500</span>
-                        </button>
-                        <button
-                          type="button"
-                          class="action-button"
-                          (click)="session.choosePowerUp('ad')"
-                        >
-                          <svg lucideSword size="16" aria-hidden="true"></svg> Attack
-                          <span>+40</span>
-                        </button>
-                        <button
-                          type="button"
-                          class="action-button"
-                          (click)="session.choosePowerUp('ap')"
-                        >
-                          <svg lucideWandSparkles size="16" aria-hidden="true"></svg> Magic
-                          <span>+50</span>
-                        </button>
-                        <button
-                          type="button"
-                          class="action-button"
-                          (click)="session.choosePowerUp('speed')"
-                        >
-                          <svg lucideFootprints size="16" aria-hidden="true"></svg> Speed
-                          <span>+10</span>
-                        </button>
-                      </div>
-                      <p class="health-label">Pending: {{ rewardedPlayer.powerUps.pending }}</p>
-                    </div>
-                  }
+                } @else {
+                  <p class="inventory-empty">No relics yet · find a merchant beyond a door.</p>
                 }
-                <button
-                  class="primary-button"
-                  data-focus-target="route-map"
-                  type="button"
-                  [disabled]="player.powerUps.pending > 0"
-                  (click)="session.openRouteMap()"
-                >
-                  View route map <svg lucideMap size="16" aria-hidden="true"></svg>
-                </button>
-              } @else {
-                <p class="validation" role="alert">You have been defeated.</p>
-                <button class="primary-button" type="button" (click)="session.reset()">
-                  Start a new run
-                </button>
+              </section>
+
+              @if (session.combatStatus() === 'ready') {
+                <section class="combat-actions" aria-labelledby="combat-actions-title">
+                  <div class="action-heading">
+                    <div>
+                      <p class="eyebrow">Your move</p>
+                      <h3 id="combat-actions-title">Choose an action</h3>
+                    </div>
+                    <span class="action-turn" [class.enemy-turn]="!session.canAct()">
+                      {{ session.canAct() ? 'Your turn' : 'Enemy turn' }}
+                    </span>
+                  </div>
+                  <div class="action-grid" role="group" aria-label="Combat actions">
+                    <button
+                      class="action-button attack"
+                      type="button"
+                      [disabled]="!session.canAct()"
+                      (click)="session.attack('attack')"
+                    >
+                      <svg lucideSword size="17" aria-hidden="true"></svg>
+                      Attack
+                      <span>Reliable physical damage · 85–115%</span>
+                    </button>
+                    <button
+                      class="action-button magic"
+                      type="button"
+                      [disabled]="!session.canAct()"
+                      (click)="session.attack('magic')"
+                    >
+                      <svg lucideWandSparkles size="17" aria-hidden="true"></svg>
+                      Magic
+                      <span>Arcane damage · 75–125%</span>
+                    </button>
+                    <button
+                      class="action-button potion"
+                      type="button"
+                      [disabled]="!session.canAct() || !player.potions"
+                      (click)="session.usePotion()"
+                    >
+                      <svg lucideHeartPulse size="17" aria-hidden="true"></svg>
+                      Potion
+                      <span>Restore 25% max health · {{ player.potions }} left</span>
+                    </button>
+                  </div>
+                </section>
               }
-            }
+
+              @if (session.combatStatus() === 'defeated') {
+                @if (session.combatState().phase === 'victory') {
+                  @if (session.player(); as rewardedPlayer) {
+                    @if (rewardedPlayer.powerUps.pending > 0) {
+                      <div class="power-up-panel" role="group" aria-labelledby="power-up-title">
+                        <p class="eyebrow">Choose an upgrade</p>
+                        <h3 id="power-up-title" data-focus-target="power-up" tabindex="-1">
+                          Power-up available
+                        </h3>
+                        <div class="power-up-grid">
+                          <button
+                            type="button"
+                            class="action-button"
+                            (click)="session.choosePowerUp('health')"
+                          >
+                            <svg lucideHeartPulse size="16" aria-hidden="true"></svg> Health
+                            <span>+500</span>
+                          </button>
+                          <button
+                            type="button"
+                            class="action-button"
+                            (click)="session.choosePowerUp('ad')"
+                          >
+                            <svg lucideSword size="16" aria-hidden="true"></svg> Attack
+                            <span>+40</span>
+                          </button>
+                          <button
+                            type="button"
+                            class="action-button"
+                            (click)="session.choosePowerUp('ap')"
+                          >
+                            <svg lucideWandSparkles size="16" aria-hidden="true"></svg> Magic
+                            <span>+50</span>
+                          </button>
+                          <button
+                            type="button"
+                            class="action-button"
+                            (click)="session.choosePowerUp('speed')"
+                          >
+                            <svg lucideFootprints size="16" aria-hidden="true"></svg> Speed
+                            <span>+10</span>
+                          </button>
+                        </div>
+                        <p class="health-label">Pending: {{ rewardedPlayer.powerUps.pending }}</p>
+                      </div>
+                    }
+                  }
+                  <button
+                    class="primary-button"
+                    data-focus-target="route-map"
+                    type="button"
+                    [disabled]="player.powerUps.pending > 0"
+                    (click)="session.openRouteMap()"
+                  >
+                    View route map <svg lucideMap size="16" aria-hidden="true"></svg>
+                  </button>
+                } @else {
+                  <p class="validation" role="alert">You have been defeated.</p>
+                  <button class="primary-button" type="button" (click)="session.reset()">
+                    Start a new run
+                  </button>
+                }
+              }
+            </div>
           </section>
         }
       }

@@ -46,7 +46,7 @@ describe('App', () => {
     expect(main?.getAttribute('tabindex')).toBe('-1');
   });
 
-  it('moves through character selection directly into the first combat', async () => {
+  it('moves through character selection into the first door choice', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
@@ -64,8 +64,11 @@ describe('App', () => {
     compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
     fixture.detectChanges();
 
+    expect(compiled.querySelector('[data-screen="map"]')).toBeTruthy();
+    expect(compiled.querySelectorAll('.door-card')).toHaveLength(3);
+    compiled.querySelector<HTMLButtonElement>('.door-card')?.click();
+    fixture.detectChanges();
     expect(compiled.querySelector('[data-screen="combat"]')).toBeTruthy();
-    expect(compiled.querySelector('.section-lead')).toBeNull();
   });
 
   it('exposes name validation semantics before character selection', async () => {
@@ -180,6 +183,8 @@ describe('App', () => {
     compiled.querySelector<HTMLButtonElement>('.character-card')?.click();
     fixture.detectChanges();
     compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
+    fixture.detectChanges();
+    compiled.querySelector<HTMLButtonElement>('.door-card')?.click();
     fixture.detectChanges();
 
     expect(compiled.querySelector('[data-screen="combat"]')).toBeTruthy();

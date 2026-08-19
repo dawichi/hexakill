@@ -1737,3 +1737,719 @@ h3 {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* The playable screens are a viewport, not a document. Keep the arena, dock,
+   and route choices on the same surface so the player never loses context. */
+.shell.game-active {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.55rem;
+  margin: 0;
+  overflow: hidden;
+  padding: clamp(0.45rem, 1.5vw, 1rem);
+}
+
+.game-active .topbar {
+  min-height: 0;
+  margin: 0;
+  padding: 0.1rem 0.15rem 0.5rem;
+}
+
+.game-active .topbar h1 {
+  font-size: clamp(1.25rem, 3vw, 1.85rem);
+}
+
+.game-active .topbar .brand-lockup {
+  gap: 0.15rem;
+}
+
+.game-active .topbar .brand-lockup .eyebrow,
+.game-active .topbar .brand-lockup .status {
+  display: none;
+}
+
+.game-active .audio-controls {
+  min-width: 14rem;
+  gap: 0.25rem;
+  padding: 0.35rem 0.5rem;
+}
+
+.game-active .audio-title {
+  display: none;
+}
+
+.game-active > .panel {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  padding: clamp(0.65rem, 1.5vw, 1.1rem);
+}
+
+.game-active .section-heading {
+  gap: 0.5rem;
+}
+
+.game-active .section-heading h2 {
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+}
+
+.game-active .section-lead {
+  max-width: 44rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.character-select-panel {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: clamp(0.55rem, 1.3vh, 1rem);
+}
+
+.game-active .name-altar {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+}
+
+.game-active .character-grid {
+  min-height: 0;
+  gap: 0.65rem;
+}
+
+.game-active .character-card {
+  min-height: 0;
+  gap: 0.45rem;
+  padding: 0.65rem;
+}
+
+.game-active .character-art-frame {
+  min-height: 0;
+  height: clamp(7rem, 23vh, 13rem);
+}
+
+.game-active .character-art {
+  width: min(9rem, 70%);
+  height: min(9rem, 90%);
+}
+
+.game-active .selection-footer {
+  padding-top: 0.6rem;
+}
+
+.door-panel {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: clamp(0.45rem, 1.5vh, 0.9rem);
+}
+
+.door-panel .route-heading {
+  min-height: 0;
+}
+
+.door-panel .route-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  white-space: nowrap;
+}
+
+.door-panel .route-origin {
+  margin: 0;
+}
+
+.door-stage {
+  display: grid;
+  min-height: 0;
+  margin: 0;
+  align-items: stretch;
+}
+
+.door-grid {
+  height: 100%;
+  min-height: 0;
+  gap: clamp(0.5rem, 1.5vw, 1rem);
+  padding-top: 0;
+}
+
+.door-card {
+  min-height: 0;
+  align-content: center;
+  gap: clamp(0.35rem, 1.2vh, 0.75rem);
+  padding: clamp(0.65rem, 1.6vw, 1.15rem);
+}
+
+.door-card .route-node-icon {
+  width: clamp(2.35rem, 5vw, 3.2rem);
+  height: clamp(2.35rem, 5vw, 3.2rem);
+}
+
+.door-card .route-node-copy strong {
+  font-size: clamp(1rem, 2vw, 1.35rem);
+}
+
+.door-card .route-node-copy span {
+  min-height: 0;
+  font-size: clamp(0.7rem, 1.3vw, 0.82rem);
+}
+
+.door-card .route-node-copy small {
+  font-size: 0.56rem;
+}
+
+.door-card.door-hidden {
+  border-color: #6b5a4a;
+  background:
+    linear-gradient(135deg, rgb(231 138 61 / 5%) 25%, transparent 25%) 0 0 / 8px 8px,
+    var(--stone-0);
+}
+
+.door-card.door-hidden .route-node-icon {
+  color: var(--ember-bright);
+  border-style: dashed;
+}
+
+.door-card.door-hidden .route-node-copy strong {
+  color: var(--ember-bright);
+}
+
+.combat-screen-panel {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.55rem;
+}
+
+.combat-screen-panel .combat-grid {
+  min-height: 0;
+  height: 100%;
+  gap: clamp(0.4rem, 1.5vw, 1rem);
+}
+
+.combat-screen-panel .combatant-card {
+  min-height: 0;
+  gap: 0.5rem;
+  padding: clamp(0.55rem, 1.3vw, 0.9rem);
+}
+
+.combat-screen-panel .combatant-body {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.combat-screen-panel .combatant-visual {
+  min-height: 0;
+  height: 100%;
+}
+
+.combat-screen-panel .combat-sprite {
+  width: min(100%, 11rem);
+  height: min(100%, 10rem);
+}
+
+.combat-dock {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.7fr);
+  grid-template-areas:
+    'banner relics'
+    'actions actions';
+  gap: 0.5rem;
+}
+
+.combat-dock .battle-banner {
+  grid-area: banner;
+  min-height: 3.2rem;
+  margin: 0;
+  padding: 0.5rem 0.65rem;
+}
+
+.combat-dock .battle-banner-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.combat-dock .battle-banner-text {
+  margin-top: 0.1rem;
+  font-size: clamp(0.78rem, 1.5vw, 0.95rem);
+}
+
+.combat-dock .inventory-panel {
+  grid-area: relics;
+  min-width: 0;
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+}
+
+.combat-dock .inventory-panel h3 {
+  margin-bottom: 0.3rem;
+  font-size: 0.75rem;
+}
+
+.combat-dock .inventory-grid {
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+  overflow: hidden;
+}
+
+.combat-dock .inventory-item {
+  min-width: 0;
+  flex: 1 1 0;
+  gap: 0.35rem;
+  padding: 0.25rem 0.35rem;
+}
+
+.combat-dock .inventory-item .item-sprite {
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: 0 0 auto;
+}
+
+.combat-dock .inventory-item span {
+  min-width: 0;
+}
+
+.combat-dock .inventory-item strong,
+.combat-dock .inventory-item small {
+  overflow: hidden;
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.combat-dock .inventory-empty {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.combat-dock .combat-actions {
+  grid-area: actions;
+  min-width: 0;
+  margin: 0;
+  padding-top: 0.45rem;
+}
+
+.combat-dock .action-heading {
+  margin-bottom: 0.4rem;
+}
+
+.combat-dock .action-heading h3 {
+  font-size: 1rem;
+}
+
+.combat-dock .action-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.combat-dock .action-button {
+  min-height: 3.15rem;
+  gap: 0.25rem;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.78rem;
+}
+
+.combat-dock .action-button span {
+  font-size: 0.58rem;
+  line-height: 1.15;
+}
+
+.combat-dock > .power-up-panel,
+.combat-dock > .primary-button,
+.combat-dock > .validation {
+  grid-column: 1 / -1;
+}
+
+.game-active > [data-screen='store'] {
+  display: grid;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 0.35rem;
+}
+
+.game-active > [data-screen='store'] .store-balance,
+.game-active > [data-screen='store'] .combat-message {
+  margin: 0;
+  font-size: 0.72rem;
+}
+
+.game-active > [data-screen='store'] h3 {
+  font-size: 0.85rem;
+}
+
+.game-active > [data-screen='store'] .store-grid {
+  min-height: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.game-active > [data-screen='store'] .store-card {
+  min-height: 0;
+  gap: 0.2rem;
+  padding: 0.45rem;
+  font-size: 0.7rem;
+}
+
+.game-active > [data-screen='store'] .store-card .item-sprite {
+  width: 2rem;
+  height: 2rem;
+}
+
+.game-active > [data-screen='store'] .store-card span {
+  overflow: hidden;
+  font-size: 0.58rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 700px) {
+  .shell.game-active {
+    gap: 0.35rem;
+    padding: 0.35rem;
+  }
+
+  .game-active .topbar {
+    align-items: center;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .game-active .audio-controls {
+    width: auto;
+    min-width: 8.5rem;
+    padding: 0.2rem 0.35rem;
+  }
+
+  .game-active .audio-controls label {
+    grid-template-columns: 2.7rem minmax(3rem, 1fr);
+    gap: 0.25rem;
+    font-size: 0.52rem;
+  }
+
+  .game-active > .panel {
+    padding: 0.55rem;
+  }
+
+  .game-active .section-heading {
+    flex-direction: row;
+    align-items: start;
+  }
+
+  .game-active .section-lead {
+    max-width: 28rem;
+    font-size: 0.66rem;
+  }
+
+  .game-active .character-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .game-active .character-card {
+    padding: 0.4rem;
+  }
+
+  .game-active .character-card-header {
+    font-size: 0.5rem;
+  }
+
+  .game-active .character-art-frame {
+    height: clamp(5.5rem, 17vh, 8.5rem);
+  }
+
+  .game-active .character-art {
+    width: min(6rem, 84%);
+    height: min(6rem, 90%);
+  }
+
+  .game-active .character-name {
+    font-size: 0.9rem;
+  }
+
+  .game-active .character-role {
+    font-size: 0.62rem;
+  }
+
+  .game-active .stat-highlights {
+    gap: 0.15rem;
+  }
+
+  .game-active .selection-footer {
+    gap: 0.45rem;
+    padding-top: 0.4rem;
+  }
+
+  .game-active .selection-hint {
+    font-size: 0.58rem;
+  }
+
+  .game-active .selection-actions {
+    flex-direction: row;
+  }
+
+  .game-active .selection-actions .primary-button,
+  .game-active .selection-actions .quiet-button {
+    width: auto;
+    padding: 0.55rem 0.65rem;
+    font-size: 0.65rem;
+  }
+
+  .door-panel .route-heading {
+    flex-direction: row;
+  }
+
+  .door-panel .route-summary {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.35rem;
+    font-size: 0.5rem;
+  }
+
+  .door-panel .route-origin {
+    font-size: 0.52rem;
+  }
+
+  .door-panel .route-origin-mark {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .door-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .door-card {
+    justify-items: center;
+    padding: 0.45rem 0.3rem;
+    text-align: center;
+  }
+
+  .door-card .route-node-copy {
+    justify-items: center;
+  }
+
+  .door-card .route-node-copy span {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .door-card .route-node-arrow {
+    right: 0.35rem;
+    bottom: 0.35rem;
+  }
+
+  .combat-screen-panel .combat-grid {
+    grid-template-columns: minmax(0, 1fr) 1.55rem minmax(0, 1fr);
+    gap: 0.25rem;
+  }
+
+  .combat-screen-panel .combatant-card {
+    padding: 0.35rem;
+  }
+
+  .combat-screen-panel .combatant-header {
+    display: block;
+  }
+
+  .combat-screen-panel .combatant-header .eyebrow {
+    overflow: hidden;
+    font-size: 0.48rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .combat-screen-panel .combatant-header h3 {
+    overflow: hidden;
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .combat-screen-panel .combatant-badge {
+    display: none;
+  }
+
+  .combat-screen-panel .combatant-body,
+  .combat-screen-panel .enemy-combatant .combatant-body {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .combat-screen-panel .combatant-visual {
+    order: -1;
+    min-height: 0;
+    height: clamp(4rem, 14vh, 7rem);
+  }
+
+  .combat-screen-panel .combat-sprite {
+    width: min(100%, 6.5rem);
+    height: min(100%, 6.5rem);
+  }
+
+  .combat-screen-panel .combat-stat-rail {
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.15rem;
+  }
+
+  .combat-screen-panel .combat-stat-rail app-stat-chip,
+  .combat-screen-panel .enemy-combatant .combat-stat-rail app-stat-chip {
+    justify-self: center;
+  }
+
+  .combat-screen-panel .combatant-health {
+    gap: 0.2rem;
+  }
+
+  .combat-screen-panel .health-heading {
+    font-size: 0.5rem;
+  }
+
+  .combat-screen-panel .health-heading strong {
+    font-size: 0.54rem;
+  }
+
+  .combat-screen-panel .health-bar {
+    height: 0.4rem;
+  }
+
+  .combat-screen-panel .combatant-experience {
+    gap: 0.2rem;
+  }
+
+  .combat-screen-panel .progress-heading {
+    font-size: 0.48rem;
+  }
+
+  .combat-dock {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'banner'
+      'relics'
+      'actions';
+    gap: 0.3rem;
+  }
+
+  .combat-dock .battle-banner {
+    min-height: 2.4rem;
+  }
+
+  .combat-dock .battle-banner-icon {
+    width: 1.55rem;
+    height: 1.55rem;
+  }
+
+  .combat-dock .battle-banner-icon svg {
+    width: 15px;
+  }
+
+  .combat-dock .battle-banner-text {
+    font-size: 0.68rem;
+  }
+
+  .combat-dock .inventory-panel {
+    padding: 0.25rem 0.35rem;
+  }
+
+  .combat-dock .inventory-panel h3 {
+    display: none;
+  }
+
+  .combat-dock .inventory-item {
+    min-height: 2rem;
+  }
+
+  .combat-dock .inventory-item .item-sprite {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  .combat-dock .inventory-item strong,
+  .combat-dock .inventory-item small {
+    font-size: 0.48rem;
+  }
+
+  .combat-dock .inventory-empty {
+    font-size: 0.48rem;
+  }
+
+  .combat-dock .combat-actions {
+    padding-top: 0.3rem;
+  }
+
+  .combat-dock .action-heading {
+    margin-bottom: 0.25rem;
+  }
+
+  .combat-dock .action-heading .eyebrow,
+  .combat-dock .action-heading h3 {
+    font-size: 0.68rem;
+  }
+
+  .combat-dock .action-turn {
+    padding: 0.2rem 0.3rem;
+    font-size: 0.48rem;
+  }
+
+  .combat-dock .action-button {
+    min-height: 2.7rem;
+    justify-items: center;
+    grid-template-columns: auto 1fr;
+    padding: 0.3rem 0.2rem;
+    font-size: 0.64rem;
+  }
+
+  .combat-dock .action-button > svg {
+    width: 14px;
+  }
+
+  .combat-dock .action-button span {
+    display: none;
+  }
+
+  .game-active > [data-screen='store'] {
+    grid-template-rows: auto auto auto auto minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .game-active > [data-screen='store'] .section-heading {
+    align-items: center;
+  }
+
+  .game-active > [data-screen='store'] .quiet-button {
+    padding: 0.45rem 0.55rem;
+    font-size: 0.58rem;
+  }
+
+  .game-active > [data-screen='store'] .store-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .game-active > [data-screen='store'] .store-card {
+    padding: 0.25rem;
+    font-size: 0.58rem;
+  }
+
+  .game-active > [data-screen='store'] .store-card .item-sprite {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .game-active > [data-screen='store'] .store-card span {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}

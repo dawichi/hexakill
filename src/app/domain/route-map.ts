@@ -1,8 +1,10 @@
 export type RouteNodeKind = 'battle' | 'elite' | 'store' | 'rest';
+// Future room type: add 'event' once event rules and its resolution UI are defined.
 
 export interface RouteNode {
   readonly id: string;
   readonly kind: RouteNodeKind;
+  readonly hidden?: boolean;
   readonly title: string;
   readonly description: string;
   readonly reward: string;
@@ -16,7 +18,7 @@ export interface RouteMapState {
 const ROUTE_PATTERNS: readonly (readonly RouteNodeKind[])[] = [
   ['battle', 'rest', 'store'],
   ['battle', 'elite', 'store'],
-  ['rest', 'battle', 'elite'],
+  ['battle', 'rest', 'elite'],
   ['battle', 'store', 'battle'],
 ];
 
@@ -33,8 +35,8 @@ const NODE_COPY: Readonly<Record<RouteNodeKind, Omit<RouteNode, 'id' | 'kind'>>>
   },
   store: {
     title: 'Merchant',
-    description: 'Trade your gold for potions and equipment.',
-    reward: 'Shop · recover your supplies',
+    description: 'Trade your gold for potions and passive relics.',
+    reward: 'Relics · potions · build power',
   },
   rest: {
     title: 'Campfire',
@@ -59,12 +61,17 @@ export function createRouteMap(floor: number, routeRoll: number): RouteMapState 
   assertFloor(floor);
   assertRoll(routeRoll);
   const pattern = ROUTE_PATTERNS[Math.floor(routeRoll * ROUTE_PATTERNS.length)];
+  const hiddenCount = routeRoll < 0.5 ? 1 : 2;
+  const firstHiddenIndex = 1 + (Math.floor(routeRoll * 2) % 2);
+  const hiddenIndexes = new Set<number>([firstHiddenIndex]);
+  if (hiddenCount === 2) hiddenIndexes.add(firstHiddenIndex === 1 ? 2 : 1);
 
   return {
     floor,
     nodes: pattern.map((kind, index) => ({
       id: `floor-${floor}-${index + 1}`,
       kind,
+      hidden: hiddenIndexes.has(index),
       ...NODE_COPY[kind],
     })),
   };
@@ -93,6 +100,7 @@ export function isRouteMapState(value: unknown): value is RouteMapState {
       return (
         typeof candidate['id'] === 'string' &&
         isRouteNodeKind(candidate['kind']) &&
+        (candidate['hidden'] === undefined || typeof candidate['hidden'] === 'boolean') &&
         typeof candidate['title'] === 'string' &&
         typeof candidate['description'] === 'string' &&
         typeof candidate['reward'] === 'string'

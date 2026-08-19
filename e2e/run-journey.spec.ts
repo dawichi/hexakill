@@ -12,6 +12,8 @@ async function startRun(
   await expect(page.locator('.character-art')).toHaveCount(3);
   await page.getByRole('button', { name: new RegExp(characterName) }).click();
   await page.getByRole('button', { name: 'Start run' }).click();
+  await expect(page.locator('[data-screen="map"]')).toBeVisible();
+  await page.locator('[data-screen="map"] .door-card').first().click();
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Attack' })).toBeEnabled();
   await expect
@@ -84,7 +86,7 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   const closeStoreButton = page.getByRole('button', { name: 'Close store' });
   await closeStoreButton.focus();
   await closeStoreButton.press('Enter');
-  await expect(page.getByRole('heading', { name: 'Where will you go?' })).toBeFocused();
+  await expect(page.getByRole('heading', { name: 'Choose a door' })).toBeFocused();
   await page.getByRole('button', { name: /Skirmish:/ }).click();
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
   await expect(
@@ -488,11 +490,25 @@ test('reduced motion and a narrow viewport remain usable', async ({ page }) => {
   await page.getByRole('button', { name: /Wizard/ }).click();
   await page.getByRole('button', { name: 'Start run' }).click();
 
+  const mapDimensions = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+    clientHeight: document.documentElement.clientHeight,
+    scrollHeight: document.documentElement.scrollHeight,
+  }));
+  expect(mapDimensions.scrollWidth).toBeLessThanOrEqual(mapDimensions.clientWidth);
+  expect(mapDimensions.scrollHeight).toBeLessThanOrEqual(mapDimensions.clientHeight);
+
+  await page.locator('[data-screen="map"] .door-card').first().click();
+  await expect(page.locator('[data-screen="combat"]')).toBeVisible();
   const combatDimensions = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,
     scrollWidth: document.documentElement.scrollWidth,
+    clientHeight: document.documentElement.clientHeight,
+    scrollHeight: document.documentElement.scrollHeight,
   }));
   expect(combatDimensions.scrollWidth).toBeLessThanOrEqual(combatDimensions.clientWidth);
+  expect(combatDimensions.scrollHeight).toBeLessThanOrEqual(combatDimensions.clientHeight);
 });
 
 test('an invalid saved session is discarded safely', async ({ page }) => {
@@ -767,6 +783,10 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   await startButton.focus();
   await expect(startButton).toBeFocused();
   await startButton.press('Enter');
+  await expect(page.locator('[data-screen="map"]')).toBeVisible();
+  const firstDoor = page.locator('[data-screen="map"] .door-card').first();
+  await firstDoor.focus();
+  await firstDoor.press('Enter');
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
 });
 
@@ -976,7 +996,7 @@ test('boss encounters advance in sequence after level ten', async ({ page }) => 
   await expect(page.getByText(/gained 150 exp and 1000 gold/)).toBeVisible();
   await page.locator('.power-up-panel').getByRole('button', { name: 'Attack' }).click();
   await page.getByRole('button', { name: /View route map/ }).click();
-  await expect(page.getByRole('heading', { name: 'Where will you go?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Choose a door' })).toBeVisible();
   await page.getByRole('button', { name: /Skirmish:/ }).click();
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
 });

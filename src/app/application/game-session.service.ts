@@ -478,9 +478,9 @@ export class GameSessionService {
     this.playerAnimation.set('idle');
     this.playerActionKind.set(null);
     this.clearCombatLogs();
-    this.combatMessage.set('The first enemy is approaching.');
+    this.combatMessage.set('Choose a door. The dungeon will reveal what waits beyond it.');
     this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
-    this.findEnemy('battle');
+    this.showRouteMap();
   }
 
   findEnemy(routeKind: Extract<RouteNodeKind, 'battle' | 'elite'> = 'battle'): void {
@@ -536,7 +536,7 @@ export class GameSessionService {
   }
 
   openStore(): void {
-    if (!this.player() || this.screen() !== 'map' || this.combatState().phase !== 'victory') return;
+    if (!this.player() || this.screen() !== 'map') return;
     this.screen.set('store');
     this.combatMessage.set('');
     this.audio?.playMusic(ASSET_MANIFEST.music.store);
@@ -544,12 +544,18 @@ export class GameSessionService {
 
   closeStore(): void {
     if (this.screen() !== 'store') return;
-    this.openRouteMap();
+    this.showRouteMap();
   }
 
   openRouteMap(): void {
     const player = this.player();
     if (!player || this.combatState().phase !== 'victory' || player.powerUps.pending > 0) return;
+    this.showRouteMap();
+  }
+
+  private showRouteMap(): void {
+    const player = this.player();
+    if (!player) return;
     if (!this.routeMap()) {
       this.routeMap.set(createRouteMap(this.routeFloor(), this.random()));
     }
@@ -584,7 +590,7 @@ export class GameSessionService {
           ? `The campfire restored ${restResult.healed} HP for the next encounter.`
           : 'The campfire found you at full health. The next route awaits.',
       );
-      this.openRouteMap();
+      this.showRouteMap();
       return;
     }
 

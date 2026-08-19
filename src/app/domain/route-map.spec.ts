@@ -7,7 +7,8 @@ describe('route map', () => {
 
     expect(map.floor).toBe(3);
     expect(map.nodes).toHaveLength(3);
-    expect(map.nodes.map((node) => node.kind)).toEqual(['rest', 'battle', 'elite']);
+    expect(map.nodes.map((node) => node.kind)).toEqual(['battle', 'rest', 'elite']);
+    expect(map.nodes.map((node) => node.hidden)).toEqual([false, true, true]);
     expect(map.nodes.every((node) => node.id.startsWith('floor-3-'))).toBe(true);
   });
 

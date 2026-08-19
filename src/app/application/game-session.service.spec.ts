@@ -122,6 +122,21 @@ describe('GameSessionService', () => {
     expect(service.combatMessage()).toContain('healed');
   });
 
+  it('resolves a first-floor merchant door before any combat victory', () => {
+    service.setPlayerName('David');
+    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
+    service.startRun();
+
+    const map = service.routeMap();
+    const merchant = map?.nodes.find((node) => node.kind === 'store');
+    if (!merchant) throw new Error('Expected a merchant door.');
+
+    service.chooseRouteNode(merchant.id);
+
+    expect(merchant.hidden).toBe(false);
+    expect(service.screen()).toBe('store');
+  });
+
   it('writes one local personal record when a run reaches defeat', () => {
     service.setPlayerName('David');
     service.selectCharacter(CHARACTER_DEFINITIONS[0]);
