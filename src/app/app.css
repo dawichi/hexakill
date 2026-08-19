@@ -2454,8 +2454,8 @@ h3 {
   }
 }
 
-/* Mobile combat uses one battle surface. The two combatants occupy opposing
-   corners, leaving the command dock to read like the next Pokémon-style panel. */
+/* Mobile combat is one continuous battle arena. The actors overlap the scene
+   diagonally, while their status boxes sit beside their sprites. */
 @media (max-width: 700px) {
   .combat-screen-panel {
     grid-template-rows: minmax(0, 1fr) auto;
@@ -2464,11 +2464,8 @@ h3 {
 
   .combat-screen-panel .combat-grid {
     position: relative;
-    display: grid;
+    display: block;
     min-height: 0;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 0;
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 0.2rem;
@@ -2506,12 +2503,12 @@ h3 {
   }
 
   .combat-screen-panel .combatant-card {
+    position: absolute;
     z-index: 1;
-    display: grid;
-    width: 92%;
+    display: block;
+    width: 78%;
+    height: 51%;
     min-height: 0;
-    align-self: stretch;
-    gap: 0.2rem;
     overflow: hidden;
     border: 0;
     border-radius: 0.15rem;
@@ -2521,22 +2518,32 @@ h3 {
   }
 
   .combat-screen-panel .player-combatant {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: start;
+    bottom: 0.2rem;
+    left: 0.25rem;
   }
 
   .combat-screen-panel .enemy-combatant {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: end;
+    top: 0.2rem;
+    right: 0.25rem;
   }
 
   .combat-screen-panel .combatant-header {
-    display: block;
+    position: absolute;
+    z-index: 3;
+    top: 0.2rem;
+    width: 51%;
     border: 1px solid var(--line-soft);
     background: rgb(16 15 18 / 88%);
     padding: 0.3rem 0.35rem;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-header {
+    right: 0;
+    text-align: right;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-header {
+    left: 0;
   }
 
   .combat-screen-panel .combatant-header .eyebrow {
@@ -2551,34 +2558,39 @@ h3 {
 
   .combat-screen-panel .combatant-body,
   .combat-screen-panel .enemy-combatant .combatant-body {
-    display: grid;
+    position: absolute;
+    inset: 0;
+    display: block;
     min-height: 0;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 0.15rem;
     overflow: visible;
   }
 
   .combat-screen-panel .player-combatant .combatant-visual {
-    grid-column: 1;
-    grid-row: 1;
-    order: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 56%;
   }
 
   .combat-screen-panel .player-combatant .combat-stat-rail {
-    grid-column: 2;
-    grid-row: 1;
+    position: absolute;
+    top: 2.2rem;
+    right: 0;
+    width: 45%;
   }
 
   .combat-screen-panel .enemy-combatant .combatant-visual {
-    grid-column: 2;
-    grid-row: 1;
-    order: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 56%;
   }
 
   .combat-screen-panel .enemy-combatant .combat-stat-rail {
-    grid-column: 1;
-    grid-row: 1;
+    position: absolute;
+    top: 2.2rem;
+    left: 0;
+    width: 45%;
   }
 
   .combat-screen-panel .combatant-visual {
@@ -2593,6 +2605,7 @@ h3 {
   }
 
   .combat-screen-panel .combat-stat-rail {
+    position: absolute;
     grid-template-columns: repeat(2, max-content);
     align-content: center;
     gap: 0.12rem;
@@ -2604,12 +2617,29 @@ h3 {
   }
 
   .combat-screen-panel .combatant-health {
+    position: absolute;
+    z-index: 3;
+    bottom: 0.85rem;
+    width: 51%;
     border: 1px solid var(--line-soft);
     background: rgb(16 15 18 / 88%);
     padding: 0.25rem 0.3rem;
   }
 
+  .combat-screen-panel .player-combatant .combatant-health {
+    right: 0;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-health {
+    left: 0;
+  }
+
   .combat-screen-panel .combatant-experience {
+    position: absolute;
+    z-index: 3;
+    right: 0;
+    bottom: 0.1rem;
+    width: 51%;
     gap: 0.12rem;
     padding: 0 0.1rem 0.1rem;
   }
