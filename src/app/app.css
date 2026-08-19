@@ -2453,3 +2453,183 @@ h3 {
     -webkit-line-clamp: 2;
   }
 }
+
+/* Mobile combat uses one battle surface. The two combatants occupy opposing
+   corners, leaving the command dock to read like the next Pokémon-style panel. */
+@media (max-width: 700px) {
+  .combat-screen-panel {
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 0.35rem;
+  }
+
+  .combat-screen-panel .combat-grid {
+    position: relative;
+    display: grid;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 0.2rem;
+    background:
+      linear-gradient(148deg, transparent 48%, rgb(231 138 61 / 7%) 48.3%, transparent 48.8%),
+      radial-gradient(circle at 78% 20%, rgb(219 106 98 / 12%), transparent 34%),
+      radial-gradient(circle at 20% 82%, rgb(105 197 211 / 12%), transparent 38%), var(--stone-0);
+  }
+
+  .combat-screen-panel .combat-grid::before,
+  .combat-screen-panel .combat-grid::after {
+    position: absolute;
+    right: 0.55rem;
+    left: 0.55rem;
+    height: 1px;
+    content: '';
+    pointer-events: none;
+  }
+
+  .combat-screen-panel .combat-grid::before {
+    top: 50%;
+    background: linear-gradient(90deg, transparent, var(--line-soft), transparent);
+  }
+
+  .combat-screen-panel .combat-grid::after {
+    bottom: 0.25rem;
+    background: linear-gradient(
+      90deg,
+      transparent 5%,
+      rgb(105 197 211 / 35%) 20% 36%,
+      transparent 48% 52%,
+      rgb(219 106 98 / 30%) 64% 80%,
+      transparent 95%
+    );
+  }
+
+  .combat-screen-panel .combatant-card {
+    z-index: 1;
+    display: grid;
+    width: 92%;
+    min-height: 0;
+    align-self: stretch;
+    gap: 0.2rem;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0.15rem;
+    background: transparent;
+    box-shadow: none;
+    padding: 0.25rem;
+  }
+
+  .combat-screen-panel .player-combatant {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .combat-screen-panel .enemy-combatant {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .combat-screen-panel .combatant-header {
+    display: block;
+    border: 1px solid var(--line-soft);
+    background: rgb(16 15 18 / 88%);
+    padding: 0.3rem 0.35rem;
+  }
+
+  .combat-screen-panel .combatant-header .eyebrow {
+    color: var(--muted);
+    font-size: 0.43rem;
+  }
+
+  .combat-screen-panel .combatant-header h3 {
+    margin-top: 0.1rem;
+    font-size: 0.72rem;
+  }
+
+  .combat-screen-panel .combatant-body,
+  .combat-screen-panel .enemy-combatant .combatant-body {
+    display: grid;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.15rem;
+    overflow: visible;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-visual {
+    grid-column: 1;
+    grid-row: 1;
+    order: 0;
+  }
+
+  .combat-screen-panel .player-combatant .combat-stat-rail {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-visual {
+    grid-column: 2;
+    grid-row: 1;
+    order: 0;
+  }
+
+  .combat-screen-panel .enemy-combatant .combat-stat-rail {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .combat-screen-panel .combatant-visual {
+    height: clamp(4rem, 13vh, 6.5rem);
+    border: 0;
+    background: transparent;
+  }
+
+  .combat-screen-panel .combat-sprite {
+    width: min(100%, 6.25rem);
+    height: min(100%, 6.25rem);
+  }
+
+  .combat-screen-panel .combat-stat-rail {
+    grid-template-columns: repeat(2, max-content);
+    align-content: center;
+    gap: 0.12rem;
+  }
+
+  .combat-screen-panel .combat-stat-rail app-stat-chip,
+  .combat-screen-panel .enemy-combatant .combat-stat-rail app-stat-chip {
+    justify-self: center;
+  }
+
+  .combat-screen-panel .combatant-health {
+    border: 1px solid var(--line-soft);
+    background: rgb(16 15 18 / 88%);
+    padding: 0.25rem 0.3rem;
+  }
+
+  .combat-screen-panel .combatant-experience {
+    gap: 0.12rem;
+    padding: 0 0.1rem 0.1rem;
+  }
+
+  .combat-screen-panel .versus {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .combat-screen-panel .versus span {
+    width: 1.8rem;
+    height: 1.8rem;
+    background: var(--stone-0);
+    font-size: 0.58rem;
+  }
+
+  .combat-screen-panel .versus small {
+    display: none;
+  }
+}
