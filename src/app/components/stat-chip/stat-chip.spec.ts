@@ -19,10 +19,12 @@ describe('StatChipComponent', () => {
     expect(chip.classList.contains('ap')).toBe(true);
     expect(chip.textContent).toContain('Magic');
     expect(chip.textContent).toContain('×2');
-    expect(chip.getAttribute('aria-label')).toBe('Magic: ×2. Magic damage dealt by Magic.');
+    expect(chip.getAttribute('aria-label')).toBe(
+      "Magic: ×2. Power for spell damage. Modifier ×2 to this character's base Magic.",
+    );
     expect(chip.getAttribute('aria-describedby')).toMatch(/^stat-tooltip-/);
     expect(chip.querySelector('[role="tooltip"]')?.textContent).toContain(
-      'Magic damage dealt by Magic.',
+      'Power for spell damage.',
     );
     expect(chip.querySelector('svg[lucideWandSparkles]')).toBeTruthy();
   });
@@ -38,7 +40,7 @@ describe('StatChipComponent', () => {
     expect(chip.querySelector('strong')?.textContent).toContain('1.5');
     expect(chip.querySelector('[role="tooltip"]')?.textContent).toContain('Speed');
     expect(chip.getAttribute('aria-label')).toBe(
-      'Speed: 1.5. Determines who acts first in an encounter.',
+      'Speed: 1.5. Determines who acts first in an encounter. Higher Speed acts first; ties favor the foe.',
     );
     expect(chip.querySelector('svg[lucideFootprints]')).toBeTruthy();
 

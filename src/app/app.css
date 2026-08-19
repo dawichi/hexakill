@@ -2963,6 +2963,7 @@ h3 {
     grid-area: arena;
     height: auto;
     align-self: start;
+    overflow: visible;
     grid-template-rows:
       auto
       clamp(6rem, 13vh, 7rem)
@@ -3010,7 +3011,8 @@ h3 {
     align-self: end;
   }
 
-  .combat-screen-panel .combatant-body {
+  .combat-screen-panel .combatant-body,
+  .combat-screen-panel .enemy-combatant .combatant-body {
     overflow: visible;
   }
 
