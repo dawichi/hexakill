@@ -2943,4 +2943,23 @@ h3 {
     grid-column: 1 / -1;
     grid-row: 8;
   }
+
+  .combat-screen-panel {
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .combat-screen-panel .combat-grid {
+    height: auto;
+    align-self: start;
+    grid-template-rows:
+      auto
+      clamp(6rem, 13vh, 7rem)
+      clamp(3rem, 6vh, 4.5rem)
+      auto
+      clamp(3rem, 6vh, 4.5rem)
+      clamp(6rem, 13vh, 7rem)
+      auto
+      auto;
+    align-content: start;
+  }
 }
