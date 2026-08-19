@@ -2710,7 +2710,7 @@ h3 {
   .combat-screen-panel .combatant-header {
     position: static;
     z-index: auto;
-    width: 52%;
+    width: 100%;
     grid-row: 1;
     border: 0;
     border-bottom: 1px solid var(--line-soft);
@@ -2806,7 +2806,7 @@ h3 {
   .combat-screen-panel .combatant-health {
     position: static;
     z-index: auto;
-    width: 52%;
+    width: 100%;
     grid-row: 3;
     border: 0;
     border-top: 1px solid var(--line-soft);
@@ -2822,13 +2822,13 @@ h3 {
 
   .combat-screen-panel .player-combatant .combatant-health,
   .combat-screen-panel .player-combatant .combatant-experience {
-    margin-left: auto;
+    margin-left: 0;
   }
 
   .combat-screen-panel .combatant-experience {
     position: static;
     z-index: auto;
-    width: 52%;
+    width: 100%;
     grid-row: 4;
     gap: 0.12rem;
     padding: 0 0.15rem 0.05rem;
