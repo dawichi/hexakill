@@ -2727,7 +2727,13 @@ h3 {
 
   .combat-screen-panel .player-combatant .combatant-header {
     margin-left: auto;
+    position: relative;
+    top: calc(-1 * clamp(1.25rem, 4vh, 1.75rem));
     text-align: right;
+  }
+
+  .combat-screen-panel .player-combatant {
+    overflow: visible;
   }
 
   .combat-screen-panel .combatant-header .eyebrow {
@@ -2735,6 +2741,8 @@ h3 {
   }
 
   .combat-screen-panel .combatant-header h3 {
+    width: 100%;
+    max-width: none;
     font-size: 0.82rem;
   }
 
@@ -2820,6 +2828,10 @@ h3 {
     left: auto;
   }
 
+  .combat-screen-panel .enemy-combatant .combatant-health {
+    margin-top: clamp(1.25rem, 4vh, 2rem);
+  }
+
   .combat-screen-panel .player-combatant .combatant-health,
   .combat-screen-panel .player-combatant .combatant-experience {
     margin-left: 0;
@@ -2835,7 +2847,100 @@ h3 {
   }
 
   .combat-screen-panel .versus {
-    top: 50%;
+    top: calc(50% - clamp(0.5rem, 1.5vh, 0.75rem));
     left: 50%;
+  }
+}
+
+/* Mobile experiment: both combatant labels share the same middle row so the
+   arena reads as one battle scene instead of two stacked cards. */
+@media (max-width: 700px) {
+  .combat-screen-panel .combat-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(2rem, 2.4rem) minmax(0, 1fr);
+    grid-template-rows:
+      auto
+      clamp(6rem, 15vh, 8rem)
+      minmax(2rem, 1fr)
+      auto
+      minmax(2rem, 1fr)
+      clamp(6rem, 15vh, 8rem)
+      auto
+      auto;
+    column-gap: 0.2rem;
+    row-gap: 0;
+    align-content: stretch;
+  }
+
+  .combat-screen-panel .combatant-card {
+    display: contents;
+  }
+
+  .combat-screen-panel .combatant-header {
+    position: static;
+    width: auto;
+    grid-row: 4;
+    align-self: center;
+    border: 0;
+    padding: 0;
+  }
+
+  .combat-screen-panel .combatant-header .eyebrow {
+    font-size: 0.55rem;
+  }
+
+  .combat-screen-panel .combatant-header h3 {
+    width: 100%;
+    max-width: none;
+    margin-top: 0.2rem;
+    font-size: clamp(0.86rem, 3.8vw, 1.05rem);
+  }
+
+  .combat-screen-panel .player-combatant .combatant-header {
+    grid-column: 1;
+    margin: 0;
+    position: static;
+    top: auto;
+    text-align: left;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-header {
+    grid-column: 3;
+    text-align: right;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-health {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin: 0;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-body {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .combat-screen-panel .versus {
+    grid-column: 2;
+    grid-row: 4;
+    position: static;
+    align-self: center;
+    justify-self: center;
+    transform: none;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-body {
+    grid-column: 1 / -1;
+    grid-row: 6;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-health {
+    grid-column: 1 / -1;
+    grid-row: 7;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-experience {
+    grid-column: 1 / -1;
+    grid-row: 8;
   }
 }
