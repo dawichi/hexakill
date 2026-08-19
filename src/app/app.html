@@ -465,6 +465,7 @@
                           combatStatValue(player.stats, stat, session.playerRemainingHealth())
                         "
                         [showLabel]="false"
+                        tooltipAlign="end"
                       />
                     }
                   </div>
@@ -620,6 +621,7 @@
                           combatStatValue(enemy.stats, stat, enemy.stats.health - enemy.damageTaken)
                         "
                         [showLabel]="false"
+                        tooltipAlign="start"
                       />
                     }
                   </div>
@@ -651,39 +653,37 @@
               </article>
             </div>
 
-            <div class="combat-dock">
-              <section
-                class="battle-banner"
-                [class.enemy-turn]="session.combatState().phase === 'enemy-turn'"
-                [class.victory]="session.combatState().phase === 'victory'"
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-              >
-                <span class="battle-banner-icon" aria-hidden="true">
-                  @if (session.combatState().phase === 'victory') {
-                    <svg lucideTrophy size="22"></svg>
-                  } @else if (session.combatState().phase === 'enemy-turn') {
-                    <svg lucideShield size="22"></svg>
-                  } @else if (
-                    session.playerActionKind() === 'magic' || session.enemyActionKind() === 'magic'
-                  ) {
-                    <svg lucideWandSparkles size="22"></svg>
-                  } @else if (
-                    session.playerActionKind() === 'attack' ||
-                    session.enemyActionKind() === 'attack'
-                  ) {
-                    <svg lucideSword size="22"></svg>
-                  } @else {
-                    <svg lucideHeartPulse size="22"></svg>
-                  }
-                </span>
-                <div>
-                  <p class="eyebrow">Battle callout</p>
-                  <p class="battle-banner-text">{{ session.combatMessage() }}</p>
-                </div>
-              </section>
+            <section
+              class="battle-banner"
+              [class.enemy-turn]="session.combatState().phase === 'enemy-turn'"
+              [class.victory]="session.combatState().phase === 'victory'"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <span class="battle-banner-icon" aria-hidden="true">
+                @if (session.combatState().phase === 'victory') {
+                  <svg lucideTrophy size="22"></svg>
+                } @else if (session.combatState().phase === 'enemy-turn') {
+                  <svg lucideShield size="22"></svg>
+                } @else if (
+                  session.playerActionKind() === 'magic' || session.enemyActionKind() === 'magic'
+                ) {
+                  <svg lucideWandSparkles size="22"></svg>
+                } @else if (
+                  session.playerActionKind() === 'attack' || session.enemyActionKind() === 'attack'
+                ) {
+                  <svg lucideSword size="22"></svg>
+                } @else {
+                  <svg lucideHeartPulse size="22"></svg>
+                }
+              </span>
+              <p class="battle-banner-text" [class.typing]="combatMessageTyping()">
+                {{ displayedCombatMessage() }}
+              </p>
+            </section>
 
+            <div class="combat-dock">
               <section class="inventory-panel" aria-labelledby="combat-inventory-title">
                 <h3 id="combat-inventory-title">Relics</h3>
                 @if (player.inventory.length) {

@@ -1346,20 +1346,18 @@ h3 {
   min-height: 4.5rem;
   margin: 1.25rem 0;
   border: 1px solid rgb(103 200 219 / 45%);
-  border-left: 4px solid #67c8db;
+  border-left-width: 1px;
   background: linear-gradient(90deg, rgb(20 57 64 / 72%), rgb(18 23 25 / 85%));
   padding: 0.85rem 1rem;
 }
 
 .battle-banner.enemy-turn {
   border-color: rgb(229 170 89 / 45%);
-  border-left-color: #e5aa59;
   background: linear-gradient(90deg, rgb(74 52 28 / 72%), rgb(25 22 19 / 85%));
 }
 
 .battle-banner.victory {
   border-color: rgb(85 194 113 / 52%);
-  border-left-color: #55c271;
   background: linear-gradient(90deg, rgb(27 70 42 / 72%), rgb(18 24 20 / 85%));
 }
 
@@ -1383,11 +1381,26 @@ h3 {
 }
 
 .battle-banner-text {
+  flex: 1;
   margin-top: 0.28rem;
   color: var(--ink);
   font-family: Georgia, serif;
   font-size: clamp(0.95rem, 2vw, 1.12rem);
   line-height: 1.35;
+}
+
+.battle-banner-text.typing::after {
+  content: '▌';
+  display: inline-block;
+  margin-left: 0.12rem;
+  color: currentColor;
+  animation: typewriter-caret 700ms steps(1, end) infinite;
+}
+
+@keyframes typewriter-caret {
+  50% {
+    opacity: 0;
+  }
 }
 
 .combat-actions {
@@ -1919,14 +1932,26 @@ h3 {
 
 .combat-screen-panel {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    'arena'
+    'callout'
+    'dock';
   gap: 0.55rem;
 }
 
 .combat-screen-panel .combat-grid {
+  grid-area: arena;
   min-height: 0;
   height: 100%;
   gap: clamp(0.4rem, 1.5vw, 1rem);
+}
+
+.combat-screen-panel > .battle-banner {
+  grid-area: callout;
+  min-height: 3.2rem;
+  margin: 0;
+  padding: 0.5rem 0.65rem;
 }
 
 .combat-screen-panel .combatant-card {
@@ -1937,7 +1962,7 @@ h3 {
 
 .combat-screen-panel .combatant-body {
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .combat-screen-panel .combatant-visual {
@@ -1951,28 +1976,20 @@ h3 {
 }
 
 .combat-dock {
+  grid-area: dock;
   display: grid;
   min-width: 0;
   grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.7fr);
-  grid-template-areas:
-    'banner relics'
-    'actions actions';
+  grid-template-areas: 'relics actions';
   gap: 0.5rem;
 }
 
-.combat-dock .battle-banner {
-  grid-area: banner;
-  min-height: 3.2rem;
-  margin: 0;
-  padding: 0.5rem 0.65rem;
-}
-
-.combat-dock .battle-banner-icon {
+.combat-screen-panel > .battle-banner .battle-banner-icon {
   width: 2rem;
   height: 2rem;
 }
 
-.combat-dock .battle-banner-text {
+.combat-screen-panel > .battle-banner .battle-banner-text {
   margin-top: 0.1rem;
   font-size: clamp(0.78rem, 1.5vw, 0.95rem);
 }
@@ -2341,23 +2358,6 @@ h3 {
       'relics'
       'actions';
     gap: 0.3rem;
-  }
-
-  .combat-dock .battle-banner {
-    min-height: 2.4rem;
-  }
-
-  .combat-dock .battle-banner-icon {
-    width: 1.55rem;
-    height: 1.55rem;
-  }
-
-  .combat-dock .battle-banner-icon svg {
-    width: 15px;
-  }
-
-  .combat-dock .battle-banner-text {
-    font-size: 0.68rem;
   }
 
   .combat-dock .inventory-panel {
@@ -2945,10 +2945,15 @@ h3 {
   }
 
   .combat-screen-panel {
-    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'arena'
+      'callout'
+      'dock';
   }
 
   .combat-screen-panel .combat-grid {
+    grid-area: arena;
     height: auto;
     align-self: start;
     grid-template-rows:
@@ -2961,5 +2966,48 @@ h3 {
       auto
       auto;
     align-content: start;
+  }
+
+  .combat-screen-panel > .battle-banner {
+    grid-area: callout;
+    min-height: 2.4rem;
+    margin: 0;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .combat-screen-panel > .battle-banner .battle-banner-icon {
+    width: 1.55rem;
+    height: 1.55rem;
+  }
+
+  .combat-screen-panel > .battle-banner .battle-banner-icon svg {
+    width: 15px;
+  }
+
+  .combat-screen-panel > .battle-banner .battle-banner-text {
+    margin-top: 0;
+    font-size: 0.68rem;
+  }
+
+  .combat-screen-panel .combat-dock {
+    grid-area: dock;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'relics'
+      'actions';
+    align-content: space-between;
+    min-height: 0;
+  }
+
+  .combat-screen-panel .combat-dock .combat-actions {
+    align-self: end;
+  }
+
+  .combat-screen-panel .combatant-body {
+    overflow: visible;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-experience {
+    margin-top: 0.4rem;
   }
 }

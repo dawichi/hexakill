@@ -1,4 +1,12 @@
-import { afterRenderEffect, Component, DOCUMENT, inject } from '@angular/core';
+import {
+  afterRenderEffect,
+  Component,
+  DOCUMENT,
+  effect,
+  inject,
+  OnDestroy,
+  signal,
+} from '@angular/core';
 import {
   LucideArrowRight,
   LucideCheck,
@@ -48,12 +56,19 @@ import { PersonalRecord } from './domain/records';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {
+export class App implements OnDestroy {
   protected readonly session = inject(GameSessionService);
   private readonly document = inject(DOCUMENT);
   protected readonly statKeys: readonly Stat[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed'];
+  protected readonly displayedCombatMessage = signal('');
+  protected readonly combatMessageTyping = signal(false);
+  private typewriterTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
+    effect(() => {
+      this.animateCombatMessage(this.session.combatMessage());
+    });
+
     afterRenderEffect(() => {
       const screen = this.session.screen();
       const pendingPowerUps = this.session.player()?.powerUps.pending ?? 0;
@@ -68,6 +83,47 @@ export class App {
         this.document.querySelector<HTMLElement>(`[data-screen="${screen}"] [data-screen-heading]`);
       if (target && this.document.activeElement !== target) target.focus();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.stopCombatMessageAnimation();
+  }
+
+  private animateCombatMessage(message: string): void {
+    this.stopCombatMessageAnimation();
+
+    if (!message) {
+      this.displayedCombatMessage.set('');
+      return;
+    }
+
+    const view = this.document.defaultView;
+    const prefersReducedMotion =
+      typeof view?.matchMedia === 'function' &&
+      view.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      this.displayedCombatMessage.set(message);
+      return;
+    }
+
+    this.displayedCombatMessage.set('');
+    this.combatMessageTyping.set(true);
+    let characterIndex = 0;
+    this.typewriterTimer = setInterval(() => {
+      characterIndex += 1;
+      this.displayedCombatMessage.set(message.slice(0, characterIndex));
+      if (characterIndex >= message.length) {
+        this.stopCombatMessageAnimation();
+      }
+    }, 22);
+  }
+
+  private stopCombatMessageAnimation(): void {
+    if (this.typewriterTimer) {
+      clearInterval(this.typewriterTimer);
+      this.typewriterTimer = null;
+    }
+    this.combatMessageTyping.set(false);
   }
 
   protected onNameInput(event: Event): void {

@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, HostListener, input, signal } from '@angular/core';
 import {
   LucideFootprints,
   LucideHeartPulse,
@@ -27,6 +27,8 @@ const STAT_DESCRIPTIONS: Record<Stat, string> = {
   speed: 'Determines who acts first in an encounter.',
 };
 
+let nextTooltipId = 0;
+
 @Component({
   selector: 'app-stat-chip',
   imports: [
@@ -41,10 +43,16 @@ const STAT_DESCRIPTIONS: Record<Stat, string> = {
     <span
       class="stat-chip"
       [class]="'stat-chip ' + stat()"
+      [class.tooltip-open]="tooltipOpen()"
+      [class.tooltip-start]="tooltipAlign() === 'start'"
+      [class.tooltip-end]="tooltipAlign() === 'end'"
       role="img"
-      [attr.tabindex]="showLabel() ? null : '0'"
+      tabindex="0"
       [attr.aria-label]="label() + ': ' + valueLabel() + '. ' + description()"
-      [title]="label() + ': ' + description()"
+      [attr.aria-describedby]="tooltipId"
+      [attr.aria-expanded]="tooltipOpen()"
+      (click)="toggleTooltip()"
+      (keydown)="onKeydown($event)"
     >
       @switch (stat()) {
         @case ('health') {
@@ -70,6 +78,10 @@ const STAT_DESCRIPTIONS: Record<Stat, string> = {
         <span>{{ label() }}</span>
       }
       <strong>{{ valueLabel() }}</strong>
+      <span class="stat-tooltip" [id]="tooltipId" role="tooltip">
+        <strong>{{ label() }}</strong>
+        <span>{{ description() }}</span>
+      </span>
     </span>
   `,
   styleUrl: './stat-chip.css',
@@ -79,10 +91,29 @@ export class StatChipComponent {
   readonly value = input.required<number>();
   readonly showLabel = input(true);
   readonly format = input<'number' | 'modifier'>('number');
+  readonly tooltipAlign = input<'center' | 'start' | 'end'>('center');
+  protected readonly tooltipOpen = signal(false);
+  protected readonly tooltipId = `stat-tooltip-${++nextTooltipId}`;
 
   protected readonly label = computed(() => STAT_LABELS[this.stat()]);
   protected readonly description = computed(() => STAT_DESCRIPTIONS[this.stat()]);
   protected readonly valueLabel = computed(() =>
     this.format() === 'modifier' ? `×${this.value()}` : this.value().toLocaleString(),
   );
+
+  protected toggleTooltip(): void {
+    this.tooltipOpen.update((open) => !open);
+  }
+
+  protected onKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.toggleTooltip();
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  protected closeTooltipWithEscape(): void {
+    this.tooltipOpen.set(false);
+  }
 }

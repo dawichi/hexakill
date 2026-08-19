@@ -3,6 +3,7 @@
 }
 
 .stat-chip {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.28rem;
@@ -13,6 +14,7 @@
   font-size: 0.58rem;
   letter-spacing: 0.02em;
   line-height: 1;
+  cursor: help;
 }
 
 .stat-chip strong {
@@ -41,4 +43,68 @@
 
 .stat-chip.speed {
   color: #8ecf91;
+}
+
+.stat-tooltip {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.35rem);
+  left: 50%;
+  display: grid;
+  width: max-content;
+  max-width: min(15rem, calc(100vw - 2rem));
+  gap: 0.2rem;
+  border: 1px solid currentColor;
+  background: #171419;
+  padding: 0.45rem 0.55rem;
+  color: var(--ink, #f4ead2);
+  font-family: 'Courier New', monospace;
+  font-size: 0.58rem;
+  line-height: 1.25;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -0.25rem);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease,
+    visibility 120ms ease;
+  visibility: hidden;
+}
+
+.stat-tooltip strong {
+  color: currentColor;
+  font-size: 0.62rem;
+}
+
+.stat-tooltip span {
+  color: var(--muted, #aa9d86);
+}
+
+.stat-chip:hover .stat-tooltip,
+.stat-chip:focus-visible .stat-tooltip,
+.stat-chip.tooltip-open .stat-tooltip {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+  visibility: visible;
+}
+
+.stat-chip.tooltip-start .stat-tooltip {
+  left: 0;
+  transform: translateY(-0.25rem);
+}
+
+.stat-chip.tooltip-end .stat-tooltip {
+  right: 0;
+  left: auto;
+  transform: translateY(-0.25rem);
+}
+
+.stat-chip.tooltip-start:hover .stat-tooltip,
+.stat-chip.tooltip-start:focus-visible .stat-tooltip,
+.stat-chip.tooltip-start.tooltip-open .stat-tooltip,
+.stat-chip.tooltip-end:hover .stat-tooltip,
+.stat-chip.tooltip-end:focus-visible .stat-tooltip,
+.stat-chip.tooltip-end.tooltip-open .stat-tooltip {
+  transform: translateY(0);
 }

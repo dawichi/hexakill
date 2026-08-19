@@ -20,7 +20,10 @@ describe('StatChipComponent', () => {
     expect(chip.textContent).toContain('Magic');
     expect(chip.textContent).toContain('×2');
     expect(chip.getAttribute('aria-label')).toBe('Magic: ×2. Magic damage dealt by Magic.');
-    expect(chip.getAttribute('title')).toBe('Magic: Magic damage dealt by Magic.');
+    expect(chip.getAttribute('aria-describedby')).toMatch(/^stat-tooltip-/);
+    expect(chip.querySelector('[role="tooltip"]')?.textContent).toContain(
+      'Magic damage dealt by Magic.',
+    );
     expect(chip.querySelector('svg[lucideWandSparkles]')).toBeTruthy();
   });
 
@@ -32,11 +35,15 @@ describe('StatChipComponent', () => {
     await fixture.whenStable();
 
     const chip = fixture.nativeElement.querySelector('.stat-chip') as HTMLElement;
-    expect(chip.textContent).not.toContain('Speed');
-    expect(chip.textContent).toContain('1.5');
+    expect(chip.querySelector('strong')?.textContent).toContain('1.5');
+    expect(chip.querySelector('[role="tooltip"]')?.textContent).toContain('Speed');
     expect(chip.getAttribute('aria-label')).toBe(
       'Speed: 1.5. Determines who acts first in an encounter.',
     );
     expect(chip.querySelector('svg[lucideFootprints]')).toBeTruthy();
+
+    chip.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fixture.detectChanges();
+    expect(chip.classList.contains('tooltip-open')).toBe(true);
   });
 });

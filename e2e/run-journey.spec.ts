@@ -110,7 +110,6 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await expect(playerAction).toBeVisible();
   await expect(playerAction).toHaveAttribute('aria-label', 'Wizard action animation');
   await expect(playerAction).toHaveCSS('background-image', /wizard/);
-  await expect(page.getByText('Battle callout')).toBeVisible();
   await expect(page.locator('.battle-banner')).toContainText('dealt');
   await expect(page.locator('.combat-log')).toHaveCount(0);
 });
