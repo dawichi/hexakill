@@ -2,9 +2,9 @@ import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { AUDIO, AudioPort } from './audio';
 import { BROWSER_CLOCK, CLOCK, Clock, ClockHandle } from './clock';
 import {
-  chooseEnemyAction,
-  CombatAction,
+  chooseEnemyIntent,
   determineFirstActor,
+  guardBlockAmount,
   resolveHeal,
   resolveAction,
 } from '../domain/combat-actions';
@@ -19,6 +19,9 @@ import {
   purchaseItem,
   purchasePotions,
   relicDamageModifiers,
+  relicGuardBlockMultiplier,
+  relicGuardBreakMultiplier,
+  relicHexMultiplier,
   relicIncomingDamageModifiers,
   relicPotionHealingFraction,
   relicVictoryHealAmount,
@@ -32,8 +35,13 @@ import {
   findEnemyDefinition,
   generateEnemy,
 } from '../domain/enemies';
-import { DamageKind, DamageResult, resolveDamage } from '../domain/combat-rules';
-import { INITIAL_COMBAT_STATE, CombatState, transitionCombat } from '../domain/combat-state';
+import { damageDealt, DamageKind, DamageResult, resolveDamage } from '../domain/combat-rules';
+import {
+  EnemyIntent,
+  INITIAL_COMBAT_STATE,
+  CombatState,
+  transitionCombat,
+} from '../domain/combat-state';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
 import { ASSET_MANIFEST } from '../domain/assets';
 import {
@@ -79,6 +87,17 @@ export interface DefeatedEnemySummary {
   readonly idleAsset: string;
   readonly count: number;
   readonly levelsLabel: string;
+}
+
+export type CombatFeedbackKind =
+  'damage' | 'critical' | 'miss' | 'blocked' | 'heal' | 'guard' | 'hex';
+
+export interface CombatFeedback {
+  readonly id: number;
+  readonly target: 'player' | 'enemy';
+  readonly kind: CombatFeedbackKind;
+  readonly amount?: number;
+  readonly action?: DamageKind;
 }
 
 interface StoredSessionSnapshot {
@@ -338,7 +357,10 @@ export class GameSessionService {
   private readonly audio: AudioPort | null = inject(AUDIO, { optional: true });
   private pendingEnemyTurn: ClockHandle | null = null;
   private pendingEnemyAnimationReset: ClockHandle | null = null;
+  private pendingPlayerImpact: ClockHandle | null = null;
+  private pendingCombatFeedbackReset: ClockHandle | null = null;
   private runGeneration = 0;
+  private feedbackSequence = 0;
   readonly screen = signal<GameScreen>('welcome');
   readonly playerName = signal('');
   readonly selectedCharacter = signal<CharacterDefinition | null>(null);
@@ -347,10 +369,15 @@ export class GameSessionService {
   readonly routeFloor = signal(1);
   readonly routeMap = signal<RouteMapState | null>(null);
   readonly enemy = computed(() => this.combatState().enemy);
+  readonly enemyIntent = computed(() => this.combatState().enemyIntent ?? null);
+  readonly playerBlock = computed(() => this.combatState().playerBlock ?? 0);
+  readonly enemyBlock = computed(() => this.combatState().enemyBlock ?? 0);
+  readonly enemyHexed = computed(() => this.combatState().enemyHexed ?? false);
   readonly enemyAnimation = signal<'idle' | 'attack' | 'hit' | 'defeat'>('idle');
   readonly enemyActionKind = signal<DamageKind | null>(null);
   readonly playerAnimation = signal<'idle' | 'action' | 'hit' | 'defeat'>('idle');
   readonly playerActionKind = signal<DamageKind | null>(null);
+  readonly combatFeedback = signal<CombatFeedback | null>(null);
   readonly actionReady = signal(false);
   readonly playerActionAsset = computed<SpriteStripAsset | null>(() => {
     const player = this.player();
@@ -509,10 +536,14 @@ export class GameSessionService {
     this.routeMap.set(null);
     this.enemyAnimation.set('idle');
     this.playerAnimation.set('idle');
+    this.enemyActionKind.set(null);
+    this.playerActionKind.set(null);
     this.actionReady.set(false);
+    const intent = chooseEnemyIntent(spawnedEnemy, player.stats, this.random(), 0);
+    this.combatState.update((state) => ({ ...state, enemyIntent: intent, turn: 0 }));
     this.addCombatLog('enemy', {
       title: spawnedEnemy.definition.name,
-      message: 'has appeared!',
+      message: 'has appeared and revealed its intent.',
     });
     this.screen.set('combat');
     this.audio?.playMusic(
@@ -522,15 +553,17 @@ export class GameSessionService {
     );
 
     if (determineFirstActor(player.stats.speed, spawnedEnemy.stats.speed) === 'enemy') {
-      this.combatMessage.set(`${spawnedEnemy.definition.name} attacks first.`);
+      this.combatMessage.set(this.enemyIntentMessage(spawnedEnemy, intent));
       this.addCombatLog('enemy', {
         title: spawnedEnemy.definition.name,
-        message: 'attacks first!',
+        message: 'acts first!',
       });
       this.startEnemyTurn();
     } else {
       this.actionReady.set(true);
-      this.combatMessage.set('The enemy has appeared. Choose an action.');
+      this.combatMessage.set(
+        `${this.enemyIntentMessage(spawnedEnemy, intent)} Choose your response.`,
+      );
       this.addCombatLog('player', { title: 'You', message: 'attack first!' });
     }
   }
@@ -620,93 +653,125 @@ export class GameSessionService {
   }
 
   attack(kind: DamageKind): void {
+    this.beginPlayerAction(kind);
+  }
+
+  guard(): void {
+    this.beginPlayerAction('guard');
+  }
+
+  private beginPlayerAction(kind: DamageKind | 'guard'): void {
+    if (!this.player() || !this.enemy() || !this.canAct()) return;
+    if (!this.applyCombatEvent({ type: 'player-action-started', kind })) return;
+
+    this.actionReady.set(false);
+    this.playerActionKind.set(kind === 'guard' ? null : kind);
+    this.playerAnimation.set(kind === 'guard' ? 'idle' : 'action');
+    this.lastActionAt.set(this.clock.now());
+    this.combatMessage.set(
+      kind === 'guard'
+        ? 'You raise your guard and prepare for the incoming action.'
+        : `You use ${kind === 'attack' ? 'Attack' : 'Magic'}.`,
+    );
+    this.audio?.playSound(
+      kind === 'guard'
+        ? ASSET_MANIFEST.sounds.guard
+        : kind === 'attack'
+          ? ASSET_MANIFEST.sounds.attack
+          : ASSET_MANIFEST.sounds.magic,
+    );
+    this.pendingPlayerImpact = this.clock.schedule(() => {
+      this.pendingPlayerImpact = null;
+      if (kind === 'guard') this.resolvePlayerGuard();
+      else this.resolvePlayerDamage(kind);
+    }, 320);
+  }
+
+  private resolvePlayerGuard(): void {
     const player = this.player();
     const enemy = this.enemy();
+    if (!player || !enemy || this.combatState().pendingAction !== 'guard') return;
 
-    if (!player || !enemy || this.combatStatus() === 'defeated') {
-      return;
-    }
+    const block = guardBlockAmount(player.stats, relicGuardBlockMultiplier(player));
+    if (!this.applyCombatEvent({ type: 'player-guard-resolved', block })) return;
 
-    if (!this.applyCombatEvent({ type: 'player-action-started', kind })) {
-      return;
-    }
-    this.actionReady.set(false);
-    this.playerActionKind.set(kind);
-    this.playerAnimation.set('action');
-    this.lastActionAt.set(this.clock.now());
-    this.audio?.playSound(
-      kind === 'attack' ? ASSET_MANIFEST.sounds.attack : ASSET_MANIFEST.sounds.magic,
-    );
+    this.showCombatFeedback({ target: 'player', kind: 'guard', amount: block });
+    this.combatMessage.set(`Guard raised ${block} Block. ${this.enemyIntentMessage(enemy)}`);
+    this.addCombatLog('player', {
+      title: player.name,
+      message: `raised ${block} Block.`,
+      value: block,
+      icon: '🛡',
+    });
+    this.scheduleEnemyTurn();
+  }
 
+  private resolvePlayerDamage(kind: DamageKind): void {
+    const player = this.player();
+    const enemy = this.enemy();
+    if (!player || !enemy || this.combatState().pendingAction !== kind) return;
+
+    const enemyHexed = this.combatState().enemyHexed ?? false;
+    const relicModifiers = relicDamageModifiers(player, kind);
+    const damageMultiplier =
+      (relicModifiers.damageMultiplier ?? 1) *
+      (kind === 'attack' && enemyHexed ? 1.25 * relicHexMultiplier(player) : 1);
     const result = resolveDamage(
       { stats: player.stats },
       enemy,
       kind,
       { damageRoll: this.random(), chanceRoll: this.random() },
-      relicDamageModifiers(player, kind),
+      {
+        ...relicModifiers,
+        damageMultiplier,
+        block:
+          (this.combatState().enemyBlock ?? 0) /
+          (kind === 'attack' ? relicGuardBreakMultiplier(player) : 1),
+      },
     );
-    const defeated = result.damageTaken >= enemy.stats.health;
+    if (!this.applyCombatEvent({ type: 'player-action-resolved', result })) return;
 
-    this.applyCombatEvent({ type: 'player-action-resolved', result });
+    const dealt = damageDealt(result);
+    const defeated = result.damageTaken >= enemy.stats.health;
     this.addCombatLog('player', {
       title: player.name,
       message: result.missed ? `${kind} missed.` : '',
-      ...(result.missed ? {} : { value: result.damageAfterResistance }),
+      ...(result.missed ? {} : { value: dealt }),
       icon: kind === 'attack' ? '🔪' : '☄',
     });
 
+    if (result.missed) {
+      this.showCombatFeedback({ target: 'enemy', kind: 'miss', action: kind });
+      this.combatMessage.set(`Your ${kind} missed. ${this.enemyIntentMessage(enemy)}`);
+    } else if (dealt === 0 && (result.blocked ?? 0) > 0) {
+      this.showCombatFeedback({
+        target: 'enemy',
+        kind: 'blocked',
+        amount: result.blocked,
+        action: kind,
+      });
+      this.combatMessage.set(`${enemy.definition.name} blocked the ${kind}.`);
+    } else {
+      this.enemyAnimation.set(defeated ? 'defeat' : 'hit');
+      this.enemyActionKind.set(null);
+      this.showCombatFeedback({
+        target: 'enemy',
+        kind: result.critical ? 'critical' : 'damage',
+        amount: dealt,
+        action: kind,
+      });
+      const criticalMessage = result.critical ? ' Critical hit!' : '';
+      const hexMessage = kind === 'magic' && !result.missed ? ' Hex applied.' : '';
+      this.combatMessage.set(`Your ${kind} dealt ${dealt} damage.${criticalMessage}${hexMessage}`);
+    }
+
     if (defeated) {
-      this.enemyAnimation.set('defeat');
-      const reward = calculateVictoryReward(player, enemy);
-      const rewardedPlayer = applyVictoryReward(player, enemy);
-      this.player.set(rewardedPlayer);
-      const victoryHeal = relicVictoryHealAmount(rewardedPlayer);
-      if (victoryHeal > 0) {
-        this.combatState.update((state) => ({
-          ...state,
-          playerDamageTaken: Math.max(0, state.playerDamageTaken - victoryHeal),
-        }));
-      }
-      this.addCombatLog('enemy', {
-        title: enemy.definition.name,
-        message: `lv ${enemy.level} has been defeated! 🎉🎉`,
-      });
-      this.addCombatLog('player', {
-        title: '',
-        message: `Well done, you have gained ${reward.experience} exp!`,
-      });
-      if (reward.powerUpsGranted > 0) {
-        this.addCombatLog('player', {
-          title: '',
-          message: 'You have leveled up! 🎉🎉',
-        });
-      }
-      this.combatMessage.set(
-        `The ${enemy.definition.name} was defeated. You gained ${reward.experience} exp and ${reward.gold} gold.`,
-      );
-      this.audio?.playSound(
-        reward.levelsGained > 0 ? ASSET_MANIFEST.sounds.levelUp : ASSET_MANIFEST.sounds.enemyKilled,
-      );
+      this.finishVictory(player, enemy);
       return;
     }
 
-    if (result.missed) {
-      this.combatMessage.set(`Your ${kind} missed.`);
-    } else {
-      this.enemyAnimation.set('hit');
-      this.enemyActionKind.set(null);
-      const criticalMessage = result.critical ? ' Critical hit.' : '';
-      this.combatMessage.set(
-        `Your ${kind} dealt ${result.damageAfterResistance} damage.${criticalMessage}${
-          defeated ? ` ${enemy.definition.name} was defeated.` : ''
-        }`,
-      );
-    }
-
-    if (this.combatState().phase === 'enemy-turn') {
-      this.combatMessage.set(`${this.combatMessage()} The enemy is preparing its turn.`);
-      this.scheduleEnemyTurn();
-    }
+    this.combatMessage.set(`${this.combatMessage()} ${this.enemyIntentMessage(enemy)}`);
+    this.scheduleEnemyTurn();
   }
 
   usePotion(): void {
@@ -733,6 +798,7 @@ export class GameSessionService {
       message: `healed ${healResult.healed} HP.`,
       icon: '❤',
     });
+    this.showCombatFeedback({ target: 'player', kind: 'heal', amount: healResult.healed });
     this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
     this.scheduleEnemyTurn();
   }
@@ -765,6 +831,8 @@ export class GameSessionService {
   reset(): void {
     this.cancelPendingEnemyTurn();
     this.cancelPendingEnemyAnimationReset();
+    this.cancelPendingPlayerImpact();
+    this.cancelPendingCombatFeedbackReset();
     this.runGeneration += 1;
     this.screen.set('welcome');
     this.playerName.set('');
@@ -778,6 +846,7 @@ export class GameSessionService {
     this.enemyActionKind.set(null);
     this.playerAnimation.set('idle');
     this.playerActionKind.set(null);
+    this.combatFeedback.set(null);
     this.clearCombatLogs();
     this.lastActionAt.set(null);
     this.combatMessage.set('');
@@ -811,87 +880,211 @@ export class GameSessionService {
     return true;
   }
 
+  private finishVictory(player: PlayerState, enemy: EnemyState): void {
+    const reward = calculateVictoryReward(player, enemy);
+    const rewardedPlayer = applyVictoryReward(player, enemy);
+    this.player.set(rewardedPlayer);
+    const victoryHeal = relicVictoryHealAmount(rewardedPlayer);
+    if (victoryHeal > 0) {
+      this.combatState.update((state) => ({
+        ...state,
+        playerDamageTaken: Math.max(0, state.playerDamageTaken - victoryHeal),
+      }));
+    }
+    this.addCombatLog('enemy', {
+      title: enemy.definition.name,
+      message: `lv ${enemy.level} has been defeated!`,
+    });
+    this.addCombatLog('player', {
+      title: '',
+      message: `Well done, you have gained ${reward.experience} exp!`,
+    });
+    if (reward.powerUpsGranted > 0) {
+      this.addCombatLog('player', {
+        title: '',
+        message: 'You have leveled up!',
+      });
+    }
+    this.combatMessage.set(
+      `The ${enemy.definition.name} was defeated. You gained ${reward.experience} exp and ${reward.gold} gold.`,
+    );
+    this.audio?.playSound(
+      reward.levelsGained > 0 ? ASSET_MANIFEST.sounds.levelUp : ASSET_MANIFEST.sounds.enemyKilled,
+    );
+  }
+
+  private beginEnemyAction(): void {
+    this.pendingEnemyTurn = null;
+    const enemy = this.enemy();
+    let intent = this.combatState().enemyIntent;
+    if (!enemy || this.combatState().phase !== 'enemy-turn') return;
+    if (!intent) {
+      intent = chooseEnemyIntent(
+        enemy,
+        this.player()?.stats ?? enemy.stats,
+        this.random(),
+        this.combatState().turn ?? 0,
+      );
+      this.combatState.update((state) => ({ ...state, enemyIntent: intent }));
+    }
+
+    this.cancelPendingEnemyAnimationReset();
+    const damageAction = intent.kind === 'attack' || intent.kind === 'magic';
+    this.enemyActionKind.set(damageAction ? (intent.kind as DamageKind) : null);
+    this.enemyAnimation.set(damageAction ? 'attack' : 'idle');
+    this.combatMessage.set(`${enemy.definition.name} ${this.intentVerb(intent)}.`);
+    if (damageAction) {
+      this.audio?.playSound(
+        intent.kind === 'attack' ? ASSET_MANIFEST.sounds.attack : ASSET_MANIFEST.sounds.magic,
+      );
+    } else if (intent.kind === 'guard') {
+      this.audio?.playSound(ASSET_MANIFEST.sounds.guard);
+    } else {
+      this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
+    }
+
+    const generation = this.runGeneration;
+    this.pendingEnemyTurn = this.clock.schedule(() => {
+      if (generation !== this.runGeneration) return;
+      this.resolveEnemyTurn();
+    }, 360);
+  }
+
   private resolveEnemyTurn(): void {
     this.pendingEnemyTurn = null;
     const player = this.player();
     const enemy = this.enemy();
+    const intent = this.combatState().enemyIntent;
 
-    if (!player || !enemy || this.combatState().phase !== 'enemy-turn') {
-      return;
-    }
+    if (!player || !enemy || !intent || this.combatState().phase !== 'enemy-turn') return;
 
-    this.cancelPendingEnemyAnimationReset();
-    const action: CombatAction = chooseEnemyAction(enemy, this.random());
-    const isDamageAction = action === 'magic' || action === 'attack';
-    this.enemyActionKind.set(isDamageAction ? action : null);
-    this.enemyAnimation.set(isDamageAction ? 'attack' : 'idle');
-    const result = resolveAction(
-      { stats: enemy.stats },
-      enemy.damageTaken,
-      { stats: player.stats, damageTaken: this.combatState().playerDamageTaken },
-      action,
-      { damageRoll: this.random(), chanceRoll: this.random() },
-      relicIncomingDamageModifiers(player),
-    );
+    const currentPlayerBlock = this.combatState().playerBlock ?? 0;
+    let playerDamageTaken = this.combatState().playerDamageTaken;
+    let remainingPlayerBlock = currentPlayerBlock;
+    let updatedEnemy = enemy;
+    let result: DamageResult | null = null;
 
-    if ('action' in result) {
-      this.combatState.update((state) => ({
-        ...state,
-        enemy: state.enemy
-          ? {
-              ...state.enemy,
-              damageTaken: result.damageTaken,
-              potions: Math.max(0, state.enemy.potions - 1),
-            }
-          : null,
-      }));
-      this.combatMessage.set(`${enemy.definition.name} healed ${result.healed} HP.`);
+    if (intent.kind === 'guard') {
+      const block = guardBlockAmount(enemy.stats);
+      updatedEnemy = enemy;
+      this.combatState.update((state) => ({ ...state, enemyBlock: block }));
+      this.showCombatFeedback({ target: 'enemy', kind: 'guard', amount: block });
+      this.combatMessage.set(`${enemy.definition.name} raised ${block} Block.`);
       this.addCombatLog('enemy', {
         title: enemy.definition.name,
-        message: `healed ${result.healed} HP.`,
+        message: `raised ${block} Block.`,
+        value: block,
+        icon: '🛡',
+      });
+    } else if (intent.kind === 'heal') {
+      const healResult = resolveHeal(enemy.damageTaken, enemy.stats.health);
+      updatedEnemy = {
+        ...enemy,
+        damageTaken: healResult.damageTaken,
+        potions: Math.max(0, enemy.potions - 1),
+      };
+      this.combatState.update((state) => ({ ...state, enemy: updatedEnemy }));
+      this.showCombatFeedback({ target: 'enemy', kind: 'heal', amount: healResult.healed });
+      this.combatMessage.set(`${enemy.definition.name} recovered ${healResult.healed} HP.`);
+      this.addCombatLog('enemy', {
+        title: enemy.definition.name,
+        message: `recovered ${healResult.healed} HP.`,
         icon: '❤',
       });
       this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
     } else {
+      const incomingModifiers = relicIncomingDamageModifiers(player);
+      result = resolveDamage(
+        { stats: enemy.stats },
+        { stats: player.stats, damageTaken: this.combatState().playerDamageTaken },
+        intent.kind,
+        { damageRoll: this.random(), chanceRoll: this.random() },
+        { ...incomingModifiers, block: currentPlayerBlock },
+      );
+      playerDamageTaken = result.damageTaken;
+      remainingPlayerBlock = Math.max(0, currentPlayerBlock - (result.blocked ?? 0));
+      const dealt = damageDealt(result);
       this.addCombatLog('enemy', {
         title: enemy.definition.name,
-        message: result.missed ? `${action} missed.` : '',
-        ...(result.missed ? {} : { value: result.damageAfterResistance }),
-        icon: action === 'attack' ? '🔪' : '☄',
+        message: result.missed ? `${intent.kind} missed.` : '',
+        ...(result.missed ? {} : { value: dealt }),
+        icon: intent.kind === 'attack' ? '🔪' : '☄',
       });
-      this.combatMessage.set(
-        result.missed
-          ? `${enemy.definition.name}'s ${action} missed.`
-          : `${enemy.definition.name}'s ${action} dealt ${result.damageAfterResistance} damage.`,
+      if (result.missed) {
+        this.showCombatFeedback({ target: 'player', kind: 'miss', action: intent.kind });
+        this.combatMessage.set(`${enemy.definition.name}'s ${intent.kind} missed.`);
+      } else if (dealt === 0 && (result.blocked ?? 0) > 0) {
+        this.showCombatFeedback({
+          target: 'player',
+          kind: 'blocked',
+          amount: result.blocked,
+          action: intent.kind,
+        });
+        this.combatMessage.set(`${enemy.definition.name}'s attack was blocked.`);
+      } else {
+        this.showCombatFeedback({
+          target: 'player',
+          kind: result.critical ? 'critical' : 'damage',
+          amount: dealt,
+          action: intent.kind,
+        });
+        this.combatMessage.set(
+          `${enemy.definition.name}'s ${intent.kind} dealt ${dealt} damage.${
+            result.critical ? ' Critical hit!' : ''
+          }`,
+        );
+      }
+      this.audio?.playSound(
+        result.missed || dealt === 0 ? ASSET_MANIFEST.sounds.miss : ASSET_MANIFEST.sounds.impact,
       );
     }
 
-    const playerDamageTaken =
-      'action' in result ? this.combatState().playerDamageTaken : result.damageTaken;
-    this.applyCombatEvent({
-      type: 'enemy-action-resolved',
-      playerDamageTaken,
-      playerHealth: player.stats.health,
-    });
+    if (result && !result.missed && damageDealt(result) > 0) {
+      this.playerAnimation.set('hit');
+    } else {
+      this.playerAnimation.set('idle');
+    }
+
+    if (updatedEnemy !== enemy) {
+      this.combatState.update((state) => ({ ...state, enemy: updatedEnemy }));
+    }
+    const nextTurn = (this.combatState().turn ?? 0) + 1;
+    const nextEnemy = this.combatState().enemy ?? updatedEnemy;
+    const nextIntent = chooseEnemyIntent(nextEnemy, player.stats, this.random(), nextTurn);
+    if (
+      !this.applyCombatEvent({
+        type: 'enemy-action-resolved',
+        playerDamageTaken,
+        playerHealth: player.stats.health,
+        playerBlock: remainingPlayerBlock,
+        enemyIntent: nextIntent,
+        turn: nextTurn,
+      })
+    ) {
+      return;
+    }
+
     if (this.combatState().phase === 'defeat') {
       this.playerAnimation.set('defeat');
       this.addCombatLog('player', {
         title: 'Oh no!',
-        message: 'You have been defeated! 😭',
+        message: 'You have been defeated!',
       });
       this.addPersonalRecord(player);
       this.screen.set('game-over');
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
     } else {
+      this.combatMessage.set(
+        `${this.combatMessage()} ${this.enemyIntentMessage(nextEnemy, nextIntent)}`,
+      );
       this.scheduleEnemyAnimationReset();
-      const playerWasHit = isDamageAction && !('action' in result) && !result.missed;
-      this.playerAnimation.set(playerWasHit ? 'hit' : 'idle');
     }
   }
 
   private startEnemyTurn(): void {
     this.actionReady.set(false);
     if (!this.applyCombatEvent({ type: 'enemy-turn-started' })) return;
+    this.combatMessage.set(this.enemyIntentMessage(this.enemy()));
     this.scheduleEnemyTurn();
   }
 
@@ -900,8 +1093,8 @@ export class GameSessionService {
     const generation = this.runGeneration;
     this.pendingEnemyTurn = this.clock.schedule(() => {
       if (generation !== this.runGeneration) return;
-      this.resolveEnemyTurn();
-    }, 1_100);
+      this.beginEnemyAction();
+    }, 650);
   }
 
   private cancelPendingEnemyTurn(): void {
@@ -923,12 +1116,54 @@ export class GameSessionService {
       this.enemyActionKind.set(null);
       this.playerAnimation.set('idle');
       this.actionReady.set(true);
-    }, 900);
+    }, 700);
   }
 
   private cancelPendingEnemyAnimationReset(): void {
     this.pendingEnemyAnimationReset?.cancel();
     this.pendingEnemyAnimationReset = null;
+  }
+
+  private cancelPendingPlayerImpact(): void {
+    this.pendingPlayerImpact?.cancel();
+    this.pendingPlayerImpact = null;
+  }
+
+  private cancelPendingCombatFeedbackReset(): void {
+    this.pendingCombatFeedbackReset?.cancel();
+    this.pendingCombatFeedbackReset = null;
+  }
+
+  private showCombatFeedback(feedback: Omit<CombatFeedback, 'id'>): void {
+    this.cancelPendingCombatFeedbackReset();
+    this.combatFeedback.set({ ...feedback, id: ++this.feedbackSequence });
+    const generation = this.runGeneration;
+    this.pendingCombatFeedbackReset = this.clock.schedule(() => {
+      this.pendingCombatFeedbackReset = null;
+      if (generation === this.runGeneration) this.combatFeedback.set(null);
+    }, 850);
+  }
+
+  private intentVerb(intent: EnemyIntent): string {
+    if (intent.kind === 'guard') return `raises ${intent.maxValue} Block`;
+    if (intent.kind === 'heal') return `prepares to recover ${intent.maxValue} HP`;
+    return `prepares ${intent.kind === 'attack' ? 'Attack' : 'Magic'}`;
+  }
+
+  private enemyIntentMessage(
+    enemy: EnemyState | null,
+    intent = this.combatState().enemyIntent,
+  ): string {
+    if (!enemy || !intent) return 'Choose your action.';
+    if (intent.kind === 'guard')
+      return `${enemy.definition.name} intends to Guard for ${intent.maxValue} Block.`;
+    if (intent.kind === 'heal')
+      return `${enemy.definition.name} intends to recover ${intent.maxValue} HP.`;
+    const range =
+      intent.minValue === intent.maxValue
+        ? `${intent.maxValue}`
+        : `${intent.minValue}–${intent.maxValue}`;
+    return `${enemy.definition.name} intends to use ${intent.kind === 'attack' ? 'Attack' : 'Magic'} for ${range} damage.`;
   }
 
   private addCombatLog(side: 'player' | 'enemy', entry: CombatLogEntry): void {
@@ -1097,8 +1332,23 @@ export class GameSessionService {
           defeatedEnemies: snapshot.player.defeatedEnemies ?? [],
         });
         const restoredEnemy = snapshot.combatState.enemy;
+        const restoredIntent =
+          snapshot.combatState.enemyIntent ??
+          (restoredEnemy
+            ? chooseEnemyIntent(
+                restoredEnemy,
+                snapshot.player.stats,
+                this.random(),
+                snapshot.combatState.turn ?? 0,
+              )
+            : null);
         this.combatState.set({
           ...snapshot.combatState,
+          enemyIntent: restoredIntent,
+          playerBlock: snapshot.combatState.playerBlock ?? 0,
+          enemyBlock: snapshot.combatState.enemyBlock ?? 0,
+          enemyHexed: snapshot.combatState.enemyHexed ?? false,
+          turn: snapshot.combatState.turn ?? 0,
           enemy: restoredEnemy
             ? {
                 ...restoredEnemy,

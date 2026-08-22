@@ -3,11 +3,98 @@ import {
   DamageKind,
   DamageModifiers,
   DamageResult,
+  COMBAT_RULES,
+  reduceDamage,
   resolveDamage,
 } from './combat-rules';
-import { EnemyState } from './game-types';
+import { EnemyIntent } from './combat-state';
+import { EnemyState, Stats } from './game-types';
 
 export type CombatAction = DamageKind | 'heal';
+
+export function guardBlockAmount(stats: Stats, multiplier = 1): number {
+  if (
+    !Object.values(stats).every((value) => Number.isFinite(value) && value >= 0) ||
+    !Number.isFinite(multiplier) ||
+    multiplier < 0
+  ) {
+    throw new RangeError('Guard stats and multiplier must be finite and non-negative.');
+  }
+
+  return Math.max(0, Math.round(((stats.armor + stats.mr) * multiplier) / 2));
+}
+
+function damagePreview(
+  attacker: Stats,
+  defender: Stats,
+  kind: DamageKind,
+): Pick<EnemyIntent, 'minValue' | 'maxValue'> {
+  const rule = COMBAT_RULES[kind];
+  const power = attacker[kind === 'attack' ? 'ad' : 'ap'];
+  const resistance = defender[rule.resistance];
+  const minRaw = Math.round(power * rule.hitRange[0]);
+  const maxRaw = Math.round(power * rule.hitRange[1]);
+  return {
+    minValue: reduceDamage(minRaw, resistance),
+    maxValue: reduceDamage(maxRaw, resistance),
+  };
+}
+
+function chooseIntentKind(
+  enemy: EnemyState,
+  roll: number,
+  turn: number,
+): DamageKind | 'guard' | 'heal' {
+  const healthRatio = (enemy.stats.health - enemy.damageTaken) / enemy.stats.health;
+  if (enemy.potions > 0 && healthRatio <= 0.22) return 'heal';
+
+  if (
+    (enemy.definition.archetype === 'tank' && turn % 3 === 0) ||
+    (enemy.definition.archetype === 'boss' && turn % 4 === 3) ||
+    (enemy.definition.archetype === 'ap' && turn % 4 === 2)
+  ) {
+    return 'guard';
+  }
+
+  // Keep the baseline split predictable. Archetype-specific behavior is
+  // expressed through the guard/heal patterns above, while the visible
+  // intent remains easy to learn from run to run.
+  const magicBias = 0.5;
+  return roll <= magicBias ? 'attack' : 'magic';
+}
+
+export function chooseEnemyIntent(
+  enemy: EnemyState,
+  defenderStats: Stats,
+  roll: number,
+  turn = 0,
+): EnemyIntent {
+  assertEnemyState(enemy);
+  if (
+    !(Object.values(defenderStats) as number[]).every(
+      (value) => Number.isFinite(value) && value >= 0,
+    ) ||
+    !Number.isFinite(roll) ||
+    roll < 0 ||
+    roll >= 1 ||
+    !Number.isSafeInteger(turn) ||
+    turn < 0
+  ) {
+    throw new RangeError('Enemy intent inputs must be finite and within their valid ranges.');
+  }
+
+  const kind = chooseIntentKind(enemy, roll, turn);
+  if (kind === 'guard') {
+    const block = guardBlockAmount(enemy.stats);
+    return { kind, minValue: block, maxValue: block };
+  }
+  if (kind === 'heal') {
+    const healing = resolveHeal(enemy.damageTaken, enemy.stats.health).healed;
+    return { kind, minValue: healing, maxValue: healing };
+  }
+
+  return { kind, ...damagePreview(enemy.stats, defenderStats, kind) };
+}
 
 function assertNonNegativeFinite(value: number, label: string): void {
   if (!Number.isFinite(value) || value < 0) {

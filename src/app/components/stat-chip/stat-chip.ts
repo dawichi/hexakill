@@ -1,5 +1,13 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, computed, ElementRef, HostListener, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  ElementRef,
+  HostListener,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import {
   LucideFootprints,
   LucideHeartPulse,
@@ -106,14 +114,14 @@ let nextTooltipId = 0;
             }
             @case ('ad') {
               <span class="stat-tooltip-detail"
-                >Deals <strong class="stat-tooltip-value">{{ damageRange() }}</strong> raw
-                damage before <strong class="stat-tooltip-keyword">Armor</strong>.</span
+                >Deals <strong class="stat-tooltip-value">{{ damageRange() }}</strong> raw damage
+                before <strong class="stat-tooltip-keyword">Armor</strong>.</span
               >
             }
             @case ('ap') {
               <span class="stat-tooltip-detail"
-                >Deals <strong class="stat-tooltip-value">{{ damageRange() }}</strong> raw
-                damage before <strong class="stat-tooltip-keyword">Magic resist</strong>.</span
+                >Deals <strong class="stat-tooltip-value">{{ damageRange() }}</strong> raw damage
+                before <strong class="stat-tooltip-keyword">Magic resist</strong>.</span
               >
             }
             @case ('armor') {
@@ -130,8 +138,8 @@ let nextTooltipId = 0;
             }
             @case ('speed') {
               <span class="stat-tooltip-detail"
-                >Higher <strong class="stat-tooltip-keyword">Speed</strong> acts first; ties
-                favor the foe.</span
+                >Higher <strong class="stat-tooltip-keyword">Speed</strong> acts first; ties favor
+                the foe.</span
               >
             }
           }

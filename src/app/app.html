@@ -453,6 +453,12 @@
                   <div>
                     <p class="eyebrow">You · level {{ player.level }}</p>
                     <h3>{{ player.name }} the {{ player.character.name }}</h3>
+                    @if (session.playerBlock() > 0) {
+                      <span class="combat-status guarded"
+                        ><svg lucideShield size="12" aria-hidden="true"></svg>
+                        {{ session.playerBlock() }} Block</span
+                      >
+                    }
                   </div>
                   <span class="combatant-badge">Hero</span>
                 </div>
@@ -469,7 +475,11 @@
                       />
                     }
                   </div>
-                  <div class="combatant-visual">
+                  <div
+                    class="combatant-visual"
+                    [class.hit-reaction]="session.playerAnimation() === 'hit'"
+                    [class.action-lunge]="session.playerAnimation() === 'action'"
+                  >
                     @if (session.playerAnimation() === 'action') {
                       @if (session.playerActionAsset(); as actionAsset) {
                         <span
@@ -577,11 +587,36 @@
                       {{ enemy.definition.archetype }} enemy · level {{ enemy.level }}
                     </p>
                     <h3>{{ enemy.definition.name }}</h3>
+                    @if (session.enemyIntent(); as intent) {
+                      <div class="enemy-intent" [class]="intent.kind">
+                        @if (intent.kind === 'attack') {
+                          <svg lucideSword size="13" aria-hidden="true"></svg>
+                          <span>Attack · {{ intentValue(intent) }}</span>
+                        } @else if (intent.kind === 'magic') {
+                          <svg lucideWandSparkles size="13" aria-hidden="true"></svg>
+                          <span>Magic · {{ intentValue(intent) }}</span>
+                        } @else if (intent.kind === 'guard') {
+                          <svg lucideShield size="13" aria-hidden="true"></svg>
+                          <span>Guard · {{ intentValue(intent) }}</span>
+                        } @else {
+                          <svg lucideHeartPulse size="13" aria-hidden="true"></svg>
+                          <span>Heal · {{ intentValue(intent) }}</span>
+                        }
+                      </div>
+                    }
+                    @if (session.enemyHexed()) {
+                      <span class="combat-status hexed"
+                        ><svg lucideSparkles size="12" aria-hidden="true"></svg> Hexed</span
+                      >
+                    }
                   </div>
                   <span class="combatant-badge">Foe</span>
                 </div>
                 <div class="combatant-body">
-                  <div class="combatant-visual">
+                  <div
+                    class="combatant-visual"
+                    [class.hit-reaction]="session.enemyAnimation() === 'hit'"
+                  >
                     @if (session.enemySpriteAsset(); as enemySpriteAsset) {
                       <span
                         class="entity-sprite combat-sprite sprite-strip enemy-sprite-strip"
@@ -651,6 +686,26 @@
                   </div>
                 </div>
               </article>
+
+              @if (session.combatFeedback(); as feedback) {
+                <div
+                  class="combat-feedback"
+                  [class]="feedbackClass(feedback)"
+                  role="status"
+                  aria-live="assertive"
+                >
+                  @if (feedback.kind === 'heal') {
+                    <svg lucideHeartPulse size="16" aria-hidden="true"></svg>
+                  } @else if (feedback.kind === 'guard' || feedback.kind === 'blocked') {
+                    <svg lucideShield size="16" aria-hidden="true"></svg>
+                  } @else if (feedback.action === 'magic') {
+                    <svg lucideWandSparkles size="16" aria-hidden="true"></svg>
+                  } @else {
+                    <svg lucideSword size="16" aria-hidden="true"></svg>
+                  }
+                  <strong>{{ feedbackText(feedback) }}</strong>
+                </div>
+              }
             </div>
 
             <section
@@ -734,6 +789,16 @@
                       <svg lucideWandSparkles size="17" aria-hidden="true"></svg>
                       Magic
                       <span>Arcane damage · 75–125%</span>
+                    </button>
+                    <button
+                      class="action-button guard"
+                      type="button"
+                      [disabled]="!session.canAct()"
+                      (click)="session.guard()"
+                    >
+                      <svg lucideShield size="17" aria-hidden="true"></svg>
+                      Guard
+                      <span>Block the next hit · {{ session.playerBlock() }} ready</span>
                     </button>
                     <button
                       class="action-button potion"

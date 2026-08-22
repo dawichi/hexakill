@@ -6,7 +6,7 @@ export const STORE_ITEMS: readonly ItemState[] = [
     id: 'whetstone',
     name: 'Whetstone',
     price: 450,
-    description: 'Attack deals 15% more damage.',
+    description: 'Attack deals 15% more damage and breaks 50% more Guard.',
     effect: { kind: 'attack-damage', amount: 0.15 },
     asset: '/images/items/sword.png',
   },
@@ -14,7 +14,7 @@ export const STORE_ITEMS: readonly ItemState[] = [
     id: 'arcane-lens',
     name: 'Arcane Lens',
     price: 550,
-    description: 'Magic deals 15% more damage.',
+    description: 'Magic deals 15% more damage and makes Hex hit harder.',
     effect: { kind: 'magic-damage', amount: 0.15 },
     asset: '/images/items/wand.png',
   },
@@ -126,6 +126,18 @@ export function relicDamageModifiers(player: PlayerState, kind: DamageKind): Dam
   return {
     damageMultiplier: 1 + effectTotal(player, kind === 'attack' ? 'attack-damage' : 'magic-damage'),
   };
+}
+
+export function relicGuardBreakMultiplier(player: PlayerState): number {
+  return player.inventory.some((item) => item.id === 'whetstone') ? 1.5 : 1;
+}
+
+export function relicGuardBlockMultiplier(player: PlayerState): number {
+  return player.inventory.some((item) => item.id === 'ironbark') ? 1.25 : 1;
+}
+
+export function relicHexMultiplier(player: PlayerState): number {
+  return player.inventory.some((item) => item.id === 'arcane-lens') ? 1.35 : 1;
 }
 
 export function relicIncomingDamageModifiers(player: PlayerState): DamageModifiers {

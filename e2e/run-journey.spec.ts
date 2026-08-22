@@ -352,6 +352,9 @@ test('vertical Witch Blue attack and defeat strips render in their states', asyn
   magicSnapshot.combatState.enemy.stats.health = 100;
   magicSnapshot.combatState.enemy.damageTaken = 0;
   magicSnapshot.combatState.playerDamageTaken = 20;
+  // Re-roll the next visible intent for this fixture after restoring the
+  // combat state with the updated v2 intent model.
+  magicSnapshot.combatState.enemyIntent = null;
   await page.evaluate((value) => {
     localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
   }, magicSnapshot);

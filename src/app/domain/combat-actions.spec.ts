@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   chooseEnemyAction,
+  chooseEnemyIntent,
   determineFirstActor,
+  guardBlockAmount,
   resolveAction,
   resolveHeal,
 } from './combat-actions';
@@ -20,6 +22,31 @@ describe('combat action policy', () => {
     const enemy = generateEnemy(4, 0, 0);
     expect(chooseEnemyAction(enemy, 0.5)).toBe('attack');
     expect(chooseEnemyAction(enemy, 0.51)).toBe('magic');
+  });
+
+  it('exposes a readable damage range for the enemy intent', () => {
+    const enemy = generateEnemy(4, 0, 0);
+    const intent = chooseEnemyIntent(enemy, stats, 0.75);
+
+    expect(intent.kind).toBe('magic');
+    expect(intent.minValue).toBeLessThanOrEqual(intent.maxValue);
+    expect(intent.minValue).toBeGreaterThan(0);
+  });
+
+  it('uses Guard as a deliberate pattern and derives its block from defenses', () => {
+    const enemy = {
+      ...generateEnemy(4, 0, 0),
+      definition: {
+        ...generateEnemy(4, 0, 0).definition,
+        archetype: 'tank' as const,
+      },
+    };
+
+    const intent = chooseEnemyIntent(enemy, stats, 0.2, 0);
+
+    expect(intent.kind).toBe('guard');
+    expect(intent.minValue).toBe(guardBlockAmount(enemy.stats));
+    expect(intent.maxValue).toBe(intent.minValue);
   });
 
   it('rejects non-finite enemy action rolls', () => {

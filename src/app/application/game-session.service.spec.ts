@@ -19,6 +19,11 @@ describe('GameSessionService', () => {
   let cancelled = false;
   let playedSounds: string[];
   let sessionValue: string | null;
+  const flushScheduled = (): void => {
+    const task = scheduledTask;
+    scheduledTask = undefined;
+    task?.();
+  };
   const testClock: Clock = {
     now: () => 1234,
     schedule: (task, delayMs) => {
@@ -78,11 +83,15 @@ describe('GameSessionService', () => {
 
     service.attack('attack');
 
+    expect(service.enemy()?.damageTaken).toBe(0);
+    expect(service.combatState().phase).toBe('resolving-player-action');
+    expect(scheduledDelays).toContain(320);
+
+    flushScheduled();
     expect(service.enemy()?.damageTaken).toBe(54);
     expect(service.combatState().phase).toBe('enemy-turn');
     expect(service.combatMessage()).toContain('dealt 54 damage');
     expect(service.lastActionAt()).toBe(1234);
-    expect(scheduledDelays).toContain(1100);
     expect(service.playerCombatLog()[1]).toEqual({
       title: 'David',
       message: '',
@@ -90,7 +99,12 @@ describe('GameSessionService', () => {
       icon: '🔪',
     });
 
-    scheduledTask?.();
+    flushScheduled();
+
+    expect(service.combatState().phase).toBe('enemy-turn');
+    expect(service.enemyAnimation()).toBe('attack');
+
+    flushScheduled();
 
     expect(service.combatState().phase).toBe('awaiting-player-action');
     expect(service.playerRemainingHealth()).toBeLessThan(800);
@@ -101,9 +115,9 @@ describe('GameSessionService', () => {
       value: expect.any(Number),
       icon: expect.stringMatching(/🔪|☄/),
     });
-    expect(scheduledDelays).toContain(900);
+    expect(scheduledDelays).toContain(700);
 
-    scheduledTask?.();
+    flushScheduled();
     expect(service.enemyAnimation()).toBe('idle');
     expect(service.playerAnimation()).toBe('idle');
 
@@ -116,10 +130,12 @@ describe('GameSessionService', () => {
       enemy: state.enemy
         ? { ...state.enemy, damageTaken: state.enemy.stats.health - 1, potions: 1 }
         : null,
+      enemyIntent: { kind: 'heal', minValue: 25, maxValue: 25 },
     }));
-    scheduledTask?.();
+    flushScheduled();
+    flushScheduled();
     expect(service.enemyAnimation()).toBe('idle');
-    expect(service.combatMessage()).toContain('healed');
+    expect(service.combatMessage()).toContain('recovered');
   });
 
   it('resolves a first-floor merchant door before any combat victory', () => {
@@ -154,11 +170,13 @@ describe('GameSessionService', () => {
       playerDamageTaken: 1,
       pendingAction: null,
       lastResult: null,
+      enemyIntent: { kind: 'attack', minValue: 1, maxValue: 1 },
     });
     service.actionReady.set(true);
 
     service.usePotion();
-    scheduledTask?.();
+    flushScheduled();
+    flushScheduled();
 
     expect(service.screen()).toBe('game-over');
     expect(service.personalRecords()).toEqual([{ characterId: 'wizard', name: 'David', level: 4 }]);
@@ -185,6 +203,7 @@ describe('GameSessionService', () => {
     });
 
     service.attack('attack');
+    flushScheduled();
 
     expect(playedSounds).toContain('/sounds/levelup.mp3');
     expect(playedSounds).not.toContain('/sounds/enemy_killed.mp3');
@@ -392,13 +411,17 @@ describe('GameSessionService', () => {
     service.findEnemy();
 
     expect(service.combatState().phase).toBe('enemy-turn');
-    expect(service.combatMessage()).toContain('attacks first');
+    expect(service.combatMessage()).toContain('intends');
     expect(service.canAct()).toBe(false);
 
-    scheduledTask?.();
+    flushScheduled();
+    expect(service.combatState().phase).toBe('enemy-turn');
+    expect(service.enemyAnimation()).toBe('attack');
+
+    flushScheduled();
     expect(service.combatState().phase).toBe('awaiting-player-action');
     expect(service.enemyAnimation()).toBe('attack');
-    scheduledTask?.();
+    flushScheduled();
     expect(service.enemyAnimation()).toBe('idle');
   });
 });

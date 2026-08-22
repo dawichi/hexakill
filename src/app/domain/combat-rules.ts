@@ -33,6 +33,7 @@ export interface DamageModifiers {
   readonly damageMultiplier?: number;
   readonly resistancePenetration?: number;
   readonly receivedDamageMultiplier?: number;
+  readonly block?: number;
 }
 
 export interface DamageResult {
@@ -42,6 +43,8 @@ export interface DamageResult {
   readonly critical: boolean;
   readonly missed: boolean;
   readonly damageTaken: number;
+  /** Damage absorbed by a temporary Guard block. Kept optional for old saves/tests. */
+  readonly blocked?: number;
 }
 
 function integerBetween(min: number, max: number, roll: number): number {
@@ -95,6 +98,7 @@ export function resolveDamage(
   const damageMultiplier = modifiers.damageMultiplier ?? 1;
   const resistancePenetration = modifiers.resistancePenetration ?? 0;
   const receivedDamageMultiplier = modifiers.receivedDamageMultiplier ?? 1;
+  const block = modifiers.block ?? 0;
   if (
     !Number.isFinite(damageMultiplier) ||
     damageMultiplier < 0 ||
@@ -102,7 +106,9 @@ export function resolveDamage(
     resistancePenetration < 0 ||
     resistancePenetration > 1 ||
     !Number.isFinite(receivedDamageMultiplier) ||
-    receivedDamageMultiplier < 0
+    receivedDamageMultiplier < 0 ||
+    !Number.isFinite(block) ||
+    block < 0
   ) {
     throw new RangeError('Damage modifiers must be finite and within their valid ranges.');
   }
@@ -120,7 +126,11 @@ export function resolveDamage(
   const damageAfterResistance = Math.trunc(
     reduceDamage(rawDamage, effectiveResistance) * receivedDamageMultiplier,
   );
-  const damageTaken = Math.min(defender.stats.health, defender.damageTaken + damageAfterResistance);
+  const blocked = Math.min(block, damageAfterResistance);
+  const damageTaken = Math.min(
+    defender.stats.health,
+    defender.damageTaken + damageAfterResistance - blocked,
+  );
 
   return {
     kind,
@@ -129,5 +139,12 @@ export function resolveDamage(
     critical,
     missed,
     damageTaken,
+    blocked,
   };
+}
+
+export function damageDealt(
+  result: Pick<DamageResult, 'damageAfterResistance' | 'blocked'>,
+): number {
+  return Math.max(0, result.damageAfterResistance - (result.blocked ?? 0));
 }

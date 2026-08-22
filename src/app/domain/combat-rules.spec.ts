@@ -36,6 +36,22 @@ describe('combat rules', () => {
     expect(result.damageTaken).toBe(500);
   });
 
+  it('absorbs damage with a temporary Guard block', () => {
+    const result = resolveDamage(
+      { stats: attackerStats },
+      defender,
+      'attack',
+      {
+        damageRoll: 0.5,
+        chanceRoll: 0.5,
+      },
+      { block: 30 },
+    );
+
+    expect(result.blocked).toBe(30);
+    expect(result.damageTaken).toBe(result.damageAfterResistance - 30);
+  });
+
   it('resolves a critical magic hit', () => {
     const result = resolveDamage({ stats: attackerStats }, defender, 'magic', {
       damageRoll: 0.5,

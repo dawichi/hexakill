@@ -56,6 +56,22 @@ describe('combat state transitions', () => {
     expect(transition.state.pendingAction).toBe('attack');
   });
 
+  it('lets the player Guard before the enemy turn', () => {
+    const transition = transitionCombat(activeState(), {
+      type: 'player-action-started',
+      kind: 'guard',
+    });
+    const resolved = transitionCombat(transition.state, {
+      type: 'player-guard-resolved',
+      block: 24,
+    });
+
+    expect(transition.accepted).toBe(true);
+    expect(resolved.accepted).toBe(true);
+    expect(resolved.state.phase).toBe('enemy-turn');
+    expect(resolved.state.playerBlock).toBe(24);
+  });
+
   it('rejects an unknown player action before storing it in state', () => {
     const transition = transitionCombat(activeState(), {
       type: 'player-action-started',

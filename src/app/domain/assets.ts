@@ -11,6 +11,9 @@ export const ASSET_MANIFEST = {
   sounds: {
     attack: '/sounds/attack.mp3',
     magic: '/sounds/magic.mp3',
+    impact: '/sounds/attack.mp3',
+    guard: '/sounds/potion.wav',
+    miss: '/sounds/error.mp3',
     coin: '/sounds/coin.mp3',
     enemyKilled: '/sounds/enemy_killed.mp3',
     error: '/sounds/error.mp3',

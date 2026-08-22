@@ -26,7 +26,8 @@ import {
   LucideVolume2,
   LucideWandSparkles,
 } from '@lucide/angular';
-import { GameSessionService } from './application/game-session.service';
+import { CombatFeedback, GameSessionService } from './application/game-session.service';
+import { EnemyIntent } from './domain/combat-state';
 import { StatChipComponent } from './components/stat-chip/stat-chip';
 import { CharacterDefinition, ItemState, SpriteStripAsset, Stat, Stats } from './domain/game-types';
 import { PersonalRecord } from './domain/records';
@@ -144,6 +145,34 @@ export class App implements OnDestroy {
 
   protected nameValidationMessageId(): string | null {
     return this.nameValidationMessage() ? 'player-name-validation' : null;
+  }
+
+  protected feedbackClass(feedback: CombatFeedback): string {
+    return `${feedback.target} ${feedback.kind} ${feedback.action ?? ''}`;
+  }
+
+  protected feedbackText(feedback: CombatFeedback): string {
+    switch (feedback.kind) {
+      case 'damage':
+        return `-${feedback.amount ?? 0}`;
+      case 'critical':
+        return `CRIT! -${feedback.amount ?? 0}`;
+      case 'miss':
+        return 'MISS';
+      case 'blocked':
+        return `BLOCKED ${feedback.amount ?? 0}`;
+      case 'heal':
+        return `+${feedback.amount ?? 0}`;
+      case 'guard':
+        return `GUARD +${feedback.amount ?? 0}`;
+      case 'hex':
+        return 'HEXED';
+    }
+  }
+
+  protected intentValue(intent: EnemyIntent): string {
+    if (intent.minValue === intent.maxValue) return `${intent.maxValue}`;
+    return `${intent.minValue}–${intent.maxValue}`;
   }
 
   protected selectCharacter(character: CharacterDefinition): void {
