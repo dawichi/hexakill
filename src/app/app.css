@@ -1832,10 +1832,15 @@ h3 {
    and route choices on the same surface so the player never loses context. */
 .shell.game-active {
   position: fixed;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: auto;
   z-index: 1;
   display: grid;
-  width: 100%;
+  /* Keep the playable surface centered on desktop. The surrounding page
+     remains available for future side content such as ads or run summaries. */
+  width: min(calc(100% - 2rem), 74rem);
   height: 100dvh;
   min-height: 0;
   grid-template-rows: auto minmax(0, 1fr);
@@ -1843,6 +1848,7 @@ h3 {
   margin: 0;
   overflow: hidden;
   padding: clamp(0.45rem, 1.5vw, 1rem);
+  transform: translateX(-50%);
 }
 
 .game-active .topbar {
@@ -2285,8 +2291,12 @@ h3 {
 
 @media (max-width: 700px) {
   .shell.game-active {
+    left: 0;
+    right: 0;
+    width: 100%;
     gap: 0.35rem;
     padding: 0.35rem;
+    transform: none;
   }
 
   .game-active .topbar {
