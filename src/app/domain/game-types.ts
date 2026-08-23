@@ -6,6 +6,38 @@ export type Stats = Record<Stat, number>;
 
 export type PowerUpType = 'health' | 'ad' | 'ap' | 'speed';
 
+export type RelicQuality = 'normal' | 'rare' | 'epic';
+
+export type RelicTrigger =
+  | 'start-of-combat'
+  | 'start-of-player-turn'
+  | 'start-of-enemy-turn'
+  | 'after-attack'
+  | 'after-magic'
+  | 'after-block-absorbs'
+  | 'below-health-threshold'
+  | 'first-time-each-combat'
+  | 'every-nth-action'
+  | 'after-victory'
+  | 'route-map'
+  | 'store';
+
+export type RelicEffect =
+  | {
+      readonly kind: 'multiplier';
+      readonly target: 'attack' | 'magic' | 'potion' | 'gold' | 'experience';
+      readonly amount: number;
+    }
+  | { readonly kind: 'stat-bonus'; readonly stat: 'health' | 'speed'; readonly amount: number }
+  | { readonly kind: 'block'; readonly amount: number; readonly trigger: RelicTrigger }
+  | {
+      readonly kind: 'trigger';
+      readonly trigger: RelicTrigger;
+      readonly amount: number;
+      readonly threshold?: number;
+      readonly counter?: number;
+    };
+
 export interface SpriteStripAsset {
   readonly src: string;
   readonly frameWidth: number;
@@ -21,21 +53,14 @@ export interface PowerUpState {
   readonly history: Readonly<Record<PowerUpType, number>>;
 }
 
-export type RelicEffect =
-  | { readonly kind: 'attack-damage'; readonly amount: number }
-  | { readonly kind: 'magic-damage'; readonly amount: number }
-  | { readonly kind: 'damage-reduction'; readonly amount: number }
-  | { readonly kind: 'victory-heal'; readonly amount: number }
-  | { readonly kind: 'victory-gold'; readonly amount: number }
-  | { readonly kind: 'potion-heal'; readonly amount: number };
-
 export interface ItemState {
   readonly id: string;
   readonly name: string;
+  readonly quality: RelicQuality;
+  readonly icon: string;
   readonly price: number;
   readonly description: string;
   readonly effect: RelicEffect;
-  readonly asset: string;
 }
 
 export interface CombatLogEntry {
