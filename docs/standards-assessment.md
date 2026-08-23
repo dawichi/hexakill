@@ -1,6 +1,8 @@
 # Standards Assessment
 
-**Snapshot:** 2026-08-16, active Angular application promoted to repository root; current implementation and release evidence recorded after validation.
+**Snapshot:** 2026-08-23, active Angular application promoted to repository root; current implementation evidence is refreshed while the full release-gate evidence remains dated separately where noted.
+
+The current focused baseline is 107 unit/component tests and 27 Chromium journeys. Combat v2 now includes visible enemy intents, Guard/Block, Arcane marks, staged feedback, and delayed-damage health presentation; the older rule-level evidence below remains valid historical characterization unless explicitly superseded.
 
 Statuses use the shared definitions: `Compliant`, `Partial`, `Gap`, `Deferred`, `Exception`, `Not applicable`, and `Unknown`. The YAML contract contains a compact machine-readable summary; this document contains the reasoning and evidence.
 

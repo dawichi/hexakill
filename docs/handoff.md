@@ -1,6 +1,6 @@
 # Current Development Handoff
 
-**Reviewed:** 2026-08-16
+**Reviewed:** 2026-08-23
 **Purpose:** Fast continuation point for a future developer agent.
 
 ## Current direction
@@ -17,13 +17,13 @@ The current vertical slice is:
 2. Player name and character selection.
 3. In-memory run creation at the legacy starting values.
 4. Typed generation for the complete observed legacy roster plus sequential Gold Slime boss encounters at levels 10, 20, and 30.
-5. Combat screen with Attack, Magic, and Potion actions.
+5. Combat screen with Attack, Magic, Guard, and Potion actions plus visible enemy intent.
 6. Pure damage resolution for ranges, misses, critical hits, resistance, integer damage, and health caps.
-7. Pure combat state transitions for `idle`, `awaiting-player-action`, `resolving-player-action`, `enemy-turn`, `victory`, and `defeat`.
+7. Pure combat state transitions for `idle`, `awaiting-player-action`, `resolving-player-action`, `enemy-turn`, `victory`, and `defeat`, including temporary Block, enemy intents, and Arcane marks.
 
 The Angular application service coordinates signals and random input. Domain rules do not import Angular. The `Clock` port exists and is injected at the application boundary; the provisional enemy turn uses it for a short presentation delay.
 
-The combat slice uses speed ordering, enemy attack/magic/heal selection, bounded damage rules, persistent player damage, relic passives, player potion use, defeat, and separate player/enemy battle logs. Damage actions select attack/Magic animation assets while healing remains visually idle. Delayed enemy turns are scheduler-backed, generation-guarded, and cancelled on reset. The active app now has provisional victory rewards, leveling, power-up allocation, and a relic shop; final numbers remain subject to manual balance review.
+The combat slice uses speed ordering, visible enemy Attack/Magic/Guard/Heal intents, bounded damage rules, temporary Block, Arcane marks, persistent player damage, relic passives, player Guard and potion use, defeat, and separate player/enemy battle logs. Damage actions select attack/Magic animation assets while Guard and healing remain visually idle. Staged action timing, hit reactions, floating feedback, delayed-damage health trails, and typed battle callouts provide the current Pokémon-like presentation. Delayed enemy turns are scheduler-backed, generation-guarded, and cancelled on reset. The active app now has provisional victory rewards, leveling, power-up allocation, and a relic shop; final numbers remain subject to manual balance review.
 
 The combat boundaries reject malformed attacker/defender stats, invalid resistance or damage values, impossible damage totals, invalid opening-turn speeds, and malformed enemy potion state before applying legacy rules. The framework-independent combat transition also rejects malformed player damage results, non-monotonic or over-health enemy damage totals, and incoherent live/defeated-enemy phase boundaries before entering enemy-turn, victory, or defeat phases. These are input-safety constraints, not gameplay rebalance decisions.
 
@@ -43,7 +43,7 @@ Final persistence acceptance, deployment, and gameplay balancing remain unresolv
 
 ## Completion gate
 
-The current green release gate means the Angular rewrite is reproducible and safe to continue; it does not mean the product is finished or ready for final manual acceptance. Do not close the development effort until the owner-dependent items below are resolved and documented:
+The current green engineering gate means the Angular rewrite is reproducible and safe to continue; it does not mean the product is finished or ready for final manual acceptance. Do not close the development effort until the owner-dependent items below are resolved and documented:
 
 - initial player-stat parity and final gameplay balance;
 - store effect timing, health semantics, restocking, persistence, and refund behavior;
@@ -67,10 +67,10 @@ The application may be played for engineering smoke checks before that gate, but
 
 ## Next recommended session
 
-1. Decide whether to migrate legacy `hxkllPersonalRecords` and whether records remain local-only; record the decision in an ADR.
+1. Run a focused balance playtest of enemy intents, Guard/Block, Arcane marks, and relic synergies; record accepted target ranges and difficulty adjustments.
 2. Resolve owner/source/license decisions recorded in [the asset provenance register](assets-provenance.md), then complete the accessibility review.
-3. Select an accepted hosting provider and run an authorized Angular preview.
-4. Review final gameplay balance, store effects, and the remaining 42 unmapped animation sources in [the sprite-source catalog](assets-sprite-sources.md).
+3. Decide whether to migrate legacy `hxkllPersonalRecords` and whether records remain local-only; record the decision in an ADR.
+4. Select an accepted hosting provider and run an authorized Angular preview.
 
 ## Validation at handoff
 
@@ -92,6 +92,8 @@ npm run build
 npm run verify:release
 ```
 
-The current verified result on 2026-08-16 is revision `3257d036e255ce15c15d44c7d497e69692d341e5` with a clean root install, 13 test files with 93 passing tests, a passing aggregate `npm run verify:release` gate, a passing root production build, a passing publishable-artifact contract check for `dist/hexakill/browser/index.html`, path and SHA-256 byte parity for all 125 retained static files in that artifact, passing source and publishable-artifact geometry checks for 33 typed sprite strips, 81 active asset paths and 42 exact deferred image sources, a passing preview-contract check for security headers, asset caching, 404 behavior, HEAD handling, unsupported methods, path traversal, and malformed URL encoding, all 21 idle assets in the output, passing formatting checks, bounded overflow-sized victory experience, malformed boss-progress, post-transition boss-schedule, and orphaned no-enemy combat-damage rejection, runtime rejection of unknown damage kinds and actions, and twenty-six Chromium journeys covering progression/store/combat and the rendered non-persistent player/enemy battle logs with their legacy eight-entry rolling window and outcome messages, Wizard Idle/Attack1/Attack2/hit provisional player-animation rendering, mapped physical/Magic/hit/idle player/enemy attack/defeat-strip rendering including Witch Blue's idle, physical, hit, and Magic charge strips, local-session restore, audio-preference restore, malformed audio-preference and personal-record recovery, invalid-session recovery including incoherent-screen, transient-combat-action, resolving-player-action, enemy-turn, malformed-combat-result, whitespace-only, negative-stat, duplicate-inventory, over-cap-power-up, and unbound-character restored data, keyboard/focus transitions including the skip link, labeled champion/combat/store control groups, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. The mapped enemy-animation, Knight idle, and Samurai/Magic player-animation journeys also passed repeated deterministic stability runs. Production journeys explicitly start the repository static server instead of reusing an unrelated service on port 4300; a separate production-artifact run passes through the repository static preview server.
+The latest focused implementation verification on 2026-08-23 is revision `e18a9a0cce6ca62019524fe1a3802d73a830984e`: formatting, TypeScript, production build, 107 unit/component tests, and 27 Chromium journeys all pass. The broader release evidence below was last collected at the earlier full-gate revision and should be rerun after the next release-candidate decision.
+
+The prior full-gate result on 2026-08-16 is revision `3257d036e255ce15c15d44c7d497e69692d341e5` with a clean root install, 13 test files with 93 passing tests, a passing aggregate `npm run verify:release` gate, a passing root production build, a passing publishable-artifact contract check for `dist/hexakill/browser/index.html`, path and SHA-256 byte parity for all 125 retained static files in that artifact, passing source and publishable-artifact geometry checks for 33 typed sprite strips, 81 active asset paths and 42 exact deferred image sources, a passing preview-contract check for security headers, asset caching, 404 behavior, HEAD handling, unsupported methods, path traversal, and malformed URL encoding, all 21 idle assets in the output, passing formatting checks, bounded overflow-sized victory experience, malformed boss-progress, post-transition boss-schedule, and orphaned no-enemy combat-damage rejection, runtime rejection of unknown damage kinds and actions, and twenty-six Chromium journeys covering progression/store/combat and the rendered non-persistent player/enemy battle logs with their legacy eight-entry rolling window and outcome messages, Wizard Idle/Attack1/Attack2/hit provisional player-animation rendering, mapped physical/Magic/hit/idle player/enemy attack/defeat-strip rendering including Witch Blue's idle, physical, hit, and Magic charge strips, local-session restore, audio-preference restore, malformed audio-preference and personal-record recovery, invalid-session recovery including incoherent-screen, transient-combat-action, resolving-player-action, enemy-turn, malformed-combat-result, whitespace-only, negative-stat, duplicate-inventory, over-cap-power-up, and unbound-character restored data, keyboard/focus transitions including the skip link, labeled champion/combat/store control groups, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. The mapped enemy-animation, Knight idle, and Samurai/Magic player-animation journeys also passed repeated deterministic stability runs. Production journeys explicitly start the repository static server instead of reusing an unrelated service on port 4300; a separate production-artifact run passes through the repository static preview server.
 
 At the read-only ref check on 2026-08-16, local `main` is 296 commits ahead of `origin/main` (`d441a661f8381feb48996746f2f284a6d0a51b56`, last remote subject `cache volume`, 2024-01-19); `origin/develop` remains a separate historical ref. This work has not been pushed, so remote CI and branch-protection evidence must be gathered separately before release.

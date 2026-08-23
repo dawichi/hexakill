@@ -19,6 +19,12 @@ Combat is intentionally predictable enough to support reading an enemy:
 - Armor and Magic Resist use `damage × 100 / (100 + resistance)`.
 - Regular enemy levels range from `floor(playerLevel / 2)` through `playerLevel + 1`.
 - A potion restores 25% of maximum health and consumes the player's turn.
+- Guard grants temporary Block derived from Armor and Magic Resist.
+- Each enemy reveals an Attack, Magic, Guard, or Heal intent before acting; Magic can apply an
+  Arcane mark that empowers the player's next Attack.
+- Whetstone improves Attack damage and Guard breaking; Arcane Lens improves Magic damage and
+  Arcane mark damage; Ironbark improves the player's Guard block as well as reducing incoming
+  damage.
 
 ## Context
 
@@ -30,6 +36,10 @@ best action difficult to read and made the route map less meaningful.
 ## Consequences
 
 - Defense and recovery are now visible strategic resources.
+- The player can respond to a readable enemy intent with damage, Guard, or recovery instead of
+  following a single highest-stat action heuristic.
+- Temporary Block and the Arcane mark create short-lived combat decisions that are separate from
+  permanent base stats.
 - A damaged player must weigh a safe route, campfire, potion, or relic purchase against pushing
   forward.
 - Character identity remains in the base stats and attack/magic preference, while relic choices
