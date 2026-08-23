@@ -140,6 +140,10 @@ export function purchaseItem(player: PlayerState, itemId: string): PurchaseResul
       stats: immediateRelicStats(player, item),
       gold: player.gold - item.price,
       inventory: [...player.inventory, item],
+      relicCharges:
+        item.id === 'phoenix-feather'
+          ? { ...player.relicCharges, 'phoenix-feather': 1 }
+          : player.relicCharges,
     },
     message: `${item.name} acquired. Its passive effect is active.`,
   };

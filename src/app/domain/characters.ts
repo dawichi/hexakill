@@ -85,6 +85,7 @@ export function createInitialPlayer(name: string, character: CharacterDefinition
     potions: 5,
     gold: 2000,
     inventory: [],
+    relicCharges: {},
     powerUps: { pending: 0, history: { health: 0, ad: 0, ap: 0, speed: 0 } },
     bossesDefeated: 0,
     defeatedEnemies: [],

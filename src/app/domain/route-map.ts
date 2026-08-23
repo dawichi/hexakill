@@ -81,6 +81,21 @@ export function findRouteNode(map: RouteMapState, nodeId: string): RouteNode | u
   return map.nodes.find((node) => node.id === nodeId);
 }
 
+export function revealHiddenRouteNodes(map: RouteMapState, count: number): RouteMapState {
+  if (!Number.isSafeInteger(count) || count < 0) {
+    throw new RangeError('The number of route nodes to reveal must be a non-negative integer.');
+  }
+  let remaining = count;
+  return {
+    ...map,
+    nodes: map.nodes.map((node) => {
+      if (!node.hidden || remaining === 0) return node;
+      remaining -= 1;
+      return { ...node, hidden: false };
+    }),
+  };
+}
+
 export function isRouteNodeKind(value: unknown): value is RouteNodeKind {
   return value === 'battle' || value === 'elite' || value === 'store' || value === 'rest';
 }

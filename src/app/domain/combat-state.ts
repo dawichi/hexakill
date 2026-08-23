@@ -30,12 +30,21 @@ export interface CombatState {
   readonly enemyBlock?: number;
   readonly enemyHexed?: boolean;
   readonly turn?: number;
+  readonly playerActions?: number;
+  readonly damagingActions?: number;
+  readonly attackCount?: number;
+  readonly magicActions?: number;
+  readonly potionUses?: number;
+  readonly enemyDamageActions?: number;
+  readonly enemyVenom?: number;
+  readonly openingActor?: 'player' | 'enemy' | null;
+  readonly relicFlags?: Readonly<Record<string, boolean>>;
 }
 
 export type CombatEvent =
   | { readonly type: 'enemy-spawned'; readonly enemy: EnemyState }
   | { readonly type: 'player-action-started'; readonly kind: PlayerCombatAction }
-  | { readonly type: 'player-potion-used' }
+  | { readonly type: 'player-potion-used'; readonly freeTurn?: boolean }
   | { readonly type: 'player-action-resolved'; readonly result: DamageResult }
   | { readonly type: 'player-guard-resolved'; readonly block: number }
   | { readonly type: 'enemy-turn-started' }
@@ -46,6 +55,7 @@ export type CombatEvent =
       readonly playerBlock?: number;
       readonly enemyIntent?: EnemyIntent | null;
       readonly turn?: number;
+      readonly allowPlayerHealing?: boolean;
     }
   | { readonly type: 'reset' };
 
@@ -64,6 +74,15 @@ export const INITIAL_COMBAT_STATE: CombatState = {
   enemyBlock: 0,
   enemyHexed: false,
   turn: 0,
+  playerActions: 0,
+  damagingActions: 0,
+  attackCount: 0,
+  magicActions: 0,
+  potionUses: 0,
+  enemyDamageActions: 0,
+  enemyVenom: 0,
+  openingActor: null,
+  relicFlags: {},
 };
 
 function rejected(state: CombatState, reason: string): CombatTransition {
@@ -143,6 +162,15 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
         enemyBlock: 0,
         enemyHexed: false,
         turn: 0,
+        playerActions: 0,
+        damagingActions: 0,
+        attackCount: 0,
+        magicActions: 0,
+        potionUses: 0,
+        enemyDamageActions: 0,
+        enemyVenom: 0,
+        openingActor: null,
+        relicFlags: {},
       },
     };
   }
@@ -183,7 +211,12 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
 
     return {
       accepted: true,
-      state: { ...state, phase: 'enemy-turn', pendingAction: null, lastResult: null },
+      state: {
+        ...state,
+        phase: event.freeTurn ? 'awaiting-player-action' : 'enemy-turn',
+        pendingAction: null,
+        lastResult: null,
+      },
     };
   }
 
@@ -206,7 +239,7 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
         phase: 'enemy-turn',
         pendingAction: null,
         lastResult: null,
-        playerBlock: event.block,
+        playerBlock: (state.playerBlock ?? 0) + event.block,
       },
     };
   }
@@ -221,7 +254,7 @@ export function transitionCombat(state: CombatState, event: CombatEvent): Combat
       event.playerDamageTaken < 0 ||
       !Number.isFinite(event.playerHealth) ||
       event.playerHealth <= 0 ||
-      event.playerDamageTaken < state.playerDamageTaken ||
+      (event.playerDamageTaken < state.playerDamageTaken && !event.allowPlayerHealing) ||
       event.playerDamageTaken > event.playerHealth ||
       (event.playerBlock !== undefined &&
         (!Number.isFinite(event.playerBlock) || event.playerBlock < 0)) ||

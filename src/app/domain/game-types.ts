@@ -110,6 +110,8 @@ export interface PlayerState {
   readonly potions: number;
   readonly gold: number;
   readonly inventory: readonly ItemState[];
+  /** Run-scoped charges for relics that are consumed, such as Phoenix Feather. */
+  readonly relicCharges?: Readonly<Record<string, number>>;
   readonly powerUps: PowerUpState;
   readonly bossesDefeated: number;
   readonly defeatedEnemies: readonly DefeatedEnemy[];
@@ -127,4 +129,6 @@ export interface EnemyState {
   readonly damageTaken: number;
   readonly potions: number;
   readonly gold: number;
+  /** Set for an elite route so relics can distinguish it from a normal encounter. */
+  readonly elite?: boolean;
 }

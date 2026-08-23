@@ -1684,6 +1684,21 @@ h3 {
   text-align: center;
 }
 
+.store-card.quality-normal,
+.inventory-item .quality-normal {
+  border-color: #71717a;
+}
+
+.store-card.quality-rare,
+.inventory-item .quality-rare {
+  border-color: #38bdf8;
+}
+
+.store-card.quality-epic,
+.inventory-item .quality-epic {
+  border-color: #c084fc;
+}
+
 .store-card:hover:not(:disabled) {
   border-color: #fbbf24;
   background: #3f3f46;
@@ -1704,6 +1719,41 @@ h3 {
   height: 2.5rem;
   object-fit: contain;
   image-rendering: pixelated;
+}
+
+.relic-icon {
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 0.4rem;
+  color: #d4d4d8;
+}
+
+.relic-icon svg {
+  width: 70%;
+  height: 70%;
+}
+
+.relic-icon.quality-normal,
+.store-card.quality-normal .relic-icon {
+  color: #d4d4d8;
+}
+
+.relic-icon.quality-rare,
+.store-card.quality-rare .relic-icon {
+  color: #38bdf8;
+}
+
+.relic-icon.quality-epic,
+.store-card.quality-epic .relic-icon {
+  color: #c084fc;
+}
+
+.store-quality {
+  color: currentColor;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .potion-icon {

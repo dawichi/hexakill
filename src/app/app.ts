@@ -29,6 +29,7 @@ import {
 import { CombatFeedback, GameSessionService } from './application/game-session.service';
 import { EnemyIntent } from './domain/combat-state';
 import { StatChipComponent } from './components/stat-chip/stat-chip';
+import { RelicIconComponent } from './components/relic-icon/relic-icon';
 import { CharacterDefinition, ItemState, SpriteStripAsset, Stat, Stats } from './domain/game-types';
 import { PersonalRecord } from './domain/records';
 
@@ -53,6 +54,7 @@ import { PersonalRecord } from './domain/records';
     LucideVolume2,
     LucideWandSparkles,
     StatChipComponent,
+    RelicIconComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

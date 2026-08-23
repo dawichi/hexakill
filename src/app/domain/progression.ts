@@ -1,5 +1,5 @@
 import { BASE_STATS } from './characters';
-import { relicVictoryGoldMultiplier } from './store';
+import { relicVictoryExperienceMultiplier, relicVictoryGoldMultiplier } from './store';
 import { EnemyState, PlayerState, PowerUpType, Stats } from './game-types';
 
 export const MAX_POWER_UPS = 24;
@@ -78,7 +78,16 @@ function assertProgressionInputs(player: PlayerState, enemy: EnemyState): void {
 
 export function calculateVictoryReward(player: PlayerState, enemy: EnemyState): VictoryReward {
   assertProgressionInputs(player, enemy);
-  const experience = Number(((enemy.level / player.level) * 100).toFixed(0));
+  const experience = Number(
+    (
+      (enemy.level / player.level) *
+      100 *
+      relicVictoryExperienceMultiplier(
+        player,
+        enemy.elite || enemy.definition.archetype === 'boss' ? 'elite' : enemy.definition.archetype,
+      )
+    ).toFixed(0),
+  );
   if (!Number.isSafeInteger(experience) || experience < 0) {
     throw new RangeError('Victory experience must be a non-negative safe integer.');
   }

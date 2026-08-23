@@ -757,9 +757,11 @@
                   <div class="inventory-grid">
                     @for (item of player.inventory; track item.id) {
                       <article class="inventory-item">
-                        <img class="item-sprite" [src]="item.asset" [alt]="item.name" />
+                        <span class="item-sprite relic-icon" [class]="'quality-' + item.quality">
+                          <app-relic-icon [icon]="item.icon" [label]="item.name" />
+                        </span>
                         <span>
-                          <strong>{{ item.name }}</strong>
+                          <strong>{{ item.name }} · {{ item.quality }}</strong>
                           <small>{{ itemDescription(item) }}</small>
                         </span>
                       </article>
@@ -938,16 +940,20 @@
 
           <h3>Relics</h3>
           <div class="store-grid" role="group" aria-label="Relic offers">
-            @for (item of session.storeItems; track item.id) {
+            @for (item of session.storeItems(); track item.id) {
               <button
                 class="store-card"
+                [class]="'quality-' + item.quality"
                 type="button"
                 [disabled]="
                   player.gold < item.price || player.inventory.some((owned) => owned.id === item.id)
                 "
                 (click)="session.buyItem(item.id)"
               >
-                <img class="item-sprite" [src]="item.asset" [alt]="item.name" />
+                <span class="item-sprite relic-icon" aria-hidden="true">
+                  <app-relic-icon [icon]="item.icon" />
+                </span>
+                <small class="store-quality">{{ item.quality }}</small>
                 <strong>{{ item.name }}</strong>
                 <span>{{ item.description }}</span>
                 <span>{{ item.price }} gold</span>

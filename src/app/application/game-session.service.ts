@@ -18,16 +18,32 @@ import {
 import {
   purchaseItem,
   purchasePotions,
-  relicDamageModifiers,
+  generateStoreOffers,
   relicGuardBlockMultiplier,
   relicGuardBreakMultiplier,
-  relicHexMultiplier,
-  relicIncomingDamageModifiers,
   relicPotionHealingFraction,
   relicVictoryHealAmount,
   STORE_ITEMS,
   STORE_POTIONS,
 } from '../domain/store';
+import {
+  relicBloodLedgerHeal,
+  relicCrownOfThornsDamage,
+  relicCrownOfThornsVenom,
+  relicDamageRules,
+  relicGuardBonus,
+  relicIncomingDamageMultiplier,
+  relicLethalProtectionAvailable,
+  relicMagicBlock,
+  relicMagicVenom,
+  relicPotionBlock,
+  relicPotionIsFree,
+  relicStartEnemyDamage,
+  relicStartOfCombatBlock,
+  relicThornsDamage,
+  relicVictoryMaxHealthBonus,
+  RelicCombatContext,
+} from '../domain/relic-rules';
 import {
   enemyAssetFor,
   enemySpriteAssetFor,
@@ -36,6 +52,7 @@ import {
   generateEnemy,
 } from '../domain/enemies';
 import { damageDealt, DamageKind, DamageResult, resolveDamage } from '../domain/combat-rules';
+import { hasRelic } from '../domain/relics';
 import {
   EnemyIntent,
   INITIAL_COMBAT_STATE,
@@ -48,6 +65,7 @@ import {
   createRouteMap,
   findRouteNode,
   isRouteMapState,
+  revealHiddenRouteNodes,
   RouteMapState,
   RouteNodeKind,
 } from '../domain/route-map';
@@ -56,6 +74,7 @@ import {
   CombatLogEntry,
   DefeatedEnemy,
   EnemyState,
+  ItemState,
   MAX_COMBAT_LOG_ENTRIES,
   PlayerState,
   SpriteStripAsset,
@@ -162,6 +181,7 @@ function isRestorablePlayer(value: unknown): value is PlayerState {
   const powerUps = value['powerUps'];
   const history = isRecord(powerUps) ? powerUps['history'] : null;
   const inventory = value['inventory'];
+  const relicCharges = value['relicCharges'];
   const powerUpTypes = ['health', 'ad', 'ap', 'speed'] as const;
 
   if (
@@ -176,6 +196,9 @@ function isRestorablePlayer(value: unknown): value is PlayerState {
     ) ||
     new Set(inventory.map((item) => (item as Record<string, unknown>)['id'])).size !==
       inventory.length ||
+    (relicCharges !== undefined &&
+      (!isRecord(relicCharges) ||
+        Object.values(relicCharges).some((charge) => !isNonNegativeInteger(charge)))) ||
     !isRecord(powerUps) ||
     !isNonNegativeInteger(powerUps['pending']) ||
     powerUps['pending'] > MAX_POWER_UPS ||
@@ -283,7 +306,7 @@ function strengthenEliteEnemy(enemy: EnemyState): EnemyState {
   (Object.keys(stats) as (keyof Stats)[]).forEach((stat) => {
     stats[stat] = Math.round(stats[stat] * 1.3);
   });
-  return { ...enemy, stats, gold: Math.round(enemy.gold * 1.5) };
+  return { ...enemy, stats, gold: Math.round(enemy.gold * 1.5), elite: true };
 }
 
 function hasCoherentSessionState(snapshot: Partial<StoredSessionSnapshot>): boolean {
@@ -439,7 +462,7 @@ export class GameSessionService {
   readonly canAct = computed(
     () => this.combatState().phase === 'awaiting-player-action' && this.actionReady(),
   );
-  readonly storeItems = STORE_ITEMS;
+  readonly storeItems = signal<readonly ItemState[]>([]);
   readonly storePotions = STORE_POTIONS;
   readonly lastActionAt = signal<number | null>(null);
   readonly combatMessage = signal('');
@@ -503,6 +526,7 @@ export class GameSessionService {
     this.enemyHealthTrail.set(0);
     this.routeFloor.set(1);
     this.routeMap.set(null);
+    this.storeItems.set([]);
     this.actionReady.set(false);
     this.enemyAnimation.set('idle');
     this.enemyActionKind.set(null);
@@ -529,6 +553,7 @@ export class GameSessionService {
     );
     const spawnedEnemy =
       routeKind === 'elite' ? strengthenEliteEnemy(generatedEnemy) : generatedEnemy;
+    const openingActor = determineFirstActor(player.stats.speed, spawnedEnemy.stats.speed);
     if (
       !this.applyCombatEvent({
         type: 'enemy-spawned',
@@ -546,7 +571,13 @@ export class GameSessionService {
     this.playerActionKind.set(null);
     this.actionReady.set(false);
     const intent = chooseEnemyIntent(spawnedEnemy, player.stats, this.random(), 0);
-    this.combatState.update((state) => ({ ...state, enemyIntent: intent, turn: 0 }));
+    this.combatState.update((state) => ({
+      ...state,
+      enemyIntent: intent,
+      turn: 0,
+      openingActor,
+      playerBlock: relicStartOfCombatBlock(player),
+    }));
     this.addCombatLog('enemy', {
       title: spawnedEnemy.definition.name,
       message: 'has appeared and revealed its intent.',
@@ -558,7 +589,7 @@ export class GameSessionService {
         : ASSET_MANIFEST.music.dungeon,
     );
 
-    if (determineFirstActor(player.stats.speed, spawnedEnemy.stats.speed) === 'enemy') {
+    if (openingActor === 'enemy') {
       this.combatMessage.set(this.enemyIntentMessage(spawnedEnemy, intent));
       this.addCombatLog('enemy', {
         title: spawnedEnemy.definition.name,
@@ -576,6 +607,11 @@ export class GameSessionService {
 
   openStore(): void {
     if (!this.player() || this.screen() !== 'map') return;
+    const player = this.player();
+    if (!player) return;
+    this.storeItems.set(
+      generateStoreOffers(player, { floor: this.routeFloor(), random: this.random }),
+    );
     this.screen.set('store');
     this.combatMessage.set('');
     this.audio?.playMusic(ASSET_MANIFEST.music.store);
@@ -596,7 +632,9 @@ export class GameSessionService {
     const player = this.player();
     if (!player) return;
     if (!this.routeMap()) {
-      this.routeMap.set(createRouteMap(this.routeFloor(), this.random()));
+      const map = createRouteMap(this.routeFloor(), this.random());
+      const hasCompass = this.player()?.inventory.some((item) => item.id === 'travelers-compass');
+      this.routeMap.set(hasCompass ? revealHiddenRouteNodes(map, 1) : map);
     }
     this.screen.set('map');
     this.actionReady.set(false);
@@ -698,8 +736,13 @@ export class GameSessionService {
     const enemy = this.enemy();
     if (!player || !enemy || this.combatState().pendingAction !== 'guard') return;
 
-    const block = guardBlockAmount(player.stats, relicGuardBlockMultiplier(player));
+    const block =
+      guardBlockAmount(player.stats, relicGuardBlockMultiplier(player)) + relicGuardBonus(player);
     if (!this.applyCombatEvent({ type: 'player-guard-resolved', block })) return;
+    this.combatState.update((state) => ({
+      ...state,
+      playerActions: (state.playerActions ?? 0) + 1,
+    }));
 
     this.showCombatFeedback({ target: 'player', kind: 'guard', amount: block });
     this.combatMessage.set(`Guard raised ${block} Block. ${this.enemyIntentMessage(enemy)}`);
@@ -712,24 +755,42 @@ export class GameSessionService {
     this.scheduleEnemyTurn();
   }
 
+  private relicContext(player: PlayerState): RelicCombatContext {
+    const state = this.combatState();
+    return {
+      playerHealth: player.stats.health,
+      playerDamageTaken: state.playerDamageTaken,
+      playerActions: state.playerActions ?? 0,
+      damagingActions: state.damagingActions ?? 0,
+      attackCount: state.attackCount ?? 0,
+      magicActions: state.magicActions ?? 0,
+      potionUses: state.potionUses ?? 0,
+      enemyDamageActions: state.enemyDamageActions ?? 0,
+      openingActor: state.openingActor ?? null,
+      relicFlags: state.relicFlags ?? {},
+    };
+  }
+
   private resolvePlayerDamage(kind: DamageKind): void {
     const player = this.player();
     const enemy = this.enemy();
     if (!player || !enemy || this.combatState().pendingAction !== kind) return;
 
-    const enemyHexed = this.combatState().enemyHexed ?? false;
+    const stateBeforeAction = this.combatState();
+    const enemyHexed = stateBeforeAction.enemyHexed ?? false;
     const previousEnemyHealth = enemy.stats.health - enemy.damageTaken;
-    const relicModifiers = relicDamageModifiers(player, kind);
+    const damageRules = relicDamageRules(player, kind, this.relicContext(player));
     const damageMultiplier =
-      (relicModifiers.damageMultiplier ?? 1) *
-      (kind === 'attack' && enemyHexed ? 1.25 * relicHexMultiplier(player) : 1);
+      damageRules.damageMultiplier * (kind === 'attack' && enemyHexed ? 1.45 : 1);
     const result = resolveDamage(
       { stats: player.stats },
       enemy,
       kind,
-      { damageRoll: this.random(), chanceRoll: this.random() },
       {
-        ...relicModifiers,
+        damageRoll: this.random(),
+        chanceRoll: damageRules.guaranteedHit ? Math.max(0.11, this.random()) : this.random(),
+      },
+      {
         damageMultiplier,
         block:
           (this.combatState().enemyBlock ?? 0) /
@@ -739,6 +800,23 @@ export class GameSessionService {
     if (!this.applyCombatEvent({ type: 'player-action-resolved', result })) return;
 
     const dealt = damageDealt(result);
+    this.combatState.update((state) => ({
+      ...state,
+      playerActions: (state.playerActions ?? 0) + 1,
+      damagingActions: (state.damagingActions ?? 0) + 1,
+      attackCount: (state.attackCount ?? 0) + (kind === 'attack' ? 1 : 0),
+      magicActions: (state.magicActions ?? 0) + (kind === 'magic' ? 1 : 0),
+      relicFlags:
+        kind === 'magic' && dealt > 0
+          ? { ...state.relicFlags, 'arcane-battery-used': true }
+          : state.relicFlags,
+      playerBlock:
+        (state.playerBlock ?? 0) +
+        (kind === 'magic' && dealt > 0 ? relicMagicBlock(player, this.relicContext(player)) : 0),
+      enemyVenom:
+        (state.enemyVenom ?? 0) + (kind === 'magic' && dealt > 0 ? relicMagicVenom(player) : 0),
+    }));
+
     if (dealt > 0) {
       this.showHealthDamageTrail(
         'enemy',
@@ -797,18 +875,25 @@ export class GameSessionService {
     const enemy = this.enemy();
     if (!player || !enemy || !this.canAct() || player.potions <= 0) return;
 
+    const relicContext = this.relicContext(player);
+    const freeTurn = relicPotionIsFree(player, relicContext);
+    const potionBlock = relicPotionBlock(player, relicContext);
+
     const healResult = resolveHeal(
       this.combatState().playerDamageTaken,
       player.stats.health,
       relicPotionHealingFraction(player),
     );
-    if (!this.applyCombatEvent({ type: 'player-potion-used' })) return;
+    if (!this.applyCombatEvent({ type: 'player-potion-used', freeTurn })) return;
 
-    this.actionReady.set(false);
+    this.actionReady.set(freeTurn);
     this.player.set({ ...player, potions: player.potions - 1 });
     this.combatState.update((state) => ({
       ...state,
       playerDamageTaken: Math.max(0, state.playerDamageTaken - healResult.healed),
+      playerActions: (state.playerActions ?? 0) + 1,
+      potionUses: (state.potionUses ?? 0) + 1,
+      playerBlock: (state.playerBlock ?? 0) + potionBlock,
     }));
     this.syncHealthTrail('player', this.playerRemainingHealth(), player.stats.health);
     this.combatMessage.set(`You used a potion and healed ${healResult.healed} HP.`);
@@ -819,7 +904,7 @@ export class GameSessionService {
     });
     this.showCombatFeedback({ target: 'player', kind: 'heal', amount: healResult.healed });
     this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
-    this.scheduleEnemyTurn();
+    if (!freeTurn) this.scheduleEnemyTurn();
   }
 
   choosePowerUp(type: Parameters<typeof applyPowerUp>[1]): void {
@@ -903,7 +988,18 @@ export class GameSessionService {
 
   private finishVictory(player: PlayerState, enemy: EnemyState): void {
     const reward = calculateVictoryReward(player, enemy);
-    const rewardedPlayer = applyVictoryReward(player, enemy);
+    const rewardedPlayerBase = applyVictoryReward(player, enemy);
+    const maxHealthBonus = relicVictoryMaxHealthBonus(rewardedPlayerBase);
+    const rewardedPlayer =
+      maxHealthBonus > 0
+        ? {
+            ...rewardedPlayerBase,
+            stats: {
+              ...rewardedPlayerBase.stats,
+              health: rewardedPlayerBase.stats.health + maxHealthBonus,
+            },
+          }
+        : rewardedPlayerBase;
     this.player.set(rewardedPlayer);
     const victoryHeal = relicVictoryHealAmount(rewardedPlayer);
     if (victoryHeal > 0) {
@@ -937,8 +1033,9 @@ export class GameSessionService {
   private beginEnemyAction(): void {
     this.pendingEnemyTurn = null;
     const enemy = this.enemy();
+    const player = this.player();
     let intent = this.combatState().enemyIntent;
-    if (!enemy || this.combatState().phase !== 'enemy-turn') return;
+    if (!player || !enemy || this.combatState().phase !== 'enemy-turn') return;
     if (!intent) {
       intent = chooseEnemyIntent(
         enemy,
@@ -947,6 +1044,36 @@ export class GameSessionService {
         this.combatState().turn ?? 0,
       );
       this.combatState.update((state) => ({ ...state, enemyIntent: intent }));
+    }
+
+    const currentVenom = this.combatState().enemyVenom ?? 0;
+    const startDamage = relicStartEnemyDamage(player) + currentVenom;
+    if (startDamage > 0) {
+      const damageTaken = Math.min(enemy.stats.health, enemy.damageTaken + startDamage);
+      const enemyAfterStart = { ...enemy, damageTaken };
+      this.combatState.update((state) => ({
+        ...state,
+        enemy: enemyAfterStart,
+        enemyVenom: Math.max(0, currentVenom - (currentVenom > 0 ? 1 : 0)),
+      }));
+      this.showHealthDamageTrail(
+        'enemy',
+        enemy.stats.health - enemy.damageTaken,
+        enemy.stats.health - damageTaken,
+        enemy.stats.health,
+      );
+      this.showCombatFeedback({ target: 'enemy', kind: 'damage', amount: startDamage });
+      this.combatMessage.set(
+        currentVenom > 0
+          ? `${enemy.definition.name} suffered ${startDamage} damage from Venom.`
+          : `${enemy.definition.name} suffered ${startDamage} damage from Soot Charm.`,
+      );
+      if (damageTaken >= enemy.stats.health) {
+        this.enemyAnimation.set('defeat');
+        this.combatState.update((state) => ({ ...state, phase: 'victory' }));
+        this.finishVictory(player, enemyAfterStart);
+        return;
+      }
     }
 
     this.cancelPendingEnemyAnimationReset();
@@ -984,6 +1111,10 @@ export class GameSessionService {
     const previousPlayerHealth = player.stats.health - playerDamageTaken;
     let remainingPlayerBlock = currentPlayerBlock;
     let updatedEnemy = enemy;
+    let reactiveEnemyDamage = 0;
+    let addedVenom = 0;
+    let bloodHeal = 0;
+    let playerForTurn = player;
     let result: DamageResult | null = null;
 
     if (intent.kind === 'guard') {
@@ -1015,17 +1146,53 @@ export class GameSessionService {
       });
       this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
     } else {
-      const incomingModifiers = relicIncomingDamageModifiers(player);
+      const incomingDamageMultiplier = relicIncomingDamageMultiplier(
+        player,
+        this.relicContext(player),
+      );
       result = resolveDamage(
         { stats: enemy.stats },
         { stats: player.stats, damageTaken: this.combatState().playerDamageTaken },
         intent.kind,
         { damageRoll: this.random(), chanceRoll: this.random() },
-        { ...incomingModifiers, block: currentPlayerBlock },
+        { receivedDamageMultiplier: incomingDamageMultiplier, block: currentPlayerBlock },
       );
       playerDamageTaken = result.damageTaken;
       remainingPlayerBlock = Math.max(0, currentPlayerBlock - (result.blocked ?? 0));
       const dealt = damageDealt(result);
+
+      if (result.damageTaken >= player.stats.health && relicLethalProtectionAvailable(player)) {
+        playerDamageTaken = Math.max(0, player.stats.health - 1);
+        remainingPlayerBlock += 30;
+        playerForTurn = {
+          ...player,
+          relicCharges: { ...player.relicCharges, 'phoenix-feather': 0 },
+        };
+        this.player.set(playerForTurn);
+        this.combatMessage.set('Phoenix Feather saved you from a lethal hit and shattered.');
+      }
+
+      const contextAfterHit: RelicCombatContext = {
+        ...this.relicContext(player),
+        playerDamageTaken,
+      };
+      const bloodLedgerUsed = this.combatState().relicFlags?.['blood-ledger-used'] ?? false;
+      bloodHeal = bloodLedgerUsed ? 0 : relicBloodLedgerHeal(player, contextAfterHit);
+      if (bloodHeal > 0) playerDamageTaken = Math.max(0, playerDamageTaken - bloodHeal);
+
+      const blocked = result.blocked ?? 0;
+      reactiveEnemyDamage += relicThornsDamage(player, blocked);
+      reactiveEnemyDamage += relicCrownOfThornsDamage(player, blocked);
+      addedVenom += relicCrownOfThornsVenom(player, blocked);
+      if (intent.kind === 'magic' && dealt > 0 && hasRelic(player, 'mirror-of-night')) {
+        reactiveEnemyDamage += Math.trunc(dealt * 0.25);
+      }
+      if (reactiveEnemyDamage > 0) {
+        updatedEnemy = {
+          ...enemy,
+          damageTaken: Math.min(enemy.stats.health, enemy.damageTaken + reactiveEnemyDamage),
+        };
+      }
       if (dealt > 0) {
         this.showHealthDamageTrail(
           'player',
@@ -1040,6 +1207,10 @@ export class GameSessionService {
         ...(result.missed ? {} : { value: dealt }),
         icon: intent.kind === 'attack' ? '🔪' : '☄',
       });
+      if (bloodHeal > 0) {
+        this.showCombatFeedback({ target: 'player', kind: 'heal', amount: bloodHeal });
+        this.combatMessage.set(`${this.combatMessage()} Blood Ledger restored ${bloodHeal} HP.`);
+      }
       if (result.missed) {
         this.showCombatFeedback({ target: 'player', kind: 'miss', action: intent.kind });
         this.combatMessage.set(`${enemy.definition.name}'s ${intent.kind} missed.`);
@@ -1075,27 +1246,48 @@ export class GameSessionService {
       this.playerAnimation.set('idle');
     }
 
+    const nextTurn = (this.combatState().turn ?? 0) + 1;
+    const nextEnemy = updatedEnemy;
+    const enemyDefeatedByReaction = nextEnemy.damageTaken >= nextEnemy.stats.health;
+    const nextIntent = enemyDefeatedByReaction
+      ? null
+      : chooseEnemyIntent(nextEnemy, playerForTurn.stats, this.random(), nextTurn);
+    if (
+      !this.applyCombatEvent({
+        type: 'enemy-action-resolved',
+        playerDamageTaken,
+        playerHealth: playerForTurn.stats.health,
+        playerBlock: remainingPlayerBlock,
+        enemyIntent: nextIntent,
+        turn: nextTurn,
+        allowPlayerHealing: bloodHeal > 0,
+      })
+    ) {
+      return;
+    }
+
+    this.combatState.update((state) => ({
+      ...state,
+      enemyDamageActions:
+        (state.enemyDamageActions ?? 0) +
+        (intent.kind === 'attack' || intent.kind === 'magic' ? 1 : 0),
+      enemyVenom: (state.enemyVenom ?? 0) + addedVenom,
+      relicFlags:
+        bloodHeal > 0 ? { ...state.relicFlags, 'blood-ledger-used': true } : state.relicFlags,
+      enemy: nextEnemy,
+    }));
     if (updatedEnemy !== enemy) {
-      this.combatState.update((state) => ({ ...state, enemy: updatedEnemy }));
       this.syncHealthTrail(
         'enemy',
         updatedEnemy.stats.health - updatedEnemy.damageTaken,
         updatedEnemy.stats.health,
       );
     }
-    const nextTurn = (this.combatState().turn ?? 0) + 1;
-    const nextEnemy = this.combatState().enemy ?? updatedEnemy;
-    const nextIntent = chooseEnemyIntent(nextEnemy, player.stats, this.random(), nextTurn);
-    if (
-      !this.applyCombatEvent({
-        type: 'enemy-action-resolved',
-        playerDamageTaken,
-        playerHealth: player.stats.health,
-        playerBlock: remainingPlayerBlock,
-        enemyIntent: nextIntent,
-        turn: nextTurn,
-      })
-    ) {
+
+    if (enemyDefeatedByReaction) {
+      this.enemyAnimation.set('defeat');
+      this.combatState.update((state) => ({ ...state, phase: 'victory' }));
+      this.finishVictory(playerForTurn, nextEnemy);
       return;
     }
 
@@ -1105,7 +1297,7 @@ export class GameSessionService {
         title: 'Oh no!',
         message: 'You have been defeated!',
       });
-      this.addPersonalRecord(player);
+      this.addPersonalRecord(playerForTurn);
       this.screen.set('game-over');
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
     } else {
@@ -1404,6 +1596,7 @@ export class GameSessionService {
           ...snapshot.player,
           character: character ?? snapshot.player.character,
           inventory,
+          relicCharges: snapshot.player.relicCharges ?? {},
           defeatedEnemies: snapshot.player.defeatedEnemies ?? [],
         });
         const restoredEnemy = snapshot.combatState.enemy;
@@ -1424,6 +1617,15 @@ export class GameSessionService {
           enemyBlock: snapshot.combatState.enemyBlock ?? 0,
           enemyHexed: snapshot.combatState.enemyHexed ?? false,
           turn: snapshot.combatState.turn ?? 0,
+          playerActions: snapshot.combatState.playerActions ?? 0,
+          damagingActions: snapshot.combatState.damagingActions ?? 0,
+          attackCount: snapshot.combatState.attackCount ?? 0,
+          magicActions: snapshot.combatState.magicActions ?? 0,
+          potionUses: snapshot.combatState.potionUses ?? 0,
+          enemyDamageActions: snapshot.combatState.enemyDamageActions ?? 0,
+          enemyVenom: snapshot.combatState.enemyVenom ?? 0,
+          openingActor: snapshot.combatState.openingActor ?? null,
+          relicFlags: snapshot.combatState.relicFlags ?? {},
           enemy: restoredEnemy
             ? {
                 ...restoredEnemy,
@@ -1441,6 +1643,11 @@ export class GameSessionService {
             : 'idle',
         );
         this.screen.set(snapshot.screen as GameScreen);
+        if (snapshot.screen === 'store') {
+          this.storeItems.set(
+            generateStoreOffers(this.player()!, { floor: routeFloor, random: this.random }),
+          );
+        }
         this.actionReady.set(
           snapshot.screen === 'combat' && snapshot.combatState.phase === 'awaiting-player-action',
         );
