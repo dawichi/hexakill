@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
 import {
+  relicArcaneMarkMultiplier,
   relicDamageRules,
   relicIncomingDamageMultiplier,
   relicMagicBlock,
@@ -61,6 +62,11 @@ describe('relic combat rules', () => {
     expect(relicPotionBlock(player, context())).toBe(6);
     expect(relicMagicBlock(player, context())).toBe(14);
     expect(relicStartEnemyDamage(player)).toBe(0);
+  });
+
+  it('uses the baseline Arcane mark bonus unless Hexglass Prism is owned', () => {
+    expect(relicArcaneMarkMultiplier(basePlayer)).toBe(1.25);
+    expect(relicArcaneMarkMultiplier(playerWith('hexglass-prism'))).toBe(1.45);
   });
 
   it('keeps one-shot triggers from repeating after their counter is consumed', () => {

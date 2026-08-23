@@ -17,6 +17,7 @@ Open `http://localhost:4200/`. The main validation commands are:
 
 ```sh
 npm run format:check
+npm run lint
 npm run verify:types
 npm run verify:docs
 npm run verify:migration
@@ -44,4 +45,4 @@ Start with [`docs/README.md`](docs/README.md), [`docs/AGENTS.md`](docs/AGENTS.md
 - `vercel.json` — candidate static Vercel install/build/output contract; external deployment remains pending.
 - `docs/` — project operating manual, architecture, standards, assets, operations, and TODOs.
 - `legacy/svelte/` — archived SvelteKit source and configuration for historical reference only.
-- `rewrite/` — migration note for the completed isolated-to-root Angular promotion.
+- `docs/architecture/rewrite-migration.md` — historical note for the completed isolated-to-root Angular promotion.

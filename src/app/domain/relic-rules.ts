@@ -20,6 +20,11 @@ export interface RelicDamageRules {
   readonly guaranteedHit: boolean;
 }
 
+/** The base Arcane mark bonus is 25%; Hexglass Prism raises it to 45%. */
+export function relicArcaneMarkMultiplier(player: PlayerState): number {
+  return hasRelic(player, 'hexglass-prism') ? 1.45 : 1.25;
+}
+
 export function relicDamageRules(
   player: PlayerState,
   kind: DamageKind,

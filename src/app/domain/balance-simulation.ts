@@ -13,7 +13,6 @@ import {
   relicDamageModifiers,
   relicGuardBlockMultiplier,
   relicGuardBreakMultiplier,
-  relicIncomingDamageModifiers,
   relicPotionHealingFraction,
   STORE_ITEMS,
 } from './store';
@@ -22,6 +21,7 @@ import {
   relicCrownOfThornsDamage,
   relicCrownOfThornsVenom,
   relicDamageRules,
+  relicArcaneMarkMultiplier,
   relicGuardBonus,
   relicIncomingDamageMultiplier,
   relicLethalProtectionAvailable,
@@ -249,7 +249,8 @@ function damageModifiersForPlayer(
   const relicModifiers = relicDamageModifiers(player, kind);
   return {
     damageMultiplier:
-      (relicModifiers.damageMultiplier ?? 1) * (kind === 'attack' && enemyHexed ? 1.45 : 1),
+      (relicModifiers.damageMultiplier ?? 1) *
+      (kind === 'attack' && enemyHexed ? relicArcaneMarkMultiplier(player) : 1),
     block: enemyBlock / (kind === 'attack' ? relicGuardBreakMultiplier(player) : 1),
   };
 }
@@ -353,7 +354,9 @@ function greedyPolicy(context: PlayerDecisionContext): SimulationAction {
 export const PLAYER_POLICIES: Readonly<Record<PlayerPolicyId, PlayerPolicy>> = {
   random: (context) => {
     const index = Math.floor(context.randomChoice() * context.legalActions.length);
-    return context.legalActions[Math.min(index, context.legalActions.length - 1)];
+    const action = context.legalActions[Math.min(index, context.legalActions.length - 1)];
+    if (!action) throw new RangeError('Simulation policy requires at least one legal action.');
+    return action;
   },
   class: classPolicy,
   reactive: reactivePolicy,
@@ -529,7 +532,8 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
           },
           {
             damageMultiplier:
-              damageRules.damageMultiplier * (action === 'attack' && enemyHexed ? 1.45 : 1),
+              damageRules.damageMultiplier *
+              (action === 'attack' && enemyHexed ? relicArcaneMarkMultiplier(player) : 1),
             block: enemyBlock / (action === 'attack' ? relicGuardBreakMultiplier(player) : 1),
           },
         );
@@ -711,16 +715,11 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
 function percentile(values: readonly number[], ratio: number): number {
   if (!values.length) return 0;
   const sorted = [...values].sort((a, b) => a - b);
-  return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * ratio))];
+  return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * ratio))] ?? 0;
 }
 
 function average(values: readonly number[]): number {
   return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
-}
-
-function scenarioEnemyRoll(scenario: BalanceScenario): EnemyState {
-  const player = playerForScenario(scenario);
-  return enemyForScenario(player, scenario);
 }
 
 function summarizeScenario(

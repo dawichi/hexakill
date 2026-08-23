@@ -3,28 +3,10 @@ name: Angular rewrite validation
 on:
   push:
     paths:
-      - 'src/**'
-      - 'e2e/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'angular.json'
-      - 'vercel.json'
-      - 'tools/**'
-      - 'static/**'
-      - 'docs/**'
-      - '.github/workflows/angular-rewrite.yml'
+      - '**'
   pull_request:
     paths:
-      - 'src/**'
-      - 'e2e/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'angular.json'
-      - 'vercel.json'
-      - 'tools/**'
-      - 'static/**'
-      - 'docs/**'
-      - '.github/workflows/angular-rewrite.yml'
+      - '**'
 
 permissions:
   contents: read
@@ -53,6 +35,8 @@ jobs:
         run: npm audit --audit-level=high
       - name: Check formatting
         run: npm run format:check
+      - name: Run lint checks
+        run: npm run lint
       - name: Verify TypeScript
         run: npm run verify:types
       - name: Verify project documentation contract

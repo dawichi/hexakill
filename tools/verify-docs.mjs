@@ -74,6 +74,7 @@ const requiredIndexTargets = [
   'architecture/current-state.md',
   'architecture/rewrite-target.md',
   'architecture/rewrite-persistence.md',
+  'architecture/rewrite-migration.md',
   'assets-provenance.md',
   'assets-sprite-sources.md',
   'accessibility-review.md',
@@ -115,6 +116,16 @@ for (const command of requiredCommands) {
 const standards = readFileSync(standardsPath, 'utf8');
 const projectRevision = standards.match(/current_revision:\s*([0-9a-f]{40})/)?.[1];
 if (!projectRevision) fail('project-standards.yml must pin a project revision');
+
+const currentRevision = execFileSync('git', ['rev-parse', 'HEAD'], {
+  cwd: projectRoot,
+  encoding: 'utf8',
+}).trim();
+if (projectRevision !== currentRevision) {
+  fail(
+    `project-standards.yml current_revision ${projectRevision} does not match checkout HEAD ${currentRevision}`,
+  );
+}
 
 try {
   execFileSync('git', ['cat-file', '-e', `${projectRevision}^{commit}`], { cwd: projectRoot });

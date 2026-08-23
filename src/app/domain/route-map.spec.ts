@@ -14,8 +14,10 @@ describe('route map', () => {
 
   it('finds a selected branch by its stable id', () => {
     const map = createRouteMap(1, 0);
+    const selectedNode = map.nodes[2];
+    if (!selectedNode) throw new Error('Expected a third route node.');
 
-    expect(findRouteNode(map, map.nodes[2].id)).toEqual(map.nodes[2]);
+    expect(findRouteNode(map, selectedNode.id)).toEqual(selectedNode);
     expect(findRouteNode(map, 'missing-node')).toBeUndefined();
   });
 

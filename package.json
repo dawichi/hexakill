@@ -20,7 +20,8 @@
     "verify:types": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "format:check": "prettier --check 'src/**/*.{ts,html,css}' 'e2e/**/*.ts' 'tools/**/*.mjs' 'playwright.config.ts' '*.json' '*.md' 'rewrite/README.md' 'legacy/svelte/README.md'",
+    "format:check": "biome check --formatter-enabled=true --linter-enabled=false --assist-enabled=false src e2e tools playwright.config.ts angular.json package.json package-lock.json tsconfig.json tsconfig.app.json tsconfig.spec.json vercel.json biome.json",
+    "lint": "biome lint src e2e tools playwright.config.ts --only=suspicious/noExplicitAny --only=correctness/noUnusedVariables --only=correctness/noUnusedImports --diagnostic-level=error",
     "test:e2e": "playwright test",
     "test:e2e:production": "npm run build && E2E_PRODUCTION=1 npm run test:e2e",
     "verify:docs": "node tools/verify-docs.mjs"
@@ -43,9 +44,9 @@
     "@angular/build": "^21.2.21",
     "@angular/cli": "^21.2.21",
     "@angular/compiler-cli": "^21.2.0",
+    "@biomejs/biome": "2.5.10",
     "@playwright/test": "^1.62.1",
     "jsdom": "^28.0.0",
-    "prettier": "^3.8.1",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
   }

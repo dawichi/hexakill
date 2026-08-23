@@ -10,6 +10,7 @@ import {
 describe('balance simulation', () => {
   it('replays the same encounter when the seed and policy are unchanged', () => {
     const scenario = DEFAULT_BALANCE_SCENARIOS[0];
+    if (!scenario) throw new Error('Expected a default balance scenario.');
     const fixture = createSimulationFixture(scenario);
     const options = {
       ...fixture,
@@ -23,6 +24,7 @@ describe('balance simulation', () => {
 
   it('keeps the policy decision stream separate from combat randomness', () => {
     const scenario = DEFAULT_BALANCE_SCENARIOS[0];
+    if (!scenario) throw new Error('Expected a default balance scenario.');
     const fixture = createSimulationFixture(scenario);
     const randomResult = simulateEncounter({
       ...fixture,
@@ -45,6 +47,7 @@ describe('balance simulation', () => {
     const scenario =
       DEFAULT_BALANCE_SCENARIOS.find((candidate) => candidate.elite) ??
       DEFAULT_BALANCE_SCENARIOS[0];
+    if (!scenario) throw new Error('Expected a default balance scenario.');
     const fixture = createSimulationFixture(scenario);
     const result = simulateEncounter({
       ...fixture,

@@ -157,6 +157,9 @@ describe('GameSessionService', () => {
     service.setPlayerName('David');
     service.selectCharacter(CHARACTER_DEFINITIONS[0]);
     service.startRun();
+    service.player.update((player) =>
+      player ? { ...player, stats: { ...player.stats, speed: 100 } } : player,
+    );
     service.findEnemy();
 
     const player = service.player();
@@ -359,6 +362,94 @@ describe('GameSessionService', () => {
 
     expect(restored.screen()).toBe('welcome');
     expect(sessionValue).toBeNull();
+  });
+
+  it('discards snapshots with malformed optional combat interaction fields', () => {
+    service.setPlayerName('David');
+    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
+    service.startRun();
+    service.player.update((player) =>
+      player ? { ...player, stats: { ...player.stats, speed: 100 } } : player,
+    );
+    service.findEnemy();
+    (service as unknown as { persist: () => void }).persist();
+
+    const validSnapshot = JSON.parse(sessionValue ?? '{}') as {
+      combatState: Record<string, unknown>;
+    };
+    const malformedFields: readonly [string, unknown][] = [
+      ['enemyIntent', { kind: 'attack', minValue: -1, maxValue: 0 }],
+      ['playerBlock', -1],
+      ['enemyBlock', Number.MAX_SAFE_INTEGER + 1],
+      ['enemyHexed', 'yes'],
+    ];
+
+    for (const [field, value] of malformedFields) {
+      sessionValue = JSON.stringify({
+        ...validSnapshot,
+        combatState: { ...validSnapshot.combatState, [field]: value },
+      });
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          GameSessionService,
+          {
+            provide: SESSION_STORAGE,
+            useValue: {
+              read: () => sessionValue,
+              write: () => undefined,
+              clear: () => (sessionValue = null),
+            },
+          },
+          {
+            provide: RECORDS_STORAGE,
+            useValue: { read: () => null, write: () => undefined, clear: () => undefined },
+          },
+        ],
+      });
+      const restored = TestBed.inject(GameSessionService);
+
+      expect(restored.screen()).toBe('welcome');
+      expect(sessionValue).toBeNull();
+    }
+  });
+
+  it('restores store offers without rerolling them', () => {
+    service.setPlayerName('David');
+    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
+    service.startRun();
+    const storeNode = service.routeMap()?.nodes.find((node) => node.kind === 'store');
+    if (!storeNode) throw new Error('Expected a store route node.');
+
+    service.chooseRouteNode(storeNode.id);
+    (service as unknown as { persist: () => void }).persist();
+    const savedSnapshot = JSON.parse(sessionValue ?? '{}') as {
+      storeItems: readonly { id: string }[];
+    };
+    const savedOfferIds = savedSnapshot.storeItems.map((item) => item.id);
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        GameSessionService,
+        {
+          provide: SESSION_STORAGE,
+          useValue: {
+            read: () => sessionValue,
+            write: () => undefined,
+            clear: () => (sessionValue = null),
+          },
+        },
+        {
+          provide: RECORDS_STORAGE,
+          useValue: { read: () => null, write: () => undefined, clear: () => undefined },
+        },
+      ],
+    });
+    const restored = TestBed.inject(GameSessionService);
+
+    expect(restored.screen()).toBe('store');
+    expect(restored.storeItems().map((item) => item.id)).toEqual(savedOfferIds);
   });
 
   it('resets the audio adapter when saved preferences are malformed', () => {

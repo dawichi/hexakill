@@ -1,6 +1,6 @@
 # Dependency Inventory
 
-**Status:** Active root inventory reviewed 2026-08-15.
+**Status:** Active root inventory reviewed 2026-08-23.
 
 The repository has two deliberately separate dependency graphs. The root graph is the only supported build target; `legacy/svelte/package.json` is historical evidence and has no committed lockfile.
 
@@ -13,7 +13,7 @@ The repository has two deliberately separate dependency graphs. The root graph i
 | Build/test | `@angular/build`, `@angular/cli`, `@angular/compiler-cli` | Build, development server, strict compiler, and unit-test builder |
 | Browser tests | `@playwright/test` | Chromium critical journeys and production-artifact checks |
 | Unit tests | `jsdom`, `vitest` | DOM-like test environment and deterministic unit tests |
-| Formatting/types | `prettier`, `typescript` | Repository formatting and TypeScript compiler baseline |
+| Formatting/linting/types | `@biomejs/biome`, `typescript` | Repository formatting, focused linting, and TypeScript compiler baseline |
 
 The active graph does not use Angular Router or Angular Forms: the app has one screen-level session state and native labelled inputs. Those generated direct dependencies were removed on 2026-08-15. No active source imports Svelte, SvelteKit, Tailwind, Flowbite, Iconify, or the archived CDN UI libraries.
 

@@ -194,9 +194,11 @@ export class App implements OnDestroy {
   }
 
   protected recordCharacter(record: PersonalRecord): CharacterDefinition {
+    const firstCharacter = this.session.characters[0];
+    if (!firstCharacter) throw new Error('At least one character must be configured.');
     return (
       this.session.characters.find((character) => character.id === record.characterId) ??
-      this.session.characters[0]
+      firstCharacter
     );
   }
 

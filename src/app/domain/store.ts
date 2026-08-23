@@ -54,7 +54,7 @@ function shuffle<T>(values: readonly T[], random: () => number): T[] {
   const result = [...values];
   for (let index = result.length - 1; index > 0; index -= 1) {
     const target = Math.min(index, Math.floor(random() * (index + 1)));
-    [result[index], result[target]] = [result[target], result[index]];
+    [result[index], result[target]] = [result[target]!, result[index]!];
   }
   return result;
 }

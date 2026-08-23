@@ -16,7 +16,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 ### TODO-002 [High] Repair validation commands
 
 - **Status:** Resolved for active root; archived Svelte commands retained as historical failures
-- **Affected area:** `package.json`, SvelteKit generated config, Prettier/ESLint configuration
+- **Affected area:** archived SvelteKit generated config and historical Prettier/ESLint configuration
 - **Evidence:** `npm run check` references missing `jsconfig.json`; `npm run lint` cannot resolve the Svelte parser; `npm run build` cannot resolve the SvelteKit Vite peer.
 - **Risk:** A future agent cannot establish a trustworthy green baseline.
 - **Next action:** Keep root format/test/build/browser/production-preview commands aligned; do not revive archived Svelte commands without a deliberate decision.
@@ -83,8 +83,8 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** Active root Angular application and CI
-- **Current baseline (2026-08-23):** The active root now has 15 test files and 107 passing unit/component tests, plus 27 passing Playwright journeys. The newer combat coverage includes visible enemy intents, Guard/Block, Arcane marks, staged feedback, and health presentation; the older evidence paragraph below remains historical characterization detail.
-- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app has 13 deterministic unit/component test files with 93 passing tests, including enemy-action thresholds, finite random-roll boundary rejection, non-finite and unsafe-integer enemy-generation/progression level and boss-progress rejection, unsafe generated-level and victory level/gold overflow rejection, overflow-sized victory experience rejection, unknown damage-kind and action rejection, safe-integer enemy potion validation and store potion-overflow rejection, malformed combat stats/resistance/damage-total/speed/potion-state rejection, invalid heal-input rejection, integer power-up-count and unknown power-up identifier rejection, malformed store gold/potion/inventory/stat-state rejection, invalid numeric reducer payload rejection, strict legacy critical/miss-threshold boundaries, name-field validation semantics, terminal-phase action rejection, impossible terminal-session rejection, labeled champion/combat/store control groups, skip-link keyboard access, power-up caps, state reset/spawn boundaries, repeatable and invalid store purchases, legacy numeric rounding/fractional-level boundaries, multi-level reward and global power-up-cap boundaries, observed enemy attack-strip mappings including Evil Wizard Magic and named idle strips, Witch Blue vertical-strip mapping, canonical restored-character binding, and level-up audio parity, plus injectable random/clock/storage/audio/records/preferences ports, application transition coverage including malformed player-action result rejection, malformed persistence-boundary rejection, resolving-player-action and enemy-turn transient-session recovery, and twenty-six Playwright journeys for store/combat, Wizard Attack1/Attack2 and idle strips plus Samurai player-action sprite rendering, mapped physical/Magic enemy attack/defeat-strip rendering, reload restore, audio-preference and personal-record malformed-input recovery, invalid/incoherent-screen/transient-combat-action/malformed-combat-result/whitespace-only/negative-stat/duplicate-inventory/over-cap-power-up/unbound-character persistence recovery, keyboard/focus transitions including skip-link navigation, responsive reduced-motion behavior, defeat/history/records, rewards/power-ups, and sequential bosses. The same journeys pass against the built static artifact, with production journeys isolated from unrelated services already occupying the preview port.
+- **Current baseline (2026-08-23):** The active root now has 18 test files and 123 passing unit/component tests, plus 27 passing Playwright journeys. The newer combat coverage includes visible enemy intents, Guard/Block, Arcane marks, staged feedback, health presentation, malformed optional combat-state rejection, and stable store-offer restoration; older evidence paragraphs below remain historical characterization detail.
+- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app now has 18 deterministic unit/component test files with 123 passing tests, including the historical rule coverage plus optional combat-state validation, store-offer restoration, and relic Arcane-mark multiplier fixtures; 27 Playwright journeys cover the active browser contract and the built static artifact.
 - **Current browser evidence:** The existing 26-journey suite also asserts Wizard player hit rendering, Knight's idle strip, Witch Blue's vertical idle and damage strips, and rejection of persisted resolving-player-action and enemy-turn phases against both development and production-like artifacts.
 - **Current application evidence:** Player/enemy battle-log entries are typed, reset with a new run, capped at the legacy eight-entry window, include legacy-style victory/defeat outcomes, and are covered by application and browser assertions; they are intentionally excluded from durable session persistence.
 - **Risk:** Final balance, accessibility, and uncharacterized edge cases can still regress outside the current automated journeys.
@@ -106,11 +106,11 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 ### TODO-010 [Medium] Consolidate presentation systems
 
-- **Status:** Deferred
-- **Affected area:** Tailwind, Flowbite-Svelte, Bootstrap Icons, Iconify, Animate.css, component CSS
-- **Evidence:** Multiple styling/icon/animation systems coexist and ownership is undocumented.
-- **Risk:** Inconsistent visuals, larger payloads, and migration friction.
-- **Next action:** Select a primary styling/icon/animation strategy and document allowed exceptions in the target design system.
+- **Status:** Resolved for the active Angular root; archived systems remain historical evidence.
+- **Affected area:** Active component CSS and Lucide icons; archived Svelte styling is out of the active dependency graph.
+- **Evidence:** The active root uses authored CSS plus `@lucide/angular`; no Tailwind, Flowbite, Bootstrap Icons, Iconify, or Animate.css dependency is active.
+- **Risk:** Future feature work could reintroduce competing systems without a design decision.
+- **Next action:** Keep new screen components on the active CSS/Lucide boundary and record any deliberate exception in an ADR.
 - **Dependencies:** TODO-009
 - **Owner:** Future UI agent
 - **Target:** Rewrite UI foundation
@@ -154,7 +154,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 - **Affected area:** CI configuration, lockfile, audit tooling, branch protection
 - **Evidence:** The Angular root has a committed lockfile, `npm ci`, `npm audit --audit-level=high` with 0 high-severity vulnerabilities, a committed `npm run verify:release` aggregate gate, formatting/TypeScript/test/browser/build/asset/preview-contract CI gates, local validation evidence, and a workflow step configured to retain test/build reports for 14 days. Branch protection and successful remote workflow execution are not verified from this checkout.
 - **Risk:** Broken builds, dependency vulnerabilities, and quality regressions can merge unnoticed.
-- **Next action:** Verify the remote artifact upload and confirm required checks protect the promoted Angular delivery; select an Angular lint policy only if future complexity warrants it.
+- **Next action:** Verify the remote artifact upload and confirm required checks protect the promoted Angular delivery; retain the committed Biome lint/format policy as the active quality baseline.
 - **Dependencies:** TODO-001, TODO-002, TODO-008
 - **Owner:** Future operations agent
 - **Target:** Before merging rewrite features

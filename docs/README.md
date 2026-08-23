@@ -30,6 +30,7 @@ This directory is the local operating manual for Hexakill and future AI develope
 
 - [Framework evaluation](architecture/rewrite-evaluation.md) — Astro, Angular, and modern SvelteKit comparison for this game.
 - [Target architecture proposal](architecture/rewrite-target.md) — proposed domain/application/UI boundaries and staged migration plan.
+- [Rewrite migration history](architecture/rewrite-migration.md) — historical record of the isolated Angular prototype promotion.
 - [Initial player-stat parity](architecture/initial-player-stat-parity.md) — accepted level-4 opening-stat rule and its characterization.
 - [Relic shop contract](architecture/rewrite-store.md) — passive relics, consumable supplies, persistent health, and current balance rules.
 - [Relic system redesign plan](features/relic-system-plan.md) — implemented Block model, quality tiers, store offer rules, and remaining tuning work.

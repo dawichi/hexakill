@@ -22,7 +22,9 @@ describe('store rules', () => {
     expect(result.player.gold).toBe(1650);
     expect(result.player.stats).toEqual(player.stats);
     expect(result.player.inventory).toHaveLength(1);
-    expect(result.player.inventory[0].description).toContain('10% more damage');
+    const purchasedItem = result.player.inventory[0];
+    if (!purchasedItem) throw new Error('Expected the purchased relic in the inventory.');
+    expect(purchasedItem.description).toContain('10% more damage');
     expect(purchaseItem(result.player, 'honed-edge').purchased).toBe(false);
   });
 
@@ -107,7 +109,10 @@ describe('store rules', () => {
     ).toThrow(RangeError);
     expect(() =>
       purchaseItem(
-        { ...player, inventory: [{ ...player.inventory[0], id: 'unknown' }] },
+        {
+          ...player,
+          inventory: [{ ...RELIC_CATALOG[0]!, id: 'unknown' }],
+        },
         'honed-edge',
       ),
     ).toThrow(RangeError);

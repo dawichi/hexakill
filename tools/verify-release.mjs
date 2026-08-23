@@ -8,6 +8,7 @@ const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const checks = [
   { label: 'toolchain', args: ['run', 'verify:toolchain'] },
   { label: 'formatting', args: ['run', 'format:check'] },
+  { label: 'linting', args: ['run', 'lint'] },
   { label: 'TypeScript', args: ['run', 'verify:types'] },
   { label: 'documentation', args: ['run', 'verify:docs'] },
   { label: 'root migration', args: ['run', 'verify:migration'] },

@@ -28,7 +28,11 @@ function statsAtLevel(level: number): Stats {
   return stats;
 }
 
-export const CHARACTER_DEFINITIONS: readonly CharacterDefinition[] = [
+export const CHARACTER_DEFINITIONS: readonly [
+  CharacterDefinition,
+  CharacterDefinition,
+  CharacterDefinition,
+] = [
   {
     id: 'wizard',
     name: 'Wizard',

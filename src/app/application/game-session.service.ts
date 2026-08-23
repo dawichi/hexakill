@@ -6,7 +6,6 @@ import {
   determineFirstActor,
   guardBlockAmount,
   resolveHeal,
-  resolveAction,
 } from '../domain/combat-actions';
 import {
   applyPowerUp,
@@ -28,6 +27,7 @@ import {
 } from '../domain/store';
 import {
   relicBloodLedgerHeal,
+  relicArcaneMarkMultiplier,
   relicCrownOfThornsDamage,
   relicCrownOfThornsVenom,
   relicDamageRules,
@@ -57,6 +57,7 @@ import {
   EnemyIntent,
   INITIAL_COMBAT_STATE,
   CombatState,
+  isEnemyIntent,
   transitionCombat,
 } from '../domain/combat-state';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
@@ -109,7 +110,13 @@ export interface DefeatedEnemySummary {
 }
 
 export type CombatFeedbackKind =
-  'damage' | 'critical' | 'miss' | 'blocked' | 'heal' | 'guard' | 'hex';
+  | 'damage'
+  | 'critical'
+  | 'miss'
+  | 'blocked'
+  | 'heal'
+  | 'guard'
+  | 'hex';
 
 export interface CombatFeedback {
   readonly id: number;
@@ -128,6 +135,7 @@ interface StoredSessionSnapshot {
   readonly combatState: CombatState;
   readonly routeFloor?: number;
   readonly routeMap?: RouteMapState | null;
+  readonly storeItems?: readonly ItemState[];
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -300,6 +308,10 @@ function isRestorableCombatState(value: unknown): value is CombatState {
     'turn',
   ] as const;
   const relicFlags = value['relicFlags'];
+  const enemyIntent = value['enemyIntent'];
+  const playerBlock = value['playerBlock'];
+  const enemyBlock = value['enemyBlock'];
+  const enemyHexed = value['enemyHexed'];
   return (
     typeof value['phase'] === 'string' &&
     phases.includes(value['phase']) &&
@@ -314,10 +326,24 @@ function isRestorableCombatState(value: unknown): value is CombatState {
       value['openingActor'] === null ||
       value['openingActor'] === 'player' ||
       value['openingActor'] === 'enemy') &&
+    (enemyIntent === undefined || enemyIntent === null || isEnemyIntent(enemyIntent)) &&
+    (playerBlock === undefined || isNonNegativeInteger(playerBlock)) &&
+    (enemyBlock === undefined || isNonNegativeInteger(enemyBlock)) &&
+    (enemyHexed === undefined || typeof enemyHexed === 'boolean') &&
     (relicFlags === undefined ||
       (isRecord(relicFlags) &&
         Object.values(relicFlags).every((flag) => typeof flag === 'boolean'))) &&
     coherentLastResult
+  );
+}
+
+function isRestorableStoreItems(value: unknown): value is readonly ItemState[] {
+  if (!Array.isArray(value)) return false;
+
+  const ids = value.map((item) => (isRecord(item) ? item['id'] : undefined));
+  return (
+    ids.every((id) => typeof id === 'string' && STORE_ITEMS.some((item) => item.id === id)) &&
+    new Set(ids).size === ids.length
   );
 }
 
@@ -371,10 +397,11 @@ function hasCoherentSessionState(snapshot: Partial<StoredSessionSnapshot>): bool
   if (snapshot.screen === 'store') {
     const storeEnemy = snapshot.combatState?.enemy;
     return (
-      phase === 'victory' &&
-      storeEnemy !== null &&
-      storeEnemy !== undefined &&
-      storeEnemy.damageTaken >= storeEnemy.stats.health &&
+      ((phase === 'idle' && storeEnemy === null) ||
+        (phase === 'victory' &&
+          storeEnemy !== null &&
+          storeEnemy !== undefined &&
+          storeEnemy.damageTaken >= storeEnemy.stats.health)) &&
       (snapshot.routeMap === null || snapshot.routeMap === undefined)
     );
   }
@@ -805,7 +832,8 @@ export class GameSessionService {
     const previousEnemyHealth = enemy.stats.health - enemy.damageTaken;
     const damageRules = relicDamageRules(player, kind, this.relicContext(player));
     const damageMultiplier =
-      damageRules.damageMultiplier * (kind === 'attack' && enemyHexed ? 1.45 : 1);
+      damageRules.damageMultiplier *
+      (kind === 'attack' && enemyHexed ? relicArcaneMarkMultiplier(player) : 1);
     const result = resolveDamage(
       { stats: player.stats },
       enemy,
@@ -1494,6 +1522,7 @@ export class GameSessionService {
         combatState: this.combatState(),
         routeFloor: this.routeFloor(),
         routeMap: this.routeMap(),
+        storeItems: this.screen() === 'store' ? this.storeItems() : undefined,
       }),
     );
   }
@@ -1596,6 +1625,7 @@ export class GameSessionService {
         (snapshot.routeMap !== undefined &&
           snapshot.routeMap !== null &&
           !isRouteMapState(snapshot.routeMap)) ||
+        (snapshot.storeItems !== undefined && !isRestorableStoreItems(snapshot.storeItems)) ||
         !isRestorableCombatState(snapshot.combatState) ||
         (snapshot.player !== null && !isRestorablePlayer(snapshot.player)) ||
         (snapshot.selectedCharacterId !== null && !selectedCharacter) ||
@@ -1669,7 +1699,11 @@ export class GameSessionService {
         this.screen.set(snapshot.screen as GameScreen);
         if (snapshot.screen === 'store') {
           this.storeItems.set(
-            generateStoreOffers(this.player()!, { floor: routeFloor, random: this.random }),
+            snapshot.storeItems
+              ? snapshot.storeItems.map(
+                  (item) => STORE_ITEMS.find((candidate) => candidate.id === item.id) ?? item,
+                )
+              : generateStoreOffers(this.player()!, { floor: routeFloor, random: this.random }),
           );
         }
         this.actionReady.set(

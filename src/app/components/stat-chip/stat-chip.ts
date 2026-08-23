@@ -169,7 +169,8 @@ export class StatChipComponent {
     this.format() === 'modifier' ? `×${this.value()}` : this.value().toLocaleString(),
   );
   protected readonly damageRange = computed(() => {
-    const multiplier = this.stat() === 'ad' ? [0.85, 1.15] : [0.75, 1.25];
+    const multiplier: readonly [number, number] =
+      this.stat() === 'ad' ? [0.85, 1.15] : [0.75, 1.25];
     const minimum = Math.round(this.value() * multiplier[0]);
     const maximum = Math.round(this.value() * multiplier[1]);
     return `${minimum.toLocaleString()}–${maximum.toLocaleString()}`;

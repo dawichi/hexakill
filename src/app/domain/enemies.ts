@@ -401,6 +401,7 @@ export function generateEnemy(
 
   if (playerLevel >= 10 && bossesDefeated < BOSS_DEFINITIONS.length) {
     const definition = BOSS_DEFINITIONS[bossesDefeated];
+    if (!definition) throw new RangeError('Boss definition is missing for the requested progress.');
     const level = 15 + bossesDefeated * 10;
     return {
       definition,
@@ -423,6 +424,7 @@ export function generateEnemy(
     throw new RangeError('Generated enemy level must be a safe integer.');
   }
   const definition = regularEnemies[Math.floor(definitionRoll * regularEnemies.length)];
+  if (!definition) throw new RangeError('No regular enemy definition is available.');
   return {
     definition,
     level,

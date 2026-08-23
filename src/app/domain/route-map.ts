@@ -61,6 +61,7 @@ export function createRouteMap(floor: number, routeRoll: number): RouteMapState 
   assertFloor(floor);
   assertRoll(routeRoll);
   const pattern = ROUTE_PATTERNS[Math.floor(routeRoll * ROUTE_PATTERNS.length)];
+  if (!pattern) throw new RangeError('Route pattern is missing for the requested roll.');
   const hiddenCount = routeRoll < 0.5 ? 1 : 2;
   const firstHiddenIndex = 1 + (Math.floor(routeRoll * 2) % 2);
   const hiddenIndexes = new Set<number>([firstHiddenIndex]);

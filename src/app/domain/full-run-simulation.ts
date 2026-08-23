@@ -176,21 +176,25 @@ function balancedRoutePolicy(context: RunDecisionContext): RouteNode {
     if (elite) return elite;
   }
 
+  const firstNode = context.nodes[0];
+  if (!firstNode) throw new RangeError('A route policy requires at least one node.');
   return (
     chooseFirst(visibleNodes(context, 'battle'), context) ??
     chooseFirst(visibleNodes(context, 'rest'), context) ??
     chooseFirst(visibleNodes(context, 'store'), context) ??
-    context.nodes[0]
+    firstNode
   );
 }
 
 function aggressiveRoutePolicy(context: RunDecisionContext): RouteNode {
+  const firstNode = context.nodes[0];
+  if (!firstNode) throw new RangeError('A route policy requires at least one node.');
   return (
     chooseFirst(visibleNodes(context, 'elite'), context) ??
     chooseFirst(visibleNodes(context, 'battle'), context) ??
     chooseFirst(visibleNodes(context, 'store'), context) ??
     chooseFirst(visibleNodes(context, 'rest'), context) ??
-    context.nodes[0]
+    firstNode
   );
 }
 
@@ -200,12 +204,14 @@ function safeRoutePolicy(context: RunDecisionContext): RouteNode {
     const rest = chooseFirst(visibleNodes(context, 'rest'), context);
     if (rest) return rest;
   }
+  const firstNode = context.nodes[0];
+  if (!firstNode) throw new RangeError('A route policy requires at least one node.');
   return (
     chooseFirst(visibleNodes(context, 'store'), context) ??
     chooseFirst(visibleNodes(context, 'battle'), context) ??
     chooseFirst(visibleNodes(context, 'rest'), context) ??
     chooseFirst(visibleNodes(context, 'elite'), context) ??
-    context.nodes[0]
+    firstNode
   );
 }
 
@@ -216,7 +222,10 @@ export const ROUTE_POLICIES: Readonly<Record<RoutePolicyId, RoutePolicy>> = {
   random: (context) =>
     context.nodes[
       Math.min(context.nodes.length - 1, Math.floor(context.randomChoice() * context.nodes.length))
-    ],
+    ] ??
+    (() => {
+      throw new RangeError('A route policy requires at least one node.');
+    })(),
 };
 
 function powerUpPreference(player: PlayerState): readonly ('health' | 'ad' | 'ap' | 'speed')[] {

@@ -120,7 +120,7 @@ function isPlayerCombatAction(value: unknown): value is PlayerCombatAction {
   return isDamageKind(value) || value === 'guard';
 }
 
-function isEnemyIntent(value: unknown): value is EnemyIntent {
+export function isEnemyIntent(value: unknown): value is EnemyIntent {
   if (typeof value !== 'object' || value === null) return false;
   const intent = value as EnemyIntent;
   return (
