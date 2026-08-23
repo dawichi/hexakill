@@ -15,6 +15,7 @@
     "verify:migration": "node tools/verify-migration.mjs",
     "verify:release": "node tools/verify-release.mjs",
     "verify:toolchain": "node tools/verify-toolchain.mjs",
+    "simulate:balance": "node tools/run-balance-simulation.mjs",
     "verify:types": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
