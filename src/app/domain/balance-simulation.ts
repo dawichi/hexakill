@@ -66,6 +66,7 @@ export interface EncounterSimulationResult {
   /** Number of player decisions made, which is the most useful combat-length measure. */
   readonly turns: number;
   readonly playerHealth: number;
+  readonly playerPotions: number;
   readonly enemyHealth: number;
   readonly potionsUsed: number;
   readonly damageDealt: number;
@@ -139,7 +140,7 @@ const EMPTY_INTENT_COUNTS: Record<EnemyIntentKind, number> = {
   heal: 0,
 };
 
-function createSeededRandom(seed: number): () => number {
+export function createSeededRandom(seed: number): () => number {
   let state = seed >>> 0 || 1;
   return () => {
     state = (state + 0x6d2b79f5) >>> 0;
@@ -171,7 +172,7 @@ function percentage(value: number, total: number): number {
   return total > 0 ? value / total : 0;
 }
 
-function strengthenElite(enemy: EnemyState): EnemyState {
+export function strengthenElite(enemy: EnemyState): EnemyState {
   const stats = { ...enemy.stats };
   (Object.keys(stats) as (keyof Stats)[]).forEach((stat) => {
     stats[stat] = Math.round(stats[stat] * 1.3);
@@ -566,6 +567,7 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
     result,
     turns: playerTurns,
     playerHealth: remainingHealth(player.stats, playerDamageTaken),
+    playerPotions: player.potions,
     enemyHealth: remainingHealth(enemy.stats, enemy.damageTaken),
     potionsUsed,
     damageDealt: damageDealtTotal,

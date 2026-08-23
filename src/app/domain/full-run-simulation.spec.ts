@@ -1,0 +1,76 @@
+import { describe, expect, it } from 'vitest';
+import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
+import { ROUTE_POLICIES, runFullRunReport, simulateFullRun } from './full-run-simulation';
+import { RouteMapState, RouteNode } from './route-map';
+
+describe('full-run simulation', () => {
+  it('replays the same route, combat, and economy with a fixed seed', () => {
+    const options = {
+      characterId: 'wizard' as const,
+      combatPolicy: 'reactive' as const,
+      routePolicy: 'balanced' as const,
+      seed: 123,
+      collectTrace: true,
+    };
+
+    expect(simulateFullRun(options)).toEqual(simulateFullRun(options));
+  });
+
+  it('does not let route policies inspect hidden door contents', () => {
+    const player = createInitialPlayer('Tester', CHARACTER_DEFINITIONS[0]);
+    const visibleBattle: RouteNode = {
+      id: 'battle',
+      kind: 'battle',
+      title: 'Battle',
+      description: '',
+      reward: '',
+    };
+    const hiddenElite: RouteNode = {
+      id: 'hidden-one',
+      kind: 'elite',
+      hidden: true,
+      title: 'Unknown',
+      description: '',
+      reward: '',
+    };
+    const hiddenRest: RouteNode = {
+      id: 'hidden-two',
+      kind: 'rest',
+      hidden: true,
+      title: 'Unknown',
+      description: '',
+      reward: '',
+    };
+    const map: RouteMapState = { floor: 1, nodes: [visibleBattle, hiddenElite, hiddenRest] };
+    const context = {
+      player,
+      playerDamageTaken: 0,
+      map,
+      nodes: map.nodes,
+      randomChoice: () => 0,
+    };
+    const alteredMap: RouteMapState = {
+      ...map,
+      nodes: [visibleBattle, { ...hiddenElite, kind: 'rest' }, { ...hiddenRest, kind: 'elite' }],
+    };
+
+    expect(ROUTE_POLICIES.balanced(context).id).toBe(
+      ROUTE_POLICIES.balanced({ ...context, map: alteredMap, nodes: alteredMap.nodes }).id,
+    );
+  });
+
+  it('reports route policy and character cells', () => {
+    const report = runFullRunReport({
+      characters: ['wizard'],
+      combatPolicies: ['reactive'],
+      routePolicies: ['balanced', 'aggressive'],
+      samplesPerCell: 4,
+      maxRooms: 8,
+      seed: 8,
+    });
+
+    expect(report.summaries).toHaveLength(2);
+    expect(report.summaries.every((summary) => summary.samples === 4)).toBe(true);
+    expect(report.summaries.every((summary) => summary.completionRate >= 0)).toBe(true);
+  });
+});

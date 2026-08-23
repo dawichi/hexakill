@@ -51,8 +51,29 @@ Simulation output is evidence for balance decisions, not a replacement for human
 bot can expose a mathematical problem, while a human still needs to validate readability,
 decision quality, and game feel.
 
-## Current scope
+## Full-run lab
 
-The first version simulates single encounters. It does not yet model route selection, campfires,
-merchant purchases, relic acquisition, or full-run completion. Those should be added only after the
-encounter report gives us a stable combat baseline.
+The second command simulates the complete route loop, including combat rewards, level-ups,
+power-ups, hidden doors, campfires, merchants, relic purchases, potion purchases, elite rooms, and
+the three-boss completion condition:
+
+```sh
+npm run simulate:full-run
+FULL_RUN_SAMPLES=1000 npm run simulate:full-run
+```
+
+The full-run report compares class and reactive combat policies against balanced, aggressive, and
+safe route policies. Route policies only inspect revealed door kinds; hidden doors remain unknown
+until selected. Combat seeds, route rolls, and policy decisions are deterministic and reproducible.
+
+Important full-run signals include completion rate, rooms survived, boss progress, relic count,
+campfire/store frequency, gold spent, and final health. The first baseline currently shows that
+reactive policies survive substantially longer than class-only policies, but the three-boss
+completion rate is still zero in the initial sample. That is an investigation signal—not a final
+balance verdict—because route heuristics and the boss curve still need deliberate tuning.
+
+## Current scope and next layer
+
+The lab now covers single encounters and full runs. It does not yet model human telemetry, event
+rooms, a learned policy, or confidence intervals/CSV export. Those should come after we establish
+the intended normal/elite/boss difficulty targets from the current report and manual playtests.

@@ -57,6 +57,7 @@ describe('balance simulation', () => {
     expect(['win', 'loss', 'draw']).toContain(result.result);
     expect(result.turns).toBeLessThanOrEqual(20);
     expect(result.playerHealth).toBeGreaterThanOrEqual(0);
+    expect(result.playerPotions).toBeGreaterThanOrEqual(0);
     expect(result.enemyHealth).toBeGreaterThanOrEqual(0);
     expect(result.damageDealt).toBeGreaterThanOrEqual(0);
     expect(result.damageTaken).toBeGreaterThanOrEqual(0);
