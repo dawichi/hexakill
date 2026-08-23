@@ -1,6 +1,13 @@
 import { applyPowerUp, applyVictoryReward } from './progression';
 import { createRouteMap, RouteMapState, RouteNode, RouteNodeKind } from './route-map';
-import { purchaseItem, purchasePotions, relicVictoryHealAmount, STORE_ITEMS } from './store';
+import {
+  generateStoreOffers,
+  purchaseItem,
+  purchasePotions,
+  relicVictoryHealAmount,
+  STORE_ITEMS,
+} from './store';
+import { relicVictoryMaxHealthBonus } from './relic-rules';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
 import { generateEnemy } from './enemies';
 import {
@@ -233,28 +240,39 @@ function applyPendingPowerUps(player: PlayerState): PlayerState {
 function relicPreference(player: PlayerState): readonly string[] {
   if (player.character.id === 'wizard') {
     return [
-      'arcane-lens',
-      'ironbark',
-      'alchemist-flask',
-      'blood-chalice',
-      'gilded-eye',
-      'whetstone',
+      'apprentices-codex',
+      'arcane-battery',
+      'hexglass-prism',
+      'alchemists-crown',
+      'the-hourglass',
+      'potion-satchel',
     ];
   }
   if (player.character.id === 'samurai') {
     return [
-      'whetstone',
-      'ironbark',
-      'blood-chalice',
-      'alchemist-flask',
-      'gilded-eye',
-      'arcane-lens',
+      'honed-edge',
+      'echoing-blade',
+      'oath-of-first-strike',
+      'guarders-buckler',
+      'war-drums',
+      'swiftstep-anklet',
     ];
   }
-  return ['ironbark', 'blood-chalice', 'alchemist-flask', 'whetstone', 'gilded-eye', 'arcane-lens'];
+  return [
+    'guarders-buckler',
+    'vitality-moss',
+    'thornmail',
+    'dungeon-heart',
+    'potion-satchel',
+    'swiftstep-anklet',
+  ];
 }
 
-function shopOnce(player: PlayerState): {
+function shopOnce(
+  player: PlayerState,
+  floor: number,
+  random: () => number,
+): {
   player: PlayerState;
   goldSpent: number;
   potionsBought: number;
@@ -262,12 +280,10 @@ function shopOnce(player: PlayerState): {
   let next = player;
   let goldSpent = 0;
   let potionsBought = 0;
+  const offers = generateStoreOffers(next, { floor, random });
   const preferredItem = relicPreference(next)
-    .map((id) => STORE_ITEMS.find((item) => item.id === id))
-    .find(
-      (item) =>
-        item && next.gold >= item.price && !next.inventory.some((owned) => owned.id === item.id),
-    );
+    .map((id) => offers.find((item) => item.id === id))
+    .find((item) => item && next.gold >= item.price);
 
   if (preferredItem) {
     const result = purchaseItem(next, preferredItem.id);
@@ -333,7 +349,18 @@ function runEncounter(
   }
 
   const damageBeforeVictoryHeal = Math.max(0, player.stats.health - encounter.playerHealth);
-  let rewardedPlayer = applyVictoryReward(playerAfterCombat, enemy);
+  const rewardedPlayerBase = applyVictoryReward(playerAfterCombat, enemy);
+  const maxHealthBonus = relicVictoryMaxHealthBonus(rewardedPlayerBase);
+  let rewardedPlayer =
+    maxHealthBonus > 0
+      ? {
+          ...rewardedPlayerBase,
+          stats: {
+            ...rewardedPlayerBase.stats,
+            health: rewardedPlayerBase.stats.health + maxHealthBonus,
+          },
+        }
+      : rewardedPlayerBase;
   const victoryHeal = relicVictoryHealAmount(rewardedPlayer);
   let rewardedDamageTaken = Math.max(0, damageBeforeVictoryHeal - victoryHeal);
   rewardedPlayer = applyPendingPowerUps(rewardedPlayer);
@@ -447,7 +474,7 @@ export function simulateFullRun(options: FullRunSimulationOptions): FullRunSimul
       }
     } else {
       storesVisited += 1;
-      const shop = shopOnce(player);
+      const shop = shopOnce(player, map.floor, random);
       player = shop.player;
       goldSpent += shop.goldSpent;
       potionsPurchased += shop.potionsBought;

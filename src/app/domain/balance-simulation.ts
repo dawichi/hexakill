@@ -13,11 +13,27 @@ import {
   relicDamageModifiers,
   relicGuardBlockMultiplier,
   relicGuardBreakMultiplier,
-  relicHexMultiplier,
   relicIncomingDamageModifiers,
   relicPotionHealingFraction,
   STORE_ITEMS,
 } from './store';
+import {
+  relicBloodLedgerHeal,
+  relicCrownOfThornsDamage,
+  relicCrownOfThornsVenom,
+  relicDamageRules,
+  relicGuardBonus,
+  relicIncomingDamageMultiplier,
+  relicLethalProtectionAvailable,
+  relicMagicBlock,
+  relicMagicVenom,
+  relicPotionBlock,
+  relicPotionIsFree,
+  relicStartEnemyDamage,
+  relicStartOfCombatBlock,
+  relicThornsDamage,
+  RelicCombatContext,
+} from './relic-rules';
 
 export type SimulationAction = PlayerCombatAction | 'potion';
 export type PlayerPolicyId = 'random' | 'class' | 'reactive' | 'greedy';
@@ -177,7 +193,7 @@ export function strengthenElite(enemy: EnemyState): EnemyState {
   (Object.keys(stats) as (keyof Stats)[]).forEach((stat) => {
     stats[stat] = Math.round(stats[stat] * 1.3);
   });
-  return { ...enemy, stats, gold: Math.round(enemy.gold * 1.5) };
+  return { ...enemy, stats, gold: Math.round(enemy.gold * 1.5), elite: true };
 }
 
 function relicInventory(ids: readonly string[] | undefined): readonly ItemState[] {
@@ -199,6 +215,9 @@ function playerForScenario(scenario: BalanceScenario): PlayerState {
   return {
     ...player,
     inventory,
+    relicCharges: inventory.some((item) => item.id === 'phoenix-feather')
+      ? { 'phoenix-feather': 1 }
+      : {},
     potions: scenario.startingPotions ?? player.potions,
   };
 }
@@ -230,8 +249,7 @@ function damageModifiersForPlayer(
   const relicModifiers = relicDamageModifiers(player, kind);
   return {
     damageMultiplier:
-      (relicModifiers.damageMultiplier ?? 1) *
-      (kind === 'attack' && enemyHexed ? 1.25 * relicHexMultiplier(player) : 1),
+      (relicModifiers.damageMultiplier ?? 1) * (kind === 'attack' && enemyHexed ? 1.45 : 1),
     block: enemyBlock / (kind === 'attack' ? relicGuardBreakMultiplier(player) : 1),
   };
 }
@@ -388,6 +406,14 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
   let playerBlock = 0;
   let enemyBlock = 0;
   let enemyHexed = false;
+  let enemyVenom = 0;
+  let playerActions = 0;
+  let damagingActions = 0;
+  let attackCount = 0;
+  let magicActions = 0;
+  let potionUses = 0;
+  let enemyDamageActions = 0;
+  let relicFlags: Readonly<Record<string, boolean>> = {};
   let turn = 0;
   let playerTurns = 0;
   let potionsUsed = 0;
@@ -402,9 +428,26 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
   const trace: SimulationTraceEvent[] = [];
   let intent = chooseEnemyIntent(enemy, player.stats, combatRandom(), turn);
   let actor = determineFirstActor(player.stats.speed, enemy.stats.speed);
+  const openingActor = actor;
+  playerBlock = relicStartOfCombatBlock(player);
+
+  const relicContext = (overrides: Partial<RelicCombatContext> = {}): RelicCombatContext => ({
+    playerHealth: player.stats.health,
+    playerDamageTaken,
+    playerActions,
+    damagingActions,
+    attackCount,
+    magicActions,
+    potionUses,
+    enemyDamageActions,
+    openingActor,
+    relicFlags,
+    ...overrides,
+  });
 
   while (playerTurns < maxTurns && result === 'draw') {
     if (actor === 'player') {
+      let potionKeepsTurn = false;
       const legalActions = SIMULATION_ACTIONS.filter(
         (action) =>
           action !== 'potion' ||
@@ -439,6 +482,7 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
       playerTurns += 1;
 
       if (action === 'potion') {
+        potionKeepsTurn = relicPotionIsFree(player, relicContext());
         const healResult = resolveHeal(
           playerDamageTaken,
           player.stats.health,
@@ -447,6 +491,12 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
         playerDamageTaken = healResult.damageTaken;
         player = { ...player, potions: Math.max(0, player.potions - 1) };
         potionsUsed += 1;
+        playerActions += 1;
+        potionUses += 1;
+        playerBlock += relicPotionBlock(
+          player,
+          relicContext({ potionUses: potionUses - 1, playerActions: playerActions - 1 }),
+        );
         if (collectTrace) {
           trace.push(
             createTraceEvent(turn, 'player', action, player, playerDamageTaken, enemy, {
@@ -455,7 +505,10 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
           );
         }
       } else if (action === 'guard') {
-        playerBlock = guardBlockAmount(player.stats, relicGuardBlockMultiplier(player));
+        playerBlock +=
+          guardBlockAmount(player.stats, relicGuardBlockMultiplier(player)) +
+          relicGuardBonus(player);
+        playerActions += 1;
         if (collectTrace) {
           trace.push(
             createTraceEvent(turn, 'player', action, player, playerDamageTaken, enemy, {
@@ -465,23 +518,42 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
         }
       } else {
         const previousEnemyHexed = enemyHexed;
+        const damageRules = relicDamageRules(player, action, relicContext());
         const resultForAction = resolveDamage(
           { stats: player.stats },
           { stats: enemy.stats, damageTaken: enemy.damageTaken },
           action,
-          { damageRoll: combatRandom(), chanceRoll: combatRandom() },
           {
-            ...relicDamageModifiers(player, action),
-            ...damageModifiersForPlayer(player, action, enemyBlock, enemyHexed),
+            damageRoll: combatRandom(),
+            chanceRoll: damageRules.guaranteedHit ? Math.max(0.11, combatRandom()) : combatRandom(),
+          },
+          {
+            damageMultiplier:
+              damageRules.damageMultiplier * (action === 'attack' && enemyHexed ? 1.45 : 1),
+            block: enemyBlock / (action === 'attack' ? relicGuardBreakMultiplier(player) : 1),
           },
         );
         const dealt = damageDealt(resultForAction);
+        playerActions += 1;
+        damagingActions += 1;
+        attackCount += action === 'attack' ? 1 : 0;
+        magicActions += action === 'magic' ? 1 : 0;
         damageDealtTotal += dealt;
         enemy = { ...enemy, damageTaken: resultForAction.damageTaken };
         enemyBlock = Math.max(0, enemyBlock - (resultForAction.blocked ?? 0));
         if (action === 'magic' && !resultForAction.missed && dealt > 0) {
           enemyHexed = true;
           hexesApplied += 1;
+          playerBlock += relicMagicBlock(
+            player,
+            relicContext({
+              magicActions: magicActions - 1,
+              damagingActions: damagingActions - 1,
+              playerActions: playerActions - 1,
+            }),
+          );
+          enemyVenom += relicMagicVenom(player);
+          relicFlags = { ...relicFlags, 'arcane-battery-used': true };
         }
         if (action === 'attack' && previousEnemyHexed) hexedAttacks += 1;
         if (action === 'attack' && previousEnemyHexed) enemyHexed = false;
@@ -501,8 +573,22 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
         }
       }
 
-      actor = 'enemy';
+      actor = potionKeepsTurn ? 'player' : 'enemy';
       continue;
+    }
+
+    const venomAtTurnStart = enemyVenom;
+    const startDamage = relicStartEnemyDamage(player) + venomAtTurnStart;
+    enemyVenom = Math.max(0, venomAtTurnStart - (venomAtTurnStart > 0 ? 1 : 0));
+    if (startDamage > 0) {
+      enemy = {
+        ...enemy,
+        damageTaken: Math.min(enemy.stats.health, enemy.damageTaken + startDamage),
+      };
+      if (enemy.damageTaken >= enemy.stats.health) {
+        result = 'win';
+        break;
+      }
     }
 
     intents[intent.kind] += 1;
@@ -535,11 +621,47 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
         { stats: player.stats, damageTaken: playerDamageTaken },
         intent.kind,
         { damageRoll: combatRandom(), chanceRoll: combatRandom() },
-        { ...relicIncomingDamageModifiers(player), block: playerBlock },
+        {
+          receivedDamageMultiplier: relicIncomingDamageMultiplier(player, relicContext()),
+          block: playerBlock,
+        },
       );
       const dealt = damageDealt(resultForAction);
       playerDamageTaken = resultForAction.damageTaken;
       playerBlock = Math.max(0, playerBlock - (resultForAction.blocked ?? 0));
+      const blocked = resultForAction.blocked ?? 0;
+      let reflected = 0;
+      reflected += relicThornsDamage(player, blocked);
+      reflected += relicCrownOfThornsDamage(player, blocked);
+      enemyVenom += relicCrownOfThornsVenom(player, blocked);
+      if (
+        intent.kind === 'magic' &&
+        dealt > 0 &&
+        player.inventory.some((item) => item.id === 'mirror-of-night')
+      ) {
+        reflected += Math.trunc(dealt * 0.25);
+      }
+      if (reflected > 0) {
+        enemy = {
+          ...enemy,
+          damageTaken: Math.min(enemy.stats.health, enemy.damageTaken + reflected),
+        };
+        damageDealtTotal += reflected;
+      }
+      const bloodHeal = relicBloodLedgerHeal(player, relicContext({ playerDamageTaken }));
+      if (bloodHeal > 0 && !relicFlags['blood-ledger-used']) {
+        playerDamageTaken = Math.max(0, playerDamageTaken - bloodHeal);
+        relicFlags = { ...relicFlags, 'blood-ledger-used': true };
+      }
+      if (
+        resultForAction.damageTaken >= player.stats.health &&
+        relicLethalProtectionAvailable(player)
+      ) {
+        playerDamageTaken = Math.max(0, player.stats.health - 1);
+        playerBlock += 30;
+        player = { ...player, relicCharges: { ...player.relicCharges, 'phoenix-feather': 0 } };
+      }
+      enemyDamageActions += 1;
       damageTakenTotal += dealt;
       guardDamagePrevented += resultForAction.blocked ?? 0;
       if (collectTrace) {
@@ -554,6 +676,10 @@ export function simulateEncounter(options: SimulateEncounterOptions): EncounterS
       }
       if (playerDamageTaken >= player.stats.health) {
         result = 'loss';
+        break;
+      }
+      if (enemy.damageTaken >= enemy.stats.health) {
+        result = 'win';
         break;
       }
     }

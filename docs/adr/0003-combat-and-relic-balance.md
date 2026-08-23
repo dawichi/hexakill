@@ -22,9 +22,9 @@ Combat is intentionally predictable enough to support reading an enemy:
 - Guard grants temporary Block derived from Armor and Magic Resist.
 - Each enemy reveals an Attack, Magic, Guard, or Heal intent before acting; Magic can apply an
   Arcane mark that empowers the player's next Attack.
-- Whetstone improves Attack damage and Guard breaking; Arcane Lens improves Magic damage and
-  Arcane mark damage; Ironbark improves the player's Guard block as well as reducing incoming
-  damage.
+- The active catalog contains 30 Normal, Rare, and Epic relics. The first implementation includes
+  action potentiators, additive Block, reactive damage, Venom, route reveal, recovery, economy,
+  and emergency effects; the complete catalog and prices live in the [relic reference list](../features/relics-reference.md).
 
 ## Context
 

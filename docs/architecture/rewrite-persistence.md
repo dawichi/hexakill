@@ -20,6 +20,9 @@ The root application separates the active run from personal records:
 - Restored player and enemy counters use non-negative safe integers, and both player and enemy health must remain positive; malformed numeric state is discarded safely before hydration.
 - Restored run snapshots must match a coherent screen/phase shape: character selection has no player or enemy, combat has an active enemy awaiting action or a defeated enemy showing victory, the route map has a defeated enemy plus a valid three-node route, the store has a defeated enemy and no active route nodes, and game-over has an enemy with a defeat phase and lethal player damage.
 - Restored players reject duplicate one-time inventory IDs and reject power-up snapshots whose pending plus spent total exceeds the global 24-point cap; valid inventory entries are hydrated from the canonical store catalog.
+- Relic charges are stored separately from inventory so a consumed Phoenix Feather remains consumed
+  after reload. Newly added combat counters and passive flags default safely when restoring older v1
+  snapshots.
 - Durable v1 snapshots reject transient `pendingAction` values, malformed `lastResult` values, and structurally valid but incoherent `lastResult`/enemy-damage pairs; the application never resumes an in-flight action or delayed enemy turn after reload.
 - Defeat writes one record; resetting a run preserves the records list.
 - The welcome and game-over views expose the list and a clear action.

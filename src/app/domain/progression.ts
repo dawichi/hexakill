@@ -91,7 +91,8 @@ export function calculateVictoryReward(player: PlayerState, enemy: EnemyState): 
   if (!Number.isSafeInteger(experience) || experience < 0) {
     throw new RangeError('Victory experience must be a non-negative safe integer.');
   }
-  const gold = Math.trunc(enemy.gold * relicVictoryGoldMultiplier(player));
+  const eliteOrBoss = enemy.elite || enemy.definition.archetype === 'boss';
+  const gold = Math.trunc(enemy.gold * relicVictoryGoldMultiplier(player, eliteOrBoss));
   const totalExperience = player.experience + experience;
   if (!Number.isSafeInteger(totalExperience)) {
     throw new RangeError('Total experience must remain a safe integer.');

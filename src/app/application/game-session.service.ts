@@ -198,7 +198,10 @@ function isRestorablePlayer(value: unknown): value is PlayerState {
       inventory.length ||
     (relicCharges !== undefined &&
       (!isRecord(relicCharges) ||
-        Object.values(relicCharges).some((charge) => !isNonNegativeInteger(charge)))) ||
+        Object.entries(relicCharges).some(
+          ([id, charge]) =>
+            !STORE_ITEMS.some((candidate) => candidate.id === id) || !isNonNegativeInteger(charge),
+        ))) ||
     !isRecord(powerUps) ||
     !isNonNegativeInteger(powerUps['pending']) ||
     powerUps['pending'] > MAX_POWER_UPS ||
@@ -286,6 +289,17 @@ function isRestorableCombatState(value: unknown): value is CombatState {
     'victory',
     'defeat',
   ];
+  const combatCounters = [
+    'playerActions',
+    'damagingActions',
+    'attackCount',
+    'magicActions',
+    'potionUses',
+    'enemyDamageActions',
+    'enemyVenom',
+    'turn',
+  ] as const;
+  const relicFlags = value['relicFlags'];
   return (
     typeof value['phase'] === 'string' &&
     phases.includes(value['phase']) &&
@@ -293,6 +307,16 @@ function isRestorableCombatState(value: unknown): value is CombatState {
     isNonNegativeInteger(value['playerDamageTaken']) &&
     (enemy !== null || value['playerDamageTaken'] === 0) &&
     value['pendingAction'] === null &&
+    combatCounters.every(
+      (counter) => value[counter] === undefined || isNonNegativeInteger(value[counter]),
+    ) &&
+    (value['openingActor'] === undefined ||
+      value['openingActor'] === null ||
+      value['openingActor'] === 'player' ||
+      value['openingActor'] === 'enemy') &&
+    (relicFlags === undefined ||
+      (isRecord(relicFlags) &&
+        Object.values(relicFlags).every((flag) => typeof flag === 'boolean'))) &&
     coherentLastResult
   );
 }

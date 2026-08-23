@@ -2,8 +2,8 @@
 
 The active Angular root includes a deterministic, headless encounter simulator in
 [`src/app/domain/balance-simulation.ts`](../src/app/domain/balance-simulation.ts). It reuses the
-current combat rules, enemy intent policy, Guard/block behavior, Arcane mark behavior, and relic
-modifiers without starting Angular or the browser.
+current combat rules, enemy intent policy, Guard/block behavior, Arcane mark behavior, and the
+implemented relic triggers without starting Angular or the browser.
 
 ## Run it
 

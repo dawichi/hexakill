@@ -32,8 +32,8 @@ This directory is the local operating manual for Hexakill and future AI develope
 - [Target architecture proposal](architecture/rewrite-target.md) — proposed domain/application/UI boundaries and staged migration plan.
 - [Initial player-stat parity](architecture/initial-player-stat-parity.md) — accepted level-4 opening-stat rule and its characterization.
 - [Relic shop contract](architecture/rewrite-store.md) — passive relics, consumable supplies, persistent health, and current balance rules.
-- [Relic system redesign plan](features/relic-system-plan.md) — proposed Block model, quality tiers, store offer rules, and implementation sequence.
-- [Relic reference list](features/relics-reference.md) — proposed Normal, Rare, and Epic catalog with prices and Lucide placeholder icons.
+- [Relic system redesign plan](features/relic-system-plan.md) — implemented Block model, quality tiers, store offer rules, and remaining tuning work.
+- [Relic reference list](features/relics-reference.md) — active Normal, Rare, and Epic catalog with prices and Lucide placeholder icons.
 - [ADR index](adr/README.md) — durable decisions and decision candidates.
 
 ## Documentation rules

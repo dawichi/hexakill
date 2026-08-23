@@ -198,9 +198,11 @@ export function relicVictoryHealAmount(player: PlayerState): number {
   return Math.trunc(player.stats.health * percentage);
 }
 
-export function relicVictoryGoldMultiplier(player: PlayerState): number {
+export function relicVictoryGoldMultiplier(player: PlayerState, eliteOrBoss = false): number {
   return (
-    1 + (hasRelic(player, 'coin-purse') ? 0.2 : 0) + (hasRelic(player, 'kings-seal') ? 0.5 : 0)
+    1 +
+    (hasRelic(player, 'coin-purse') ? 0.2 : 0) +
+    (eliteOrBoss && hasRelic(player, 'kings-seal') ? 0.5 : 0)
   );
 }
 

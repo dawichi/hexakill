@@ -1,6 +1,7 @@
 # Relic system redesign plan
 
-**Status:** Proposed design — documentation only. No gameplay implementation has started.
+**Status:** Implemented foundation — relic catalog, tiered offers, Block rules, combat triggers,
+and Lucide icon rendering are live. Balance and feedback remain subject to playtesting.
 
 ## Why the current relic model is being replaced
 
@@ -8,7 +9,7 @@ The current six-item merchant is a useful prototype, but it mostly provides perm
 modifiers: more Attack, more Magic, less damage, more healing, or more gold. That makes a purchase
 feel like a stat upgrade instead of a build decision.
 
-The replacement should make each relic change the way a run is played. A strong relic should make
+The replacement makes each relic change the way a run is played. A strong relic should make
 the player ask a different question in combat:
 
 - Can I build around Block and punish enemies for attacking?
@@ -118,18 +119,20 @@ Offer rules:
 - Store relics use Lucide icons initially. Art assets can be added later without changing the
   effect or inventory contract.
 
-## Implementation order after approval
+## Implementation status and next tuning work
 
-1. Replace the current item effect union with an explicit relic-effect vocabulary and a versioned
-   inventory migration policy.
-2. Finalize Block expiration and trigger timing in pure combat tests.
-3. Implement the relic catalog as data, including quality, price, icon name, and typed effect.
-4. Add one trigger at a time, starting with direct damage, Block grants, and action potentiators.
-5. Replace the full-pool merchant with seeded tiered offers.
-6. Add combat feedback and tooltips for every trigger.
-7. Update the encounter and full-run simulators with relic policies and trigger metrics.
-8. Tune prices, tier weights, and effect magnitudes using simulation plus human runs.
+1. Done — replaced the item effect union with typed relic effects and a save-compatible inventory
+   migration boundary.
+2. Done — finalized additive Block and trigger timing in pure combat tests.
+3. Done — implemented the 30-item catalog with quality, price, Lucide icon, and typed effect.
+4. Done — wired direct damage, Block grants, action potentiators, Venom, reactive damage, and
+   progression triggers into the combat session.
+5. Done — replaced the full-pool merchant with seeded tiered offers.
+6. In progress — the store and inventory render quality-colored Lucide icons; combat feedback for
+   each triggered passive is the next UI polish pass.
+7. Done — updated encounter and full-run simulations to consume the new catalog and core triggers.
+8. Next — tune prices, tier weights, and effect magnitudes using simulation plus human runs.
 
-The catalog is intentionally a proposal. No item should be considered balanced or implemented
-until its trigger can be tested independently and its UI feedback is understandable in a real
-combat.
+The catalog is now the active prototype catalog. Effects are covered by pure rule tests and the
+balance lab, but prices and trigger strength still need human-run tuning. The remaining follow-up
+is richer combat status feedback for triggered relics and a final balance pass.

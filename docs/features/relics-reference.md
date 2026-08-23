@@ -1,6 +1,6 @@
 # Relic reference list
 
-**Status:** Proposed catalog — documentation only. These relics are not implemented yet.
+**Status:** Active prototype catalog — implemented in `src/app/domain/relics.ts`.
 
 Prices are initial hypotheses in gold. Icon names are Lucide suggestions for the first UI pass;
 they are placeholders for future pixel-art item assets.
@@ -52,22 +52,21 @@ condition, or counterplay opportunity.
 | The Hourglass        | `Hourglass`       | 1,300 | For the first **3 player turns** of each combat, your damaging actions deal **25% more damage**.                    |
 | Mirror of Night      | `MoonStar`        | 1,500 | When an enemy Magic action deals health damage, reflect **25% of that damage** back to the enemy.                   |
 | Crown of Thorns      | `Crown`           | 1,400 | When Block absorbs **20 or more damage** from one enemy action, deal **20 effect damage** and apply **3 Venom**.    |
-| Infinite Edge        | `Infinity`        | 1,350 | Every **fourth damaging action** deals an additional **35% effect damage**. The counter resets between combats.     |
+| Infinite Edge        | `Infinity`        | 1,350 | Every **fourth damaging action** deals **35% bonus damage**. The counter resets between combats.                    |
 | Dungeon Heart        | `Heart`           | 1,600 | After victory, gain **+40 maximum Health** and restore **10% maximum Health**.                                      |
 | Void Lantern         | `LampDesk`        | 1,350 | The first enemy Attack or Magic action in each combat deals **50% less damage**.                                    |
 | Oath of First Strike | `Crosshair`       | 1,450 | If you act first, your first damaging action cannot miss and deals **50% bonus damage**.                            |
 | Alchemist's Crown    | `Crown`           | 1,350 | Potions restore **50% maximum Health** instead of 25%, and the first Potion each combat does not consume your turn. |
 | King's Seal          | `BadgeDollarSign` | 1,500 | Elite and boss victories grant **50% more gold and experience**.                                                    |
 
-## Questions to resolve before implementation
+## Implementation notes
 
-- Should effect damage be reduced by resistance, Block, both, or neither by default?
-- Does Block expire at the start of the owner's next turn, or immediately after the protected
-  action resolves?
-- Should `Vitality Moss` and `Dungeon Heart` increase current Health proportionally, leave it
-  unchanged, or heal the difference?
-- Should Venom stack additively, refresh its duration, or increase its damage?
-- Does a relic that grants an extra store offer affect the guaranteed Normal row or add another
-  tier-rolled slot?
-- Should Epic relics be allowed in the first merchant, or only after a minimum route floor?
-- Does the first lethal protection from Phoenix Feather count as a combat trigger or a run trigger?
+- Reactive relic damage resolves as direct effect damage: it does not roll, crit, or miss, and is
+  applied after the protected action. Venom and Soot trigger before the enemy action.
+- Block stacks when it is granted and is consumed by the next incoming action; unused Block is
+  carried until that action resolves and never persists into a new room.
+- Vitality Moss and Dungeon Heart increase maximum Health while leaving current damage taken
+  unchanged; Dungeon Heart also heals after victory.
+- Venom decreases by one stack at the start of each enemy turn.
+- Salvager's Map adds one extra tier-rolled store slot. Epic relics can appear in the first store.
+- Phoenix Feather is a run-scoped one-charge relic and is consumed by the first lethal hit.
