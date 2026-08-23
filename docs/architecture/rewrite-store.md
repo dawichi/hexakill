@@ -2,6 +2,9 @@
 
 **Status:** Implemented gameplay contract; balance remains subject to manual play review.
 
+> This document describes the current prototype pool. The proposed replacement is documented in
+> the [relic system redesign plan](../features/relic-system-plan.md) and [relic reference list](../features/relics-reference.md).
+
 Hexakill now uses two different kinds of run resources:
 
 - **Relics** are one-time purchases with passive effects. They never inflate the player's raw
@@ -11,14 +14,14 @@ Hexakill now uses two different kinds of run resources:
 
 ## Relic pool
 
-| Relic | Price | Passive |
-| --- | ---: | --- |
-| Whetstone | 450 | Attack deals 15% more damage and breaks 50% more Guard. |
-| Arcane Lens | 550 | Magic deals 15% more damage and makes Arcane marks hit harder. |
-| Ironbark | 500 | Incoming enemy damage is reduced by 15%; Guard grants 25% more Block. |
-| Blood Chalice | 600 | Recover 12% of maximum health after victory. |
-| Gilded Eye | 500 | Earn 25% more gold from defeated enemies. |
-| Alchemist Flask | 450 | Potions restore 50% more health. |
+| Relic           | Price | Passive                                                               |
+| --------------- | ----: | --------------------------------------------------------------------- |
+| Whetstone       |   450 | Attack deals 15% more damage and breaks 50% more Guard.               |
+| Arcane Lens     |   550 | Magic deals 15% more damage and makes Arcane marks hit harder.        |
+| Ironbark        |   500 | Incoming enemy damage is reduced by 15%; Guard grants 25% more Block. |
+| Blood Chalice   |   600 | Recover 12% of maximum health after victory.                          |
+| Gilded Eye      |   500 | Earn 25% more gold from defeated enemies.                             |
+| Alchemist Flask |   450 | Potions restore 50% more health.                                      |
 
 The current merchant presents the full pool, disables already-owned relics, and keeps potion
 offers repeatable. The pool can later become a rotating three-offer selection once route identity
