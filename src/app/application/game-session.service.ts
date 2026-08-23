@@ -373,6 +373,8 @@ export class GameSessionService {
   readonly playerBlock = computed(() => this.combatState().playerBlock ?? 0);
   readonly enemyBlock = computed(() => this.combatState().enemyBlock ?? 0);
   readonly enemyHexed = computed(() => this.combatState().enemyHexed ?? false);
+  readonly playerHealthTrail = signal(0);
+  readonly enemyHealthTrail = signal(0);
   readonly enemyAnimation = signal<'idle' | 'attack' | 'hit' | 'defeat'>('idle');
   readonly enemyActionKind = signal<DamageKind | null>(null);
   readonly playerAnimation = signal<'idle' | 'action' | 'hit' | 'defeat'>('idle');
@@ -497,6 +499,8 @@ export class GameSessionService {
 
     this.player.set(createInitialPlayer(name, character));
     this.combatState.set(INITIAL_COMBAT_STATE);
+    this.playerHealthTrail.set(100);
+    this.enemyHealthTrail.set(0);
     this.routeFloor.set(1);
     this.routeMap.set(null);
     this.actionReady.set(false);
@@ -534,6 +538,8 @@ export class GameSessionService {
       return;
     }
     this.routeMap.set(null);
+    this.syncHealthTrail('player', this.playerRemainingHealth(), player.stats.health);
+    this.syncHealthTrail('enemy', spawnedEnemy.stats.health, spawnedEnemy.stats.health);
     this.enemyAnimation.set('idle');
     this.playerAnimation.set('idle');
     this.enemyActionKind.set(null);
@@ -712,6 +718,7 @@ export class GameSessionService {
     if (!player || !enemy || this.combatState().pendingAction !== kind) return;
 
     const enemyHexed = this.combatState().enemyHexed ?? false;
+    const previousEnemyHealth = enemy.stats.health - enemy.damageTaken;
     const relicModifiers = relicDamageModifiers(player, kind);
     const damageMultiplier =
       (relicModifiers.damageMultiplier ?? 1) *
@@ -732,6 +739,14 @@ export class GameSessionService {
     if (!this.applyCombatEvent({ type: 'player-action-resolved', result })) return;
 
     const dealt = damageDealt(result);
+    if (dealt > 0) {
+      this.showHealthDamageTrail(
+        'enemy',
+        previousEnemyHealth,
+        enemy.stats.health - result.damageTaken,
+        enemy.stats.health,
+      );
+    }
     const defeated = result.damageTaken >= enemy.stats.health;
     this.addCombatLog('player', {
       title: player.name,
@@ -761,7 +776,10 @@ export class GameSessionService {
         action: kind,
       });
       const criticalMessage = result.critical ? ' Critical hit!' : '';
-      const hexMessage = kind === 'magic' && !result.missed ? ' Hex applied.' : '';
+      const hexMessage =
+        kind === 'magic' && !result.missed
+          ? ' Arcane mark applied: your next Attack hits harder.'
+          : '';
       this.combatMessage.set(`Your ${kind} dealt ${dealt} damage.${criticalMessage}${hexMessage}`);
     }
 
@@ -792,6 +810,7 @@ export class GameSessionService {
       ...state,
       playerDamageTaken: Math.max(0, state.playerDamageTaken - healResult.healed),
     }));
+    this.syncHealthTrail('player', this.playerRemainingHealth(), player.stats.health);
     this.combatMessage.set(`You used a potion and healed ${healResult.healed} HP.`);
     this.addCombatLog('player', {
       title: player.name,
@@ -847,6 +866,8 @@ export class GameSessionService {
     this.playerAnimation.set('idle');
     this.playerActionKind.set(null);
     this.combatFeedback.set(null);
+    this.playerHealthTrail.set(0);
+    this.enemyHealthTrail.set(0);
     this.clearCombatLogs();
     this.lastActionAt.set(null);
     this.combatMessage.set('');
@@ -960,6 +981,7 @@ export class GameSessionService {
 
     const currentPlayerBlock = this.combatState().playerBlock ?? 0;
     let playerDamageTaken = this.combatState().playerDamageTaken;
+    const previousPlayerHealth = player.stats.health - playerDamageTaken;
     let remainingPlayerBlock = currentPlayerBlock;
     let updatedEnemy = enemy;
     let result: DamageResult | null = null;
@@ -1004,6 +1026,14 @@ export class GameSessionService {
       playerDamageTaken = result.damageTaken;
       remainingPlayerBlock = Math.max(0, currentPlayerBlock - (result.blocked ?? 0));
       const dealt = damageDealt(result);
+      if (dealt > 0) {
+        this.showHealthDamageTrail(
+          'player',
+          previousPlayerHealth,
+          player.stats.health - playerDamageTaken,
+          player.stats.health,
+        );
+      }
       this.addCombatLog('enemy', {
         title: enemy.definition.name,
         message: result.missed ? `${intent.kind} missed.` : '',
@@ -1047,6 +1077,11 @@ export class GameSessionService {
 
     if (updatedEnemy !== enemy) {
       this.combatState.update((state) => ({ ...state, enemy: updatedEnemy }));
+      this.syncHealthTrail(
+        'enemy',
+        updatedEnemy.stats.health - updatedEnemy.damageTaken,
+        updatedEnemy.stats.health,
+      );
     }
     const nextTurn = (this.combatState().turn ?? 0) + 1;
     const nextEnemy = this.combatState().enemy ?? updatedEnemy;
@@ -1115,6 +1150,7 @@ export class GameSessionService {
       this.enemyAnimation.set('idle');
       this.enemyActionKind.set(null);
       this.playerAnimation.set('idle');
+      this.syncHealthTrails();
       this.actionReady.set(true);
     }, 700);
   }
@@ -1132,6 +1168,45 @@ export class GameSessionService {
   private cancelPendingCombatFeedbackReset(): void {
     this.pendingCombatFeedbackReset?.cancel();
     this.pendingCombatFeedbackReset = null;
+  }
+
+  private showHealthDamageTrail(
+    target: 'player' | 'enemy',
+    previousHealth: number,
+    currentHealth: number,
+    maximumHealth: number,
+  ): void {
+    const previousPercent = this.healthPercent(previousHealth, maximumHealth);
+    const currentPercent = this.healthPercent(currentHealth, maximumHealth);
+    const trail = Math.max(previousPercent, currentPercent);
+    if (target === 'player') this.playerHealthTrail.set(trail);
+    else this.enemyHealthTrail.set(trail);
+  }
+
+  private syncHealthTrail(
+    target: 'player' | 'enemy',
+    remainingHealth: number,
+    maximumHealth: number,
+  ): void {
+    const percent = this.healthPercent(remainingHealth, maximumHealth);
+    if (target === 'player') this.playerHealthTrail.set(percent);
+    else this.enemyHealthTrail.set(percent);
+  }
+
+  private syncHealthTrails(): void {
+    const player = this.player();
+    const enemy = this.enemy();
+    if (player) {
+      this.syncHealthTrail('player', this.playerRemainingHealth(), player.stats.health);
+    }
+    if (enemy) {
+      this.syncHealthTrail('enemy', enemy.stats.health - enemy.damageTaken, enemy.stats.health);
+    }
+  }
+
+  private healthPercent(remainingHealth: number, maximumHealth: number): number {
+    if (maximumHealth <= 0) return 0;
+    return Math.max(0, Math.min(100, (remainingHealth / maximumHealth) * 100));
   }
 
   private showCombatFeedback(feedback: Omit<CombatFeedback, 'id'>): void {
@@ -1357,6 +1432,7 @@ export class GameSessionService {
               }
             : null,
         });
+        this.syncHealthTrails();
         this.enemyAnimation.set('idle');
         this.enemyActionKind.set(null);
         this.playerAnimation.set(

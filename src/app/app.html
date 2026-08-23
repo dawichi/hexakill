@@ -460,7 +460,6 @@
                       >
                     }
                   </div>
-                  <span class="combatant-badge">Hero</span>
                 </div>
                 <div class="combatant-body">
                   <div class="combat-stat-rail" role="group" aria-label="Your combat stats">
@@ -554,6 +553,12 @@
                     [attr.aria-valuemax]="player.stats.health"
                   >
                     <span
+                      class="health-bar-trail"
+                      aria-hidden="true"
+                      [style.width.%]="session.playerHealthTrail()"
+                    ></span>
+                    <span
+                      class="health-bar-fill"
                       [style.width.%]="
                         (session.playerRemainingHealth() / player.stats.health) * 100
                       "
@@ -605,12 +610,13 @@
                       </div>
                     }
                     @if (session.enemyHexed()) {
-                      <span class="combat-status hexed"
-                        ><svg lucideSparkles size="12" aria-hidden="true"></svg> Hexed</span
+                      <span
+                        class="combat-status hexed"
+                        title="Arcane mark: your next Attack deals bonus damage."
+                        ><svg lucideSparkles size="12" aria-hidden="true"></svg> Arcane mark</span
                       >
                     }
                   </div>
-                  <span class="combatant-badge">Foe</span>
                 </div>
                 <div class="combatant-body">
                   <div
@@ -679,6 +685,12 @@
                     [attr.aria-valuemax]="enemy.stats.health"
                   >
                     <span
+                      class="health-bar-trail"
+                      aria-hidden="true"
+                      [style.width.%]="session.enemyHealthTrail()"
+                    ></span>
+                    <span
+                      class="health-bar-fill"
                       [style.width.%]="
                         ((enemy.stats.health - enemy.damageTaken) / enemy.stats.health) * 100
                       "

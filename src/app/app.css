@@ -1256,26 +1256,6 @@ h3 {
   color: #b99ce0;
 }
 
-.combatant-badge {
-  border: 1px solid var(--line-soft);
-  padding: 0.25rem 0.35rem;
-  color: var(--muted);
-  font-family: 'Courier New', monospace;
-  font-size: 0.56rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.player-combatant .combatant-badge {
-  border-color: #38bdf8;
-  color: #67c8db;
-}
-
-.enemy-combatant .combatant-badge {
-  border-color: #fb7185;
-  color: #fb7185;
-}
-
 .combatant-body {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -1483,6 +1463,7 @@ h3 {
 }
 
 .health-bar {
+  position: relative;
   height: 0.7rem;
   overflow: hidden;
   border-radius: 999px;
@@ -1490,11 +1471,24 @@ h3 {
 }
 
 .health-bar span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
   display: block;
-  height: 100%;
   min-width: 0;
   border-radius: inherit;
-  transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.health-bar-trail {
+  z-index: 0;
+  background: #89837c;
+  transition: width 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.health-bar-fill {
+  z-index: 1;
+  transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes combat-hit-reaction {
@@ -1531,15 +1525,15 @@ h3 {
   }
 }
 
-.health-bar.healthy span {
+.health-bar.healthy .health-bar-fill {
   background: #55c271;
 }
 
-.health-bar.wounded span {
+.health-bar.wounded .health-bar-fill {
   background: #e5aa59;
 }
 
-.health-bar.critical span {
+.health-bar.critical .health-bar-fill {
   background: #db6a62;
 }
 
@@ -1834,8 +1828,8 @@ h3 {
   position: fixed;
   top: 0;
   bottom: 0;
-  left: 50%;
-  right: auto;
+  left: max(1rem, calc((100% - 74rem) / 2));
+  right: max(1rem, calc((100% - 74rem) / 2));
   z-index: 1;
   display: grid;
   /* Keep the playable surface centered on desktop. The surrounding page
@@ -1848,7 +1842,6 @@ h3 {
   margin: 0;
   overflow: hidden;
   padding: clamp(0.45rem, 1.5vw, 1rem);
-  transform: translateX(-50%);
 }
 
 .game-active .topbar {
@@ -2042,6 +2035,13 @@ h3 {
   min-height: 0;
   gap: 0.5rem;
   padding: clamp(0.55rem, 1.3vw, 0.9rem);
+}
+
+@media (min-width: 701px) {
+  .combat-screen-panel .combatant-card:has(.tooltip-open) {
+    position: relative;
+    z-index: 30;
+  }
 }
 
 .combat-screen-panel .combatant-body {
@@ -2457,10 +2457,6 @@ h3 {
     font-size: 0.78rem;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .combat-screen-panel .combatant-badge {
-    display: none;
   }
 
   .combat-screen-panel .combatant-body,
