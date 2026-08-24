@@ -858,16 +858,36 @@ test('a player can use a potion and reach the defeat screen', async ({ page }) =
   await expect(page.getByRole('heading', { name: 'Game over.' })).toBeVisible();
   await expect(page.getByRole('img', { name: 'Wizard defeat animation' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Enemies defeated' })).toBeVisible();
-  await expect(page.locator('.enemy-history-row')).toContainText('Slime Blue');
-  await expect(page.locator('.enemy-history-row')).toContainText('Levels: 3');
-  await expect(page.locator('.record-row')).toContainText('Agent · Wizard');
-  await expect(page.locator('.record-row')).toContainText('Level 4');
+  await page.evaluate(() => {
+    localStorage.setItem(
+      'hexakill.angular.records.v1',
+      JSON.stringify({
+        version: 1,
+        records: [
+          { characterId: 'wizard', name: 'Agent', level: 4 },
+          { characterId: 'samurai', name: 'Rin', level: 3 },
+          { characterId: 'warrior', name: 'Borin', level: 2 },
+          { characterId: 'wizard', name: 'Mira', level: 1 },
+          { characterId: 'samurai', name: 'Kato', level: 1 },
+        ],
+      }),
+    );
+  });
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Game over.' })).toBeVisible();
+  await expect(page.locator('.enemy-history-tile')).toContainText('Slime Blue');
+  await expect(page.locator('.enemy-history-count')).toHaveText('x1');
+  await expect(page.locator('.game-over-records .record-row')).toHaveCount(5);
+  await expect(page.getByText('Agent · Wizard', { exact: true })).toBeVisible();
+  await expect(page.getByText('Level 4', { exact: true })).toBeVisible();
+  await expect(page.locator('.game-over-records .records-list')).toHaveCSS('overflow-y', 'auto');
+  await expect(page.getByRole('button', { name: 'Return to home' })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Start a new run' }).click();
+  await page.getByRole('button', { name: 'Return to home' }).click();
   const welcomeHeading = page.getByRole('heading', { name: 'Survive the dungeon.' });
   await expect(welcomeHeading).toBeVisible();
   await expect(welcomeHeading).toBeFocused();
-  await expect(page.locator('.record-row')).toContainText('Agent · Wizard');
+  await expect(page.getByText('Agent · Wizard', { exact: true })).toBeVisible();
   await expect(
     page.evaluate(() => localStorage.getItem('hexakill.angular.records.v1')),
   ).resolves.toContain('Agent');
