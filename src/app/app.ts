@@ -11,8 +11,10 @@ import {
   LucideArrowRight,
   LucideCheck,
   LucideCircleHelp,
+  LucideDoorOpen,
   LucideFootprints,
   LucideHeartPulse,
+  LucideLogOut,
   LucideMap,
   LucideMapPin,
   LucideScrollText,
@@ -23,6 +25,7 @@ import {
   LucideSwords,
   LucideTentTree,
   LucideTrophy,
+  LucideTriangleAlert,
   LucideVolume2,
   LucideWandSparkles,
 } from '@lucide/angular';
@@ -39,8 +42,10 @@ import { PersonalRecord } from './domain/records';
     LucideArrowRight,
     LucideCheck,
     LucideCircleHelp,
+    LucideDoorOpen,
     LucideFootprints,
     LucideHeartPulse,
+    LucideLogOut,
     LucideMap,
     LucideMapPin,
     LucideScrollText,
@@ -51,6 +56,7 @@ import { PersonalRecord } from './domain/records';
     LucideSwords,
     LucideTentTree,
     LucideTrophy,
+    LucideTriangleAlert,
     LucideVolume2,
     LucideWandSparkles,
     StatChipComponent,
@@ -65,6 +71,7 @@ export class App implements OnDestroy {
   protected readonly statKeys: readonly Stat[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed'];
   protected readonly displayedCombatMessage = signal('');
   protected readonly combatMessageTyping = signal(false);
+  protected readonly exitConfirmationOpen = signal(false);
   private typewriterTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
@@ -132,6 +139,20 @@ export class App implements OnDestroy {
   protected onNameInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.session.setPlayerName(input.value);
+  }
+
+  protected requestExitRun(): void {
+    if (this.session.screen() === 'welcome' || this.session.screen() === 'game-over') return;
+    this.exitConfirmationOpen.set(true);
+  }
+
+  protected cancelExitRun(): void {
+    this.exitConfirmationOpen.set(false);
+  }
+
+  protected confirmExitRun(): void {
+    this.exitConfirmationOpen.set(false);
+    this.session.reset();
   }
 
   protected nameValidationMessage(): string {

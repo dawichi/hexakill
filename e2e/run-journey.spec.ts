@@ -787,6 +787,17 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   await firstDoor.focus();
   await firstDoor.press('Enter');
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
+
+  await page.locator('.exit-run-button').click();
+  const exitDialog = page.getByRole('dialog', { name: 'Abandon this run?' });
+  await expect(exitDialog).toBeVisible();
+  await exitDialog.getByRole('button', { name: 'Stay in run' }).click();
+  await expect(exitDialog).toBeHidden();
+  await expect(page.locator('[data-screen="combat"]')).toBeVisible();
+
+  await page.locator('.exit-run-button').click();
+  await exitDialog.getByRole('button', { name: 'Exit run' }).click();
+  await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
 });
 
 test('a player can use a potion and reach the defeat screen', async ({ page }) => {

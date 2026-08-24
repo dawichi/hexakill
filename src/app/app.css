@@ -32,6 +32,13 @@
   border-bottom: 1px solid var(--line-soft);
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
 .topbar h1,
 h2,
 h3,
@@ -102,6 +109,29 @@ p {
   height: 0.8rem;
 }
 
+.exit-run-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 0.15rem;
+  background: rgb(16 15 18 / 76%);
+  color: var(--muted);
+  padding: 0.55rem 0.65rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.exit-run-button:hover,
+.exit-run-button:focus-visible {
+  border-color: var(--ember-bright);
+  color: var(--ember-bright);
+}
+
 .eyebrow,
 .status,
 .prototype-note {
@@ -138,6 +168,71 @@ p {
   height: 0.55rem;
   content: '';
   pointer-events: none;
+}
+
+.confirmation-backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(5 4 6 / 78%);
+  padding: 1rem;
+}
+
+.confirmation-dialog {
+  width: min(100%, 28rem);
+  border: 1px solid var(--ember);
+  border-radius: 0.2rem;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 2%) 25%, transparent 25%) 0 0 / 8px 8px,
+    var(--stone-1);
+  box-shadow:
+    0 1.5rem 4rem rgb(0 0 0 / 65%),
+    inset 0 0 0 1px rgb(255 255 255 / 3%);
+  padding: 1.25rem;
+}
+
+.confirmation-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.confirmation-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 1px solid var(--ember);
+  border-radius: 50%;
+  color: var(--ember-bright);
+}
+
+.confirmation-dialog h2 {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.35rem, 4vw, 2rem);
+}
+
+.confirmation-dialog > p {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.confirmation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+.confirmation-actions .primary-button,
+.confirmation-actions .quiet-button {
+  height: auto;
+  min-height: 2.5rem;
 }
 
 .panel::before {
@@ -2479,16 +2574,39 @@ h3 {
     padding-bottom: 0.35rem;
   }
 
+  .game-active .topbar-actions {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    gap: 0.35rem;
+  }
+
   .game-active .audio-controls {
     width: auto;
     min-width: 8.5rem;
     padding: 0.2rem 0.35rem;
   }
 
+  .game-active .exit-run-button {
+    flex: 0 0 auto;
+    gap: 0.2rem;
+    padding: 0.35rem 0.4rem;
+    font-size: 0.52rem;
+  }
+
   .game-active .audio-controls label {
     grid-template-columns: 2.7rem minmax(3rem, 1fr);
     gap: 0.25rem;
     font-size: 0.52rem;
+  }
+
+  .confirmation-actions {
+    flex-direction: column-reverse;
+  }
+
+  .confirmation-actions .primary-button,
+  .confirmation-actions .quiet-button {
+    justify-content: center;
+    width: 100%;
   }
 
   .game-active > .panel {

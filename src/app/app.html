@@ -10,35 +10,42 @@
       <h1>HEXAKILL</h1>
       <p class="status">A pixel dungeon run</p>
     </div>
-    <section class="audio-controls" aria-label="Audio controls">
-      <p class="audio-title"><svg lucideVolume2 size="14" aria-hidden="true"></svg> Sound relics</p>
-      <label>
-        <span>Music</span>
-        <input
-          aria-label="Music volume"
-          [attr.aria-valuetext]="volumeLabel(session.musicVolume())"
-          type="range"
-          min="0"
-          max="0.5"
-          step="0.01"
-          [value]="session.musicVolume()"
-          (input)="setMusicVolume($event)"
-        />
-      </label>
-      <label>
-        <span>Effects</span>
-        <input
-          aria-label="Effects volume"
-          [attr.aria-valuetext]="volumeLabel(session.effectsVolume())"
-          type="range"
-          min="0"
-          max="0.5"
-          step="0.01"
-          [value]="session.effectsVolume()"
-          (input)="setEffectsVolume($event)"
-        />
-      </label>
-    </section>
+    <div class="topbar-actions">
+      @if (session.screen() !== 'welcome' && session.screen() !== 'game-over') {
+        <button class="exit-run-button" type="button" (click)="requestExitRun()">
+          <svg lucideLogOut size="14" aria-hidden="true"></svg> Exit run
+        </button>
+      }
+      <section class="audio-controls" aria-label="Audio controls">
+        <p class="audio-title"><svg lucideVolume2 size="14" aria-hidden="true"></svg> Sound relics</p>
+        <label>
+          <span>Music</span>
+          <input
+            aria-label="Music volume"
+            [attr.aria-valuetext]="volumeLabel(session.musicVolume())"
+            type="range"
+            min="0"
+            max="0.5"
+            step="0.01"
+            [value]="session.musicVolume()"
+            (input)="setMusicVolume($event)"
+          />
+        </label>
+        <label>
+          <span>Effects</span>
+          <input
+            aria-label="Effects volume"
+            [attr.aria-valuetext]="volumeLabel(session.effectsVolume())"
+            type="range"
+            min="0"
+            max="0.5"
+            step="0.01"
+            [value]="session.effectsVolume()"
+            (input)="setEffectsVolume($event)"
+          />
+        </label>
+      </section>
+    </div>
   </header>
 
   @switch (session.screen()) {
@@ -1051,5 +1058,34 @@
         </section>
       }
     }
+  }
+
+  @if (exitConfirmationOpen()) {
+    <div class="confirmation-backdrop">
+      <section
+        class="confirmation-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="exit-dialog-title"
+        aria-describedby="exit-dialog-description"
+      >
+        <div class="confirmation-heading">
+          <span class="confirmation-icon"><svg lucideTriangleAlert size="20" aria-hidden="true"></svg></span>
+          <div>
+            <p class="eyebrow">Leave the dungeon?</p>
+            <h2 id="exit-dialog-title">Abandon this run?</h2>
+          </div>
+        </div>
+        <p id="exit-dialog-description">
+          Your current progress will be discarded and you will return to the home screen.
+        </p>
+        <div class="confirmation-actions">
+          <button class="quiet-button" type="button" (click)="cancelExitRun()">Stay in run</button>
+          <button class="primary-button" type="button" (click)="confirmExitRun()">
+            <svg lucideDoorOpen size="16" aria-hidden="true"></svg> Exit run
+          </button>
+        </div>
+      </section>
+    </div>
   }
 </main>
