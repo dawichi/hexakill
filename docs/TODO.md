@@ -6,31 +6,31 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved for active root
 - **Affected area:** `package.json`, `.npmrc`, `.gitignore`, lockfile, Node/package-manager configuration
-- **Evidence:** The archived `legacy/svelte/` package has no lockfile and remains unreproducible; the active Angular root has a committed lockfile, Node.js range enforcement, an `.nvmrc` baseline, pinned npm metadata, an executable Node/npm verification command, and a source-reviewed direct dependency set with unused generated forms/router entries removed.
+- **Evidence:** The active Angular root has a committed lockfile, Node.js range enforcement, an `.nvmrc` baseline, pinned npm metadata, an executable Node/npm verification command, and a source-reviewed direct dependency set with unused generated forms/router entries removed.
 - **Risk:** Agents cannot reproduce the same dependency graph or know whether a build failure is code or tooling.
-- **Next action:** Retain npm/Node 24.19.0 as the active baseline; decide whether the archived Svelte package metadata should be deleted after the historical audit is complete.
-- **Dependencies:** Confirm whether the archived Svelte package should be deleted after the historical audit.
+- **Next action:** Retain npm/Node 24.19.0 as the active baseline and review dependency changes through the frozen-install gate.
+- **Dependencies:** None.
 - **Owner:** Tech Lead / future developer agent
 - **Target:** Before dependency upgrades or feature work
 
 ### TODO-002 [High] Repair validation commands
 
-- **Status:** Resolved for active root; archived Svelte commands retained as historical failures
-- **Affected area:** archived SvelteKit generated config and historical Prettier/ESLint configuration
-- **Evidence:** `npm run check` references missing `jsconfig.json`; `npm run lint` cannot resolve the Svelte parser; `npm run build` cannot resolve the SvelteKit Vite peer.
+- **Status:** Resolved
+- **Affected area:** Root formatting, linting, build, test, and preview commands
+- **Evidence:** The active Angular commands are documented and exercised by the local release gate and CI workflow.
 - **Risk:** A future agent cannot establish a trustworthy green baseline.
-- **Next action:** Keep root format/test/build/browser/production-preview commands aligned; do not revive archived Svelte commands without a deliberate decision.
+- **Next action:** Keep root format/test/build/browser/production-preview commands aligned.
 - **Dependencies:** TODO-001
 - **Owner:** Future developer agent
 - **Target:** First implementation session
 
 ### TODO-003 [High] Clear current type and accessibility errors
 
-- **Status:** Deferred for archived source; active root has a separate accessibility backlog
-- **Affected area:** `Tooltip.svelte`, `PowerUps.svelte`, `StoreItem.svelte`, `Modal.svelte`, `Welcome.svelte`, `src/routes/+layout.svelte`
-- **Evidence:** Direct `svelte-check` found 4 type errors and 3 warnings; ESLint found 5 errors and 3 warnings.
+- **Status:** Resolved for the active application; accessibility backlog remains
+- **Affected area:** Active Angular interaction and accessibility boundaries
+- **Evidence:** The active root has semantic controls, focus handling, status regions, and browser coverage for the core journeys.
 - **Risk:** The current source cannot serve as a clean characterization baseline, and interaction defects are hidden by tooling noise.
-- **Next action:** Keep the archived findings as evidence and track active-root accessibility in TODO-011; do not repair archived source without an explicit compatibility need.
+- **Next action:** Track remaining manual accessibility work in TODO-011.
 - **Dependencies:** TODO-001 and TODO-002
 - **Owner:** Future developer agent
 - **Target:** Before migration comparison
@@ -38,8 +38,8 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 ### TODO-004 [High] Extract and characterize game rules
 
 - **Status:** Partially resolved
-- **Affected area:** `legacy/svelte/src/lib/models/`, archived services/config, and active `src/app/domain/`
-- **Evidence:** Randomness, mutable class instances, timers, and global stores are mixed with combat logic in the archived app. The active Angular app now has pure combat, full-roster/boss enemy generation with positive-health lower-bound normalization, speed-based opening turns, action-policy, transition, potion, progression, and store modules; delayed turns are scheduler-backed and reset-safe, but the rewrite does not yet establish full legacy parity.
+- **Affected area:** Active `src/app/domain/` and `src/app/application/`
+- **Evidence:** The Angular app has pure combat, full-roster/boss enemy generation with positive-health lower-bound normalization, speed-based opening turns, action-policy, transition, potion, progression, and store modules; delayed turns are scheduler-backed and reset-safe, but final balance remains under review.
 - **Risk:** A rewrite can accidentally rebalance or change gameplay while appearing structurally cleaner.
 - **Next action:** Extend fixtures for progression, terminal-state rules, persistence migration, and final balance; mark each rule intentional, suspicious, or obsolete before migration.
 - **Dependencies:** Product review of current gameplay and TODO-005
@@ -49,7 +49,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 ### TODO-005 [High] Decide store contract and item effects
 
 - **Status:** Resolved for the gameplay prototype by [ADR-0003](adr/0003-combat-and-relic-balance.md)
-- **Affected area:** `Store.svelte`, `StoreItem.svelte`, `CharacterModel.addItem`, inventory/stat display
+- **Affected area:** Angular store, relic, inventory, and stat display
 - **Evidence:** The active Angular app now models one-time relics as typed passive effects, keeps raw player stats unchanged after purchase, persists health between encounters, and applies potion, reward, and damage effects through pure helpers. The implementation is documented in [the relic shop contract](architecture/rewrite-store.md).
 - **Risk:** Rewriting the store without a product contract preserves or removes progression accidentally.
 - **Next action:** Review relic pool rotation, pricing, merchant rarity, and final balance through manual runs.
@@ -71,7 +71,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 ### TODO-007 [High] Version and validate browser persistence
 
 - **Status:** Partially resolved
-- **Affected area:** `legacy/svelte/src/lib/services/storage.service.ts`, root Angular storage adapter, and volume preference handling
+- **Affected area:** Root Angular storage adapter and volume preference handling
 - **Evidence:** The active Angular app has versioned `hexakill.angular.session.v1`, `hexakill.angular.records.v1`, and `hexakill.angular.preferences.v1` envelopes, injectable storage boundaries, structural validation for player/enemy/progression/record/preference data, safe-integer record and session-counter validation, positive restored health validation, coherent screen/phase validation, rejection of transient combat actions and malformed damage results at the durable-session boundary, canonical character/item hydration, invalid-record clearing, accessible volume controls, and non-fatal browser storage failure handling. Migration from legacy keys remains missing.
 - **Risk:** Old/corrupt local storage can crash or create invalid records and preferences.
 - **Next action:** Decide migration policy for legacy keys/preferences, record the decision in an ADR, and extend malformed-input fixtures as the schemas evolve.
@@ -84,7 +84,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 - **Status:** Partially resolved
 - **Affected area:** Active root Angular application and CI
 - **Current baseline (2026-08-23):** The active root now has 18 test files and 123 passing unit/component tests, plus 27 passing Playwright journeys. The newer combat coverage includes visible enemy intents, Guard/Block, Arcane marks, staged feedback, health presentation, malformed optional combat-state rejection, and stable store-offer restoration; older evidence paragraphs below remain historical characterization detail.
-- **Evidence:** The archived Svelte app has no tests or test runner. The active Angular app now has 18 deterministic unit/component test files with 123 passing tests, including the historical rule coverage plus optional combat-state validation, store-offer restoration, and relic Arcane-mark multiplier fixtures; 27 Playwright journeys cover the active browser contract and the built static artifact.
+- **Evidence:** The active Angular app has deterministic unit/component tests, domain fixtures, store-offer restoration coverage, relic passive fixtures, and Playwright journeys covering the active browser contract and built static artifact.
 - **Current browser evidence:** The existing 26-journey suite also asserts Wizard player hit rendering, Knight's idle strip, Witch Blue's vertical idle and damage strips, and rejection of persisted resolving-player-action and enemy-turn phases against both development and production-like artifacts.
 - **Current application evidence:** Player/enemy battle-log entries are typed, reset with a new run, capped at the legacy eight-entry window, include legacy-style victory/defeat outcomes, and are covered by application and browser assertions; they are intentionally excluded from durable session persistence.
 - **Risk:** Final balance, accessibility, and uncharacterized edge cases can still regress outside the current automated journeys.
@@ -107,7 +107,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 ### TODO-010 [Medium] Consolidate presentation systems
 
 - **Status:** Resolved for the active Angular root; archived systems remain historical evidence.
-- **Affected area:** Active component CSS and Lucide icons; archived Svelte styling is out of the active dependency graph.
+- **Affected area:** Active component CSS and Lucide icons.
 - **Evidence:** The active root uses authored CSS plus `@lucide/angular`; no Tailwind, Flowbite, Bootstrap Icons, Iconify, or Animate.css dependency is active.
 - **Risk:** Future feature work could reintroduce competing systems without a design decision.
 - **Next action:** Keep new screen components on the active CSS/Lucide boundary and record any deliberate exception in an ADR.
@@ -119,7 +119,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** All game views and interactive components
-- **Evidence:** Archived Svelte warnings identify mouse-only tooltip behavior and clickable non-controls. The active root has labeled name/audio inputs, semantic buttons/status regions, visible focus styles, programmatic focus targets for screen transitions and power-up progression, browser coverage for keyboard/focus, store, combat, audio, game-over/reset, reduced motion, and narrow viewport behavior, and an [accessibility review record](accessibility-review.md) with representative contrast calculations and rendered browser smoke evidence. A full assistive-technology review remains open.
+- **Evidence:** The active root has labeled name/audio inputs, semantic buttons/status regions, visible focus styles, programmatic focus targets for screen transitions and power-up progression, browser coverage for keyboard/focus, store, combat, audio, game-over/reset, reduced motion, and narrow viewport behavior, and an [accessibility review record](accessibility-review.md) with representative contrast calculations and rendered browser smoke evidence. A full assistive-technology review remains open.
 - **Risk:** Players cannot complete core flows with keyboard, assistive technology, or non-pointer input.
 - **Next action:** Perform manual screen-reader, contrast, zoom, and focus-visibility review; retain automated focus/reduced-motion journeys as regression coverage.
 - **Dependencies:** TODO-006 and TODO-009
@@ -141,7 +141,7 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 
 - **Status:** Partially resolved
 - **Affected area:** Vercel claim, adapter-auto, build output, static assets, 404/headers
-- **Evidence:** `https://hexakill.vercel.app` is reachable and returns a Vercel-served SvelteKit response, proving an existing endpoint but not Angular ownership or migration. The active Angular root has `vercel.json`, a passing `verify:deployment` contract check, a passing production build, a static preview server, a `verify:preview` gate for headers/cache/404 behavior, and browser journeys against the built output.
+- **Evidence:** The active Angular root has `vercel.json`, a passing `verify:deployment` contract check, a passing production build, a static preview server, a `verify:preview` gate for headers/cache/404 behavior, and browser journeys against the built output.
 - **Risk:** Agents may assume a deployment target or claim production readiness without evidence.
 - **Next action:** Confirm project ownership/authorization, deploy Angular to a preview, and document rollback and post-deploy asset behavior in an ADR; compare the external headers/404 behavior with the local contract.
 - **Dependencies:** TODO-001 and TODO-009
@@ -173,10 +173,10 @@ This is the prioritized backlog for making the project safe to rewrite. Items ar
 ### TODO-016 [High] Resolve initial player-stat parity
 
 - **Status:** Resolved by [ADR-0002](adr/0002-level-4-player-initialization.md)
-- **Affected area:** `legacy/svelte/src/lib/models/Entity.ts`, `legacy/svelte/src/lib/models/Character.ts`, `src/app/domain/characters.ts`, combat balance
+- **Affected area:** `src/app/domain/characters.ts`, combat balance, and opening-run fixtures
 - **Evidence:** The archived `BaseEntityModel` initializes every stat as `level * base`, and character selection constructs `CharacterModel` at level 4. The active Angular `createInitialPlayer` now applies the same level-4 scaling; character modifiers remain applied during Angular level-up progression. The accepted values and regression fixture are recorded in [the initial player-stat parity characterization](architecture/initial-player-stat-parity.md) and [ADR-0002](adr/0002-level-4-player-initialization.md).
-- **Risk:** Changing it later will alter opening health, damage, speed ordering, store value, enemy difficulty, and every browser fixture; preserving the current prototype may intentionally reject the legacy balance.
-- **Next action:** Review opening combat, store value, and progression pacing with the accepted legacy-scaled baseline.
+- **Risk:** Changing it later will alter opening health, damage, speed ordering, store value, enemy difficulty, and every browser fixture.
+- **Next action:** Review opening combat, store value, and progression pacing with the accepted compatibility-scaled baseline.
 - **Dependencies:** TODO-004 and TODO-005
 - **Owner:** Project owner / Tech Lead
 - **Target:** Before gameplay balance is accepted

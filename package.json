@@ -12,7 +12,6 @@
     "verify:asset-geometry": "node tools/verify-asset-geometry.mjs",
     "inspect:assets": "node tools/inspect-assets.mjs",
     "verify:deployment": "node tools/verify-deployment.mjs",
-    "verify:migration": "node tools/verify-migration.mjs",
     "verify:release": "node tools/verify-release.mjs",
     "verify:toolchain": "node tools/verify-toolchain.mjs",
     "simulate:balance": "node tools/run-balance-simulation.mjs",

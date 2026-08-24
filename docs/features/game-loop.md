@@ -1,6 +1,6 @@
 # Gameplay Loop and Characterization Boundary
 
-**Status:** The legacy behavior and active Angular behavior are recorded separately. The Angular rules remain provisional until product balance and persistence decisions are accepted.
+**Status:** The compatibility baseline and active Angular behavior are recorded together. Gameplay rules remain provisional until product balance and persistence decisions are accepted.
 
 ## Active Angular journey
 
@@ -37,12 +37,12 @@ The active UI relies on native buttons, inputs, and range controls. Legacy globa
 - Closing the store returns to the active `map` route.
 - Store rotation, relic pricing, selling, and final balance remain open in [the relic shop contract](../architecture/rewrite-store.md). Current relics can also modify Guard breaking, Guard block, and Arcane mark damage; the catalog remains a balance baseline rather than a final pool.
 
-## Legacy observations retained for comparison
+## Compatibility observations retained for comparison
 
-- The archived Svelte journey used `welcome`, `champSelect`, `combat`, `store`, and `gameover` views, plus global keyboard handlers.
-- The archived combat service used speed to choose the first actor, two-second delayed turns, mutable logs, and delayed defeat callbacks without explicit cancellation.
-- The archived game created a level-4 character, generated regular enemies from player-level ranges, consumed Gold Slime bosses in sequence, wrote unversioned top-five records, and grouped defeated-enemy history by image.
-- Archived formulas and configuration remain evidence in `legacy/svelte/src/lib/`; the Angular implementation is not assumed to be exact parity until each difference is classified.
+- The previous journey used `welcome`, `champSelect`, `combat`, `store`, and `gameover` phases, plus global keyboard handlers.
+- The previous combat service used speed to choose the first actor, delayed turns, mutable logs, and delayed defeat callbacks without explicit cancellation.
+- The previous game created a level-4 character, generated regular enemies from player-level ranges, consumed Gold Slime bosses in sequence, wrote unversioned top-five records, and grouped defeated-enemy history by image.
+- Compatibility formulas and configuration remain characterized in the active domain fixtures; the Angular implementation is not assumed to be exact parity until each difference is classified.
 
 ## Product gaps to clarify
 

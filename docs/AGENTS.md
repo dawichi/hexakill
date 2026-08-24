@@ -8,22 +8,22 @@ This file is the canonical project-specific instruction entry point for AI devel
 2. Read the [documentation index](README.md).
 3. Read the [standards contract](project-standards.yml) and [standards assessment](standards-assessment.md).
 4. Read [current architecture](architecture/current-state.md) and the relevant [game-loop documentation](features/game-loop.md).
-5. For architecture work, read the [framework evaluation](architecture/rewrite-evaluation.md) and [target architecture proposal](architecture/rewrite-target.md).
+5. For architecture work, read the [target architecture](architecture/rewrite-target.md).
 6. For continuation work, read the [current development handoff](handoff.md).
 7. For persistence changes, read the [Angular persistence contract](architecture/rewrite-persistence.md).
 
 ## Source-of-truth map
 
-- Current implementation and behavior: root `src/` Angular application; archived Svelte code under `legacy/svelte/` is historical evidence only.
+- Current implementation and behavior: root `src/` Angular application.
 - Current entry points and composition: `src/main.ts`, `src/app/app.ts`, and `src/app/app.html`.
 - Current game state and rules: `src/app/application/` and `src/app/domain/`.
 - Current static assets: `static/`.
 - Asset provenance and release restrictions: [asset provenance register](assets-provenance.md).
 - Deferred sprite/sheet evidence: [sprite-source catalog](assets-sprite-sources.md).
 - Package and tool configuration: `package.json`, `package-lock.json`, `angular.json`, TypeScript/Biome files, and the CI workflow.
-- Current deployment evidence: [operations documentation](operations.md), `vercel.json`, and the root `README.md`. The Vercel endpoint is observed but still serves the archived SvelteKit deployment.
+- Current deployment evidence: [operations documentation](operations.md), `vercel.json`, and the root `README.md`.
 - Proposed future design: `docs/architecture/rewrite-*.md`. These files MUST NOT be used as evidence that the proposed architecture already exists.
-- Active Angular application: root `src/`, `package.json`, `angular.json`, and `e2e/`. The isolated prototype was promoted and removed after validation; the former Svelte source is archived under `legacy/svelte/`.
+- Active Angular application: root `src/`, `package.json`, `angular.json`, and `e2e/`.
 - Durable project decisions: [ADR index](adr/README.md).
 - Known gaps and deferred work: [TODO.md](TODO.md).
 - Active local persistence contract: [rewrite persistence](architecture/rewrite-persistence.md).
@@ -43,7 +43,7 @@ This file is the canonical project-specific instruction entry point for AI devel
 
 ## Validation commands
 
-The archived Svelte source is not reproducible and is not the active application. Use the root Angular commands below:
+Use the root Angular commands below:
 
 - Install: `npm ci`
 - Toolchain: `npm run verify:toolchain`
@@ -51,7 +51,6 @@ The archived Svelte source is not reproducible and is not the active application
 - Linting: `npm run lint`
 - TypeScript: `npm run verify:types`
 - Documentation contract: `npm run verify:docs`
-- Root migration contract: `npm run verify:migration`
 - Asset manifest: `npm run verify:assets` (pass a built artifact path after `--` to verify copied assets)
 - Sprite geometry contract: `npm run verify:asset-geometry` (pass a built artifact path after `--` to verify copied strip geometry)
 - Asset geometry inventory: `npm run inspect:assets` (add `--json` for machine-readable output)
@@ -74,7 +73,7 @@ Run these commands from the repository root for active Angular work:
 - Tests: `npm test -- --watch=false --no-progress`
 - Development server: `npm start`
 
-The active application uses Angular 21, Node.js 24.19.0, npm 11.17.0, strict compiler/template checks, standalone components, signals, Vitest, and Playwright. Keep the root lockfile committed and do not reintroduce the archived Svelte dependency graph.
+The active application uses Angular 21, Node.js 24.19.0, npm 11.17.0, strict compiler/template checks, standalone components, signals, Vitest, and Playwright. Keep the root lockfile committed and the dependency graph focused on the active application.
 
 ## Documentation maintenance
 

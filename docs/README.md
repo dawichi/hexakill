@@ -1,6 +1,6 @@
 # Hexakill Project Documentation
 
-This directory is the local operating manual for Hexakill and future AI developer agents. It documents the archived SvelteKit implementation, the active Angular root, and the remaining reviewable path toward production readiness.
+This directory is the local operating manual for Hexakill and future AI developer agents. It documents the active Angular application and the remaining reviewable path toward production readiness.
 
 ## Start here
 
@@ -15,7 +15,7 @@ This directory is the local operating manual for Hexakill and future AI develope
 - [Gameplay loop](features/game-loop.md) — current user journey and implemented game rules, with known inconsistencies called out.
 - [Balance simulation lab](balance-simulation.md) — deterministic encounter simulations, bot policies, commands, and interpretation guidance.
 - [Operations](operations.md) — setup, commands, build/deployment evidence, and troubleshooting.
-- [Dependency inventory](dependencies.md) — active Angular graph, archived Svelte graph, and install trust policy.
+- [Dependency inventory](dependencies.md) — active Angular graph and install trust policy.
 - [Deployment contract](architecture/rewrite-deployment.md) — proposed static output, hosting requirements, and release gate.
 - [Angular persistence contract](architecture/rewrite-persistence.md) — observed records behavior, active versioned keys, and migration unknowns.
 - [Asset inventory](assets.md) — retained assets, active Angular usage, and migration rules.
@@ -26,11 +26,10 @@ This directory is the local operating manual for Hexakill and future AI develope
 - [Finalization decision packet](decision-packet.md) — owner decisions and acceptance evidence required before calling the rewrite complete.
 - [Finalization recommendation guide](finalization-recommendations.md) — evidence-backed resolution order and agent guardrails; recommendations are not accepted decisions.
 
-## Future rewrite
+## Architecture and decisions
 
-- [Framework evaluation](architecture/rewrite-evaluation.md) — Astro, Angular, and modern SvelteKit comparison for this game.
-- [Target architecture proposal](architecture/rewrite-target.md) — proposed domain/application/UI boundaries and staged migration plan.
-- [Rewrite migration history](architecture/rewrite-migration.md) — historical record of the isolated Angular prototype promotion.
+- [Framework decision](adr/0001-angular-rewrite.md) — accepted Angular application framework and boundaries.
+- [Target architecture](architecture/rewrite-target.md) — domain/application/UI boundaries and staged implementation plan.
 - [Initial player-stat parity](architecture/initial-player-stat-parity.md) — accepted level-4 opening-stat rule and its characterization.
 - [Relic shop contract](architecture/rewrite-store.md) — passive relics, consumable supplies, persistent health, and current balance rules.
 - [Relic system redesign plan](features/relic-system-plan.md) — implemented Block model, quality tiers, store offer rules, and remaining tuning work.

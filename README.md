@@ -1,8 +1,6 @@
 # Hexakill
 
-Hexakill is a single-player browser RPG. The active application is now an Angular rewrite with typed domain rules, explicit session transitions, bundled legacy assets, local-session persistence, and browser-journey validation.
-
-The former SvelteKit implementation is preserved under [`legacy/svelte/`](legacy/svelte/) as historical behavior reference. It is no longer the active build target.
+Hexakill is a single-player browser RPG. The application uses Angular with typed domain rules, explicit session transitions, bundled assets, local-session persistence, and browser-journey validation.
 
 ## Development
 
@@ -20,7 +18,6 @@ npm run format:check
 npm run lint
 npm run verify:types
 npm run verify:docs
-npm run verify:migration
 npm run verify:assets
 npm run verify:asset-geometry
 npm run verify:deployment
@@ -34,7 +31,7 @@ The production artifact is written to `dist/hexakill/browser/` and includes the 
 
 ## Project documentation
 
-Start with [`docs/README.md`](docs/README.md), [`docs/AGENTS.md`](docs/AGENTS.md), and [`docs/handoff.md`](docs/handoff.md). They document the rewrite contract, characterized legacy behavior, standards evidence, release gates, unresolved product decisions, and migration boundaries.
+Start with [`docs/README.md`](docs/README.md), [`docs/AGENTS.md`](docs/AGENTS.md), and [`docs/handoff.md`](docs/handoff.md). They document the application contract, characterized compatibility behavior, standards evidence, release gates, and unresolved product decisions.
 
 ## Repository structure
 
@@ -44,5 +41,4 @@ Start with [`docs/README.md`](docs/README.md), [`docs/AGENTS.md`](docs/AGENTS.md
 - `tools/serve-static.mjs` — local static server for production-artifact verification.
 - `vercel.json` — candidate static Vercel install/build/output contract; external deployment remains pending.
 - `docs/` — project operating manual, architecture, standards, assets, operations, and TODOs.
-- `legacy/svelte/` — archived SvelteKit source and configuration for historical reference only.
-- `docs/architecture/rewrite-migration.md` — historical note for the completed isolated-to-root Angular promotion.
+- `docs/architecture/current-state.md` — verified runtime, source boundaries, state, persistence, integrations, and risks.

@@ -7,7 +7,7 @@
 - Preserve intentional gameplay rules and assets while making them reviewable and testable.
 - Make invalid state transitions difficult to represent.
 - Keep random outcomes, clocks, audio, persistence, and browser APIs behind explicit adapters.
-- Allow the rules engine to run in unit tests without Svelte, Angular, a browser, timers, or local storage.
+- Allow the rules engine to run in unit tests without Angular, a browser, timers, or local storage.
 - Make the store a first-class feature with an explicit product contract.
 - Make accessibility and critical journeys testable at the rendered UI boundary.
 - Leave room for a future backend without pretending that accounts or network play are requirements today.
@@ -34,7 +34,7 @@ Own immutable or controlled state transitions such as `startRun`, `chooseCharact
 
 ### Application
 
-Own the run/session lifecycle and command sequencing. It should decide when a turn is pending, resolved, cancelled, or terminal. It should not know whether the UI is Svelte or Angular. Delays should be injected through a clock/scheduler port so tests can advance time deterministically.
+Own the run/session lifecycle and command sequencing. It should decide when a turn is pending, resolved, cancelled, or terminal. It should not know about presentation details. Delays should be injected through a clock/scheduler port so tests can advance time deterministically.
 
 ### Presentation
 
@@ -70,7 +70,7 @@ This is a design direction, not a claim about required field names. The exact mo
 5. Build the welcome/character-select/combat-ready/combat vertical slice in Angular. The root application now covers this slice with typed enemy generation and actions.
 6. Add victory rewards, progression, store, power-ups, game-over, persistence, audio playback, and complete asset mapping as separate slices; the root application contains provisional implementations for all except final product balance and provenance acceptance.
 7. Add application transition tests, browser critical-journey tests, accessibility checks, production build validation, and deployment configuration.
-8. Remove the archived Svelte implementation only after behavior and assets have an explicit migration/replacement record; it is currently retained under `legacy/svelte/` for auditability.
+8. Keep behavior and asset decisions documented as the Angular implementation evolves; the repository contains only the active application.
 
 ## Non-goals for the first rewrite slice
 

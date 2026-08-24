@@ -11,7 +11,6 @@ const checks = [
   { label: 'linting', args: ['run', 'lint'] },
   { label: 'TypeScript', args: ['run', 'verify:types'] },
   { label: 'documentation', args: ['run', 'verify:docs'] },
-  { label: 'root migration', args: ['run', 'verify:migration'] },
   { label: 'deployment contract', args: ['run', 'verify:deployment'] },
   { label: 'assets', args: ['run', 'verify:assets'] },
   { label: 'asset geometry contract', args: ['run', 'verify:asset-geometry'] },

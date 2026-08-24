@@ -5,7 +5,7 @@
 
 ## Current direction
 
-The project owner chose Angular for the rewrite. The former SvelteKit application is archived under `legacy/svelte/` as a behavior reference. The active implementation surface is the repository root; the isolated Angular prototype was promoted and removed after root validation.
+The project owner chose Angular for the application. The active implementation surface is the repository root; the isolated Angular prototype was promoted and removed after root validation.
 
 The accepted framework decision is [ADR-0001](adr/0001-angular-rewrite.md). The root app uses Angular 21, Node.js 24.19.0, npm 11.17.0, standalone components, strict compiler/template checks, signals, Vitest, and Playwright.
 
@@ -82,7 +82,6 @@ npm run verify:toolchain
 npm run format:check
 npm run verify:types
 npm run verify:docs
-npm run verify:migration
 npm run verify:assets
 npm run verify:asset-geometry
 npm run verify:deployment

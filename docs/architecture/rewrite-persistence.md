@@ -2,9 +2,9 @@
 
 **Status:** Implemented provisional local-browser contract; migration and product scope remain open.
 
-## Observed legacy behavior
+## Compatibility behavior
 
-The archived Svelte application stored personal records under `hxkllPersonalRecords` as an unversioned JSON array. A record contained `classIdx`, `name`, and `record`; records were sorted descending by level and truncated to five entries. Player defeat appended a record, the layout displayed the list, and retry did not clear it. The archived reader trusted arbitrary JSON and could throw on malformed input.
+The previous implementation stored personal records under `hxkllPersonalRecords` as an unversioned JSON array. A record contained `classIdx`, `name`, and `record`; records were sorted descending by level and truncated to five entries. Player defeat appended a record, the layout displayed the list, and retry did not clear it. The current application replaces this with a validated versioned envelope and does not automatically migrate the old key.
 
 ## Active Angular contract
 

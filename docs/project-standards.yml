@@ -9,9 +9,9 @@ standards_source:
 project:
   name: hexakill
   lifecycle: existing
-  maturity: legacy unfinished browser game; rewrite preparation
+  maturity: active Angular browser game; product hardening in progress
   current_branch: main
-  current_revision: a9472594e055fa2455e926ad9460e19a65fc46a1
+  current_revision: 756a28e38e7a571c1794fc21c528c1a6aaecc2d1
 
 standards:
   - documentation
@@ -29,7 +29,7 @@ profiles:
   current:
     - id: none
       status: not_applicable
-      rationale: The shared profile catalog has no Svelte/SvelteKit profile. Current SvelteKit facts are documented locally.
+      rationale: The shared profile catalog has no game-specific Angular profile. Current application facts are documented locally.
   rewrite:
     - id: angular-application
       status: adopted
@@ -77,27 +77,27 @@ compliance:
       next_action: Retain the automated focus/responsive assertions and add manual accessibility evidence before release.
     - id: TS-001
       status: partial
-      evidence: The active Angular root has strict compiler settings and npm run verify:types passes tsc --noEmit for the application and test projects; the archived Svelte npm run check command still references missing jsconfig.json.
+      evidence: The active Angular root has strict compiler settings and npm run verify:types passes tsc --noEmit for the application and test projects.
       priority: high
       next_action: Retain the active compiler gate and do not revive archived tooling without a decision.
     - id: TS-005
       status: partial
-      evidence: Archived Svelte storage trusts JSON.parse; active Angular session and records adapters validate versioned browser envelopes.
+      evidence: Active Angular session and records adapters validate versioned browser envelopes.
       priority: high
       next_action: Decide legacy-key migration and retain runtime validation for new schemas.
     - id: DEP-001
       status: partial
-      evidence: The archived Svelte package has no tracked lockfile; the active Angular root has a committed package-lock.json, pinned Node/npm baseline, and frozen-install validation.
+      evidence: The active Angular root has a committed package-lock.json, pinned Node/npm baseline, and frozen-install validation.
       priority: high
-      next_action: Retain the root Angular baseline and remove/archive legacy package metadata when the historical audit is complete.
+      next_action: Retain the root Angular baseline and review dependency changes through the frozen-install gate.
     - id: CI-001
       status: partial
-      evidence: .github/workflows/angular-rewrite.yml validates all repository changes with frozen install, audit, Biome formatting/linting, TypeScript, docs, deployment-contract, publishable-artifact, source and artifact asset-path/SHA parity, source and artifact typed sprite-geometry checks, tests, preview-contract checks, dev-server and production-artifact browser journeys, build, and configured validation-artifact retention; the root also exposes a local aggregate release gate; archived Svelte remains historical evidence only.
+      evidence: .github/workflows/angular-rewrite.yml validates all repository changes with frozen install, audit, Biome formatting/linting, TypeScript, docs, deployment-contract, publishable-artifact, source and artifact asset-path/SHA parity, source and artifact typed sprite-geometry checks, tests, preview-contract checks, dev-server and production-artifact browser journeys, build, and configured validation-artifact retention; the root also exposes a local aggregate release gate.
       priority: high
       next_action: Verify the remote workflow and keep the gates aligned with top-level promotion.
     - id: A11Y-002
       status: partial
-      evidence: Archived Svelte source has non-keyboard tooltip/store findings; the active root replaces those interactions with buttons and covers keyboard activation for the core run controls.
+      evidence: The active root uses semantic buttons and covers keyboard activation for the core run controls.
       priority: high
       next_action: Complete manual screen-reader, contrast, zoom, and focus-visibility review across the core run journey.
 

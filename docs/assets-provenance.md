@@ -2,7 +2,7 @@
 
 **Status:** Inventory complete at repository level; source, license, and attribution remain unknown pending owner confirmation.
 
-This register is intentionally conservative. A file being committed to this repository, referenced by the historical Svelte application, or used by the Angular rewrite does not prove copyright ownership, license permission, attribution requirements, or redistribution rights.
+This register is intentionally conservative. A file being committed to this repository or used by the Angular application does not prove copyright ownership, license permission, attribution requirements, or redistribution rights.
 
 ## Evidence currently available
 
@@ -10,7 +10,7 @@ This register is intentionally conservative. A file being committed to this repo
 - Formats and dimensions vary across GIF, PNG, MP3, and WAV files; sprite sheets contain multiple frame layouts and are not interchangeable with the active idle/animation paths.
 - No tracked root `LICENSE`, `COPYING`, or per-asset license file exists in the checkout.
 - The historical README advertised an MIT badge/claim, but that is not sufficient evidence for bundled media rights and does not replace a tracked license file.
-- Archived Svelte HTML referenced Bootstrap Icons, Animate.css, and Iconify from CDNs. The active Angular `src/index.html` references local favicon/assets only; archived CDN dependencies are historical evidence, not active media provenance.
+- The active Angular `src/index.html` references local favicon/assets only; no external UI CDN is an active media dependency.
 - Git history records repository commits that added or retained asset files, but no authoritative upstream source or license metadata was found in those commits.
 
 ## Register by asset group

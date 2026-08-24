@@ -74,7 +74,6 @@ const requiredIndexTargets = [
   'architecture/current-state.md',
   'architecture/rewrite-target.md',
   'architecture/rewrite-persistence.md',
-  'architecture/rewrite-migration.md',
   'assets-provenance.md',
   'assets-sprite-sources.md',
   'accessibility-review.md',
@@ -102,7 +101,6 @@ const requiredCommands = [
   'verify:docs',
   'verify:preview',
   'verify:deployment',
-  'verify:migration',
   'verify:types',
   'verify:toolchain',
   'verify:release',
@@ -121,18 +119,22 @@ const currentRevision = execFileSync('git', ['rev-parse', 'HEAD'], {
   cwd: projectRoot,
   encoding: 'utf8',
 }).trim();
-if (projectRevision !== currentRevision) {
-  fail(
-    `project-standards.yml current_revision ${projectRevision} does not match checkout HEAD ${currentRevision}`,
-  );
-}
-
 try {
   execFileSync('git', ['cat-file', '-e', `${projectRevision}^{commit}`], { cwd: projectRoot });
 } catch {
   fail(`pinned project revision does not exist in Git: ${projectRevision}`);
 }
 
+try {
+  execFileSync('git', ['merge-base', '--is-ancestor', projectRevision, currentRevision], {
+    cwd: projectRoot,
+  });
+} catch {
+  fail(
+    `pinned project revision ${projectRevision} is not an ancestor of checkout HEAD ${currentRevision}`,
+  );
+}
+
 console.log(
-  `Verified docs index, ${markdownFiles.length} Markdown files, local links and anchors, commands, and project revision ${projectRevision}.`,
+  `Verified docs index, ${markdownFiles.length} Markdown files, local links and anchors, commands, and project baseline revision ${projectRevision}.`,
 );

@@ -1,6 +1,6 @@
 # Angular Rewrite Deployment Contract
 
-**Status:** Proposed static deployment contract; Vercel endpoint observed, Angular deployment still pending.
+**Status:** Static deployment contract for the Angular application.
 
 ## Current output
 
@@ -26,11 +26,13 @@ The publishable artifact is `dist/hexakill/browser/`. It includes the applicatio
 - Do not expose source maps or development server output in the production artifact unless intentionally approved.
 - Preserve long-lived caching for hashed bundles while allowing HTML to revalidate.
 - Send a self-contained Content Security Policy; the current app has no external script, font, image, media, or connection requirement.
-- Configure security headers and remove the legacy external CDN dependency before release if it remains in the promoted application.
+- Configure security headers before release and keep the production artifact self-contained.
 
 ## Provider status
 
-`https://hexakill.vercel.app` was observed returning HTTP `200` from Vercel on 2026-08-16, with `x-sveltekit-page: true` and the legacy `TS + Svelte game` description; it still serves the archived SvelteKit application. Repository evidence does not prove project ownership or deployment authorization. `vercel.json` records the candidate Angular install/build/output contract, but it is not evidence of a completed deployment. The first Angular deployment must record the provider/project, preview URL, rollback procedure, 404 behavior, headers, and asset verification.
+Production hosting is managed outside this repository. Keep the provider, project ownership,
+preview URL, rollback procedure, 404 behavior, headers, and asset verification recorded with the
+release process.
 
 ## Local contract verification
 
@@ -38,4 +40,7 @@ The publishable artifact is `dist/hexakill/browser/`. It includes the applicatio
 
 ## Release gate
 
-The root Angular migration now has local gates for clean-install/build, preview HTTP behavior (security headers, asset caching, 404, HEAD, unsupported methods, path traversal, and malformed URL encoding), browser journeys against the production-like output, and representative assets. Release still requires owner-approved deployment target/ownership, rollback, and external verification in an ADR.
+The application has local gates for clean-install/build, preview HTTP behavior (security headers,
+asset caching, 404, HEAD, unsupported methods, path traversal, and malformed URL encoding), browser
+journeys against the production-like output, and representative assets. Release still requires
+owner-approved deployment target/ownership, rollback, and external verification in an ADR.
