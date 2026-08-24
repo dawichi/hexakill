@@ -1404,13 +1404,19 @@ h3 {
 
 .combatant-header {
   display: flex;
+  min-width: 0;
   align-items: start;
   justify-content: space-between;
   gap: 0.75rem;
 }
 
+.combatant-header > div {
+  min-width: 0;
+  width: 100%;
+}
+
 .combatant-header h3 {
-  max-width: 14ch;
+  width: 100%;
   margin-top: 0.3rem;
   color: var(--ink);
   font-family: Georgia, serif;

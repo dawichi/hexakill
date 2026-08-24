@@ -490,7 +490,7 @@ test('reduced motion and a narrow viewport remain usable', async ({ page }) => {
   expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
 
   await page.getByRole('button', { name: 'Enter the dungeon' }).click();
-  await page.getByLabel('Player name').fill('Agent');
+  await page.getByLabel('Player name').fill('David');
   await page.getByRole('button', { name: /Wizard/ }).click();
   await page.getByRole('button', { name: 'Start run' }).click();
 
@@ -773,7 +773,7 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   await expect(selectHeading).toBeVisible();
   await expect(selectHeading).toBeFocused();
 
-  await page.getByLabel('Player name').fill('Agent');
+  await page.getByLabel('Player name').fill('David');
   const wizardButton = page.getByRole('button', { name: /Wizard/ });
   await wizardButton.focus();
   await page.keyboard.press('Enter');
@@ -787,6 +787,16 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   await firstDoor.focus();
   await firstDoor.press('Enter');
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
+  const playerLabelMetrics = await page
+    .locator('.player-combatant .combatant-header h3')
+    .evaluate((element) => {
+      const styles = getComputedStyle(element);
+      return {
+        height: element.getBoundingClientRect().height,
+        lineHeight: Number.parseFloat(styles.lineHeight),
+      };
+    });
+  expect(playerLabelMetrics.height).toBeLessThanOrEqual(playerLabelMetrics.lineHeight * 1.25);
 
   await page.locator('.exit-run-button').click();
   const exitDialog = page.getByRole('dialog', { name: 'Abandon this run?' });
