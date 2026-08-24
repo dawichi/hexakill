@@ -27,29 +27,9 @@ input {
 }
 
 button:focus-visible,
-input:focus-visible,
-.skip-link:focus-visible {
+input:focus-visible {
   outline: 3px solid #ffbd65;
   outline-offset: 3px;
-}
-
-.skip-link {
-  position: fixed;
-  z-index: 10;
-  top: 0;
-  left: 1rem;
-  transform: translateY(-150%);
-  border-radius: 0 0 0.15rem 0.15rem;
-  background: #f4ead2;
-  color: #181317;
-  padding: 0.65rem 0.9rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: transform 150ms ease;
-}
-
-.skip-link:focus-visible {
-  transform: translateY(0);
 }
 
 .sprite-strip {

@@ -7,7 +7,7 @@ This record separates evidence that can be verified from source and automated br
 ## Verified in the active Angular root
 
 - Core actions use native buttons, the player name uses a label, volume controls use labels, and status/error feedback uses `role="status"` or `role="alert"`.
-- The document has a keyboard skip link targeting the focusable game-content main landmark; the component and browser suites verify its target contract and keyboard activation.
+- The active root does not currently include a dedicated skip link; broader keyboard-navigation refinements remain a future accessibility pass.
 - Music and effects sliders expose a human-readable `aria-valuetext` and retain their values through the versioned preferences envelope.
 - Dynamic validation, combat callouts, store, and game-over messages use atomic status/alert regions so assistive technology receives the complete updated message. Combat also exposes enemy intent, Guard/Block feedback, Arcane mark explanations, and delayed health presentation through text callouts rather than visual effects alone.
 - Screen headings have programmatic focus targets. The browser suite verifies focus after welcome navigation, store entry/return, route-map entry, combat entry, power-up selection, game-over, reset, and keyboard activation.
