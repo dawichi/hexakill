@@ -11,7 +11,11 @@
       <p class="status">A pixel dungeon run</p>
     </div>
     <div class="topbar-actions">
-      @if (session.screen() !== 'welcome' && session.screen() !== 'game-over') {
+      @if (
+        session.screen() !== 'welcome' &&
+        session.screen() !== 'game-over' &&
+        session.screen() !== 'run-complete'
+      ) {
         <button class="exit-run-button" type="button" (click)="requestExitRun()">
           <svg lucideLogOut size="14" aria-hidden="true"></svg> Exit run
         </button>
@@ -362,11 +366,15 @@
           >
             <div class="section-heading route-heading">
               <div>
-                <p class="eyebrow">Floor {{ route.floor }} · room selection</p>
+                <p class="eyebrow">Room {{ route.floor }} · {{ route.nodes.length === 1 ? 'milestone' : 'room selection' }}</p>
                 <h2 id="route-map-title" data-screen-heading tabindex="-1">Choose a door</h2>
                 <p class="section-lead">
-                  Pick one room. Some doors show their purpose; others keep their secret until you
-                  enter.
+                  @if (route.nodes.length === 1) {
+                    The milestone guardian awaits. Defeat it to keep moving.
+                  } @else {
+                    Pick one room. Some doors show their purpose; others keep their secret until
+                    you enter.
+                  }
                 </p>
               </div>
               <div class="route-summary" aria-label="Run summary">
@@ -382,14 +390,45 @@
 
             <div class="route-origin" aria-hidden="true">
               <span class="route-origin-mark"><svg lucideMapPin size="17"></svg></span>
-              <span>Three doors · one choice</span>
+              <span>{{ route.nodes.length === 1 ? 'One guardian · no detour' : 'Three doors · one choice' }}</span>
+            </div>
+            <div
+              class="run-progress"
+              role="progressbar"
+              aria-label="Dungeon progress"
+              aria-valuemin="0"
+              [attr.aria-valuemax]="session.totalRooms"
+              [attr.aria-valuenow]="session.completedRooms()"
+              [attr.aria-valuetext]="
+                session.completedRooms() + ' of ' + session.totalRooms + ' rooms complete'
+              "
+            >
+              <div class="progress-heading run-progress-heading">
+                <span>Run progress</span>
+                <strong>{{ session.completedRooms() }} / {{ session.totalRooms }} rooms</strong>
+              </div>
+              <div class="run-progress-track experience-bar">
+                <span [style.width.%]="session.runProgressPercent()"></span>
+              </div>
+              <div class="run-progress-bosses" aria-hidden="true">
+                <span [class.reached]="player.bossesDefeated >= 1">I · Room 10</span>
+                <span [class.reached]="player.bossesDefeated >= 2">II · Room 20</span>
+                <span [class.reached]="player.bossesDefeated >= 3">III · Room 30</span>
+              </div>
             </div>
             <!-- Future room type: events will join battles, elites, stores, and camps here. -->
-            <div class="route-map door-stage" role="group" aria-label="Available doors">
-              <div class="route-branches" aria-hidden="true">
-                <span></span><span></span><span></span>
-              </div>
-              <div class="route-nodes door-grid">
+            <div
+              class="route-map door-stage"
+              [class.boss-stage]="route.nodes.length === 1"
+              role="group"
+              aria-label="Available doors"
+            >
+              @if (route.nodes.length > 1) {
+                <div class="route-branches" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </div>
+              }
+              <div class="route-nodes door-grid" [class.boss-room]="route.nodes.length === 1">
                 @for (node of route.nodes; track node.id; let index = $index) {
                   <button
                     class="route-node door-card"
@@ -420,6 +459,8 @@
                         @if (node.kind === 'battle') {
                           <svg lucideSwords size="22"></svg>
                         } @else if (node.kind === 'elite') {
+                          <svg lucideTrophy size="22"></svg>
+                        } @else if (node.kind === 'boss') {
                           <svg lucideTrophy size="22"></svg>
                         } @else if (node.kind === 'store') {
                           <svg lucideStore size="22"></svg>
@@ -965,6 +1006,53 @@
               </button>
             }
           </div>
+        </section>
+      }
+    }
+
+    @case ('run-complete') {
+      @if (session.player(); as player) {
+        <section class="panel run-complete" data-screen="run-complete" aria-labelledby="run-complete-title">
+          <header class="run-complete-header">
+            <div>
+              <p class="eyebrow">The dungeon is conquered</p>
+              <h2 id="run-complete-title" data-screen-heading tabindex="-1">Run complete.</h2>
+              <p class="lead">
+                {{ player.name }} defeated all three Gold Slimes and cleared all
+                {{ session.totalRooms }} rooms.
+              </p>
+            </div>
+            <span class="run-complete-trophy" aria-hidden="true">
+              <svg lucideTrophy size="42"></svg>
+            </span>
+          </header>
+          <div
+            class="run-progress run-progress-complete"
+            role="progressbar"
+            aria-label="Dungeon progress"
+            aria-valuemin="0"
+            [attr.aria-valuemax]="session.totalRooms"
+            [attr.aria-valuenow]="session.completedRooms()"
+            [attr.aria-valuetext]="session.totalRooms + ' of ' + session.totalRooms + ' rooms complete'"
+          >
+            <div class="progress-heading run-progress-heading">
+              <span>Run progress</span>
+              <strong>{{ session.completedRooms() }} / {{ session.totalRooms }} rooms</strong>
+            </div>
+            <div class="run-progress-track experience-bar"><span [style.width.%]="session.runProgressPercent()"></span></div>
+            <div class="run-progress-bosses">
+              <span class="reached">I · Gold Slime 1</span>
+              <span class="reached">II · Gold Slime 2</span>
+              <span class="reached">III · Gold Slime 3</span>
+            </div>
+          </div>
+          <p class="combat-message" role="status" aria-atomic="true">{{ session.combatMessage() }}</p>
+          <footer class="game-over-footer">
+            <span><svg lucideTrophy size="15" aria-hidden="true"></svg> Your legend is written in stone.</span>
+            <button class="primary-button" type="button" (click)="session.reset()">
+              Return to home <svg lucideArrowRight size="16" aria-hidden="true"></svg>
+            </button>
+          </footer>
         </section>
       }
     }

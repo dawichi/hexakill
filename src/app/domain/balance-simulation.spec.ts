@@ -5,6 +5,7 @@ import {
   PLAYER_POLICIES,
   runBalanceReport,
   simulateEncounter,
+  strengthenElite,
 } from './balance-simulation';
 
 describe('balance simulation', () => {
@@ -64,6 +65,18 @@ describe('balance simulation', () => {
     expect(result.enemyHealth).toBeGreaterThanOrEqual(0);
     expect(result.damageDealt).toBeGreaterThanOrEqual(0);
     expect(result.damageTaken).toBeGreaterThanOrEqual(0);
+  });
+
+  it('keeps the provisional elite premium survivable', () => {
+    const scenario = DEFAULT_BALANCE_SCENARIOS[0];
+    if (!scenario) throw new Error('Expected a default balance scenario.');
+    const { enemy } = createSimulationFixture(scenario);
+    const elite = strengthenElite(enemy);
+
+    expect(elite.stats.health).toBe(Math.round(enemy.stats.health * 1.15));
+    expect(elite.stats.ad).toBe(Math.round(enemy.stats.ad * 1.15));
+    expect(elite.gold).toBe(Math.round(enemy.gold * 1.5));
+    expect(elite.elite).toBe(true);
   });
 
   it('produces summaries for every scenario and selected policy', () => {

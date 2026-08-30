@@ -1,6 +1,6 @@
 # Current Development Handoff
 
-**Reviewed:** 2026-08-23
+**Reviewed:** 2026-08-30
 **Purpose:** Fast continuation point for a future developer agent.
 
 ## Current direction
@@ -16,10 +16,10 @@ The current vertical slice is:
 1. Welcome screen.
 2. Player name and character selection.
 3. In-memory run creation at the legacy starting values.
-4. Typed generation for the complete observed legacy roster plus sequential Gold Slime boss encounters at levels 10, 20, and 30.
+4. Typed generation for the complete observed legacy roster plus fixed Gold Slime boss rooms at rooms 10, 20, and 30.
 5. Combat screen with Attack, Magic, Guard, and Potion actions plus visible enemy intent.
 6. Pure damage resolution for ranges, misses, critical hits, resistance, integer damage, and health caps.
-7. Pure combat state transitions for `idle`, `awaiting-player-action`, `resolving-player-action`, `enemy-turn`, `victory`, and `defeat`, including temporary Block, enemy intents, and Arcane marks.
+7. Pure combat state transitions for `idle`, `awaiting-player-action`, `resolving-player-action`, `enemy-turn`, `victory`, and `defeat`, including temporary Block, enemy intents, and Arcane marks. Defeating the room-30 boss enters the `run-complete` screen.
 
 The Angular application service coordinates signals and random input. Domain rules do not import Angular. The `Clock` port exists and is injected at the application boundary; the provisional enemy turn uses it for a short presentation delay.
 
@@ -37,9 +37,11 @@ Durable session snapshots reject transient actions, malformed damage results, in
 
 The active app consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields, uses observed Evil Tree/slime attack and defeat GIFs through optional typed enemy animation fields with a scheduler-backed 600 ms enemy-attack window, renders provisional Wizard/Samurai single-row `Idle.png` strips for combat idle states and `Attack1.png` strips for physical actions, `Attack2.png` strips for Magic actions, `Hit.png`/`Take Hit.png` strips when the player receives damage, and `Death.png` strips on game over, and maps observed Wild Huntress/Evil Wizard/Fire Worm/Knight/Martial Hero single-row `Idle.png` and `Attack1.png` strips plus five enemy hit strips, Evil Wizard's `Attack2.png` strip, and Witch Blue's nine-frame vertical `B_witch_idle.png` idle strip plus vertical `B_witch_charge.png` strip for Magic during enemy attack windows, with corresponding defeat strips during provisional defeat states. Boss encounters select the typed boss music asset; regular encounters select dungeon music. The retained root `static/` tree is copied into Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is behind an injectable audio port.
 
+The route map now tracks a fixed 30-room run, shows one guardian door at rooms 10, 20, and 30, and displays a room progress bar. Defeating the room-30 Gold Slime enters `run-complete`.
+
 ## Deliberate non-goals
 
-Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session, records, and preferences envelopes, non-fatal audio playback, Biome CI gates, and 27 Chromium journeys, but these are still provisional.
+Final persistence acceptance, deployment, and gameplay balancing remain unresolved. The app has versioned local-session, records, and preferences envelopes, non-fatal audio playback, Biome CI gates, and 29 Chromium journeys, but these are still provisional. The current balance pass uses a 15% elite stat premium and provisional boss levels 8, 12, and 16; reactive full-run completion is now non-zero for Wizard and Samurai, while Warrior remains under review.
 
 ## Completion gate
 
@@ -91,8 +93,8 @@ npm run build
 npm run verify:release
 ```
 
-The latest focused implementation verification on 2026-08-23 is revision `a9472594e055fa2455e926ad9460e19a65fc46a1`: Biome formatting/linting, TypeScript, production build, 123 unit/component tests, and 27 Chromium journeys all pass. The broader release evidence below must be rerun after any release-candidate change.
+The latest verification on 2026-08-30 is the fixed-room implementation: Biome formatting/linting, TypeScript, production build, 126 unit/component tests, and 29 Chromium journeys all pass. The broader release evidence below was rerun through `npm run verify:release`.
 
 The prior full-gate result on 2026-08-16 is revision `3257d036e255ce15c15d44c7d497e69692d341e5` with a clean root install, 13 test files with 93 passing tests, a passing aggregate `npm run verify:release` gate, a passing root production build, a passing publishable-artifact contract check for `dist/hexakill/browser/index.html`, path and SHA-256 byte parity for all 125 retained static files in that artifact, passing source and publishable-artifact geometry checks for 33 typed sprite strips, 81 active asset paths and 42 exact deferred image sources, a passing preview-contract check for security headers, asset caching, 404 behavior, HEAD handling, unsupported methods, path traversal, and malformed URL encoding, all 21 idle assets in the output, passing formatting checks, bounded overflow-sized victory experience, malformed boss-progress, post-transition boss-schedule, and orphaned no-enemy combat-damage rejection, runtime rejection of unknown damage kinds and actions, and twenty-six Chromium journeys covering progression/store/combat and the rendered non-persistent player/enemy battle logs with their legacy eight-entry rolling window and outcome messages, Wizard Idle/Attack1/Attack2/hit provisional player-animation rendering, mapped physical/Magic/hit/idle player/enemy attack/defeat-strip rendering including Witch Blue's idle, physical, hit, and Magic charge strips, local-session restore, audio-preference restore, malformed audio-preference and personal-record recovery, invalid-session recovery including incoherent-screen, transient-combat-action, resolving-player-action, enemy-turn, malformed-combat-result, whitespace-only, negative-stat, duplicate-inventory, over-cap-power-up, and unbound-character restored data, keyboard/focus transitions across the core controls, labeled champion/combat/store control groups, responsive reduced-motion behavior, keyboard game-over/reset and record clearing, defeated-enemy history, rewards/power-ups, and sequential bosses. The mapped enemy-animation, Knight idle, and Samurai/Magic player-animation journeys also passed repeated deterministic stability runs. Production journeys explicitly start the repository static server instead of reusing an unrelated service on port 4300; a separate production-artifact run passes through the repository static preview server.
 
-At the read-only ref check on 2026-08-23, local `main` is nine commits ahead of `origin/main` (`de008a93f22d7981905e84b14ff62135444a5cb1`); `origin/develop` remains a separate historical ref. This work has not been pushed, so remote CI and branch-protection evidence must be gathered separately before release.
+At the read-only ref check on 2026-08-30, local `main` and `origin/main` both point to `09430519b1b3f2ccb6143d232bc3f07088af0104`; `origin/develop` remains a separate historical ref. Remote CI and branch-protection evidence remain separate release checks.

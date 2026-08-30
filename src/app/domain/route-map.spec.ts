@@ -21,11 +21,23 @@ describe('route map', () => {
     expect(findRouteNode(map, 'missing-node')).toBeUndefined();
   });
 
+  it('creates a single visible boss door at rooms 10, 20, and 30', () => {
+    for (const room of [10, 20, 30]) {
+      const map = createRouteMap(room, 0.5);
+
+      expect(map.nodes).toHaveLength(1);
+      expect(map.nodes[0]?.kind).toBe('boss');
+      expect(map.nodes[0]?.hidden).toBe(false);
+      expect(isRouteMapState(map)).toBe(true);
+    }
+  });
+
   it('rejects malformed persisted route maps', () => {
     const map = createRouteMap(1, 0.25);
 
     expect(isRouteMapState(map)).toBe(true);
     expect(isRouteMapState({ ...map, nodes: map.nodes.slice(0, 2) })).toBe(false);
     expect(isRouteMapState({ ...map, floor: 0 })).toBe(false);
+    expect(isRouteMapState({ ...createRouteMap(10, 0), nodes: map.nodes })).toBe(false);
   });
 });

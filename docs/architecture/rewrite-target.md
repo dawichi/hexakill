@@ -53,7 +53,7 @@ Render view models and dispatch commands. Components should not mutate domain ob
 
 Replace the current mutable `GameDTO` class graph with explicit serializable state. A possible shape is:
 
-- `screen`: `welcome | character-select | map | combat | store | game-over`, with combat phases and scheduler-backed action locks carrying the transient resolving/enemy-turn states.
+- `screen`: `welcome | character-select | map | combat | store | game-over | run-complete`, with fixed boss rooms at 10, 20, and 30 and combat phases/scheduler-backed action locks carrying the transient resolving/enemy-turn states.
 - `run`: player, enemy, inventory, progression, shop, logs, defeated-enemy history.
 - `interaction`: selected action, pending command, scheduler token, focus target.
 - `preferences`: music/effects volume.

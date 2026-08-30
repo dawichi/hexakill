@@ -11,7 +11,7 @@ project:
   lifecycle: existing
   maturity: active Angular browser game; product hardening in progress
   current_branch: main
-  current_revision: 756a28e38e7a571c1794fc21c528c1a6aaecc2d1
+  current_revision: 09430519b1b3f2ccb6143d232bc3f07088af0104
 
 standards:
   - documentation
@@ -72,7 +72,7 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: 'Active Angular baseline: 123 tests and 27 Playwright journeys, including the existing validation, persistence, animation, keyboard, responsive, store, progression, and boss coverage plus intent-driven combat, Guard/Block, Arcane mark, staged feedback, and current combat presentation; production journeys explicitly start the repository static server rather than reusing a stale port occupant; broader gameplay/accessibility coverage remains incomplete.'
+      evidence: 'Active Angular baseline: 126 tests and 29 Playwright journeys, including validation, persistence, animation, keyboard, responsive, store, progression, fixed boss rooms, room progress, run completion, and production-artifact coverage plus intent-driven combat, Guard/Block, Arcane mark, staged feedback, elite tuning, and current combat presentation; broader gameplay/accessibility coverage remains incomplete.'
       priority: high
       next_action: Retain the automated focus/responsive assertions and add manual accessibility evidence before release.
     - id: TS-001

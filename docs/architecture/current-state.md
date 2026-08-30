@@ -4,7 +4,7 @@
 
 ## Executive summary
 
-Hexakill is a single-route, browser-only Angular game. The root application renders all game screens from one standalone shell, while framework-independent domain modules own combat, progression, route, store, relic, asset, and persistence-validation rules. `GameSessionService` is the application façade for signals, command sequencing, timers, audio, and browser-storage ports. There is no server route, API, database, account system, queue, or authenticated boundary.
+Hexakill is a single-route, browser-only Angular game. The root application renders all game screens from one standalone shell, while framework-independent domain modules own combat, progression, route, store, relic, asset, and persistence-validation rules. `GameSessionService` is the application façade for signals, command sequencing, timers, audio, and browser-storage ports. There is no server route, API, database, account system, queue, or authenticated boundary. Runs contain 30 rooms, with fixed boss rooms at 10, 20, and 30; room 30 produces a successful `run-complete` state.
 
 ## Application organization
 
@@ -72,9 +72,9 @@ Browser storage uses versioned envelopes:
 - `hexakill.angular.preferences.v1` for validated audio preferences.
 
 All restored data is structurally validated before hydration. Transient combat actions, malformed
-damage results, incoherent phases, unsafe counters, duplicate inventory, and non-positive restored
-health are rejected. The app does not automatically migrate data from earlier unversioned browser
-keys; that policy remains an explicit product decision.
+damage results, incoherent phases, unsafe counters, duplicate inventory, invalid milestone maps,
+and non-positive restored health are rejected. The app does not automatically migrate data from
+earlier unversioned browser keys; that policy remains an explicit product decision.
 
 ## Integrations and trust boundaries
 
@@ -90,6 +90,7 @@ asset caching, preview behavior, and release verification are documented in
 
 - `GameSessionService` remains a large façade and should be split before substantial UI expansion.
 - Final combat balance, relic pricing, enemy intent pacing, and progression curves remain under manual review.
+- The full-run simulator measures completion as defeating all three fixed-room bosses by room 30; the current baseline still needs balance tuning to make that outcome reliably attainable.
 - Persistence migration from earlier browser keys is not implemented.
 - Asset provenance/licensing and the disposition of deferred sprite sources remain unresolved.
 - Manual accessibility and assistive-technology review is still incomplete.

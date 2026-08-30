@@ -33,7 +33,7 @@ describe('enemy generation', () => {
     expect(enemy.stats.health).toBeGreaterThan(0);
   });
 
-  it('opens the sequential gold-slime bosses at level ten', () => {
+  it('opens the sequential gold-slime bosses at the legacy level threshold', () => {
     const firstBoss = generateEnemy(10, 0.5, 0, 0);
     const secondBoss = generateEnemy(20, 0.5, 0, 1);
 
@@ -42,6 +42,13 @@ describe('enemy generation', () => {
     expect(firstBoss.gold).toBe(1000);
     expect(secondBoss.definition.name).toBe('Gold Slime 2');
     expect(secondBoss.level).toBe(25);
+  });
+
+  it('can generate a fixed-room boss before the level threshold', () => {
+    const boss = generateEnemy(4, 0, 0, 0, true);
+
+    expect(boss.definition.id).toBe('gold-slime-1');
+    expect(boss.level).toBe(8);
   });
 
   it('rejects invalid random rolls', () => {

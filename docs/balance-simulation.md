@@ -64,16 +64,21 @@ FULL_RUN_SAMPLES=1000 npm run simulate:full-run
 
 The full-run report compares class and reactive combat policies against balanced, aggressive, and
 safe route policies. Route policies only inspect revealed door kinds; hidden doors remain unknown
-until selected. Combat seeds, route rolls, and policy decisions are deterministic and reproducible.
+until selected. Rooms 10, 20, and 30 are fixed boss rooms; room 30 is the completion boundary.
+Combat seeds, route rolls, and policy decisions are deterministic and reproducible.
 
 Important full-run signals include completion rate, rooms survived, boss progress, relic count,
-campfire/store frequency, gold spent, and final health. The first baseline currently shows that
-reactive policies survive substantially longer than class-only policies, but the three-boss
-completion rate is still zero in the initial sample. That is an investigation signal—not a final
-balance verdict—because route heuristics and the boss curve still need deliberate tuning.
+campfire/store frequency, gold spent, and final health. Completion means defeating all three
+sequential Gold Slime bosses by room 30. The current pass uses a 15% elite stat premium and
+provisional boss levels 8, 12, and 16. Reactive policies now produce non-zero three-boss completion
+for Wizard and Samurai in the seeded baseline, while Warrior and class-only policies still need
+tuning. That is an investigation signal—not a final balance verdict—because route heuristics,
+fixed-room pressure, and the boss curve all affect it.
 
 ## Current scope and next layer
 
-The lab now covers single encounters and full runs. It does not yet model human telemetry, event
+The milestone boss curve is currently level 8, 12, and 16 for rooms 10, 20, and 30 respectively;
+these levels are provisional targets chosen to keep the fixed rooms reachable while preserving
+escalation. The lab now covers single encounters and full runs. It does not yet model human telemetry, event
 rooms, a learned policy, or confidence intervals/CSV export. Those should come after we establish
 the intended normal/elite/boss difficulty targets from the current report and manual playtests.

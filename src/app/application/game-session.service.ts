@@ -63,7 +63,9 @@ import {
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
 import { ASSET_MANIFEST } from '../domain/assets';
 import {
+  BOSS_ROOMS,
   createRouteMap,
+  FINAL_ROOM,
   findRouteNode,
   isRouteMapState,
   revealHiddenRouteNodes,
@@ -99,7 +101,14 @@ import {
   isStoredPreferencesSnapshot,
 } from '../domain/preferences';
 
-export type GameScreen = 'welcome' | 'character-select' | 'map' | 'combat' | 'store' | 'game-over';
+export type GameScreen =
+  | 'welcome'
+  | 'character-select'
+  | 'map'
+  | 'combat'
+  | 'store'
+  | 'game-over'
+  | 'run-complete';
 
 export interface DefeatedEnemySummary {
   readonly enemyId: string;
@@ -354,7 +363,7 @@ function isRestorableRouteFloor(value: unknown): value is number {
 function strengthenEliteEnemy(enemy: EnemyState): EnemyState {
   const stats = { ...enemy.stats };
   (Object.keys(stats) as (keyof Stats)[]).forEach((stat) => {
-    stats[stat] = Math.round(stats[stat] * 1.3);
+    stats[stat] = Math.round(stats[stat] * 1.15);
   });
   return { ...enemy, stats, gold: Math.round(enemy.gold * 1.5), elite: true };
 }
@@ -406,6 +415,19 @@ function hasCoherentSessionState(snapshot: Partial<StoredSessionSnapshot>): bool
     );
   }
 
+  if (snapshot.screen === 'run-complete') {
+    const finalEnemy = snapshot.combatState?.enemy;
+    return (
+      phase === 'victory' &&
+      finalEnemy !== null &&
+      finalEnemy !== undefined &&
+      finalEnemy.damageTaken >= finalEnemy.stats.health &&
+      snapshot.player !== null &&
+      snapshot.player !== undefined &&
+      snapshot.player.bossesDefeated >= BOSS_ROOMS.length
+    );
+  }
+
   return (
     snapshot.screen === 'game-over' &&
     phase === 'defeat' &&
@@ -441,6 +463,13 @@ export class GameSessionService {
   readonly player = signal<PlayerState | null>(null);
   readonly combatState = signal<CombatState>(INITIAL_COMBAT_STATE);
   readonly routeFloor = signal(1);
+  readonly totalRooms = FINAL_ROOM;
+  readonly completedRooms = computed(() =>
+    Math.min(this.totalRooms, Math.max(0, this.routeFloor() - 1)),
+  );
+  readonly runProgressPercent = computed(() =>
+    Math.round((this.completedRooms() / this.totalRooms) * 100),
+  );
   readonly routeMap = signal<RouteMapState | null>(null);
   readonly enemy = computed(() => this.combatState().enemy);
   readonly enemyIntent = computed(() => this.combatState().enemyIntent ?? null);
@@ -589,7 +618,7 @@ export class GameSessionService {
     this.showRouteMap();
   }
 
-  findEnemy(routeKind: Extract<RouteNodeKind, 'battle' | 'elite'> = 'battle'): void {
+  findEnemy(routeKind: Extract<RouteNodeKind, 'battle' | 'elite' | 'boss'> = 'battle'): void {
     const player = this.player();
 
     if (!player || player.powerUps.pending > 0) {
@@ -601,6 +630,7 @@ export class GameSessionService {
       this.random(),
       this.random(),
       player.bossesDefeated,
+      routeKind === 'boss',
     );
     const spawnedEnemy =
       routeKind === 'elite' ? strengthenEliteEnemy(generatedEnemy) : generatedEnemy;
@@ -675,7 +705,13 @@ export class GameSessionService {
 
   openRouteMap(): void {
     const player = this.player();
-    if (!player || this.combatState().phase !== 'victory' || player.powerUps.pending > 0) return;
+    if (
+      !player ||
+      this.combatState().phase !== 'victory' ||
+      player.powerUps.pending > 0 ||
+      player.bossesDefeated >= BOSS_ROOMS.length
+    )
+      return;
     this.showRouteMap();
   }
 
@@ -1015,7 +1051,7 @@ export class GameSessionService {
 
   private syncMusicToScreen(): void {
     const asset =
-      this.screen() === 'welcome'
+      this.screen() === 'welcome' || this.screen() === 'run-complete'
         ? ASSET_MANIFEST.music.welcome
         : this.screen() === 'character-select'
           ? ASSET_MANIFEST.music.characterSelect
@@ -1080,6 +1116,14 @@ export class GameSessionService {
     this.audio?.playSound(
       reward.levelsGained > 0 ? ASSET_MANIFEST.sounds.levelUp : ASSET_MANIFEST.sounds.enemyKilled,
     );
+    if (rewardedPlayer.bossesDefeated >= BOSS_ROOMS.length) {
+      this.actionReady.set(false);
+      this.screen.set('run-complete');
+      this.combatMessage.set(
+        `The final Gold Slime was defeated. You completed all ${FINAL_ROOM} rooms.`,
+      );
+      this.audio?.playMusic(ASSET_MANIFEST.music.welcome);
+    }
   }
 
   private beginEnemyAction(): void {
@@ -1618,9 +1662,15 @@ export class GameSessionService {
         snapshot.version !== 1 ||
         typeof snapshot.playerName !== 'string' ||
         snapshot.selectedCharacterId === undefined ||
-        !['welcome', 'character-select', 'map', 'combat', 'store', 'game-over'].includes(
-          String(snapshot.screen),
-        ) ||
+        ![
+          'welcome',
+          'character-select',
+          'map',
+          'combat',
+          'store',
+          'game-over',
+          'run-complete',
+        ].includes(String(snapshot.screen)) ||
         !isRestorableRouteFloor(routeFloor) ||
         (snapshot.routeMap !== undefined &&
           snapshot.routeMap !== null &&

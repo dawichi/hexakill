@@ -191,7 +191,7 @@ function percentage(value: number, total: number): number {
 export function strengthenElite(enemy: EnemyState): EnemyState {
   const stats = { ...enemy.stats };
   (Object.keys(stats) as (keyof Stats)[]).forEach((stat) => {
-    stats[stat] = Math.round(stats[stat] * 1.3);
+    stats[stat] = Math.round(stats[stat] * 1.15);
   });
   return { ...enemy, stats, gold: Math.round(enemy.gold * 1.5), elite: true };
 }

@@ -992,7 +992,7 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   await expect(nextEnemyButton).toBeFocused();
 });
 
-test('boss encounters advance in sequence after level ten', async ({ page }) => {
+test('legacy level-threshold boss encounters still advance in sequence', async ({ page }) => {
   await startRun(page);
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')))
@@ -1039,4 +1039,84 @@ test('boss encounters advance in sequence after level ten', async ({ page }) => 
   await expect(page.getByRole('heading', { name: 'Choose a door' })).toBeVisible();
   await page.getByRole('button', { name: /Skirmish:/ }).click();
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
+});
+
+test('milestone rooms show fixed boss doors and run progress', async ({ page }) => {
+  await startRun(page);
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.screen = 'map';
+  snapshot.routeFloor = 10;
+  snapshot.routeMap = {
+    floor: 10,
+    nodes: [
+      {
+        id: 'floor-10-boss',
+        kind: 'boss',
+        hidden: false,
+        title: 'Gold Slime',
+        description: 'A milestone guardian blocks the path forward.',
+        reward: 'Defeat the guardian to continue',
+      },
+    ],
+  };
+  snapshot.combatState.phase = 'victory';
+  snapshot.combatState.enemy.damageTaken = snapshot.combatState.enemy.stats.health;
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+  await page.reload();
+
+  await expect(page.getByText(/Room 10 · milestone/)).toBeVisible();
+  await expect(page.getByRole('progressbar', { name: 'Dungeon progress' })).toHaveAttribute(
+    'aria-valuenow',
+    '9',
+  );
+  await expect(page.locator('[data-screen="map"] .door-card')).toHaveCount(1);
+  await page.locator('[data-screen="map"] .door-card').click();
+  await expect(page.locator('[data-screen="combat"]')).toContainText('Gold Slime 1');
+});
+
+test('defeating the room 30 boss ends the run at 30 of 30 rooms', async ({ page }) => {
+  await startRun(page);
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  snapshot.screen = 'combat';
+  snapshot.routeFloor = 31;
+  snapshot.player.bossesDefeated = 2;
+  snapshot.player.stats.speed = 100;
+  snapshot.combatState = {
+    phase: 'awaiting-player-action',
+    enemy: {
+      definition: {
+        id: 'gold-slime-3',
+        name: 'Gold Slime 3',
+        archetype: 'boss',
+        modifiers: { health: 1.5, ad: 1.25, ap: 1.25, armor: 1.25, mr: 1.25, speed: 2 },
+        idleAsset: '/images/slime-gold/idle.gif',
+      },
+      level: 35,
+      stats: { health: 1, ad: 1, ap: 1, armor: 1, mr: 1, speed: 1 },
+      damageTaken: 0,
+      potions: 0,
+      gold: 1000,
+    },
+    playerDamageTaken: 0,
+    pendingAction: null,
+    lastResult: null,
+  };
+  await page.evaluate((value) => {
+    localStorage.setItem('hexakill.angular.session.v1', JSON.stringify(value));
+  }, snapshot);
+  await page.reload();
+
+  await page.getByRole('button', { name: /Attack Reliable physical damage/ }).click();
+  await expect(page.locator('[data-screen="run-complete"]')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Run complete.' })).toBeFocused();
+  await expect(page.getByRole('progressbar', { name: 'Dungeon progress' })).toHaveAttribute(
+    'aria-valuenow',
+    '30',
+  );
 });

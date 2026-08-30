@@ -1,6 +1,6 @@
 # Finalization Decision Packet
 
-**Status:** Open owner decisions required before final product acceptance. Reviewed 2026-08-23.
+**Status:** Open owner decisions required before final product acceptance. Reviewed 2026-08-30.
 
 This packet is the short decision surface for the finalization session. It does not replace the detailed characterization documents or create product decisions by implication. Each item below is either an explicit owner choice or an acceptance review with evidence already collected. The [recommendation guide](finalization-recommendations.md) explains a safe resolution order without accepting any choice on the owner's behalf.
 
@@ -19,7 +19,7 @@ This packet is the short decision surface for the finalization session. It does 
 
 ## Current implementation boundary
 
-The Angular root is ready for engineering smoke play, not final product acceptance. The latest focused implementation revision is `a9472594e055fa2455e926ad9460e19a65fc46a1`: Node 24.19.0/npm 11.17.0, Biome formatting/linting, 123 unit/component tests, 27 Chromium journeys, and a clean production build. The broader asset, static-artifact, security, preview, and full-release evidence must be rerun for a release candidate. The progression boundary rejects overflow-sized victory experience, malformed boss progress, and a boss reward that would exceed the three-boss schedule before state publication; the persistence boundary rejects orphaned combat damage and malformed optional combat fields; and the combat boundaries reject unknown damage kinds and actions instead of falling through to Magic. The automated accessibility contract exposes labeled groups for champion selection, combat actions, power-up choices, and store offers.
+The Angular root is ready for engineering smoke play, not final product acceptance. The current fixed-room implementation is at `09430519b1b3f2ccb6143d232bc3f07088af0104`: Node 24.19.0/npm 11.17.0, Biome formatting/linting, 126 unit/component tests, 29 Chromium journeys, and a clean production build. The progression boundary rejects overflow-sized victory experience, malformed boss progress, and a boss reward that would exceed the three-boss schedule before state publication; the persistence boundary rejects orphaned combat damage and malformed optional fields; and the combat boundaries reject unknown damage kinds and actions instead of falling through to Magic. The automated accessibility contract exposes labeled groups for champion selection, combat actions, power-up choices, and store offers.
 
 The green baseline proves reproducibility and safety boundaries. D-001 and the prototype portion of D-002 are resolved, while D-003 through D-008 and the remaining final acceptance reviews remain open. A future agent must not mark the rewrite complete while any open owner decision or acceptance review remains.
 

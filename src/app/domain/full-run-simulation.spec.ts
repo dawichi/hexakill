@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
 import { ROUTE_POLICIES, runFullRunReport, simulateFullRun } from './full-run-simulation';
-import { RouteMapState, RouteNode } from './route-map';
+import { createRouteMap, RouteMapState, RouteNode } from './route-map';
 
 describe('full-run simulation', () => {
   it('replays the same route, combat, and economy with a fixed seed', () => {
@@ -72,5 +72,12 @@ describe('full-run simulation', () => {
     expect(report.summaries).toHaveLength(2);
     expect(report.summaries.every((summary) => summary.samples === 4)).toBe(true);
     expect(report.summaries.every((summary) => summary.completionRate >= 0)).toBe(true);
+  });
+
+  it('places boss rooms at the fixed run milestones', () => {
+    expect(createRouteMap(9, 0).nodes).toHaveLength(3);
+    expect(createRouteMap(10, 0).nodes.map((node) => node.kind)).toEqual(['boss']);
+    expect(createRouteMap(20, 0).nodes.map((node) => node.kind)).toEqual(['boss']);
+    expect(createRouteMap(30, 0).nodes.map((node) => node.kind)).toEqual(['boss']);
   });
 });

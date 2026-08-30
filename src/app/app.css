@@ -1105,7 +1105,8 @@ h3 {
   white-space: nowrap;
 }
 
-.game-over-header {
+.game-over-header,
+.run-complete-header {
   display: flex;
   min-height: 0;
   align-items: center;
@@ -1234,6 +1235,12 @@ h3 {
   color: var(--ember-bright);
 }
 
+.run-progress {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1.25rem;
+}
+
 .route-map {
   position: relative;
   margin-top: 0.75rem;
@@ -1271,6 +1278,10 @@ h3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
   padding-top: 2.25rem;
+}
+
+.route-nodes.boss-room {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .route-node {

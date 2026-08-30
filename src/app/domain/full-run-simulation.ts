@@ -1,5 +1,12 @@
 import { applyPowerUp, applyVictoryReward } from './progression';
-import { createRouteMap, RouteMapState, RouteNode, RouteNodeKind } from './route-map';
+import {
+  BOSS_ROOMS,
+  createRouteMap,
+  FINAL_ROOM,
+  RouteMapState,
+  RouteNode,
+  RouteNodeKind,
+} from './route-map';
 import {
   generateStoreOffers,
   purchaseItem,
@@ -108,14 +115,15 @@ export interface FullRunReport {
   readonly summaries: readonly FullRunSummary[];
 }
 
-const DEFAULT_MAX_ROOMS = 40;
+const DEFAULT_MAX_ROOMS = FINAL_ROOM;
 const DEFAULT_MAX_COMBAT_TURNS = 100;
-const ROUTE_KINDS: readonly RouteNodeKind[] = ['battle', 'elite', 'store', 'rest'];
+const ROUTE_KINDS: readonly RouteNodeKind[] = ['battle', 'elite', 'store', 'rest', 'boss'];
 const EMPTY_ROUTE_COUNTS: Record<RouteNodeKind, number> = {
   battle: 0,
   elite: 0,
   store: 0,
   rest: 0,
+  boss: 0,
 };
 
 function remainingHealth(player: PlayerState, damageTaken: number): number {
@@ -320,7 +328,7 @@ function shopOnce(
 function runEncounter(
   player: PlayerState,
   playerDamageTaken: number,
-  routeKind: Extract<RouteNodeKind, 'battle' | 'elite'>,
+  routeKind: Extract<RouteNodeKind, 'battle' | 'elite' | 'boss'>,
   random: () => number,
   combatPolicy: PlayerPolicyId,
   maxCombatTurns: number,
@@ -333,7 +341,13 @@ function runEncounter(
   elite: boolean;
   boss: boolean;
 } {
-  const generated = generateEnemy(player.level, random(), random(), player.bossesDefeated);
+  const generated = generateEnemy(
+    player.level,
+    random(),
+    random(),
+    player.bossesDefeated,
+    routeKind === 'boss',
+  );
   const enemy = routeKind === 'elite' ? strengthenElite(generated) : generated;
   const encounter = simulateEncounter({
     player,
@@ -417,7 +431,7 @@ export function simulateFullRun(options: FullRunSimulationOptions): FullRunSimul
   let goldSpent = 0;
   let potionsPurchased = 0;
 
-  while (room < maxRooms && result === 'draw' && player.bossesDefeated < 3) {
+  while (room < maxRooms && result === 'draw' && player.bossesDefeated < BOSS_ROOMS.length) {
     const policyContext: RunDecisionContext = {
       player,
       playerDamageTaken,
@@ -434,7 +448,7 @@ export function simulateFullRun(options: FullRunSimulationOptions): FullRunSimul
     finalFloor = map.floor;
     routeCounts[node.kind] += 1;
 
-    if (node.kind === 'battle' || node.kind === 'elite') {
+    if (node.kind === 'battle' || node.kind === 'elite' || node.kind === 'boss') {
       combats += 1;
       if (node.kind === 'elite') eliteCombats += 1;
       const encounter = runEncounter(
@@ -503,7 +517,7 @@ export function simulateFullRun(options: FullRunSimulationOptions): FullRunSimul
     map = createRouteMap(map.floor + 1, random());
   }
 
-  if (result === 'draw' && player.bossesDefeated >= 3) result = 'win';
+  if (result === 'draw' && player.bossesDefeated >= BOSS_ROOMS.length) result = 'win';
   return {
     result,
     roomsVisited: room,

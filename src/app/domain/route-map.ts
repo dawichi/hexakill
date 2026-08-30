@@ -1,5 +1,8 @@
-export type RouteNodeKind = 'battle' | 'elite' | 'store' | 'rest';
+export type RouteNodeKind = 'battle' | 'elite' | 'store' | 'rest' | 'boss';
 // Future room type: add 'event' once event rules and its resolution UI are defined.
+
+export const BOSS_ROOMS = [10, 20, 30] as const;
+export const FINAL_ROOM = 30;
 
 export interface RouteNode {
   readonly id: string;
@@ -43,6 +46,11 @@ const NODE_COPY: Readonly<Record<RouteNodeKind, Omit<RouteNode, 'id' | 'kind'>>>
     description: 'Take a breath and restore part of your health.',
     reward: 'Recover 25% of damage taken',
   },
+  boss: {
+    title: 'Gold Slime',
+    description: 'A milestone guardian blocks the path forward.',
+    reward: 'Defeat the guardian to continue',
+  },
 };
 
 function assertFloor(floor: number): void {
@@ -60,6 +68,20 @@ function assertRoll(roll: number): void {
 export function createRouteMap(floor: number, routeRoll: number): RouteMapState {
   assertFloor(floor);
   assertRoll(routeRoll);
+  if (BOSS_ROOMS.includes(floor as (typeof BOSS_ROOMS)[number])) {
+    return {
+      floor,
+      nodes: [
+        {
+          id: `floor-${floor}-boss`,
+          kind: 'boss',
+          hidden: false,
+          ...NODE_COPY.boss,
+        },
+      ],
+    };
+  }
+
   const pattern = ROUTE_PATTERNS[Math.floor(routeRoll * ROUTE_PATTERNS.length)];
   if (!pattern) throw new RangeError('Route pattern is missing for the requested roll.');
   const hiddenCount = routeRoll < 0.5 ? 1 : 2;
@@ -98,18 +120,26 @@ export function revealHiddenRouteNodes(map: RouteMapState, count: number): Route
 }
 
 export function isRouteNodeKind(value: unknown): value is RouteNodeKind {
-  return value === 'battle' || value === 'elite' || value === 'store' || value === 'rest';
+  return (
+    value === 'battle' ||
+    value === 'elite' ||
+    value === 'store' ||
+    value === 'rest' ||
+    value === 'boss'
+  );
 }
 
 export function isRouteMapState(value: unknown): value is RouteMapState {
   if (typeof value !== 'object' || value === null) return false;
   const record = value as Record<string, unknown>;
   const nodes = record['nodes'];
+  const floor = record['floor'];
+  const isBossRoom = BOSS_ROOMS.includes(floor as (typeof BOSS_ROOMS)[number]);
   return (
-    Number.isSafeInteger(record['floor']) &&
-    Number(record['floor']) >= 1 &&
+    Number.isSafeInteger(floor) &&
+    Number(floor) >= 1 &&
     Array.isArray(nodes) &&
-    nodes.length === 3 &&
+    nodes.length === (isBossRoom ? 1 : 3) &&
     nodes.every((node) => {
       if (typeof node !== 'object' || node === null) return false;
       const candidate = node as Record<string, unknown>;
@@ -121,6 +151,7 @@ export function isRouteMapState(value: unknown): value is RouteMapState {
         typeof candidate['description'] === 'string' &&
         typeof candidate['reward'] === 'string'
       );
-    })
+    }) &&
+    (!isBossRoom || nodes[0]?.kind === 'boss')
   );
 }

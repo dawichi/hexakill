@@ -331,6 +331,9 @@ const BOSS_DEFINITIONS: readonly EnemyDefinition[] = [
   }),
 ];
 
+const FIXED_BOSS_LEVELS = [8, 12, 16] as const;
+const LEGACY_BOSS_LEVELS = [15, 25, 35] as const;
+
 export function findEnemyDefinition(id: string): EnemyDefinition | undefined {
   return [...ENEMY_DEFINITIONS, ...BOSS_DEFINITIONS].find((candidate) => candidate.id === id);
 }
@@ -385,6 +388,7 @@ export function generateEnemy(
   definitionRoll: number,
   levelRoll: number,
   bossesDefeated = 0,
+  forceBoss = false,
 ): EnemyState {
   if (!Number.isSafeInteger(playerLevel) || playerLevel < 1) {
     throw new RangeError('Player level must be a positive safe integer.');
@@ -399,10 +403,11 @@ export function generateEnemy(
   assertRoll(definitionRoll);
   assertRoll(levelRoll);
 
-  if (playerLevel >= 10 && bossesDefeated < BOSS_DEFINITIONS.length) {
+  if ((playerLevel >= 10 || forceBoss) && bossesDefeated < BOSS_DEFINITIONS.length) {
     const definition = BOSS_DEFINITIONS[bossesDefeated];
     if (!definition) throw new RangeError('Boss definition is missing for the requested progress.');
-    const level = 15 + bossesDefeated * 10;
+    const level = (forceBoss ? FIXED_BOSS_LEVELS : LEGACY_BOSS_LEVELS)[bossesDefeated];
+    if (!level) throw new RangeError('Boss level is missing for the requested progress.');
     return {
       definition,
       level,
