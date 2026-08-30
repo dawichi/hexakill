@@ -12,8 +12,9 @@ Each run contains 30 rooms. Gold Slime bosses appear at fixed milestones:
 - Room 20: Gold Slime 2
 - Room 30: Gold Slime 3 and run completion
 
-The provisional boss levels are 8, 12, and 16 in that order, giving the fixed encounters an
-escalating but room-appropriate difficulty curve.
+The provisional boss levels are 8, 12, and 16 in that order. Boss stats use a moderated linear
+multiplier curve, giving the fixed encounters an escalating but room-appropriate difficulty curve.
+Regular rooms never invoke the boss schedule, even when the player reaches level 10 or higher.
 
 Milestone rooms show one visible boss door instead of the normal three route choices. Defeating
 the room-30 boss enters the `run-complete` screen and the run-progress indicator reaches 30 of 30.

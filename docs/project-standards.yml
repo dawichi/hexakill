@@ -72,7 +72,7 @@ compliance:
       next_action: Keep root README concise and link to docs.
     - id: TEST-008
       status: partial
-      evidence: 'Active Angular baseline: 126 tests and 29 Playwright journeys, including validation, persistence, animation, keyboard, responsive, store, progression, fixed boss rooms, room progress, run completion, and production-artifact coverage plus intent-driven combat, Guard/Block, Arcane mark, staged feedback, elite tuning, and current combat presentation; broader gameplay/accessibility coverage remains incomplete.'
+      evidence: 'Active Angular baseline: 128 tests and 29 Playwright journeys, including validation, persistence, animation, keyboard, responsive, store, progression, fixed boss rooms, room progress, run completion, capped-combat full-run termination, and production-artifact coverage plus intent-driven combat, Guard/Block, Arcane mark, staged feedback, elite tuning, and current combat presentation; broader gameplay/accessibility coverage remains incomplete.'
       priority: high
       next_action: Retain the automated focus/responsive assertions and add manual accessibility evidence before release.
     - id: TS-001

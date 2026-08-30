@@ -101,7 +101,7 @@ describe('progression rules', () => {
   });
 
   it('rejects a boss reward that would exceed the three-boss schedule', () => {
-    const finalBoss = generateEnemy(30, 0, 0, 2);
+    const finalBoss = generateEnemy(30, 0, 0, 2, true);
 
     expect(() => applyVictoryReward({ ...player, bossesDefeated: 3 }, finalBoss)).toThrow(
       RangeError,
@@ -109,7 +109,7 @@ describe('progression rules', () => {
   });
 
   it('records sequential boss progress in the player run', () => {
-    const boss = generateEnemy(10, 0, 0, 0);
+    const boss = generateEnemy(10, 0, 0, 0, true);
     const bossPlayer = { ...player, level: 10 };
     const rewardedPlayer = applyVictoryReward(bossPlayer, boss);
 
@@ -117,17 +117,17 @@ describe('progression rules', () => {
   });
 
   it('grants the legacy even-level power-up count after multiple levels', () => {
-    const boss = generateEnemy(10, 0, 0, 0);
-    const leveledPlayer = { ...player, level: 10 };
+    const boss = generateEnemy(10, 0, 0, 0, true);
+    const leveledPlayer = { ...player, level: 10, experience: 20 };
     const reward = calculateVictoryReward(leveledPlayer, boss);
 
-    expect(reward.experience).toBe(150);
+    expect(reward.experience).toBe(80);
     expect(reward.levelsGained).toBe(1);
     expect(reward.powerUpsGranted).toBe(1);
   });
 
   it('caps newly granted power-ups at the global legacy maximum', () => {
-    const enemy = generateEnemy(10, 0, 0, 0);
+    const enemy = generateEnemy(10, 0, 0, 0, true);
     const nearlyCappedPlayer = {
       ...player,
       powerUps: {

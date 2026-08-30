@@ -21,7 +21,8 @@ try {
 
   const simulation = await import(pathToFileURL(outputFile).href);
   const samples = Number(process.env['FULL_RUN_SAMPLES'] ?? 200);
-  const report = simulation.runFullRunReport({ samplesPerCell: samples });
+  const maxCombatTurns = Number(process.env['FULL_RUN_MAX_COMBAT_TURNS'] ?? 100);
+  const report = simulation.runFullRunReport({ samplesPerCell: samples, maxCombatTurns });
   console.log(simulation.formatFullRunReport(report));
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });

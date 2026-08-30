@@ -60,6 +60,8 @@ the three-boss completion condition:
 ```sh
 npm run simulate:full-run
 FULL_RUN_SAMPLES=1000 npm run simulate:full-run
+# Optional: inspect sensitivity to the combat turn cap.
+FULL_RUN_SAMPLES=1000 FULL_RUN_MAX_COMBAT_TURNS=150 npm run simulate:full-run
 ```
 
 The full-run report compares class and reactive combat policies against balanced, aggressive, and
@@ -69,16 +71,20 @@ Combat seeds, route rolls, and policy decisions are deterministic and reproducib
 
 Important full-run signals include completion rate, rooms survived, boss progress, relic count,
 campfire/store frequency, gold spent, and final health. Completion means defeating all three
-sequential Gold Slime bosses by room 30. The current pass uses a 15% elite stat premium and
-provisional boss levels 8, 12, and 16. Reactive policies now produce non-zero three-boss completion
-for Wizard and Samurai in the seeded baseline, while Warrior and class-only policies still need
-tuning. That is an investigation signal—not a final balance verdict—because route heuristics,
-fixed-room pressure, and the boss curve all affect it.
+sequential Gold Slime bosses by room 30. A loss or turn-cap draw ends the run at the unresolved
+encounter; the simulator never walks past an undefeated enemy. The current pass uses a 15% elite
+stat premium and caps elite encounter levels at the current player level; regular encounters retain
+the `floor(playerLevel / 2)` through `playerLevel + 1` range. It also uses provisional boss levels
+8, 12, and 16. The current seeded 500-sample matrix lands roughly in the 35–65% completion band
+across class and reactive policies, with the three classes in the same broad range; this is an
+investigation signal, not a final balance verdict, because route heuristics, item offers, fixed-room
+pressure, and the boss curve all affect it.
 
 ## Current scope and next layer
 
 The milestone boss curve is currently level 8, 12, and 16 for rooms 10, 20, and 30 respectively;
-these levels are provisional targets chosen to keep the fixed rooms reachable while preserving
-escalation. The lab now covers single encounters and full runs. It does not yet model human telemetry, event
+boss stats use a moderated linear multiplier curve so the level-10 regular-enemy formula change does
+not create a sudden guardian spike. These values are provisional targets chosen to keep the fixed
+rooms reachable while preserving escalation. The lab now covers single encounters and full runs. It does not yet model human telemetry, event
 rooms, a learned policy, or confidence intervals/CSV export. Those should come after we establish
 the intended normal/elite/boss difficulty targets from the current report and manual playtests.

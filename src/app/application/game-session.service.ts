@@ -631,6 +631,7 @@ export class GameSessionService {
       this.random(),
       player.bossesDefeated,
       routeKind === 'boss',
+      routeKind === 'elite' ? player.level : undefined,
     );
     const spawnedEnemy =
       routeKind === 'elite' ? strengthenEliteEnemy(generatedEnemy) : generatedEnemy;

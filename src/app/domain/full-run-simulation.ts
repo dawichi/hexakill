@@ -162,21 +162,19 @@ function chooseFirst(
   return context.nodes[0];
 }
 
+function canBuyRelic(context: RunDecisionContext): boolean {
+  return STORE_ITEMS.some(
+    (item) =>
+      context.player.gold >= item.price &&
+      !context.player.inventory.some((owned) => owned.id === item.id),
+  );
+}
+
 function balancedRoutePolicy(context: RunDecisionContext): RouteNode {
   const currentHealth = healthRatio(context.player, context.playerDamageTaken);
   if (currentHealth <= 0.45) {
     const rest = chooseFirst(visibleNodes(context, 'rest'), context);
     if (rest) return rest;
-  }
-
-  const canBuyRelic = STORE_ITEMS.some(
-    (item) =>
-      context.player.gold >= item.price &&
-      !context.player.inventory.some((owned) => owned.id === item.id),
-  );
-  if (canBuyRelic) {
-    const store = chooseFirst(visibleNodes(context, 'store'), context);
-    if (store) return store;
   }
 
   if (currentHealth >= 0.7) {
@@ -188,8 +186,8 @@ function balancedRoutePolicy(context: RunDecisionContext): RouteNode {
   if (!firstNode) throw new RangeError('A route policy requires at least one node.');
   return (
     chooseFirst(visibleNodes(context, 'battle'), context) ??
-    chooseFirst(visibleNodes(context, 'rest'), context) ??
     chooseFirst(visibleNodes(context, 'store'), context) ??
+    chooseFirst(visibleNodes(context, 'rest'), context) ??
     firstNode
   );
 }
@@ -215,7 +213,7 @@ function safeRoutePolicy(context: RunDecisionContext): RouteNode {
   const firstNode = context.nodes[0];
   if (!firstNode) throw new RangeError('A route policy requires at least one node.');
   return (
-    chooseFirst(visibleNodes(context, 'store'), context) ??
+    (canBuyRelic(context) ? chooseFirst(visibleNodes(context, 'store'), context) : undefined) ??
     chooseFirst(visibleNodes(context, 'battle'), context) ??
     chooseFirst(visibleNodes(context, 'rest'), context) ??
     chooseFirst(visibleNodes(context, 'elite'), context) ??
@@ -347,6 +345,7 @@ function runEncounter(
     random(),
     player.bossesDefeated,
     routeKind === 'boss',
+    routeKind === 'elite' ? player.level : undefined,
   );
   const enemy = routeKind === 'elite' ? strengthenElite(generated) : generated;
   const encounter = simulateEncounter({
@@ -459,6 +458,7 @@ export function simulateFullRun(options: FullRunSimulationOptions): FullRunSimul
         options.combatPolicy,
         maxCombatTurns,
       );
+      const encounterFailed = encounter.result !== 'win';
       player = encounter.player;
       playerDamageTaken = encounter.playerDamageTaken;
       if (encounter.result === 'win') {
@@ -481,6 +481,7 @@ export function simulateFullRun(options: FullRunSimulationOptions): FullRunSimul
           relics: player.inventory.length,
         });
       }
+      if (encounterFailed) break;
     } else if (node.kind === 'rest') {
       restsVisited += 1;
       const rest = resolveHeal(playerDamageTaken, player.stats.health, 0.3);

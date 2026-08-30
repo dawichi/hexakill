@@ -17,7 +17,7 @@ The active UI relies on native buttons, inputs, and range controls. Legacy globa
 
 ## Active combat sequencing
 
-- `findEnemy` generates a regular enemy from the observed level range or the fixed Gold Slime boss for rooms 10, 20, and 30.
+- `findEnemy` generates a regular enemy from the observed level range, caps elite encounters at the current player level, or generates the fixed Gold Slime boss for rooms 10, 20, and 30.
 - The active service compares player and enemy speed. The faster actor opens the encounter; player actions show a 320 ms action window, the enemy gets a 650 ms announce pause followed by a 360 ms resolution window, and the result remains presented for 700 ms before the next player action is enabled. Player damage persists when the route advances.
 - Player Attack and Magic use bounded random ranges, lower miss rates, critical multipliers, and meaningful resistance reduction. Attack uses 85–115% power, 5% miss, and 1.5× criticals; Magic uses 75–125% power, 10% miss, and 1.75× criticals. Resistance uses `100 / (100 + resistance)`. Potion use restores 25% of maximum health, then gives the enemy a turn. Guard grants temporary Block based on Armor and Magic Resist.
 - The enemy reveals an intent before each turn: Attack, Magic, Guard, or Heal. Patterned intent selection creates deliberate Guard and low-health Heal opportunities while damage intents expose their expected ranges. Magic applies an Arcane mark to the enemy; the next player Attack consumes the mark for bonus damage. Relic passives can amplify these interactions.
@@ -26,8 +26,8 @@ The active UI relies on native buttons, inputs, and range controls. Legacy globa
 - Route choices are deterministic under the injected random source. Elite nodes strengthen the generated enemy's stats and gold by a provisional 15% and 50%; this is a pacing/progression prototype, not final balance. Campfires restore 30% of maximum health.
 - Reset cancels pending delayed enemy work and guards stale callbacks with a run-generation token.
 - Victory applies provisional experience, gold, level, boss, power-up, and defeated-enemy-history updates. Pending power-ups must be chosen before another enemy can be generated. Defeating the room-30 boss changes the screen to `run-complete`.
-- Enemy levels use a tighter regular range from `floor(playerLevel / 2)` through `playerLevel + 1`; gold and experience retain their archived `toFixed(0)` rounding rules. These numeric boundaries have deterministic fixtures; broader balance acceptance remains open.
-- Fixed Gold Slime bosses currently use provisional levels 8, 12, and 16 at rooms 10, 20, and 30; the curve is subject to the full-run balance report and manual playtests.
+- Regular enemy levels use a tighter range from `floor(playerLevel / 2)` through `playerLevel + 1`; elite encounters cap that range at the current player level. Gold and experience retain their archived `toFixed(0)` rounding rules. These numeric boundaries have deterministic fixtures; broader balance acceptance remains open.
+- Fixed Gold Slime bosses currently use provisional levels 8, 12, and 16 at rooms 10, 20, and 30, with a moderated linear stat curve; regular rooms never request the boss schedule. The curve is subject to the full-run balance report and manual playtests.
 - Defeat writes a versioned local personal-record envelope and changes the screen to `game-over` after the enemy turn resolves.
 
 ## Active store behavior

@@ -273,13 +273,17 @@ function hasUsablePotion(context: PlayerDecisionContext): boolean {
 }
 
 function classPolicy(context: PlayerDecisionContext): SimulationAction {
+  const health = remainingHealth(context.player.stats, context.playerDamageTaken);
+  if (hasUsablePotion(context) && health <= context.player.stats.health * 0.35) {
+    return 'potion';
+  }
   if (context.enemyHexed && context.legalActions.includes('attack')) return 'attack';
   if (context.player.character.id === 'wizard' && context.legalActions.includes('magic')) {
     return 'magic';
   }
   if (context.player.character.id === 'warrior' && context.intent.kind !== 'heal') {
     const remaining = remainingHealth(context.player.stats, context.playerDamageTaken);
-    if (context.intent.maxValue > remaining * 0.3 && context.legalActions.includes('guard')) {
+    if (context.intent.maxValue > remaining * 0.5 && context.legalActions.includes('guard')) {
       return 'guard';
     }
   }

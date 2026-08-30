@@ -26,6 +26,12 @@ describe('enemy generation', () => {
     expect(enemy.level).toBe(4);
   });
 
+  it('supports a lower elite level cap without changing the normal range', () => {
+    const enemy = generateEnemy(4, 0, 0.99, 0, false, 4);
+
+    expect(enemy.level).toBe(4);
+  });
+
   it('keeps the lowest valid player level from producing a zero-health enemy', () => {
     const enemy = generateEnemy(1, 0, 0);
 
@@ -33,15 +39,11 @@ describe('enemy generation', () => {
     expect(enemy.stats.health).toBeGreaterThan(0);
   });
 
-  it('opens the sequential gold-slime bosses at the legacy level threshold', () => {
-    const firstBoss = generateEnemy(10, 0.5, 0, 0);
-    const secondBoss = generateEnemy(20, 0.5, 0, 1);
+  it('keeps regular enemy generation independent of player level', () => {
+    const enemy = generateEnemy(10, 0.5, 0, 0);
 
-    expect(firstBoss.definition.name).toBe('Gold Slime 1');
-    expect(firstBoss.level).toBe(15);
-    expect(firstBoss.gold).toBe(1000);
-    expect(secondBoss.definition.name).toBe('Gold Slime 2');
-    expect(secondBoss.level).toBe(25);
+    expect(enemy.definition.archetype).not.toBe('boss');
+    expect(enemy.level).toBe(5);
   });
 
   it('can generate a fixed-room boss before the level threshold', () => {
@@ -49,6 +51,14 @@ describe('enemy generation', () => {
 
     expect(boss.definition.id).toBe('gold-slime-1');
     expect(boss.level).toBe(8);
+    expect(boss.stats).toEqual({
+      health: 2000,
+      ad: 96,
+      ap: 120,
+      armor: 72,
+      mr: 72,
+      speed: 32,
+    });
   });
 
   it('rejects invalid random rolls', () => {

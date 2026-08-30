@@ -74,6 +74,21 @@ describe('full-run simulation', () => {
     expect(report.summaries.every((summary) => summary.completionRate >= 0)).toBe(true);
   });
 
+  it('stops the run when a combat reaches its turn cap', () => {
+    const result = simulateFullRun({
+      characterId: 'wizard',
+      combatPolicy: 'class',
+      routePolicy: 'balanced',
+      seed: 42,
+      maxCombatTurns: 1,
+      collectTrace: true,
+    });
+
+    expect(result.result).toBe('draw');
+    expect(result.trace.at(-1)?.result).toBe('draw');
+    expect(result.roomsVisited).toBe(result.trace.length);
+  });
+
   it('places boss rooms at the fixed run milestones', () => {
     expect(createRouteMap(9, 0).nodes).toHaveLength(3);
     expect(createRouteMap(10, 0).nodes.map((node) => node.kind)).toEqual(['boss']);

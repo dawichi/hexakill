@@ -992,7 +992,7 @@ test('a victory grants progression and a power-up choice', async ({ page }) => {
   await expect(nextEnemyButton).toBeFocused();
 });
 
-test('legacy level-threshold boss encounters still advance in sequence', async ({ page }) => {
+test('boss encounters advance in sequence when defeated', async ({ page }) => {
   await startRun(page);
   await expect
     .poll(() => page.evaluate(() => localStorage.getItem('hexakill.angular.session.v1')))

@@ -217,12 +217,12 @@ const TANK_MODIFIERS = modifiers({
   ap: 0.5,
 });
 const BOSS_MODIFIERS = modifiers({
-  health: 1.5,
-  ad: 1.25,
-  ap: 1.25,
-  armor: 1.25,
-  mr: 1.25,
-  speed: 2,
+  health: 1.25,
+  ad: 0.75,
+  ap: 0.75,
+  armor: 0.75,
+  mr: 0.75,
+  speed: 1,
 });
 
 /** Complete legacy roster. Boss encounters are kept separately below. */
@@ -332,7 +332,6 @@ const BOSS_DEFINITIONS: readonly EnemyDefinition[] = [
 ];
 
 const FIXED_BOSS_LEVELS = [8, 12, 16] as const;
-const LEGACY_BOSS_LEVELS = [15, 25, 35] as const;
 
 export function findEnemyDefinition(id: string): EnemyDefinition | undefined {
   return [...ENEMY_DEFINITIONS, ...BOSS_DEFINITIONS].find((candidate) => candidate.id === id);
@@ -376,7 +375,9 @@ function assertRoll(roll: number): void {
 function calculateStats(level: number, definition: EnemyDefinition): Stats {
   const stats = {} as Stats;
   (Object.keys(BASE_STATS) as Stat[]).forEach((stat) => {
-    if (level < 10) stats[stat] = level * BASE_STATS[stat] * 0.75;
+    if (definition.archetype === 'boss') {
+      stats[stat] = level * BASE_STATS[stat] * definition.modifiers[stat];
+    } else if (level < 10) stats[stat] = level * BASE_STATS[stat] * 0.75;
     else if (level < 20) stats[stat] = level * BASE_STATS[stat] * 0.75 + level;
     else stats[stat] = level * BASE_STATS[stat] * definition.modifiers[stat] + 4 * level;
   });
@@ -389,6 +390,7 @@ export function generateEnemy(
   levelRoll: number,
   bossesDefeated = 0,
   forceBoss = false,
+  maximumLevel = playerLevel + 1,
 ): EnemyState {
   if (!Number.isSafeInteger(playerLevel) || playerLevel < 1) {
     throw new RangeError('Player level must be a positive safe integer.');
@@ -402,11 +404,19 @@ export function generateEnemy(
   }
   assertRoll(definitionRoll);
   assertRoll(levelRoll);
+  const minimumLevel = Math.max(1, Math.floor(playerLevel / 2));
+  if (
+    !Number.isSafeInteger(maximumLevel) ||
+    maximumLevel < minimumLevel ||
+    maximumLevel > playerLevel + 1
+  ) {
+    throw new RangeError('Generated enemy level cap must stay within the player-level range.');
+  }
 
-  if ((playerLevel >= 10 || forceBoss) && bossesDefeated < BOSS_DEFINITIONS.length) {
+  if (forceBoss && bossesDefeated < BOSS_DEFINITIONS.length) {
     const definition = BOSS_DEFINITIONS[bossesDefeated];
     if (!definition) throw new RangeError('Boss definition is missing for the requested progress.');
-    const level = (forceBoss ? FIXED_BOSS_LEVELS : LEGACY_BOSS_LEVELS)[bossesDefeated];
+    const level = FIXED_BOSS_LEVELS[bossesDefeated];
     if (!level) throw new RangeError('Boss level is missing for the requested progress.');
     return {
       definition,
@@ -419,12 +429,7 @@ export function generateEnemy(
   }
 
   const regularEnemies = ENEMY_DEFINITIONS.filter((candidate) => candidate.archetype !== 'boss');
-  const minLevel = Math.max(1, Math.floor(playerLevel / 2));
-  const maxLevel = playerLevel + 1;
-  if (!Number.isSafeInteger(maxLevel)) {
-    throw new RangeError('Generated enemy level must be a safe integer.');
-  }
-  const level = Math.floor(levelRoll * (maxLevel - minLevel + 1)) + minLevel;
+  const level = Math.floor(levelRoll * (maximumLevel - minimumLevel + 1)) + minimumLevel;
   if (!Number.isSafeInteger(level)) {
     throw new RangeError('Generated enemy level must be a safe integer.');
   }
