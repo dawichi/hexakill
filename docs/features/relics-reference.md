@@ -15,7 +15,7 @@ entire strategy of a run.
 | Honed Edge         | `Sword`        |   350 | Your Attack deals **10% more damage**.                                     |
 | Apprentice's Codex | `BookOpen`     |   350 | Your Magic deals **10% more damage**.                                      |
 | Guarder's Buckler  | `Shield`       |   400 | Guard grants **8 additional Block**.                                       |
-| Swiftstep Anklet   | `Footprints`   |   400 | Gain **+2 Speed**, improving opening-turn priority.                        |
+| Swiftstep Anklet   | `Footprints`   |   400 | Gain **+5 Speed**, improving opening-turn priority.                        |
 | Vitality Moss      | `HeartPlus`    |   450 | Gain **+100 maximum Health**. Current health is unchanged when acquired.   |
 | Soot Charm         | `Flame`        |   400 | At the start of each enemy turn, deal **4 effect damage** to the enemy.    |
 | Bandage Roll       | `HeartPulse`   |   350 | After victory, restore **8% of maximum Health**, capped at missing health. |

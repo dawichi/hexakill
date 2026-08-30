@@ -137,6 +137,28 @@ export interface BalanceReport {
   readonly summaries: readonly BalanceSummary[];
 }
 
+export interface RelicBalanceSummary {
+  readonly relicId: string;
+  readonly relicName: string;
+  readonly quality: ItemState['quality'];
+  readonly character: string;
+  readonly samples: number;
+  readonly baselineWinRate: number;
+  readonly relicWinRate: number;
+  readonly deltaWinRate: number;
+  readonly baselineEliteWinRate: number;
+  readonly relicEliteWinRate: number;
+  readonly baselineAverageTurns: number;
+  readonly relicAverageTurns: number;
+}
+
+export interface RelicBalanceReport {
+  readonly seed: number;
+  readonly samplesPerCell: number;
+  readonly maxTurns: number;
+  readonly summaries: readonly RelicBalanceSummary[];
+}
+
 const SIMULATION_ACTIONS: readonly SimulationAction[] = ['attack', 'magic', 'guard', 'potion'];
 const ENEMY_INTENTS: readonly EnemyIntentKind[] = ['attack', 'magic', 'guard', 'heal'];
 const DEFAULT_MAX_TURNS = 100;
@@ -848,6 +870,77 @@ export function runBalanceReport(options: BalanceReportOptions = {}): BalanceRep
   return { seed, samplesPerCell, maxTurns, summaries };
 }
 
+export interface RelicBalanceReportOptions {
+  readonly seed?: number;
+  readonly samplesPerCell?: number;
+  readonly maxTurns?: number;
+  readonly scenarios?: readonly BalanceScenario[];
+  readonly relics?: readonly ItemState[];
+}
+
+function averageSummaryValue(
+  summaries: readonly BalanceSummary[],
+  value: 'winRate' | 'averageTurns',
+): number {
+  return summaries.length
+    ? summaries.reduce((total, summary) => total + summary[value], 0) / summaries.length
+    : 0;
+}
+
+function eliteWinRate(summaries: readonly BalanceSummary[]): number {
+  const eliteSummaries = summaries.filter((summary) => summary.elite);
+  return averageSummaryValue(eliteSummaries, 'winRate');
+}
+
+export function runRelicBalanceReport(options: RelicBalanceReportOptions = {}): RelicBalanceReport {
+  const seed = options.seed ?? 42;
+  const samplesPerCell = options.samplesPerCell ?? DEFAULT_SAMPLES;
+  const maxTurns = options.maxTurns ?? DEFAULT_MAX_TURNS;
+  const scenarios = options.scenarios ?? DEFAULT_BALANCE_SCENARIOS;
+  const relics = options.relics ?? STORE_ITEMS;
+  if (!Number.isSafeInteger(samplesPerCell) || samplesPerCell < 1) {
+    throw new RangeError('Relic balance report samplesPerCell must be a positive safe integer.');
+  }
+
+  const summaries = relics.flatMap((relic) => {
+    const characters = [...new Set(scenarios.map((scenario) => scenario.characterId))];
+    return characters.flatMap((characterId) => {
+      const characterScenarios = scenarios.filter(
+        (scenario) => scenario.characterId === characterId,
+      );
+      const baseline = characterScenarios.map((scenario) =>
+        summarizeScenario(scenario, 'reactive', samplesPerCell, seed, maxTurns),
+      );
+      const withRelic = characterScenarios.map((scenario) =>
+        summarizeScenario(
+          { ...scenario, relicIds: [...(scenario.relicIds ?? []), relic.id] },
+          'reactive',
+          samplesPerCell,
+          seed,
+          maxTurns,
+        ),
+      );
+      const character = baseline[0]?.character ?? characterId;
+      return {
+        relicId: relic.id,
+        relicName: relic.name,
+        quality: relic.quality,
+        character,
+        samples: samplesPerCell,
+        baselineWinRate: averageSummaryValue(baseline, 'winRate'),
+        relicWinRate: averageSummaryValue(withRelic, 'winRate'),
+        deltaWinRate:
+          averageSummaryValue(withRelic, 'winRate') - averageSummaryValue(baseline, 'winRate'),
+        baselineEliteWinRate: eliteWinRate(baseline),
+        relicEliteWinRate: eliteWinRate(withRelic),
+        baselineAverageTurns: averageSummaryValue(baseline, 'averageTurns'),
+        relicAverageTurns: averageSummaryValue(withRelic, 'averageTurns'),
+      } satisfies RelicBalanceSummary;
+    });
+  });
+  return { seed, samplesPerCell, maxTurns, summaries };
+}
+
 function fixed(value: number): string {
   return value.toFixed(2);
 }
@@ -879,6 +972,19 @@ export function formatBalanceReport(report: BalanceReport): string {
   return lines.join('\n');
 }
 
+export function formatRelicBalanceReport(report: RelicBalanceReport): string {
+  const lines = [
+    `Hexakill relic balance lab · ${report.samplesPerCell.toLocaleString()} samples/cell · seed ${report.seed}`,
+    'Relic                         Character  Base   Item  Delta  Elite base/item  Turns base/item',
+  ];
+  for (const summary of report.summaries) {
+    lines.push(
+      `${summary.relicName.padEnd(28)} ${summary.character.padEnd(9)} ${percentLabel(summary.baselineWinRate).padStart(6)} ${percentLabel(summary.relicWinRate).padStart(6)} ${percentLabel(summary.deltaWinRate).padStart(7)} ${`${percentLabel(summary.baselineEliteWinRate)}/${percentLabel(summary.relicEliteWinRate)}`.padStart(16)} ${`${fixed(summary.baselineAverageTurns)}/${fixed(summary.relicAverageTurns)}`.padStart(17)}`,
+    );
+  }
+  return lines.join('\n');
+}
+
 export function createSimulationFixture(scenario: BalanceScenario): {
   readonly player: PlayerState;
   readonly enemy: EnemyState;
@@ -893,3 +999,5 @@ export const simulationDefaults = {
   actions: SIMULATION_ACTIONS,
   intents: ENEMY_INTENTS,
 } as const;
+
+export { STORE_ITEMS };

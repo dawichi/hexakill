@@ -62,11 +62,11 @@ export const RELIC_CATALOG: readonly ItemState[] = [
     'Swiftstep Anklet',
     'Footprints',
     400,
-    'Gain +2 Speed, improving opening-turn priority.',
+    'Gain +5 Speed, improving opening-turn priority.',
     {
       kind: 'stat-bonus',
       stat: 'speed',
-      amount: 2,
+      amount: 5,
     },
   ),
   normal(

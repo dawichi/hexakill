@@ -89,6 +89,20 @@ describe('full-run simulation', () => {
     expect(result.roomsVisited).toBe(result.trace.length);
   });
 
+  it('can seed a controlled full-run relic comparison', () => {
+    const result = simulateFullRun({
+      characterId: 'warrior',
+      combatPolicy: 'reactive',
+      routePolicy: 'safe',
+      seed: 42,
+      maxRooms: 1,
+      startingRelicIds: ['swiftstep-anklet'],
+    });
+
+    expect(result.relics).toBe(1);
+    expect(result.trace.length).toBe(1);
+  });
+
   it('places boss rooms at the fixed run milestones', () => {
     expect(createRouteMap(9, 0).nodes).toHaveLength(3);
     expect(createRouteMap(10, 0).nodes.map((node) => node.kind)).toEqual(['boss']);

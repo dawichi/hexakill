@@ -24,6 +24,29 @@ try {
   const maxCombatTurns = Number(process.env['FULL_RUN_MAX_COMBAT_TURNS'] ?? 100);
   const report = simulation.runFullRunReport({ samplesPerCell: samples, maxCombatTurns });
   console.log(simulation.formatFullRunReport(report));
+
+  if (process.env['FULL_RUN_RELIC_MATRIX'] === '1') {
+    const byCharacter = (candidateReport, character) =>
+      candidateReport.summaries
+        .filter((summary) => summary.character === character)
+        .reduce((total, summary) => total + summary.completionRate, 0) /
+      candidateReport.summaries.filter((summary) => summary.character === character).length;
+    const characters = ['Wizard', 'Samurai', 'Warrior'];
+    console.log();
+    console.log('Relic full-run impact (starting relic, price excluded)');
+    console.log('Relic                         Wizard  Samurai  Warrior');
+    for (const relic of simulation.STORE_ITEMS) {
+      const relicReport = simulation.runFullRunReport({
+        samplesPerCell: samples,
+        maxCombatTurns,
+        startingRelicIds: [relic.id],
+      });
+      const values = characters.map((character) => byCharacter(relicReport, character));
+      console.log(
+        `${relic.name.padEnd(28)} ${values.map((value) => `${(value * 100).toFixed(1)}%`.padStart(7)).join(' ')}`,
+      );
+    }
+  }
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });
 }

@@ -62,6 +62,8 @@ npm run simulate:full-run
 FULL_RUN_SAMPLES=1000 npm run simulate:full-run
 # Optional: inspect sensitivity to the combat turn cap.
 FULL_RUN_SAMPLES=1000 FULL_RUN_MAX_COMBAT_TURNS=150 npm run simulate:full-run
+# Optional: compare each relic when active from the beginning of a run.
+FULL_RUN_SAMPLES=100 npm run simulate:full-run:relics
 ```
 
 The full-run report compares class and reactive combat policies against balanced, aggressive, and
@@ -79,6 +81,11 @@ the `floor(playerLevel / 2)` through `playerLevel + 1` range. It also uses provi
 across class and reactive policies, with the three classes in the same broad range; this is an
 investigation signal, not a final balance verdict, because route heuristics, item offers, fixed-room
 pressure, and the boss curve all affect it.
+
+The relic matrix seeds one relic into a run while leaving starting gold unchanged, so it measures
+combat and route contribution before purchase timing and price. It models Compass map reveals and
+Salvager's Map store slots; use it to find outliers, then validate candidate price/effect changes
+with a normal purchase path and manual play.
 
 ## Current scope and next layer
 

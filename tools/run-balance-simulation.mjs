@@ -23,6 +23,28 @@ try {
   const samples = Number(process.env['BALANCE_SAMPLES'] ?? 1_000);
   const report = simulation.runBalanceReport({ samplesPerCell: samples });
   console.log(simulation.formatBalanceReport(report));
+
+  if (process.env['BALANCE_RELIC_MATRIX'] === '1') {
+    const relics = process.env['BALANCE_RELICS']
+      ? simulation.STORE_ITEMS.filter((item) =>
+          process.env['BALANCE_RELICS'].split(',').includes(item.id),
+        )
+      : undefined;
+    const scenarios =
+      process.env['BALANCE_RELIC_HARD'] === '1'
+        ? simulation.DEFAULT_BALANCE_SCENARIOS.map((scenario) => ({
+            ...scenario,
+            enemyLevel: scenario.elite ? 4 : 5,
+          }))
+        : undefined;
+    const relicReport = simulation.runRelicBalanceReport({
+      samplesPerCell: samples,
+      scenarios,
+      relics,
+    });
+    console.log();
+    console.log(simulation.formatRelicBalanceReport(relicReport));
+  }
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });
 }

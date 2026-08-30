@@ -6,6 +6,7 @@ import {
   RouteMapState,
   RouteNode,
   RouteNodeKind,
+  revealHiddenRouteNodes,
 } from './route-map';
 import {
   generateStoreOffers,
@@ -46,6 +47,7 @@ export interface FullRunSimulationOptions {
   readonly seed: number;
   readonly maxRooms?: number;
   readonly maxCombatTurns?: number;
+  readonly startingRelicIds?: readonly string[];
   readonly collectTrace?: boolean;
 }
 
@@ -323,6 +325,26 @@ function shopOnce(
   return { player: next, goldSpent, potionsBought };
 }
 
+function applyStartingRelics(
+  player: PlayerState,
+  relicIds: readonly string[] | undefined,
+): PlayerState {
+  if (!relicIds?.length) return player;
+  return relicIds.reduce((current, relicId) => {
+    const relic = STORE_ITEMS.find((candidate) => candidate.id === relicId);
+    if (!relic || current.inventory.some((item) => item.id === relic.id)) return current;
+    const result = purchaseItem({ ...current, gold: current.gold + relic.price }, relic.id);
+    return result.purchased ? result.player : current;
+  }, player);
+}
+
+function openRouteMap(player: PlayerState, floor: number, routeRoll: number): RouteMapState {
+  const map = createRouteMap(floor, routeRoll);
+  return player.inventory.some((item) => item.id === 'travelers-compass')
+    ? revealHiddenRouteNodes(map, 1)
+    : map;
+}
+
 function runEncounter(
   player: PlayerState,
   playerDamageTaken: number,
@@ -410,9 +432,12 @@ export function simulateFullRun(options: FullRunSimulationOptions): FullRunSimul
 
   const character = CHARACTER_DEFINITIONS.find((candidate) => candidate.id === options.characterId);
   if (!character) throw new RangeError(`Unknown run character: ${options.characterId}`);
-  let player = createInitialPlayer('Simulation player', character);
+  let player = applyStartingRelics(
+    createInitialPlayer('Simulation player', character),
+    options.startingRelicIds,
+  );
   let playerDamageTaken = 0;
-  let map = createRouteMap(1, createSeededRandom(options.seed)());
+  let map = openRouteMap(player, 1, createSeededRandom(options.seed)());
   const random = createSeededRandom(options.seed ^ 0x517cc1b7);
   const decisionRandom = createSeededRandom(options.seed ^ 0x9e3779b9);
   const routeCounts = { ...EMPTY_ROUTE_COUNTS };
@@ -515,7 +540,7 @@ export function simulateFullRun(options: FullRunSimulationOptions): FullRunSimul
     }
 
     if (result !== 'draw') break;
-    map = createRouteMap(map.floor + 1, random());
+    map = openRouteMap(player, map.floor + 1, random());
   }
 
   if (result === 'draw' && player.bossesDefeated >= BOSS_ROOMS.length) result = 'win';
@@ -547,6 +572,7 @@ export interface FullRunReportOptions {
   readonly samplesPerCell?: number;
   readonly maxRooms?: number;
   readonly maxCombatTurns?: number;
+  readonly startingRelicIds?: readonly string[];
   readonly characters?: readonly CharacterId[];
   readonly combatPolicies?: readonly PlayerPolicyId[];
   readonly routePolicies?: readonly RoutePolicyId[];
@@ -560,6 +586,7 @@ function summarize(
   seed: number,
   maxRooms: number,
   maxCombatTurns: number,
+  startingRelicIds: readonly string[] | undefined,
 ): FullRunSummary {
   const results: FullRunSimulationResult[] = [];
   for (let sample = 0; sample < samples; sample += 1) {
@@ -571,6 +598,7 @@ function summarize(
         seed: (seed + sample * 7_919) >>> 0,
         maxRooms,
         maxCombatTurns,
+        startingRelicIds,
         collectTrace: false,
       }),
     );
@@ -639,6 +667,7 @@ export function runFullRunReport(options: FullRunReportOptions = {}): FullRunRep
           seed,
           maxRooms,
           maxCombatTurns,
+          options.startingRelicIds,
         ),
       ),
     ),
@@ -665,3 +694,5 @@ export const fullRunSimulationDefaults = {
   defaultMaxCombatTurns: DEFAULT_MAX_COMBAT_TURNS,
   defaultSamples: 200,
 } as const;
+
+export { STORE_ITEMS };

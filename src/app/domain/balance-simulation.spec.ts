@@ -3,6 +3,7 @@ import {
   createSimulationFixture,
   DEFAULT_BALANCE_SCENARIOS,
   PLAYER_POLICIES,
+  runRelicBalanceReport,
   runBalanceReport,
   simulateEncounter,
   strengthenElite,
@@ -93,5 +94,31 @@ describe('balance simulation', () => {
     expect(report.summaries.every((summary) => summary.winRate >= 0 && summary.winRate <= 1)).toBe(
       true,
     );
+  });
+
+  it('compares a relic against the same seeded encounter matrix', () => {
+    const scenarios = DEFAULT_BALANCE_SCENARIOS.filter(
+      (scenario) => scenario.characterId === 'wizard',
+    ).slice(0, 2);
+    const relicReport = runRelicBalanceReport({
+      scenarios,
+      relics: [
+        {
+          id: 'honed-edge',
+          name: 'Honed Edge',
+          quality: 'normal',
+          icon: 'Sword',
+          price: 350,
+          description: '',
+          effect: { kind: 'multiplier', target: 'attack', amount: 0.1 },
+        },
+      ],
+      samplesPerCell: 4,
+    });
+
+    expect(relicReport.summaries).toHaveLength(1);
+    expect(relicReport.summaries[0]?.relicId).toBe('honed-edge');
+    expect(relicReport.summaries[0]?.relicWinRate).toBeGreaterThanOrEqual(0);
+    expect(relicReport.summaries[0]?.deltaWinRate).toBeGreaterThanOrEqual(-1);
   });
 });
