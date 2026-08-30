@@ -64,11 +64,13 @@ import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters
 import { ASSET_MANIFEST } from '../domain/assets';
 import {
   BOSS_ROOMS,
+  advanceRouteMap,
   createRouteMap,
   FINAL_ROOM,
   findRouteNode,
   isRouteMapState,
   revealHiddenRouteNodes,
+  RouteLayer,
   RouteMapState,
   RouteNodeKind,
 } from '../domain/route-map';
@@ -144,6 +146,7 @@ interface StoredSessionSnapshot {
   readonly combatState: CombatState;
   readonly routeFloor?: number;
   readonly routeMap?: RouteMapState | null;
+  readonly nextRouteMap?: RouteMapState | null;
   readonly storeItems?: readonly ItemState[];
 }
 
@@ -471,6 +474,25 @@ export class GameSessionService {
     Math.round((this.completedRooms() / this.totalRooms) * 100),
   );
   readonly routeMap = signal<RouteMapState | null>(null);
+  /** The next frontier survives combat/store screens so path choices stay connected. */
+  readonly nextRouteMap = signal<RouteMapState | null>(null);
+  readonly routeLayers = computed(() => {
+    const map = this.routeMap();
+    if (!map) return [] as readonly RouteLayer[];
+    if (!map.layers) return [{ floor: map.floor, nodes: map.nodes }] as readonly RouteLayer[];
+
+    const layers: RouteLayer[] = [];
+    let reachableIds = new Set(map.nodes.map((node) => node.id));
+    for (let floor = map.floor; floor <= Math.min(FINAL_ROOM, map.floor + 3); floor += 1) {
+      const layer = map.layers.find((candidate) => candidate.floor === floor);
+      if (!layer) break;
+      const visibleNodes = layer.nodes.filter((node) => reachableIds.has(node.id));
+      if (!visibleNodes.length) break;
+      layers.push({ ...layer, nodes: visibleNodes });
+      reachableIds = new Set(visibleNodes.flatMap((node) => node.nextNodeIds ?? []));
+    }
+    return layers;
+  });
   readonly enemy = computed(() => this.combatState().enemy);
   readonly enemyIntent = computed(() => this.combatState().enemyIntent ?? null);
   readonly playerBlock = computed(() => this.combatState().playerBlock ?? 0);
@@ -606,6 +628,7 @@ export class GameSessionService {
     this.enemyHealthTrail.set(0);
     this.routeFloor.set(1);
     this.routeMap.set(null);
+    this.nextRouteMap.set(null);
     this.storeItems.set([]);
     this.actionReady.set(false);
     this.enemyAnimation.set('idle');
@@ -720,7 +743,8 @@ export class GameSessionService {
     const player = this.player();
     if (!player) return;
     if (!this.routeMap()) {
-      const map = createRouteMap(this.routeFloor(), this.random());
+      const map = this.nextRouteMap() ?? createRouteMap(this.routeFloor(), this.random());
+      this.nextRouteMap.set(null);
       const hasCompass = this.player()?.inventory.some((item) => item.id === 'travelers-compass');
       this.routeMap.set(hasCompass ? revealHiddenRouteNodes(map, 1) : map);
     }
@@ -735,6 +759,7 @@ export class GameSessionService {
     const node = map ? findRouteNode(map, nodeId) : undefined;
     if (!player || !map || !node || this.screen() !== 'map') return;
 
+    this.nextRouteMap.set(advanceRouteMap(map, node.id));
     this.routeMap.set(null);
     this.routeFloor.set(map.floor + 1);
 
@@ -1033,6 +1058,7 @@ export class GameSessionService {
     this.player.set(null);
     this.routeFloor.set(1);
     this.routeMap.set(null);
+    this.nextRouteMap.set(null);
     this.actionReady.set(false);
     this.applyCombatEvent({ type: 'reset' });
     this.enemyAnimation.set('idle');
@@ -1567,6 +1593,7 @@ export class GameSessionService {
         combatState: this.combatState(),
         routeFloor: this.routeFloor(),
         routeMap: this.routeMap(),
+        nextRouteMap: this.nextRouteMap(),
         storeItems: this.screen() === 'store' ? this.storeItems() : undefined,
       }),
     );
@@ -1676,6 +1703,9 @@ export class GameSessionService {
         (snapshot.routeMap !== undefined &&
           snapshot.routeMap !== null &&
           !isRouteMapState(snapshot.routeMap)) ||
+        (snapshot.nextRouteMap !== undefined &&
+          snapshot.nextRouteMap !== null &&
+          !isRouteMapState(snapshot.nextRouteMap)) ||
         (snapshot.storeItems !== undefined && !isRestorableStoreItems(snapshot.storeItems)) ||
         !isRestorableCombatState(snapshot.combatState) ||
         (snapshot.player !== null && !isRestorablePlayer(snapshot.player)) ||
@@ -1693,6 +1723,7 @@ export class GameSessionService {
       this.playerName.set(snapshot.playerName.slice(0, 14));
       this.routeFloor.set(routeFloor);
       this.routeMap.set(snapshot.routeMap ?? null);
+      this.nextRouteMap.set(snapshot.nextRouteMap ?? null);
       if (snapshot.player) {
         const inventory = snapshot.player.inventory.map(
           (item) => STORE_ITEMS.find((candidate) => candidate.id === item.id) ?? item,

@@ -450,6 +450,8 @@ describe('GameSessionService', () => {
 
     expect(restored.screen()).toBe('store');
     expect(restored.storeItems().map((item) => item.id)).toEqual(savedOfferIds);
+    expect(restored.nextRouteMap()?.floor).toBe(2);
+    expect(restored.nextRouteMap()?.visitedNodeIds).toHaveLength(1);
   });
 
   it('resets the audio adapter when saved preferences are malformed', () => {

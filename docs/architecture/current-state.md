@@ -4,7 +4,7 @@
 
 ## Executive summary
 
-Hexakill is a single-route, browser-only Angular game. The root application renders all game screens from one standalone shell, while framework-independent domain modules own combat, progression, route, store, relic, asset, and persistence-validation rules. `GameSessionService` is the application façade for signals, command sequencing, timers, audio, and browser-storage ports. There is no server route, API, database, account system, queue, or authenticated boundary. Runs contain 30 rooms, with fixed boss rooms at 10, 20, and 30; room 30 produces a successful `run-complete` state.
+Hexakill is a single-route, browser-only Angular game. The root application renders all game screens from one standalone shell, while framework-independent domain modules own combat, progression, route, store, relic, asset, and persistence-validation rules. `GameSessionService` is the application façade for signals, command sequencing, timers, audio, and browser-storage ports. There is no server route, API, database, account system, queue, or authenticated boundary. Runs contain a persisted connected 30-room expedition graph with fixed boss rooms at 10, 20, and 30; room 30 produces a successful `run-complete` state.
 
 ## Application organization
 

@@ -35,6 +35,7 @@ import { StatChipComponent } from './components/stat-chip/stat-chip';
 import { RelicIconComponent } from './components/relic-icon/relic-icon';
 import { CharacterDefinition, ItemState, SpriteStripAsset, Stat, Stats } from './domain/game-types';
 import { PersonalRecord } from './domain/records';
+import { RouteNode, RouteNodeKind } from './domain/route-map';
 
 @Component({
   selector: 'app-root',
@@ -259,5 +260,35 @@ export class App implements OnDestroy {
       .filter(({ value }) => value !== 1)
       .sort((left, right) => Math.abs(right.value - 1) - Math.abs(left.value - 1))
       .slice(0, 3);
+  }
+
+  protected routeKindLabel(kind: RouteNodeKind): string {
+    return kind === 'battle'
+      ? 'Skirmish'
+      : kind === 'elite'
+        ? 'Elite'
+        : kind === 'store'
+          ? 'Merchant'
+          : kind === 'rest'
+            ? 'Campfire'
+            : 'Boss';
+  }
+
+  protected routeForecast(node: RouteNode): string {
+    const kinds = [...new Set(node.nextKinds ?? [])];
+    if (!kinds.length)
+      return node.kind === 'boss' ? 'The run ends beyond this fight' : 'The way ahead is obscured';
+    if (kinds.length === 1) return `Next: ${this.routeKindLabel(kinds[0]!)}`;
+    return `Ahead: ${kinds.map((kind) => this.routeKindLabel(kind)).join(' · ')}`;
+  }
+
+  protected routeRiskLabel(node: RouteNode): string {
+    return node.risk === 'safe'
+      ? 'Low risk'
+      : node.risk === 'dangerous'
+        ? 'High risk'
+        : node.risk === 'milestone'
+          ? 'Milestone'
+          : 'Steady risk';
   }
 }

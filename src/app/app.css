@@ -1241,49 +1241,6 @@ h3 {
   margin-top: 1.25rem;
 }
 
-.route-map {
-  position: relative;
-  margin-top: 0.75rem;
-}
-
-.route-branches {
-  position: absolute;
-  top: 0;
-  right: 16.5%;
-  left: 16.5%;
-  display: grid;
-  height: 2rem;
-  grid-template-columns: repeat(3, 1fr);
-  pointer-events: none;
-}
-
-.route-branches::before {
-  position: absolute;
-  top: 0.25rem;
-  right: 16.5%;
-  left: 16.5%;
-  border-top: 1px solid var(--line);
-  content: '';
-}
-
-.route-branches span {
-  justify-self: center;
-  width: 1px;
-  height: 2rem;
-  background: var(--line);
-}
-
-.route-nodes {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  padding-top: 2.25rem;
-}
-
-.route-nodes.boss-room {
-  grid-template-columns: minmax(0, 1fr);
-}
-
 .route-node {
   position: relative;
   display: grid;
@@ -2036,7 +1993,7 @@ h3 {
 
   .character-grid,
   .combat-grid,
-  .route-nodes,
+  .door-grid,
   .action-grid,
   .power-up-grid,
   .store-grid {
@@ -2067,11 +2024,7 @@ h3 {
     width: 100%;
   }
 
-  .route-branches {
-    display: none;
-  }
-
-  .route-nodes {
+  .door-grid {
     padding-top: 0;
   }
 }
@@ -2223,10 +2176,15 @@ h3 {
 }
 
 .door-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   height: 100%;
   min-height: 0;
   gap: clamp(0.5rem, 1.5vw, 1rem);
   padding-top: 0;
+}
+
+.door-grid.boss-room {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .door-card {
@@ -2268,6 +2226,142 @@ h3 {
 
 .door-card.door-hidden .route-node-copy strong {
   color: var(--ember-bright);
+}
+
+.door-panel {
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+}
+
+.expedition-overview {
+  display: grid;
+  gap: 0.45rem;
+  border: 1px solid var(--line-soft);
+  background: linear-gradient(180deg, rgb(255 255 255 / 2%), transparent), var(--stone-0);
+  padding: 0.6rem 0.75rem 0.55rem;
+}
+
+.expedition-overview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.expedition-overview-heading span,
+.expedition-overview-heading svg {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--ink);
+}
+
+.expedition-layers {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(4rem, 1fr));
+  gap: 0.35rem;
+  overflow-x: auto;
+}
+
+.expedition-layer {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  border-left: 1px solid var(--line-soft);
+}
+
+.expedition-layer:not(:last-child)::after {
+  position: absolute;
+  top: 50%;
+  right: -0.3rem;
+  width: 0.6rem;
+  border-top: 1px solid var(--line);
+  content: '';
+}
+
+.expedition-layer-label {
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.08em;
+}
+
+.current-layer .expedition-layer-label,
+.expedition-overview-heading svg {
+  color: var(--ember-bright);
+}
+
+.milestone-layer .expedition-layer-label {
+  color: var(--amber);
+}
+
+.expedition-layer-nodes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+}
+
+.expedition-node {
+  display: grid;
+  width: 1.2rem;
+  height: 1.2rem;
+  place-items: center;
+  border: 1px solid var(--aether);
+  border-radius: 50%;
+  color: var(--aether);
+}
+
+.expedition-node.elite,
+.expedition-node.boss {
+  border-color: var(--ember-bright);
+  color: var(--ember-bright);
+}
+
+.expedition-node.store {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.expedition-node.rest {
+  border-color: #55c271;
+  color: #55c271;
+}
+
+.expedition-node.node-hidden {
+  border-style: dashed;
+  border-color: var(--muted);
+  color: var(--muted);
+}
+
+.expedition-overview-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.route-node-forecast {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ember-bright);
+  font-family: 'Courier New', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+}
+
+.route-node-forecast svg {
+  flex: 0 0 auto;
 }
 
 .combat-screen-panel {

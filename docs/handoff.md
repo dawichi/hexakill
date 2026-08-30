@@ -37,7 +37,7 @@ Durable session snapshots reject transient actions, malformed damage results, in
 
 The active app consumes the legacy character/enemy idle GIFs through typed `idleAsset` fields, uses observed Evil Tree/slime attack and defeat GIFs through optional typed enemy animation fields with a scheduler-backed 600 ms enemy-attack window, renders provisional Wizard/Samurai single-row `Idle.png` strips for combat idle states and `Attack1.png` strips for physical actions, `Attack2.png` strips for Magic actions, `Hit.png`/`Take Hit.png` strips when the player receives damage, and `Death.png` strips on game over, and maps observed Wild Huntress/Evil Wizard/Fire Worm/Knight/Martial Hero single-row `Idle.png` and `Attack1.png` strips plus five enemy hit strips, Evil Wizard's `Attack2.png` strip, and Witch Blue's nine-frame vertical `B_witch_idle.png` idle strip plus vertical `B_witch_charge.png` strip for Magic during enemy attack windows, with corresponding defeat strips during provisional defeat states. Boss encounters select the typed boss music asset; regular encounters select dungeon music. The retained root `static/` tree is copied into Angular build output. Music, sound, and item paths are centralized in `domain/assets.ts`; playback is behind an injectable audio port.
 
-The route map now tracks a fixed 30-room run, shows one guardian door at rooms 10, 20, and 30, and displays a room progress bar. Defeating the room-30 Gold Slime enters `run-complete`.
+The route map now stores a connected 30-room expedition graph, presents the current reachable fork plus a three-room horizon preview, shows one guardian path at rooms 10, 20, and 30, and displays a room progress bar. Defeating the room-30 Gold Slime enters `run-complete`.
 
 ## Deliberate non-goals
 

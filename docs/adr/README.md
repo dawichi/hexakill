@@ -8,6 +8,7 @@ ADRs record durable, accepted project decisions. Accepted ADRs are not silently 
 - [ADR-0002: Scale level-4 player initialization](0002-level-4-player-initialization.md) — accepted opening-stat rule for new runs.
 - [ADR-0003: Use persistent health and passive relics for run balance](0003-combat-and-relic-balance.md) — accepted prototype combat and merchant contract.
 - [ADR-0004: Use fixed milestone rooms for run completion](0004-fixed-room-run.md) — accepted 30-room structure with bosses at rooms 10, 20, and 30.
+- [ADR-0005: Use a connected expedition graph for route choices](0005-connected-expedition-route.md) — accepted persistent branching route model with a three-layer horizon preview.
 
 ## Candidates for the next ADRs
 

@@ -1,6 +1,7 @@
 import { applyPowerUp, applyVictoryReward } from './progression';
 import {
   BOSS_ROOMS,
+  advanceRouteMap,
   createRouteMap,
   FINAL_ROOM,
   RouteMapState,
@@ -208,15 +209,17 @@ function aggressiveRoutePolicy(context: RunDecisionContext): RouteNode {
 
 function safeRoutePolicy(context: RunDecisionContext): RouteNode {
   const currentHealth = healthRatio(context.player, context.playerDamageTaken);
-  if (currentHealth < 0.75) {
+  if (currentHealth < 0.9) {
     const rest = chooseFirst(visibleNodes(context, 'rest'), context);
     if (rest) return rest;
   }
   const firstNode = context.nodes[0];
   if (!firstNode) throw new RangeError('A route policy requires at least one node.');
   return (
-    (canBuyRelic(context) ? chooseFirst(visibleNodes(context, 'store'), context) : undefined) ??
     chooseFirst(visibleNodes(context, 'battle'), context) ??
+    (currentHealth >= 0.95 && canBuyRelic(context)
+      ? chooseFirst(visibleNodes(context, 'store'), context)
+      : undefined) ??
     chooseFirst(visibleNodes(context, 'rest'), context) ??
     chooseFirst(visibleNodes(context, 'elite'), context) ??
     firstNode
@@ -343,6 +346,18 @@ function openRouteMap(player: PlayerState, floor: number, routeRoll: number): Ro
   return player.inventory.some((item) => item.id === 'travelers-compass')
     ? revealHiddenRouteNodes(map, 1)
     : map;
+}
+
+function advanceSimulationRoute(
+  player: PlayerState,
+  map: RouteMapState,
+  node: RouteNode,
+): RouteMapState | null {
+  const next = advanceRouteMap(map, node.id);
+  if (!next) return null;
+  return player.inventory.some((item) => item.id === 'travelers-compass')
+    ? revealHiddenRouteNodes(next, 1)
+    : next;
 }
 
 function runEncounter(
@@ -540,7 +555,9 @@ export function simulateFullRun(options: FullRunSimulationOptions): FullRunSimul
     }
 
     if (result !== 'draw') break;
-    map = openRouteMap(player, map.floor + 1, random());
+    if (room >= maxRooms || player.bossesDefeated >= BOSS_ROOMS.length) break;
+    map =
+      advanceSimulationRoute(player, map, node) ?? openRouteMap(player, map.floor + 1, random());
   }
 
   if (result === 'draw' && player.bossesDefeated >= BOSS_ROOMS.length) result = 'win';

@@ -20,7 +20,7 @@ entire strategy of a run.
 | Soot Charm         | `Flame`        |   400 | At the start of each enemy turn, deal **4 effect damage** to the enemy.    |
 | Bandage Roll       | `HeartPulse`   |   350 | After victory, restore **8% of maximum Health**, capped at missing health. |
 | Coin Purse         | `Coins`        |   350 | Earn **20% more gold** from victories.                                     |
-| Traveler's Compass | `Compass`      |   450 | When a route map opens, reveal **one additional hidden door**.             |
+| Traveler's Compass | `Compass`      |   450 | When a route map opens, reveal **one additional hidden path**.             |
 | Potion Satchel     | `FlaskConical` |   400 | The first Potion used in each combat also grants **6 Block**.              |
 
 ## Rare relics

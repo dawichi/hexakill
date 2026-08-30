@@ -54,7 +54,7 @@ decision quality, and game feel.
 ## Full-run lab
 
 The second command simulates the complete route loop, including combat rewards, level-ups,
-power-ups, hidden doors, campfires, merchants, relic purchases, potion purchases, elite rooms, and
+power-ups, hidden paths, campfires, merchants, relic purchases, potion purchases, elite rooms, and
 the three-boss completion condition:
 
 ```sh
@@ -67,7 +67,7 @@ FULL_RUN_SAMPLES=100 npm run simulate:full-run:relics
 ```
 
 The full-run report compares class and reactive combat policies against balanced, aggressive, and
-safe route policies. Route policies only inspect revealed door kinds; hidden doors remain unknown
+safe route policies. Route policies only inspect revealed frontier kinds; hidden paths remain unknown
 until selected. Rooms 10, 20, and 30 are fixed boss rooms; room 30 is the completion boundary.
 Combat seeds, route rolls, and policy decisions are deterministic and reproducible.
 

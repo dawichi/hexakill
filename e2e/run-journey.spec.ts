@@ -90,7 +90,7 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   const closeStoreButton = page.getByRole('button', { name: 'Close store' });
   await closeStoreButton.focus();
   await closeStoreButton.press('Enter');
-  await expect(page.getByRole('heading', { name: 'Choose a door' })).toBeFocused();
+  await expect(page.getByRole('heading', { name: 'Choose your path' })).toBeFocused();
   await page.getByRole('button', { name: /Skirmish:/ }).click();
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
   await expect(page.locator('.inventory-item')).toHaveCount(1);
@@ -810,6 +810,32 @@ test('the start journey is operable with keyboard activation', async ({ page }) 
   await expect(page.getByRole('heading', { name: 'Survive the dungeon.' })).toBeVisible();
 });
 
+test('the route screen previews a connected horizon and persists the chosen successor frontier', async ({
+  page,
+}) => {
+  await expect(page.getByRole('button', { name: 'Enter the dungeon' })).toBeVisible();
+  await page.getByRole('button', { name: 'Enter the dungeon' }).click();
+  await page.getByLabel('Player name').fill('Agent');
+  await page.getByRole('button', { name: /Wizard/ }).click();
+  await page.getByRole('button', { name: 'Start run' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Choose your path' })).toBeVisible();
+  await expect(page.locator('.expedition-overview')).toBeVisible();
+  await expect(page.locator('.expedition-layer')).toHaveCount(4);
+  await expect(page.locator('.expedition-overview')).toContainText('Current fork');
+
+  await page.locator('[data-screen="map"] .door-card').first().click();
+  await expect(page.locator('[data-screen="combat"]')).toBeVisible();
+  const snapshot = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem('hexakill.angular.session.v1') ?? '{}'),
+  );
+  expect(snapshot.nextRouteMap.floor).toBe(2);
+  expect(snapshot.nextRouteMap.layers).toHaveLength(30);
+  expect(snapshot.nextRouteMap.visitedNodeIds).toHaveLength(1);
+  expect(snapshot.nextRouteMap.nodes.length).toBeGreaterThanOrEqual(1);
+  expect(snapshot.nextRouteMap.nodes.length).toBeLessThanOrEqual(3);
+});
+
 test('a player can use a potion and reach the defeat screen', async ({ page }) => {
   const snapshot = {
     version: 1,
@@ -1036,7 +1062,7 @@ test('boss encounters advance in sequence when defeated', async ({ page }) => {
   await expect(page.getByText(/gained 150 exp and 1000 gold/)).toBeVisible();
   await page.locator('.power-up-panel').getByRole('button', { name: 'Attack' }).click();
   await page.getByRole('button', { name: /View route map/ }).click();
-  await expect(page.getByRole('heading', { name: 'Choose a door' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Choose your path' })).toBeVisible();
   await page.getByRole('button', { name: /Skirmish:/ }).click();
   await expect(page.locator('[data-screen="combat"]')).toBeVisible();
 });

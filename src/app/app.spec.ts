@@ -55,6 +55,8 @@ describe('App', () => {
 
     expect(compiled.querySelector('[data-screen="map"]')).toBeTruthy();
     expect(compiled.querySelectorAll('.door-card')).toHaveLength(3);
+    expect(compiled.querySelector('.expedition-overview')).toBeTruthy();
+    expect(compiled.querySelectorAll('.expedition-layer')).toHaveLength(4);
     compiled.querySelector<HTMLButtonElement>('.door-card')?.click();
     fixture.detectChanges();
     expect(compiled.querySelector('[data-screen="combat"]')).toBeTruthy();
