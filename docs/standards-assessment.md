@@ -2,7 +2,7 @@
 
 **Snapshot:** 2026-08-30, active Angular application with fixed boss rooms and room-30 completion; current implementation evidence is refreshed while owner-dependent release evidence remains open.
 
-The current focused baseline is 130 unit/component tests and 29 Chromium journeys. Combat v2 now includes visible enemy intents, Guard/Block, Arcane marks, staged feedback, delayed-damage health presentation, malformed optional combat-state rejection, stable store-offer restoration, fixed boss rooms, room progress, room-30 completion, capped-combat full-run termination, controlled full-run relic seeding, and the provisional elite tuning contract. Older numeric counts in detailed evidence paragraphs are preserved historical characterization unless explicitly superseded.
+The current focused baseline is 131 unit/component tests and 29 Chromium journeys. Combat v2 now includes visible enemy intents, Guard/Block, Arcane marks, staged feedback, delayed-damage health presentation, malformed optional combat-state rejection, stable store-offer restoration, fixed boss rooms, room progress, room-30 completion, capped-combat full-run termination, controlled full-run relic seeding, class-viability regression coverage, and the provisional elite tuning contract. Older numeric counts in detailed evidence paragraphs are preserved historical characterization unless explicitly superseded.
 
 Statuses use the shared definitions: `Compliant`, `Partial`, `Gap`, `Deferred`, `Exception`, `Not applicable`, and `Unknown`. The YAML contract contains a compact machine-readable summary; this document contains the reasoning and evidence.
 

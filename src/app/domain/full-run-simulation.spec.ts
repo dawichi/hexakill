@@ -103,6 +103,19 @@ describe('full-run simulation', () => {
     expect(result.trace.length).toBe(1);
   });
 
+  it('keeps every class viable on the aggressive reactive route', () => {
+    const report = runFullRunReport({
+      characters: ['wizard', 'samurai', 'warrior'],
+      combatPolicies: ['reactive'],
+      routePolicies: ['aggressive'],
+      samplesPerCell: 100,
+      seed: 42,
+    });
+
+    expect(report.summaries).toHaveLength(3);
+    expect(report.summaries.every((summary) => summary.completionRate >= 0.25)).toBe(true);
+  });
+
   it('places boss rooms at the fixed run milestones', () => {
     expect(createRouteMap(9, 0).nodes).toHaveLength(3);
     expect(createRouteMap(10, 0).nodes.map((node) => node.kind)).toEqual(['boss']);
