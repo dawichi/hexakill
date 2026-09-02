@@ -9,6 +9,7 @@ import { AUDIO, AudioPort } from './audio';
 import { PREFERENCES_STORAGE, PreferencesStoragePort } from './preferences-storage';
 import { SESSION_STORAGE, SessionStoragePort } from './storage';
 import { INITIAL_COMBAT_STATE } from '../domain/combat-state';
+import { STORE_ITEMS } from '../domain/store';
 
 describe('GameSessionService', () => {
   let service: GameSessionService;
@@ -85,12 +86,13 @@ describe('GameSessionService', () => {
 
     expect(service.enemy()?.damageTaken).toBe(0);
     expect(service.combatState().phase).toBe('resolving-player-action');
-    expect(scheduledDelays).toContain(320);
+    expect(scheduledDelays[scheduledDelays.length - 1]).toBeGreaterThan(320);
 
     flushScheduled();
     expect(service.enemy()?.damageTaken).toBe(54);
     expect(service.combatState().phase).toBe('enemy-turn');
-    expect(service.combatMessage()).toContain('dealt 54 damage');
+    expect(service.combatMessage()).toBe('Your attack dealt 54 damage.');
+    expect(scheduledDelays[scheduledDelays.length - 1]).toBeGreaterThan(650);
     expect(service.lastActionAt()).toBe(1234);
     expect(service.playerCombatLog()[1]).toEqual({
       title: 'David',
@@ -103,6 +105,8 @@ describe('GameSessionService', () => {
 
     expect(service.combatState().phase).toBe('enemy-turn');
     expect(service.enemyAnimation()).toBe('attack');
+    expect(service.combatMessage()).toContain('prepares');
+    expect(scheduledDelays[scheduledDelays.length - 1]).toBeGreaterThan(360);
 
     flushScheduled();
 
@@ -110,12 +114,13 @@ describe('GameSessionService', () => {
     expect(service.playerRemainingHealth()).toBeLessThan(800);
     expect(service.enemyAnimation()).toBe('attack');
     expect(service.playerAnimation()).toBe('hit');
+    expect(service.combatMessage()).toContain("Adventurer's attack dealt");
+    expect(scheduledDelays[scheduledDelays.length - 1]).toBeGreaterThan(700);
     expect(service.enemyCombatLog()[1]).toMatchObject({
       title: 'Adventurer',
       value: expect.any(Number),
       icon: expect.stringMatching(/🔪|☄/),
     });
-    expect(scheduledDelays).toContain(700);
 
     flushScheduled();
     expect(service.enemyAnimation()).toBe('idle');
@@ -516,5 +521,27 @@ describe('GameSessionService', () => {
     expect(service.enemyAnimation()).toBe('attack');
     flushScheduled();
     expect(service.enemyAnimation()).toBe('idle');
+  });
+
+  it('paces a free potion turn until the potion message has been shown', () => {
+    const player = createInitialPlayer('David', CHARACTER_DEFINITIONS[0]);
+    const freePotionRelic = STORE_ITEMS.find((item) => item.id === 'alchemists-crown');
+    if (!freePotionRelic) throw new Error('Expected the Alchemist’s Crown relic.');
+
+    service.player.set({
+      ...player,
+      stats: { ...player.stats, speed: 100 },
+      inventory: [freePotionRelic],
+    });
+    service.findEnemy();
+
+    service.usePotion();
+
+    expect(service.combatState().phase).toBe('awaiting-player-action');
+    expect(service.actionReady()).toBe(false);
+    expect(scheduledDelays[scheduledDelays.length - 1]).toBeGreaterThan(0);
+
+    flushScheduled();
+    expect(service.actionReady()).toBe(true);
   });
 });

@@ -175,6 +175,11 @@ export class App implements OnDestroy {
     return `${feedback.target} ${feedback.kind} ${feedback.action ?? ''}`;
   }
 
+  protected feedbackPlacementClass(feedback: CombatFeedback): string {
+    const placements = ['placement-left', 'placement-center', 'placement-right'] as const;
+    return placements[feedback.id % placements.length] ?? 'placement-center';
+  }
+
   protected feedbackText(feedback: CombatFeedback): string {
     switch (feedback.kind) {
       case 'damage':

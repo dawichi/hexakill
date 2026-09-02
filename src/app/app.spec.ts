@@ -182,4 +182,48 @@ describe('App', () => {
     expect(compiled.querySelector('.action-button.attack')).toBeTruthy();
     expect(compiled.querySelector('.action-button.magic')).toBeTruthy();
   });
+
+  it('anchors combat feedback to the combatant visual that was affected', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
+    fixture.detectChanges();
+    const nameInput = compiled.querySelector<HTMLInputElement>('#player-name');
+    if (!nameInput) throw new Error('Player name input was not rendered.');
+    nameInput.value = 'David';
+    nameInput.dispatchEvent(new Event('input'));
+    compiled.querySelector<HTMLButtonElement>('.character-card')?.click();
+    fixture.detectChanges();
+    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
+    fixture.detectChanges();
+    compiled.querySelector<HTMLButtonElement>('.door-card')?.click();
+    fixture.detectChanges();
+
+    const session = TestBed.inject(GameSessionService);
+    session.combatFeedback.set({
+      id: 1,
+      target: 'enemy',
+      kind: 'damage',
+      amount: 10,
+      action: 'attack',
+    });
+    fixture.detectChanges();
+
+    const enemyFeedback = compiled.querySelector(
+      '.enemy-combatant .combatant-visual .combat-feedback',
+    );
+    expect(enemyFeedback).toBeTruthy();
+    expect(enemyFeedback?.classList.contains('placement-center')).toBe(true);
+    expect(compiled.querySelector('.player-combatant .combat-feedback')).toBeNull();
+
+    session.combatFeedback.set({ id: 2, target: 'player', kind: 'guard', amount: 20 });
+    fixture.detectChanges();
+
+    expect(
+      compiled.querySelector('.player-combatant .combatant-visual .combat-feedback'),
+    ).toBeTruthy();
+    expect(compiled.querySelector('.enemy-combatant .combat-feedback')).toBeNull();
+  });
 });

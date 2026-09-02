@@ -103,6 +103,9 @@ import {
   isStoredPreferencesSnapshot,
 } from '../domain/preferences';
 
+const COMBAT_MESSAGE_CHARACTER_MS = 22;
+const COMBAT_MESSAGE_PAUSE_MS = 400;
+
 export type GameScreen =
   | 'welcome'
   | 'character-select'
@@ -457,6 +460,7 @@ export class GameSessionService {
   private pendingEnemyTurn: ClockHandle | null = null;
   private pendingEnemyAnimationReset: ClockHandle | null = null;
   private pendingPlayerImpact: ClockHandle | null = null;
+  private pendingPlayerActionReady: ClockHandle | null = null;
   private pendingCombatFeedbackReset: ClockHandle | null = null;
   private runGeneration = 0;
   private feedbackSequence = 0;
@@ -837,11 +841,14 @@ export class GameSessionService {
           ? ASSET_MANIFEST.sounds.attack
           : ASSET_MANIFEST.sounds.magic,
     );
-    this.pendingPlayerImpact = this.clock.schedule(() => {
-      this.pendingPlayerImpact = null;
-      if (kind === 'guard') this.resolvePlayerGuard();
-      else this.resolvePlayerDamage(kind);
-    }, 320);
+    this.pendingPlayerImpact = this.clock.schedule(
+      () => {
+        this.pendingPlayerImpact = null;
+        if (kind === 'guard') this.resolvePlayerGuard();
+        else this.resolvePlayerDamage(kind);
+      },
+      this.combatMessagePacingDelay(this.combatMessage(), 320),
+    );
   }
 
   private resolvePlayerGuard(): void {
@@ -858,7 +865,7 @@ export class GameSessionService {
     }));
 
     this.showCombatFeedback({ target: 'player', kind: 'guard', amount: block });
-    this.combatMessage.set(`Guard raised ${block} Block. ${this.enemyIntentMessage(enemy)}`);
+    this.combatMessage.set(`Guard raised ${block} Block.`);
     this.addCombatLog('player', {
       title: player.name,
       message: `raised ${block} Block.`,
@@ -949,7 +956,7 @@ export class GameSessionService {
 
     if (result.missed) {
       this.showCombatFeedback({ target: 'enemy', kind: 'miss', action: kind });
-      this.combatMessage.set(`Your ${kind} missed. ${this.enemyIntentMessage(enemy)}`);
+      this.combatMessage.set(`Your ${kind} missed.`);
     } else if (dealt === 0 && (result.blocked ?? 0) > 0) {
       this.showCombatFeedback({
         target: 'enemy',
@@ -980,7 +987,6 @@ export class GameSessionService {
       return;
     }
 
-    this.combatMessage.set(`${this.combatMessage()} ${this.enemyIntentMessage(enemy)}`);
     this.scheduleEnemyTurn();
   }
 
@@ -1000,7 +1006,7 @@ export class GameSessionService {
     );
     if (!this.applyCombatEvent({ type: 'player-potion-used', freeTurn })) return;
 
-    this.actionReady.set(freeTurn);
+    this.actionReady.set(false);
     this.player.set({ ...player, potions: player.potions - 1 });
     this.combatState.update((state) => ({
       ...state,
@@ -1018,7 +1024,8 @@ export class GameSessionService {
     });
     this.showCombatFeedback({ target: 'player', kind: 'heal', amount: healResult.healed });
     this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
-    if (!freeTurn) this.scheduleEnemyTurn();
+    if (freeTurn) this.schedulePlayerActionReady();
+    else this.scheduleEnemyTurn();
   }
 
   choosePowerUp(type: Parameters<typeof applyPowerUp>[1]): void {
@@ -1050,6 +1057,7 @@ export class GameSessionService {
     this.cancelPendingEnemyTurn();
     this.cancelPendingEnemyAnimationReset();
     this.cancelPendingPlayerImpact();
+    this.cancelPendingPlayerActionReady();
     this.cancelPendingCombatFeedbackReset();
     this.runGeneration += 1;
     this.screen.set('welcome');
@@ -1215,10 +1223,13 @@ export class GameSessionService {
     }
 
     const generation = this.runGeneration;
-    this.pendingEnemyTurn = this.clock.schedule(() => {
-      if (generation !== this.runGeneration) return;
-      this.resolveEnemyTurn();
-    }, 360);
+    this.pendingEnemyTurn = this.clock.schedule(
+      () => {
+        if (generation !== this.runGeneration) return;
+        this.resolveEnemyTurn();
+      },
+      this.combatMessagePacingDelay(undefined, 360),
+    );
   }
 
   private resolveEnemyTurn(): void {
@@ -1424,9 +1435,6 @@ export class GameSessionService {
       this.screen.set('game-over');
       this.combatMessage.set('You have been defeated. Start a new run to try again.');
     } else {
-      this.combatMessage.set(
-        `${this.combatMessage()} ${this.enemyIntentMessage(nextEnemy, nextIntent)}`,
-      );
       this.scheduleEnemyAnimationReset();
     }
   }
@@ -1441,10 +1449,13 @@ export class GameSessionService {
   private scheduleEnemyTurn(): void {
     this.cancelPendingEnemyTurn();
     const generation = this.runGeneration;
-    this.pendingEnemyTurn = this.clock.schedule(() => {
-      if (generation !== this.runGeneration) return;
-      this.beginEnemyAction();
-    }, 650);
+    this.pendingEnemyTurn = this.clock.schedule(
+      () => {
+        if (generation !== this.runGeneration) return;
+        this.beginEnemyAction();
+      },
+      this.combatMessagePacingDelay(undefined, 650),
+    );
   }
 
   private cancelPendingEnemyTurn(): void {
@@ -1454,20 +1465,23 @@ export class GameSessionService {
 
   private scheduleEnemyAnimationReset(): void {
     const generation = this.runGeneration;
-    this.pendingEnemyAnimationReset = this.clock.schedule(() => {
-      this.pendingEnemyAnimationReset = null;
-      if (
-        generation !== this.runGeneration ||
-        this.combatState().phase !== 'awaiting-player-action'
-      ) {
-        return;
-      }
-      this.enemyAnimation.set('idle');
-      this.enemyActionKind.set(null);
-      this.playerAnimation.set('idle');
-      this.syncHealthTrails();
-      this.actionReady.set(true);
-    }, 700);
+    this.pendingEnemyAnimationReset = this.clock.schedule(
+      () => {
+        this.pendingEnemyAnimationReset = null;
+        if (
+          generation !== this.runGeneration ||
+          this.combatState().phase !== 'awaiting-player-action'
+        ) {
+          return;
+        }
+        this.enemyAnimation.set('idle');
+        this.enemyActionKind.set(null);
+        this.playerAnimation.set('idle');
+        this.syncHealthTrails();
+        this.actionReady.set(true);
+      },
+      this.combatMessagePacingDelay(undefined, 700),
+    );
   }
 
   private cancelPendingEnemyAnimationReset(): void {
@@ -1478,6 +1492,25 @@ export class GameSessionService {
   private cancelPendingPlayerImpact(): void {
     this.pendingPlayerImpact?.cancel();
     this.pendingPlayerImpact = null;
+  }
+
+  private schedulePlayerActionReady(): void {
+    const generation = this.runGeneration;
+    this.pendingPlayerActionReady = this.clock.schedule(() => {
+      this.pendingPlayerActionReady = null;
+      if (
+        generation !== this.runGeneration ||
+        this.combatState().phase !== 'awaiting-player-action'
+      ) {
+        return;
+      }
+      this.actionReady.set(true);
+    }, this.combatMessagePacingDelay());
+  }
+
+  private cancelPendingPlayerActionReady(): void {
+    this.pendingPlayerActionReady?.cancel();
+    this.pendingPlayerActionReady = null;
   }
 
   private cancelPendingCombatFeedbackReset(): void {
@@ -1532,6 +1565,13 @@ export class GameSessionService {
       this.pendingCombatFeedbackReset = null;
       if (generation === this.runGeneration) this.combatFeedback.set(null);
     }, 850);
+  }
+
+  private combatMessagePacingDelay(message = this.combatMessage(), minimumMs = 0): number {
+    return Math.max(
+      minimumMs,
+      message.length * COMBAT_MESSAGE_CHARACTER_MS + COMBAT_MESSAGE_PAUSE_MS,
+    );
   }
 
   private intentVerb(intent: EnemyIntent): string {

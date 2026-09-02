@@ -112,7 +112,25 @@ test('a player can start a run, buy an item, and enter combat', async ({ page })
   await expect(playerAction).toBeVisible();
   await expect(playerAction).toHaveAttribute('aria-label', 'Wizard action animation');
   await expect(playerAction).toHaveCSS('background-image', /wizard/);
+  const battleBannerText = page.locator('.battle-banner-text');
+  await expect(battleBannerText).toHaveText('You use Attack.');
+  await page.waitForTimeout(200);
+  await expect(battleBannerText).toHaveText('You use Attack.');
   await expect(page.locator('.battle-banner')).toContainText('dealt');
+  const enemyFeedback = page.locator('.enemy-combatant .combatant-visual .combat-feedback');
+  await expect(enemyFeedback).toBeVisible();
+  const enemyVisual = page.locator('.enemy-combatant .combatant-visual');
+  const feedbackBox = await enemyFeedback.boundingBox();
+  const visualBox = await enemyVisual.boundingBox();
+  expect(feedbackBox).not.toBeNull();
+  expect(visualBox).not.toBeNull();
+  if (feedbackBox && visualBox) {
+    expect(feedbackBox.y).toBeGreaterThanOrEqual(visualBox.y);
+    expect(feedbackBox.y + feedbackBox.height).toBeLessThanOrEqual(visualBox.y + visualBox.height);
+  }
+  const completedActionText = await battleBannerText.textContent();
+  await page.waitForTimeout(250);
+  await expect(battleBannerText).toHaveText(completedActionText ?? '');
   await expect(page.locator('.combat-log')).toHaveCount(0);
 });
 
