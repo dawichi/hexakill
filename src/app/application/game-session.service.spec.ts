@@ -1,15 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
-import { GameSessionService } from './game-session.service';
-import { CLOCK, Clock } from './clock';
-import { RANDOM_SOURCE } from './random';
-import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
-import { AUDIO, AudioPort } from './audio';
-import { PREFERENCES_STORAGE, PreferencesStoragePort } from './preferences-storage';
-import { SESSION_STORAGE, SessionStoragePort } from './storage';
 import { INITIAL_COMBAT_STATE } from '../domain/combat-state';
 import { STORE_ITEMS } from '../domain/store';
+import { AUDIO, AudioPort } from './audio';
+import { CLOCK, Clock } from './clock';
+import { GameSessionService } from './game-session.service';
+import { PREFERENCES_STORAGE, PreferencesStoragePort } from './preferences-storage';
+import { RANDOM_SOURCE } from './random';
+import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
+import { SESSION_STORAGE, SessionStoragePort } from './storage';
 
 describe('GameSessionService', () => {
   let service: GameSessionService;

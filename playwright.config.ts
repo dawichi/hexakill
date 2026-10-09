@@ -19,7 +19,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: productionPreview ? 'npm run serve:dist' : 'npm start -- --host 127.0.0.1',
+    command: productionPreview ? 'bun run serve:dist' : 'bun run start --host 127.0.0.1',
     url: productionPreview ? 'http://127.0.0.1:4300' : 'http://127.0.0.1:4200',
     // A stale process on the production port can serve a different project and
     // create false-positive navigation or false-negative journey failures.

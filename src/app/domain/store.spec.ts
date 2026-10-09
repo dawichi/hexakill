@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
+import { RELIC_CATALOG, relicsOfQuality } from './relics';
 import {
   generateStoreOffers,
   purchaseItem,
@@ -9,7 +10,6 @@ import {
   relicPotionHealingFraction,
   relicVictoryGoldMultiplier,
 } from './store';
-import { RELIC_CATALOG, relicsOfQuality } from './relics';
 
 const player = createInitialPlayer('David', CHARACTER_DEFINITIONS[0]);
 

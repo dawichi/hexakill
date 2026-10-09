@@ -1,4 +1,3 @@
-import { CharacterDefinition, CharacterId, PlayerState, Stats } from './game-types';
 import {
   PLAYER_ACTION_ASSETS,
   PLAYER_DEFEAT_ASSETS,
@@ -6,6 +5,7 @@ import {
   PLAYER_IDLE_ASSETS,
   PLAYER_MAGIC_ASSETS,
 } from './assets';
+import { CharacterDefinition, CharacterId, PlayerState, Stats } from './game-types';
 
 export const BASE_STATS: Stats = {
   health: 200,

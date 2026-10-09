@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DamageResult } from './combat-rules';
+import { CombatState, INITIAL_COMBAT_STATE, transitionCombat } from './combat-state';
 import { generateEnemy } from './enemies';
-import { INITIAL_COMBAT_STATE, CombatState, transitionCombat } from './combat-state';
 
 const enemy = generateEnemy(4, 0, 0);
 const result: DamageResult = {

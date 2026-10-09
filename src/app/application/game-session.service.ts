@@ -1,12 +1,45 @@
-import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { AUDIO, AudioPort } from './audio';
-import { BROWSER_CLOCK, CLOCK, Clock, ClockHandle } from './clock';
+import { computed, effect, Injectable, inject, signal } from '@angular/core';
+import { ASSET_MANIFEST } from '../domain/assets';
+import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
 import {
   chooseEnemyIntent,
   determineFirstActor,
   guardBlockAmount,
   resolveHeal,
 } from '../domain/combat-actions';
+import { DamageKind, DamageResult, damageDealt, resolveDamage } from '../domain/combat-rules';
+import {
+  CombatState,
+  EnemyIntent,
+  INITIAL_COMBAT_STATE,
+  isEnemyIntent,
+  transitionCombat,
+} from '../domain/combat-state';
+import {
+  ENEMY_DEFINITIONS,
+  enemyAssetFor,
+  enemySpriteAssetFor,
+  findEnemyDefinition,
+  generateEnemy,
+} from '../domain/enemies';
+import {
+  CharacterDefinition,
+  CombatLogEntry,
+  DefeatedEnemy,
+  EnemyState,
+  ItemState,
+  MAX_COMBAT_LOG_ENTRIES,
+  PlayerState,
+  SpriteStripAsset,
+  Stats,
+} from '../domain/game-types';
+import {
+  AudioPreferences,
+  clampVolume,
+  DEFAULT_EFFECTS_VOLUME,
+  DEFAULT_MUSIC_VOLUME,
+  isStoredPreferencesSnapshot,
+} from '../domain/preferences';
 import {
   applyPowerUp,
   applyVictoryReward,
@@ -15,19 +48,15 @@ import {
   MAX_POWER_UPS_PER_STAT,
 } from '../domain/progression';
 import {
-  purchaseItem,
-  purchasePotions,
-  generateStoreOffers,
-  relicGuardBlockMultiplier,
-  relicGuardBreakMultiplier,
-  relicPotionHealingFraction,
-  relicVictoryHealAmount,
-  STORE_ITEMS,
-  STORE_POTIONS,
-} from '../domain/store';
+  createPersonalRecord,
+  isStoredRecordsSnapshot,
+  PersonalRecord,
+  sortPersonalRecords,
+} from '../domain/records';
 import {
-  relicBloodLedgerHeal,
+  RelicCombatContext,
   relicArcaneMarkMultiplier,
+  relicBloodLedgerHeal,
   relicCrownOfThornsDamage,
   relicCrownOfThornsVenom,
   relicDamageRules,
@@ -42,66 +71,37 @@ import {
   relicStartOfCombatBlock,
   relicThornsDamage,
   relicVictoryMaxHealthBonus,
-  RelicCombatContext,
 } from '../domain/relic-rules';
-import {
-  enemyAssetFor,
-  enemySpriteAssetFor,
-  ENEMY_DEFINITIONS,
-  findEnemyDefinition,
-  generateEnemy,
-} from '../domain/enemies';
-import { damageDealt, DamageKind, DamageResult, resolveDamage } from '../domain/combat-rules';
 import { hasRelic } from '../domain/relics';
 import {
-  EnemyIntent,
-  INITIAL_COMBAT_STATE,
-  CombatState,
-  isEnemyIntent,
-  transitionCombat,
-} from '../domain/combat-state';
-import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
-import { ASSET_MANIFEST } from '../domain/assets';
-import {
-  BOSS_ROOMS,
   advanceRouteMap,
+  BOSS_ROOMS,
   createRouteMap,
   FINAL_ROOM,
   findRouteNode,
   isRouteMapState,
-  revealHiddenRouteNodes,
   RouteLayer,
   RouteMapState,
   RouteNodeKind,
+  revealHiddenRouteNodes,
 } from '../domain/route-map';
 import {
-  CharacterDefinition,
-  CombatLogEntry,
-  DefeatedEnemy,
-  EnemyState,
-  ItemState,
-  MAX_COMBAT_LOG_ENTRIES,
-  PlayerState,
-  SpriteStripAsset,
-  Stats,
-} from '../domain/game-types';
+  generateStoreOffers,
+  purchaseItem,
+  purchasePotions,
+  relicGuardBlockMultiplier,
+  relicGuardBreakMultiplier,
+  relicPotionHealingFraction,
+  relicVictoryHealAmount,
+  STORE_ITEMS,
+  STORE_POTIONS,
+} from '../domain/store';
+import { AUDIO, AudioPort } from './audio';
+import { BROWSER_CLOCK, CLOCK, Clock, ClockHandle } from './clock';
+import { PREFERENCES_STORAGE, PreferencesStoragePort } from './preferences-storage';
 import { RANDOM_SOURCE, RandomSource } from './random';
 import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
-import { PREFERENCES_STORAGE, PreferencesStoragePort } from './preferences-storage';
 import { SESSION_STORAGE, SessionStoragePort } from './storage';
-import {
-  createPersonalRecord,
-  isStoredRecordsSnapshot,
-  PersonalRecord,
-  sortPersonalRecords,
-} from '../domain/records';
-import {
-  AudioPreferences,
-  clampVolume,
-  DEFAULT_EFFECTS_VOLUME,
-  DEFAULT_MUSIC_VOLUME,
-  isStoredPreferencesSnapshot,
-} from '../domain/preferences';
 
 const COMBAT_MESSAGE_CHARACTER_MS = 22;
 const COMBAT_MESSAGE_PAUSE_MS = 400;

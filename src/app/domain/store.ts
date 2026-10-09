@@ -1,6 +1,6 @@
 import { DamageKind, DamageModifiers } from './combat-rules';
-import { findRelic, hasRelic, RELIC_CATALOG, relicsOfQuality } from './relics';
 import { ItemState, PlayerState, RelicQuality, Stats } from './game-types';
+import { findRelic, hasRelic, RELIC_CATALOG, relicsOfQuality } from './relics';
 
 export const STORE_ITEMS: readonly ItemState[] = RELIC_CATALOG;
 

@@ -1,6 +1,6 @@
 import { BASE_STATS } from './characters';
-import { relicVictoryExperienceMultiplier, relicVictoryGoldMultiplier } from './store';
 import { EnemyState, PlayerState, PowerUpType, Stats } from './game-types';
+import { relicVictoryExperienceMultiplier, relicVictoryGoldMultiplier } from './store';
 
 export const MAX_POWER_UPS = 24;
 export const MAX_POWER_UPS_PER_STAT = 6;

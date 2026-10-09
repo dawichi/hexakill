@@ -1,27 +1,21 @@
+import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
 import {
   chooseEnemyIntent,
   determineFirstActor,
   guardBlockAmount,
   resolveHeal,
 } from './combat-actions';
-import { damageDealt, DamageKind, DamageResult, resolveDamage } from './combat-rules';
-import { ENEMY_DEFINITIONS, generateEnemy } from './enemies';
-import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
+import { DamageKind, DamageResult, damageDealt, resolveDamage } from './combat-rules';
 import { EnemyIntent, EnemyIntentKind, PlayerCombatAction } from './combat-state';
+import { ENEMY_DEFINITIONS, generateEnemy } from './enemies';
 import { CharacterId, EnemyState, ItemState, PlayerState, Stats } from './game-types';
 import {
-  relicDamageModifiers,
-  relicGuardBlockMultiplier,
-  relicGuardBreakMultiplier,
-  relicPotionHealingFraction,
-  STORE_ITEMS,
-} from './store';
-import {
+  RelicCombatContext,
+  relicArcaneMarkMultiplier,
   relicBloodLedgerHeal,
   relicCrownOfThornsDamage,
   relicCrownOfThornsVenom,
   relicDamageRules,
-  relicArcaneMarkMultiplier,
   relicGuardBonus,
   relicIncomingDamageMultiplier,
   relicLethalProtectionAvailable,
@@ -32,8 +26,14 @@ import {
   relicStartEnemyDamage,
   relicStartOfCombatBlock,
   relicThornsDamage,
-  RelicCombatContext,
 } from './relic-rules';
+import {
+  relicDamageModifiers,
+  relicGuardBlockMultiplier,
+  relicGuardBreakMultiplier,
+  relicPotionHealingFraction,
+  STORE_ITEMS,
+} from './store';
 
 export type SimulationAction = PlayerCombatAction | 'potion';
 export type PlayerPolicyId = 'random' | 'class' | 'reactive' | 'greedy';

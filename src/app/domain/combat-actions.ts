@@ -1,9 +1,9 @@
 import {
+  COMBAT_RULES,
   Combatant,
   DamageKind,
   DamageModifiers,
   DamageResult,
-  COMBAT_RULES,
   reduceDamage,
   resolveDamage,
 } from './combat-rules';

@@ -3,8 +3,8 @@ import {
   createSimulationFixture,
   DEFAULT_BALANCE_SCENARIOS,
   PLAYER_POLICIES,
-  runRelicBalanceReport,
   runBalanceReport,
+  runRelicBalanceReport,
   simulateEncounter,
   strengthenElite,
 } from './balance-simulation';

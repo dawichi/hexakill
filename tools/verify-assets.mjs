@@ -1,224 +1,82 @@
-import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+// Verifies that every asset referenced by the app exists, that typed sprite strips match their
+// declared frame geometry, and that `static/` ships no unreferenced media.
+// Usage: bun tools/verify-assets.mjs [assetRoot=static]
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { relative, resolve } from 'node:path';
 
 const projectRoot = resolve(new URL('..', import.meta.url).pathname);
-const artifactArgument = process.argv[2];
-const assetRoot = resolve(projectRoot, artifactArgument ?? 'static');
-const sourceAssetRoot = resolve(projectRoot, 'static');
+const assetRoot = resolve(projectRoot, process.argv[2] ?? 'static');
+const sourceRoot = resolve(projectRoot, 'src');
+const mediaDirectories = ['images', 'music', 'sounds', 'fonts'];
+const errors = [];
 
-function listFiles(directory) {
+function listFiles(directory, filter = () => true) {
+  if (!existsSync(directory)) return [];
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const path = resolve(directory, entry.name);
-    return entry.isDirectory() ? listFiles(path) : [path];
+    if (entry.isDirectory()) return listFiles(path, filter);
+    return filter(entry.name) ? [path] : [];
   });
 }
 
-function fileDigest(path) {
-  return createHash('sha256').update(readFileSync(path)).digest('hex');
+function readPngDimensions(path) {
+  const data = readFileSync(path);
+  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  if (data.length < 24 || !data.subarray(0, 8).equals(signature)) return null;
+  return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
 }
 
-const idleEntities = [
-  'adventurer',
-  'archer',
-  'armored-huntress',
-  'bringer-of-death',
-  'evil-tree',
-  'evil-wizard',
-  'fire-knight',
-  'fire-worm',
-  'knight',
-  'martial-hero',
-  'samurai',
-  'slime-blue',
-  'slime-gold',
-  'slime-green',
-  'slime-purple',
-  'slime-red',
-  'warrior',
-  'water-priestess',
-  'wild-huntress',
-  'witch-blue',
-  'wizard',
-];
+const sources = listFiles(
+  sourceRoot,
+  (name) => /\.(ts|html|css)$/.test(name) && !name.endsWith('.spec.ts'),
+).map((path) => readFileSync(path, 'utf8'));
 
-const requiredAssets = [
-  ...idleEntities.map((entity) => `images/${entity}/idle.gif`),
-  'images/evil-tree/attack.gif',
-  'images/evil-tree/die.gif',
-  'images/slime-blue/attack.gif',
-  'images/slime-blue/die.gif',
-  'images/slime-gold/attack.gif',
-  'images/slime-gold/die.gif',
-  'images/slime-green/attack.gif',
-  'images/slime-green/die.gif',
-  'images/slime-purple/attack.gif',
-  'images/slime-purple/die.gif',
-  'images/slime-red/attack.gif',
-  'images/slime-red/die.gif',
-  'images/evil-wizard/sprites/Death.png',
-  'images/evil-wizard/sprites/Attack1.png',
-  'images/evil-wizard/sprites/Attack2.png',
-  'images/evil-wizard/sprites/Idle.png',
-  'images/evil-wizard/sprites/Take hit.png',
-  'images/wizard/sprites/Attack2.png',
-  'images/wizard/sprites/Hit.png',
-  'images/samurai/Sprites/Attack2.png',
-  'images/samurai/Sprites/Take Hit.png',
-  'images/fire-worm/Sprites/Worm/Death.png',
-  'images/fire-worm/Sprites/Worm/Attack.png',
-  'images/fire-worm/Sprites/Worm/Get Hit.png',
-  'images/fire-worm/Sprites/Worm/Idle.png',
-  'images/knight/idle.png',
-  'images/martial-hero/Sprite/Death.png',
-  'images/martial-hero/Sprite/Attack1.png',
-  'images/martial-hero/Sprite/Take Hit.png',
-  'images/martial-hero/Sprite/Idle.png',
-  'images/samurai/Sprites/Death.png',
-  'images/samurai/Sprites/Idle.png',
-  'images/wild-huntress/sprites/Death.png',
-  'images/wild-huntress/sprites/Attack1.png',
-  'images/wild-huntress/sprites/Take hit.png',
-  'images/wild-huntress/sprites/Idle.png',
-  'images/witch-blue/assets/B_witch_attack.png',
-  'images/witch-blue/assets/B_witch_charge.png',
-  'images/witch-blue/assets/B_witch_idle.png',
-  'images/witch-blue/assets/B_witch_take_damage.png',
-  'images/witch-blue/assets/B_witch_death.png',
-  'images/wizard/sprites/Attack1.png',
-  'images/wizard/sprites/Death.png',
-  'images/wizard/sprites/Idle.png',
-  'images/samurai/Sprites/Attack1.png',
-  'images/items/orb.png',
-  'images/items/sword.png',
-  'images/items/wand.png',
-  'music/boss.mp3',
-  'music/champSelect.mp3',
-  'music/dungeon.mp3',
-  'music/store.mp3',
-  'music/welcome.mp3',
-  'sounds/attack.mp3',
-  'sounds/coin.mp3',
-  'sounds/enemy_killed.mp3',
-  'sounds/error.mp3',
-  'sounds/levelup.mp3',
-  'sounds/magic.mp3',
-  'sounds/potion.wav',
-];
+const referencePattern = new RegExp(
+  `['"(]/((?:${mediaDirectories.join('|')})/[^'")]+\\.[a-z0-9]+)['")]`,
+  'g',
+);
+const referenced = new Set(
+  sources.flatMap((source) => [...source.matchAll(referencePattern)].map((match) => match[1])),
+);
 
-const missing = requiredAssets.filter((asset) => !existsSync(resolve(assetRoot, asset)));
-if (missing.length > 0) {
-  console.error(`Missing ${missing.length} required assets under ${assetRoot}:`);
-  console.error(missing.map((asset) => `- ${asset}`).join('\n'));
+for (const path of referenced) {
+  if (!existsSync(resolve(assetRoot, path))) errors.push(`referenced asset is missing: ${path}`);
+}
+
+const spritePattern =
+  /src:\s*['"]\/(images\/[^'"]+\.png)['"][\s\S]{0,240}?frameWidth:\s*(\d+),\s*frameHeight:\s*(\d+),\s*frameCount:\s*(\d+)(?:,\s*orientation:\s*['"](horizontal|vertical)['"])?(?:,\s*trailingPixels:\s*(\d+))?/g;
+let spriteCount = 0;
+for (const source of sources) {
+  for (const match of source.matchAll(spritePattern)) {
+    const [, path, width, height, count, orientation = 'horizontal', trailing = '0'] = match;
+    const filePath = resolve(assetRoot, path);
+    if (!existsSync(filePath)) continue;
+    const dimensions = readPngDimensions(filePath);
+    const [frameWidth, frameHeight, frameCount, trailingPixels] = [width, height, count, trailing].map(Number);
+    const expected =
+      orientation === 'vertical'
+        ? { width: frameWidth, height: frameHeight * frameCount - trailingPixels }
+        : { width: frameWidth * frameCount - trailingPixels, height: frameHeight };
+    if (!dimensions || dimensions.width !== expected.width || dimensions.height !== expected.height) {
+      errors.push(
+        `${path} is ${dimensions ? `${dimensions.width}x${dimensions.height}` : 'not a PNG'}; expected ${expected.width}x${expected.height}`,
+      );
+    }
+    spriteCount += 1;
+  }
+}
+
+const shipped = mediaDirectories.flatMap((directory) =>
+  listFiles(resolve(assetRoot, directory)).map((path) => relative(assetRoot, path)),
+);
+for (const path of shipped) {
+  if (!referenced.has(path)) errors.push(`unreferenced asset is shipped: ${path}`);
+}
+
+if (errors.length) {
+  console.error(`Asset verification failed:\n${errors.map((error) => `  - ${error}`).join('\n')}`);
   process.exit(1);
 }
-
-const activeImagePaths = new Set(requiredAssets.filter((asset) => asset.startsWith('images/')));
-const allImagePaths = listFiles(resolve(assetRoot, 'images')).map((path) =>
-  relative(assetRoot, path).split('\\').join('/'),
-);
-const deferredImageCount = allImagePaths.filter((asset) => !activeImagePaths.has(asset)).length;
-if (deferredImageCount !== 42) {
-  console.error(
-    `Expected 42 deferred image sources from the asset catalog, found ${deferredImageCount}. Update docs/assets-sprite-sources.md and this verification boundary when assets change.`,
-  );
-  process.exit(1);
-}
-
-const sourceRegister = readFileSync(resolve(projectRoot, 'docs/assets-sprite-sources.md'), 'utf8');
-const catalogedDeferredImagePaths = new Set();
-for (const line of sourceRegister.split('\n')) {
-  const retainedFilesCell = line.split('|')[3] ?? '';
-  for (const match of retainedFilesCell.matchAll(/`([^`]+)`/g)) {
-    catalogedDeferredImagePaths.add(`images/${match[1]}`);
-  }
-}
-const actualDeferredImagePaths = new Set(
-  allImagePaths.filter((asset) => !activeImagePaths.has(asset)),
-);
-const missingFromSourceRegister = [...actualDeferredImagePaths].filter(
-  (asset) => !catalogedDeferredImagePaths.has(asset),
-);
-const staleInSourceRegister = [...catalogedDeferredImagePaths].filter(
-  (asset) => !actualDeferredImagePaths.has(asset),
-);
-if (missingFromSourceRegister.length > 0 || staleInSourceRegister.length > 0) {
-  console.error('The deferred asset register does not match the retained image tree.');
-  if (missingFromSourceRegister.length > 0) {
-    console.error(
-      `- Deferred files missing from docs/assets-sprite-sources.md: ${missingFromSourceRegister.join(', ')}`,
-    );
-  }
-  if (staleInSourceRegister.length > 0) {
-    console.error(
-      `- Catalog entries no longer present as deferred files: ${staleInSourceRegister.join(', ')}`,
-    );
-  }
-  process.exit(1);
-}
-
-const sourceAssetPaths = new Set();
-for (const sourcePath of listFiles(resolve(projectRoot, 'src/app'))) {
-  const source = readFileSync(sourcePath, 'utf8');
-  for (const match of source.matchAll(/["'`](\/(?:images|music|sounds)\/[^"'`)]*)["'`]/g)) {
-    sourceAssetPaths.add(match[1].slice(1));
-  }
-}
-
-const undeclaredSourceAssets = [...sourceAssetPaths].filter(
-  (asset) => !requiredAssets.includes(asset),
-);
-const missingSourceDeclarations = requiredAssets.filter((asset) => !sourceAssetPaths.has(asset));
-if (undeclaredSourceAssets.length > 0 || missingSourceDeclarations.length > 0) {
-  console.error('The active source asset references and the verification contract have drifted.');
-  if (undeclaredSourceAssets.length > 0) {
-    console.error(
-      `- Source references missing from requiredAssets: ${undeclaredSourceAssets.join(', ')}`,
-    );
-  }
-  if (missingSourceDeclarations.length > 0) {
-    console.error(
-      `- requiredAssets not referenced by active source: ${missingSourceDeclarations.join(', ')}`,
-    );
-  }
-  process.exit(1);
-}
-
-if (artifactArgument) {
-  const sourceStaticPaths = new Set(
-    listFiles(sourceAssetRoot).map((path) => relative(sourceAssetRoot, path).split('\\').join('/')),
-  );
-  const artifactStaticPaths = new Set(
-    listFiles(assetRoot).map((path) => relative(assetRoot, path).split('\\').join('/')),
-  );
-  const missingCopiedAssets = [...sourceStaticPaths].filter(
-    (asset) => !artifactStaticPaths.has(asset),
-  );
-  if (missingCopiedAssets.length > 0) {
-    console.error('The publishable artifact is missing retained static assets:');
-    console.error(missingCopiedAssets.map((asset) => `- ${asset}`).join('\n'));
-    process.exit(1);
-  }
-
-  const changedCopiedAssets = [...sourceStaticPaths].filter((asset) => {
-    const sourcePath = resolve(sourceAssetRoot, asset);
-    const artifactPath = resolve(assetRoot, asset);
-    return (
-      statSync(sourcePath).size !== statSync(artifactPath).size ||
-      fileDigest(sourcePath) !== fileDigest(artifactPath)
-    );
-  });
-  if (changedCopiedAssets.length > 0) {
-    console.error('The publishable artifact changed retained static assets:');
-    console.error(changedCopiedAssets.map((asset) => `- ${asset}`).join('\n'));
-    process.exit(1);
-  }
-
-  console.log(
-    `Verified complete retained static-tree path and byte parity for ${sourceStaticPaths.size} files.`,
-  );
-}
-
 console.log(
-  `Verified ${requiredAssets.length} active asset paths, ${deferredImageCount} exact deferred image sources, source-reference parity, and deferred-register parity under ${assetRoot}.`,
+  `Verified ${referenced.size} asset references and ${spriteCount} sprite strips in ${relative(projectRoot, assetRoot) || '.'}.`,
 );

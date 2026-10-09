@@ -1,6 +1,6 @@
 import { DamageKind } from './combat-rules';
-import { hasRelic } from './relics';
 import { PlayerState } from './game-types';
+import { hasRelic } from './relics';
 
 export interface RelicCombatContext {
   readonly playerHealth: number;

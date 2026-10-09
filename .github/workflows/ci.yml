@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Format and lint
+        run: bun run check
+      - name: Type check
+        run: bun run verify:types
+      - name: Unit tests
+        run: bun run test --watch=false --no-progress
+      - name: Asset references
+        run: bun run verify:assets
+      - name: Install Playwright browser
+        run: bunx playwright install --with-deps chromium
+      - name: End-to-end journeys (dev server)
+        run: bun run test:e2e
+      - name: End-to-end journeys (production build)
+        run: bun run test:e2e:production
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7

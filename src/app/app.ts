@@ -24,15 +24,15 @@ import {
   LucideSword,
   LucideSwords,
   LucideTentTree,
-  LucideTrophy,
   LucideTriangleAlert,
+  LucideTrophy,
   LucideVolume2,
   LucideWandSparkles,
 } from '@lucide/angular';
 import { CombatFeedback, GameSessionService } from './application/game-session.service';
-import { EnemyIntent } from './domain/combat-state';
-import { StatChipComponent } from './components/stat-chip/stat-chip';
 import { RelicIconComponent } from './components/relic-icon/relic-icon';
+import { StatChipComponent } from './components/stat-chip/stat-chip';
+import { EnemyIntent } from './domain/combat-state';
 import { CharacterDefinition, ItemState, SpriteStripAsset, Stat, Stats } from './domain/game-types';
 import { PersonalRecord } from './domain/records';
 import { RouteNode, RouteNodeKind } from './domain/route-map';

@@ -1,7 +1,19 @@
-import { applyPowerUp, applyVictoryReward } from './progression';
 import {
-  BOSS_ROOMS,
+  createSeededRandom,
+  PLAYER_POLICIES,
+  PlayerPolicyId,
+  simulateEncounter,
+  strengthenElite,
+} from './balance-simulation';
+import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
+import { resolveHeal } from './combat-actions';
+import { generateEnemy } from './enemies';
+import { CharacterId, PlayerState } from './game-types';
+import { applyPowerUp, applyVictoryReward } from './progression';
+import { relicVictoryMaxHealthBonus } from './relic-rules';
+import {
   advanceRouteMap,
+  BOSS_ROOMS,
   createRouteMap,
   FINAL_ROOM,
   RouteMapState,
@@ -16,18 +28,6 @@ import {
   relicVictoryHealAmount,
   STORE_ITEMS,
 } from './store';
-import { relicVictoryMaxHealthBonus } from './relic-rules';
-import { CHARACTER_DEFINITIONS, createInitialPlayer } from './characters';
-import { generateEnemy } from './enemies';
-import {
-  createSeededRandom,
-  PLAYER_POLICIES,
-  PlayerPolicyId,
-  simulateEncounter,
-  strengthenElite,
-} from './balance-simulation';
-import { resolveHeal } from './combat-actions';
-import { CharacterId, PlayerState } from './game-types';
 
 export type RoutePolicyId = 'balanced' | 'aggressive' | 'safe' | 'random';
 
