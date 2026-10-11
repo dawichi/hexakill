@@ -14,6 +14,7 @@ import {
   LucideTrophy,
   LucideWandSparkles,
 } from '@lucide/angular';
+import { combatMessageCharacterInterval } from '../../ui/combat-message-timing';
 import { ScreenBase } from '../screen-base';
 
 @Component({
@@ -60,14 +61,11 @@ export class BattleBanner extends ScreenBase implements OnDestroy {
     this.displayedCombatMessage.set('');
     this.combatMessageTyping.set(true);
     let characterIndex = 0;
-    this.typewriterTimer = setInterval(
-      () => {
-        characterIndex += 1;
-        this.displayedCombatMessage.set(message.slice(0, characterIndex));
-        if (characterIndex >= message.length) this.stopCombatMessageAnimation();
-      },
-      speed === 'slow' ? 42 : 22,
-    );
+    this.typewriterTimer = setInterval(() => {
+      characterIndex += 1;
+      this.displayedCombatMessage.set(message.slice(0, characterIndex));
+      if (characterIndex >= message.length) this.stopCombatMessageAnimation();
+    }, combatMessageCharacterInterval(speed));
   }
 
   private stopCombatMessageAnimation(): void {

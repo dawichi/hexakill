@@ -23,6 +23,7 @@ import {
   roomsCleared,
 } from '../domain/run';
 import { POTION_OFFERS, PotionOfferId } from '../domain/store';
+import { combatMessagePresentationDelay } from '../ui/combat-message-timing';
 import { combatEventMessage } from '../ui/combat-messages';
 import { AUDIO, AudioPort } from './audio';
 import { BROWSER_CLOCK, CLOCK, Clock } from './clock';
@@ -364,10 +365,16 @@ export class GameSessionService {
   }
 
   private eventDelay(event: CombatEvent): number {
-    if (this.prefersReducedMotion() || this.textSpeed() === 'instant') return 0;
-    const slow = this.textSpeed() === 'slow';
-    if (event.type === 'action' || event.type === 'combat-start') return slow ? 520 : 360;
-    return slow ? 340 : 220;
+    const message = combatEventMessage(event, this.enemy()?.definition.name ?? 'The enemy');
+    const minimumMs =
+      event.type === 'combat-start'
+        ? 650
+        : event.type === 'action'
+          ? event.actor === 'player'
+            ? 320
+            : 360
+          : 0;
+    return combatMessagePresentationDelay(message, this.textSpeed(), minimumMs);
   }
 
   private applyPresentationEvent(event: CombatEvent, fastForward = false): void {
@@ -495,7 +502,7 @@ export class GameSessionService {
   private showFeedback(feedback: Omit<CombatFeedback, 'id'>): void {
     const current = { ...feedback, id: ++this.feedbackSequence };
     this.combatFeedback.set(current);
-    this.presentationQueue.schedule(720, () => {
+    this.presentationQueue.schedule(850, () => {
       if (this.combatFeedback()?.id === current.id) this.combatFeedback.set(null);
     });
   }
@@ -575,14 +582,6 @@ export class GameSessionService {
     const track = musicForScreen(this.screen(), this.runState());
     if (track) this.audio?.playMusic(track);
     else this.audio?.stopMusic();
-  }
-
-  private prefersReducedMotion(): boolean {
-    try {
-      return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    } catch {
-      return false;
-    }
   }
 
   private clearCombatPresentation(): void {

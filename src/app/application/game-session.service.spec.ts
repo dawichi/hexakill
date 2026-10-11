@@ -10,23 +10,44 @@ import { KeyValueStore, memoryStore, readJson, STORAGE, STORAGE_KEYS } from './s
 describe('GameSessionService', () => {
   let service: GameSessionService;
   let storage: KeyValueStore & { readonly data: Map<string, string> };
-  let scheduled: Array<{ task: () => void; cancelled: boolean; delay: number }>;
+  let scheduled: Array<{
+    task: () => void;
+    cancelled: boolean;
+    delay: number;
+    dueAt: number;
+  }>;
   let played: string[];
   let appliedVolumes: Array<readonly [number, number]>;
+  let currentTime = Date.UTC(2026, 9, 11);
   const testClock: Clock = {
-    now: () => Date.UTC(2026, 9, 11),
+    now: () => currentTime,
     schedule: (task, delay) => {
-      const item = { task, cancelled: false, delay };
+      const item = { task, cancelled: false, delay, dueAt: currentTime + delay };
       scheduled.push(item);
       return { cancel: () => (item.cancelled = true) } satisfies ClockHandle;
     },
   };
 
+  function advanceBy(milliseconds: number): void {
+    const targetTime = currentTime + milliseconds;
+    while (true) {
+      const next = scheduled
+        .filter((candidate) => !candidate.cancelled)
+        .sort((left, right) => left.dueAt - right.dueAt)[0];
+      if (!next || next.dueAt > targetTime) break;
+      next.cancelled = true;
+      currentTime = next.dueAt;
+      next.task();
+    }
+    currentTime = targetTime;
+  }
+
   function flushOne(): void {
-    const item = scheduled.find((candidate) => !candidate.cancelled);
+    const item = scheduled
+      .filter((candidate) => !candidate.cancelled)
+      .sort((left, right) => left.dueAt - right.dueAt)[0];
     if (!item) return;
-    item.cancelled = true;
-    item.task();
+    advanceBy(item.dueAt - currentTime);
   }
 
   function configure(): void {
@@ -61,6 +82,7 @@ describe('GameSessionService', () => {
     scheduled = [];
     played = [];
     appliedVolumes = [];
+    currentTime = Date.UTC(2026, 9, 11);
     configure();
   });
 
@@ -180,6 +202,27 @@ describe('GameSessionService', () => {
     service.attack('attack');
     expect(service.isPresenting()).toBe(true);
     flushOne();
+    expect(service.isPresenting()).toBe(true);
+  });
+
+  it('holds an action message through typing and a reading pause before the next event', () => {
+    service.beginCharacterSelection();
+    service.setPlayerName('Hero');
+    service.selectCharacter(characterAt(0));
+    service.startRun();
+    const encounter = service.routeMap()?.nodes.find((node) => node.kind === 'battle');
+    if (!encounter) throw new Error('Expected a battle route.');
+    service.chooseRouteNode(encounter.id);
+    service.skipPresentation();
+
+    service.attack('magic');
+
+    expect(service.combatMessage()).toBe('You use Magic.');
+    const messageDuration = service.combatMessage().length * 22 + 400;
+    advanceBy(messageDuration - 1);
+    expect(service.combatMessage()).toBe('You use Magic.');
+    advanceBy(1);
+    expect(service.combatMessage()).not.toBe('You use Magic.');
     expect(service.isPresenting()).toBe(true);
   });
 });

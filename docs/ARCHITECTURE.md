@@ -47,7 +47,9 @@ stateDiagram-v2
 `domain/combat.ts` resolves a turn synchronously and returns the new combat state plus typed
 events. The application saves the state before its presentation queue plays those events as
 messages, sounds, sprite animation, and feedback. The queue can be skipped; it does not change the
-outcome. Reloading during presentation resumes from the already committed result.
+outcome. Combat text speed controls both character reveal and event pacing, with a short reading pause
+after each complete message. Reduced motion removes the movement effects while preserving the event
+order and message timing. Reloading during presentation resumes from the already committed result.
 
 `application/session-view-model.ts` derives the screen, route, combat, and character display state
 from the current run. `application/session-persistence.ts` owns validation and migration at the
