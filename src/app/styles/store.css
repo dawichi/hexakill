@@ -1,0 +1,111 @@
+.store-balance {
+  margin-bottom: 1.25rem;
+  color: #fde68a;
+  font-size: 1.1rem;
+}
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.store-card {
+  display: grid;
+  min-height: 10rem;
+  place-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  border: 1px solid #52525b;
+  border-radius: 0.75rem;
+  background: #27272a;
+  color: #fafafa;
+  padding: 1rem;
+  text-align: center;
+}
+
+.store-card:hover:not(:disabled) {
+  border-color: #fbbf24;
+  background: #3f3f46;
+}
+
+.store-card span {
+  color: #b7b7c0;
+  font-size: 0.8rem;
+}
+
+.store-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.relic-icon.quality-normal,
+.store-card.quality-normal .relic-icon {
+  color: #d4d4d8;
+}
+
+.relic-icon.quality-rare,
+.store-card.quality-rare .relic-icon {
+  color: #38bdf8;
+}
+
+.relic-icon.quality-epic,
+.store-card.quality-epic .relic-icon {
+  color: #c084fc;
+}
+
+.store-quality {
+  color: currentColor;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.game-active > * > [data-screen='store'] .store-grid {
+  min-height: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.game-active > * > [data-screen='store'] .store-card {
+  min-height: 0;
+  gap: 0.2rem;
+  padding: 0.45rem;
+  font-size: 0.7rem;
+}
+
+.game-active > * > [data-screen='store'] .store-card .item-sprite {
+  width: 2rem;
+  height: 2rem;
+}
+
+.game-active > * > [data-screen='store'] .store-card span {
+  overflow: hidden;
+  font-size: 0.58rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 700px) {
+  .game-active > * > [data-screen='store'] .store-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .game-active > * > [data-screen='store'] .store-card {
+    padding: 0.25rem;
+    font-size: 0.58rem;
+  }
+
+  .game-active > * > [data-screen='store'] .store-card .item-sprite {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .game-active > * > [data-screen='store'] .store-card span {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}

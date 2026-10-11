@@ -1,0 +1,22 @@
+@if (session.player(); as player) {
+<section class="inventory-panel" aria-labelledby="combat-inventory-title">
+          <h3 id="combat-inventory-title">Relics</h3>
+          @if (player.inventory.length) {
+            <div class="inventory-grid">
+              @for (item of player.inventory; track item.id) {
+                <article class="inventory-item">
+                  <span class="item-sprite relic-icon" [class]="'quality-' + item.quality">
+                    <app-relic-icon [icon]="item.icon" [label]="item.name" />
+                  </span>
+                  <span>
+                    <strong>{{ item.name }} · {{ item.quality }}</strong>
+                    <small>{{ itemDescription(item) }}</small>
+                  </span>
+                </article>
+              }
+            </div>
+          } @else {
+            <p class="inventory-empty">No relics yet · find a merchant beyond a door.</p>
+          }
+</section>
+}

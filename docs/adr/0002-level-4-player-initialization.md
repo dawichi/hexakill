@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted — 2026-08-17
+Superseded by [ADR-0006](0006-distinct-character-starts-and-passives.md) — 2026-10-11
 
 ## Decision
 
@@ -18,7 +18,7 @@ Character modifiers remain part of the level-up progression rule and are not app
 
 ## Context
 
-The Angular application displayed level 4 while storing the unscaled base row (`200 / 16 / 20 / 12 / 12 / 4`). Regular enemies were generated from the player level and therefore commonly entered the first encounter with substantially higher stats than the hero. This made the opening combat unfair and diverged from the previous character constructor, which initialized each stat as `level × base`.
+The Angular application displayed level 4 while storing the unscaled base row (`200 / 16 / 20 / 12 / 12 / 4`). Regular enemies were generated from the player level and therefore commonly entered the first encounter with substantially higher stats than the hero. This decision restored the prior level-scaled baseline. It is retained as historical context; new class modifiers now shape starting stats under ADR-0006.
 
 ## Consequences
 

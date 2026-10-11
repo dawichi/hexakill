@@ -1,0 +1,14 @@
+<div class="enemy-intent" [class]="intent().kind">
+  @if (intent().kind === 'attack') {
+    <svg lucideSword size="13" aria-hidden="true"></svg>
+  } @else if (intent().kind === 'magic') {
+    <svg lucideWandSparkles size="13" aria-hidden="true"></svg>
+  } @else if (intent().kind === 'guard') {
+    <svg lucideShield size="13" aria-hidden="true"></svg>
+  } @else if (intent().kind === 'heal') {
+    <svg lucideHeartPulse size="13" aria-hidden="true"></svg>
+  } @else {
+    <svg lucideSwords size="13" aria-hidden="true"></svg>
+  }
+  <span>{{ intentSummary(intent()) }}</span>
+</div>

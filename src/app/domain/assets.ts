@@ -1,6 +1,4 @@
-import { CharacterId, SpriteStripAsset } from './game-types';
-
-export const ASSET_MANIFEST = {
+export const AUDIO_ASSETS = {
   music: {
     welcome: '/music/welcome.mp3',
     characterSelect: '/music/champSelect.mp3',
@@ -11,102 +9,15 @@ export const ASSET_MANIFEST = {
   sounds: {
     attack: '/sounds/attack.mp3',
     magic: '/sounds/magic.mp3',
-    impact: '/sounds/attack.mp3',
-    guard: '/sounds/potion.wav',
+    guard: '/sounds/potion.mp3',
     miss: '/sounds/error.mp3',
     coin: '/sounds/coin.mp3',
     enemyKilled: '/sounds/enemy_killed.mp3',
     error: '/sounds/error.mp3',
     levelUp: '/sounds/levelup.mp3',
-    potion: '/sounds/potion.wav',
-  },
-  items: {
-    orb: '/images/items/orb.png',
-    sword: '/images/items/sword.png',
-    wand: '/images/items/wand.png',
+    potion: '/sounds/potion.mp3',
   },
 } as const;
 
-/**
- * Provisional single-row player action strips. The original files are retained
- * historical art; the dimensions describe the observed files, not a product
- * decision about the final combat animation language.
- */
-export const PLAYER_ACTION_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
-  wizard: {
-    src: '/images/wizard/sprites/Attack1.png',
-    frameWidth: 231,
-    frameHeight: 190,
-    frameCount: 8,
-  },
-  samurai: {
-    src: '/images/samurai/Sprites/Attack1.png',
-    frameWidth: 200,
-    frameHeight: 200,
-    frameCount: 6,
-  },
-};
-
-/** Observed single-row player idle strips, rendered provisionally in combat. */
-export const PLAYER_IDLE_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
-  wizard: {
-    src: '/images/wizard/sprites/Idle.png',
-    frameWidth: 231,
-    frameHeight: 190,
-    frameCount: 6,
-  },
-  samurai: {
-    src: '/images/samurai/Sprites/Idle.png',
-    frameWidth: 200,
-    frameHeight: 200,
-    frameCount: 8,
-  },
-};
-
-/** Provisional single-row player Magic strips, selected only for the Magic action. */
-export const PLAYER_MAGIC_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
-  wizard: {
-    src: '/images/wizard/sprites/Attack2.png',
-    frameWidth: 231,
-    frameHeight: 190,
-    frameCount: 8,
-  },
-  samurai: {
-    src: '/images/samurai/Sprites/Attack2.png',
-    frameWidth: 200,
-    frameHeight: 200,
-    frameCount: 6,
-  },
-};
-
-/** Provisional single-row player hit-reaction strips. */
-export const PLAYER_HIT_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
-  wizard: {
-    src: '/images/wizard/sprites/Hit.png',
-    frameWidth: 231,
-    frameHeight: 190,
-    frameCount: 4,
-  },
-  samurai: {
-    src: '/images/samurai/Sprites/Take Hit.png',
-    frameWidth: 200,
-    frameHeight: 200,
-    frameCount: 4,
-  },
-};
-
-/** Provisional single-row player defeat strips with observed frame geometry. */
-export const PLAYER_DEFEAT_ASSETS: Readonly<Partial<Record<CharacterId, SpriteStripAsset>>> = {
-  wizard: {
-    src: '/images/wizard/sprites/Death.png',
-    frameWidth: 231,
-    frameHeight: 190,
-    frameCount: 7,
-  },
-  samurai: {
-    src: '/images/samurai/Sprites/Death.png',
-    frameWidth: 200,
-    frameHeight: 200,
-    frameCount: 6,
-  },
-};
+export type MusicTrack = keyof typeof AUDIO_ASSETS.music;
+export type SoundEffect = keyof typeof AUDIO_ASSETS.sounds;

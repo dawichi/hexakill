@@ -1,0 +1,64 @@
+@if (session.player(); as player) {
+  <section class="panel" data-screen="store" aria-labelledby="store-title">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Between turns · store</p>
+        <h2 id="store-title" data-screen-heading tabindex="-1">Spend your gold.</h2>
+      </div>
+      <button class="quiet-button" type="button" (click)="session.closeStore()">
+        Close store
+      </button>
+    </div>
+    <p class="store-balance">
+      Gold: <strong>{{ player.gold }}</strong> · Potions:
+      <strong>{{ player.potions }}</strong>
+    </p>
+    <p class="combat-message" role="status" aria-atomic="true">
+      {{ session.combatMessage() }}
+    </p>
+
+    <h3>Potions</h3>
+    <div class="store-grid" role="group" aria-label="Potion offers">
+      @for (offer of session.storePotions; track offer.id) {
+        <button
+          class="store-card"
+          type="button"
+          [disabled]="player.gold < offer.price"
+          (click)="session.buyPotions(offer.id)"
+        >
+          <span class="item-sprite potion-icon" aria-hidden="true"
+            ><svg lucideHeartPulse size="28"></svg
+          ></span>
+          <strong>{{ offer.name }}</strong>
+          <span
+            >{{ offer.quantity }} potion{{ offer.quantity === 1 ? '' : 's' }} ·
+            {{ offer.price }} gold</span
+          >
+        </button>
+      }
+    </div>
+
+    <h3>Relics</h3>
+    <div class="store-grid" role="group" aria-label="Relic offers">
+      @for (item of session.storeItems(); track item.id) {
+        <button
+          class="store-card"
+          [class]="'quality-' + item.quality"
+          type="button"
+          [disabled]="
+            player.gold < item.price || player.inventory.some((owned) => owned.id === item.id)
+          "
+          (click)="session.buyItem(item.id)"
+        >
+          <span class="item-sprite relic-icon" aria-hidden="true">
+            <app-relic-icon [icon]="item.icon" />
+          </span>
+          <small class="store-quality">{{ item.quality }}</small>
+          <strong>{{ item.name }}</strong>
+          <span>{{ item.description }}</span>
+          <span>{{ item.price }} gold</span>
+        </button>
+      }
+    </div>
+  </section>
+}

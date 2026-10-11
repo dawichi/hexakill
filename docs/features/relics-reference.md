@@ -1,72 +1,64 @@
-# Relic reference list
+# Relic reference
 
-**Status:** Active prototype catalog — implemented in `src/app/domain/relics.ts`.
-
-Prices are initial hypotheses in gold. Icon names are Lucide suggestions for the first UI pass;
-they are placeholders for future pixel-art item assets.
+**Source of truth:** `src/app/domain/relics.ts`, as accepted in
+[ADR-0009](../adr/0009-catalog-driven-relic-effects.md). Names, icons, prices, descriptions, and
+numeric effects are read from the same typed catalog. Prices and effects are provisional balance
+values.
 
 ## Normal relics
 
-Normal relics are dependable foundations. They should be useful immediately without being the
-entire strategy of a run.
-
-| Relic              | Icon           | Price | Effect                                                                     |
-| ------------------ | -------------- | ----: | -------------------------------------------------------------------------- |
-| Honed Edge         | `Sword`        |   350 | Your Attack deals **10% more damage**.                                     |
-| Apprentice's Codex | `BookOpen`     |   350 | Your Magic deals **10% more damage**.                                      |
-| Guarder's Buckler  | `Shield`       |   400 | Guard grants **8 additional Block**.                                       |
-| Swiftstep Anklet   | `Footprints`   |   400 | Gain **+5 Speed**, improving opening-turn priority.                        |
-| Vitality Moss      | `HeartPlus`    |   450 | Gain **+100 maximum Health**. Current health is unchanged when acquired.   |
-| Soot Charm         | `Flame`        |   400 | At the start of each enemy turn, deal **4 effect damage** to the enemy.    |
-| Bandage Roll       | `HeartPulse`   |   350 | After victory, restore **8% of maximum Health**, capped at missing health. |
-| Coin Purse         | `Coins`        |   350 | Earn **20% more gold** from victories.                                     |
-| Traveler's Compass | `Compass`      |   450 | When a route map opens, reveal **one additional hidden path**.             |
-| Potion Satchel     | `FlaskConical` |   400 | The first Potion used in each combat also grants **6 Block**.              |
+| Relic | Icon | Price | Effect |
+| --- | --- | ---: | --- |
+| Honed Edge | `Sword` | 350 | Attack deals 10% more damage. |
+| Apprentice's Codex | `BookOpen` | 350 | Magic deals 10% more damage. |
+| Guarder's Buckler | `Shield` | 400 | Guard grants 25% more Block. |
+| Swiftstep Anklet | `Footprints` | 400 | Gain 5 Speed. |
+| Vitality Moss | `HeartPlus` | 450 | Gain 100 maximum Health; current damage is unchanged. |
+| Soot Charm | `Flame` | 400 | At each enemy turn, deal effect damage equal to 0.75% of enemy maximum Health. |
+| Bandage Roll | `HeartPulse` | 350 | After victory, restore 5% of maximum Health. |
+| Coin Purse | `Coins` | 350 | Earn 30% more gold from victories. |
+| Traveler's Compass | `Compass` | 450 | Each fork reveals one additional hidden path. |
+| Potion Satchel | `FlaskConical` | 400 | The first Potion each combat also grants Block equal to 50% of the Health it restores. |
 
 ## Rare relics
 
-Rare relics should encourage a recognizable build. Their value increases when the player commits
-to the action or route pattern they support.
-
-| Relic          | Icon              | Price | Effect                                                                                                             |
-| -------------- | ----------------- | ----: | ------------------------------------------------------------------------------------------------------------------ |
-| Thornmail      | `ShieldAlert`     |   800 | Once per enemy action, when Block absorbs damage, deal **6 effect damage** back to the attacker.                   |
-| Hexglass Prism | `Sparkles`        |   850 | Arcane mark empowers the next Attack by **45% instead of 25%**. Applying the mark also grants **4 Block**.         |
-| Echoing Blade  | `Swords`          |   850 | Every **third Attack** in a combat deals **75% bonus damage**. The counter resets between combats.                 |
-| Blood Ledger   | `ScrollText`      |   750 | Once per combat, when you fall below **40% Health**, restore **12% maximum Health**.                               |
-| Ritual Bell    | `BellRing`        |   800 | Start combat with **14 Block**. Your first damaging action deals **10% less damage**.                              |
-| Arcane Battery | `BatteryCharging` |   800 | The first Magic that hits in each combat grants **10 Block**.                                                      |
-| War Drums      | `Drum`            |   800 | If you act first, your first damaging action deals **30% more damage**.                                            |
-| Venom Vial     | `FlaskRound`      |   850 | After Magic hits, apply **5 Venom**. At the start of the enemy turn, Venom deals effect damage and decreases by 1. |
-| Salvager's Map | `Map`             |   700 | Stores offer **one additional relic**. The extra offer follows the store's normal tier roll.                       |
-| Emberheart     | `HeartCrack`      |   900 | While below **50% Health**, your Attack and Magic deal **20% more damage**.                                        |
+| Relic | Icon | Price | Effect |
+| --- | --- | ---: | --- |
+| Thornmail | `ShieldAlert` | 800 | When Block absorbs damage, deal 30% of the absorbed damage back. |
+| Hexglass Prism | `Sparkles` | 850 | Arcane mark adds 50% Attack damage instead of 25%; applying it grants Block equal to 25% of Magic damage. |
+| Echoing Blade | `Swords` | 850 | Every third Attack in a combat deals 50% bonus damage. |
+| Blood Ledger | `ScrollText` | 750 | Once per combat, when a hit leaves you below 35% Health, restore 10% maximum Health. |
+| Ritual Bell | `BellRing` | 800 | Start combat with Block equal to 8% of maximum Health; your first damaging action deals 10% less damage. |
+| Arcane Battery | `BatteryCharging` | 800 | The first Magic that hits each combat grants Block equal to 50% of its damage. |
+| War Drums | `Drum` | 800 | If you act first, your first damaging action deals 30% more damage. |
+| Venom Vial | `FlaskRound` | 850 | Magic hits apply 5 Venom. Venom damages the enemy at turn start and decreases by one. |
+| Salvager's Map | `Map` | 700 | Merchants offer one additional relic. |
+| Emberheart | `HeartCrack` | 900 | Below 50% Health, Attack and Magic deal 15% more damage. |
 
 ## Epic relics
 
-Epic relics should be rare run-defining pivots. They may be powerful, but each one has a limit,
-condition, or counterplay opportunity.
+| Relic | Icon | Price | Effect |
+| --- | --- | ---: | --- |
+| Phoenix Feather | `Feather` | 1,400 | The first lethal hit leaves you at 1 Health, restores 20% maximum Health, and consumes the relic. |
+| The Hourglass | `Hourglass` | 1,300 | The first three actions each combat deal 25% more Attack or Magic damage. |
+| Mirror of Night | `MoonStar` | 1,500 | Reflect 25% of damage dealt to you by enemy Magic. |
+| Crown of Thorns | `Crown` | 1,400 | When one enemy action is blocked by at least 5% of maximum Health, reflect 50% of the absorbed amount and apply 3 Venom. |
+| Infinite Edge | `Infinity` | 1,350 | Every fourth Attack or Magic deals 35% more damage. |
+| Dungeon Heart | `Heart` | 1,600 | After victory, gain 60 maximum Health and restore 5% maximum Health. |
+| Void Lantern | `LampDesk` | 1,350 | The first enemy Attack or Magic each combat deals 50% less damage. |
+| Oath of First Strike | `Crosshair` | 1,450 | If you act first, your first damaging action cannot miss and deals 50% more damage. |
+| Alchemist's Crown | `Crown` | 1,350 | Potions restore 35% maximum Health; the first Potion each combat does not end your turn. |
+| King's Seal | `BadgeDollarSign` | 1,500 | Elite and boss victories grant 50% more gold and experience. |
 
-| Relic                | Icon              | Price | Effect                                                                                                              |
-| -------------------- | ----------------- | ----: | ------------------------------------------------------------------------------------------------------------------- |
-| Phoenix Feather      | `Feather`         | 1,400 | The first lethal hit in a run leaves you at **1 Health**, grants **30 Block**, and consumes this relic.             |
-| The Hourglass        | `Hourglass`       | 1,300 | For the first **3 player turns** of each combat, your damaging actions deal **25% more damage**.                    |
-| Mirror of Night      | `MoonStar`        | 1,500 | When an enemy Magic action deals health damage, reflect **25% of that damage** back to the enemy.                   |
-| Crown of Thorns      | `Crown`           | 1,400 | When Block absorbs **20 or more damage** from one enemy action, deal **20 effect damage** and apply **3 Venom**.    |
-| Infinite Edge        | `Infinity`        | 1,350 | Every **fourth damaging action** deals **35% bonus damage**. The counter resets between combats.                    |
-| Dungeon Heart        | `Heart`           | 1,600 | After victory, gain **+40 maximum Health** and restore **10% maximum Health**.                                      |
-| Void Lantern         | `LampDesk`        | 1,350 | The first enemy Attack or Magic action in each combat deals **50% less damage**.                                    |
-| Oath of First Strike | `Crosshair`       | 1,450 | If you act first, your first damaging action cannot miss and deals **50% bonus damage**.                            |
-| Alchemist's Crown    | `Crown`           | 1,350 | Potions restore **50% maximum Health** instead of 25%, and the first Potion each combat does not consume your turn. |
-| King's Seal          | `BadgeDollarSign` | 1,500 | Elite and boss victories grant **50% more gold and experience**.                                                    |
+## Rules shared by the catalog
 
-## Implementation notes
-
-- Reactive relic damage resolves as direct effect damage: it does not roll, crit, or miss, and is
-  applied after the protected action. Venom and Soot trigger before the enemy action.
-- Block stacks when it is granted and is consumed by the next incoming action; unused Block is
-  carried until that action resolves and never persists into a new room.
-- Vitality Moss and Dungeon Heart increase maximum Health while leaving current damage taken
-  unchanged; Dungeon Heart also heals after victory.
-- Venom decreases by one stack at the start of each enemy turn.
-- Salvager's Map adds one extra tier-rolled store slot. Epic relics can appear in the first store.
-- Phoenix Feather is a run-scoped one-charge relic and is consumed by the first lethal hit.
+- Relic effects are passive; one-time relics cannot be purchased twice. A consumed Phoenix Feather
+  stays consumed after reload.
+- Guard Block is temporary. Each incoming hit consumes its share independently; it does not carry
+  into a new room.
+- Vitality Moss and Dungeon Heart increase maximum Health without clearing existing damage.
+- Venom deals damage at the start of the enemy turn and loses one stack after its tick.
+- Salvager's Map adds a tier-rolled offer; Epic relics can appear in the first merchant.
+- The catalog and simulator do not establish media rights. Icon glyphs are Lucide UI icons; bundled
+  art and audio origins and license terms remain unverified as described in the
+  [README credits note](../../README.md#asset-credits-and-licensing).

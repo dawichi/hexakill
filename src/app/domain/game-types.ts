@@ -2,41 +2,13 @@ export type CharacterId = 'wizard' | 'samurai' | 'warrior';
 
 export type Stat = 'health' | 'ad' | 'ap' | 'armor' | 'mr' | 'speed';
 
-export type Stats = Record<Stat, number>;
+export type Stats = Readonly<Record<Stat, number>>;
 
-export type PowerUpType = 'health' | 'ad' | 'ap' | 'speed';
+export const STAT_KEYS: readonly Stat[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed'];
 
-export type RelicQuality = 'normal' | 'rare' | 'epic';
+export type DamageKind = 'attack' | 'magic';
 
-export type RelicTrigger =
-  | 'start-of-combat'
-  | 'start-of-player-turn'
-  | 'start-of-enemy-turn'
-  | 'after-attack'
-  | 'after-magic'
-  | 'after-block-absorbs'
-  | 'below-health-threshold'
-  | 'first-time-each-combat'
-  | 'every-nth-action'
-  | 'after-victory'
-  | 'route-map'
-  | 'store';
-
-export type RelicEffect =
-  | {
-      readonly kind: 'multiplier';
-      readonly target: 'attack' | 'magic' | 'potion' | 'gold' | 'experience';
-      readonly amount: number;
-    }
-  | { readonly kind: 'stat-bonus'; readonly stat: 'health' | 'speed'; readonly amount: number }
-  | { readonly kind: 'block'; readonly amount: number; readonly trigger: RelicTrigger }
-  | {
-      readonly kind: 'trigger';
-      readonly trigger: RelicTrigger;
-      readonly amount: number;
-      readonly threshold?: number;
-      readonly counter?: number;
-    };
+export type Side = 'player' | 'enemy';
 
 export interface SpriteStripAsset {
   readonly src: string;
@@ -48,87 +20,18 @@ export interface SpriteStripAsset {
   readonly trailingPixels?: number;
 }
 
-export interface PowerUpState {
-  readonly pending: number;
-  readonly history: Readonly<Record<PowerUpType, number>>;
+export type AnimationState = 'idle' | 'attack' | 'magic' | 'hit' | 'defeat';
+
+/**
+ * Visual assets for a combatant. `portrait` is an animated GIF used outside combat and as the
+ * fallback for any state without a sprite strip; missing states use CSS motion instead.
+ */
+export interface CombatantSprites {
+  readonly portrait: string;
+  readonly strips: Readonly<Partial<Record<AnimationState, SpriteStripAsset>>>;
+  readonly gifs?: Readonly<Partial<Record<'attack' | 'defeat', string>>>;
 }
 
-export interface ItemState {
-  readonly id: string;
-  readonly name: string;
-  readonly quality: RelicQuality;
-  readonly icon: string;
-  readonly price: number;
-  readonly description: string;
-  readonly effect: RelicEffect;
-}
-
-export interface CombatLogEntry {
-  readonly title: string;
-  readonly message: string;
-  readonly value?: number;
-  readonly icon?: string;
-}
-
-export const MAX_COMBAT_LOG_ENTRIES = 8;
-
-export interface CharacterDefinition {
-  readonly id: CharacterId;
-  readonly name: string;
-  readonly description: string;
-  readonly modifiers: Stats;
-  readonly accent: 'blue' | 'red' | 'amber';
-  readonly idleAsset: string;
-  readonly idleSpriteAsset?: SpriteStripAsset;
-  readonly actionAsset?: SpriteStripAsset;
-  readonly magicAsset?: SpriteStripAsset;
-  readonly hitAsset?: SpriteStripAsset;
-  readonly defeatAsset?: SpriteStripAsset;
-}
-
-export interface EnemyDefinition {
-  readonly id: string;
-  readonly name: string;
-  readonly archetype: 'basic' | 'ad' | 'ap' | 'tank' | 'boss';
-  readonly modifiers: Stats;
-  readonly idleAsset: string;
-  readonly idleSpriteAsset?: SpriteStripAsset;
-  readonly attackAsset?: string;
-  readonly attackSpriteAsset?: SpriteStripAsset;
-  readonly magicSpriteAsset?: SpriteStripAsset;
-  readonly hitSpriteAsset?: SpriteStripAsset;
-  readonly defeatAsset?: string;
-  readonly defeatSpriteAsset?: SpriteStripAsset;
-}
-
-export interface PlayerState {
-  readonly name: string;
-  readonly character: CharacterDefinition;
-  readonly level: number;
-  readonly experience: number;
-  readonly stats: Stats;
-  readonly potions: number;
-  readonly gold: number;
-  readonly inventory: readonly ItemState[];
-  /** Run-scoped charges for relics that are consumed, such as Phoenix Feather. */
-  readonly relicCharges?: Readonly<Record<string, number>>;
-  readonly powerUps: PowerUpState;
-  readonly bossesDefeated: number;
-  readonly defeatedEnemies: readonly DefeatedEnemy[];
-}
-
-export interface DefeatedEnemy {
-  readonly enemyId: string;
-  readonly level: number;
-}
-
-export interface EnemyState {
-  readonly definition: EnemyDefinition;
-  readonly level: number;
-  readonly stats: Stats;
-  readonly damageTaken: number;
-  readonly potions: number;
-  readonly gold: number;
-  /** Set for an elite route so relics can distinguish it from a normal encounter. */
-  readonly elite?: boolean;
+export function scaleStats(stats: Stats, scale: (stat: Stat, value: number) => number): Stats {
+  return Object.fromEntries(STAT_KEYS.map((stat) => [stat, scale(stat, stats[stat])])) as Stats;
 }

@@ -1,0 +1,16 @@
+<div
+  class="combat-feedback"
+  [class]="feedbackClass(feedback()) + ' ' + feedbackPlacementClass(feedback())"
+  aria-hidden="true"
+>
+  @if (feedback().kind === 'heal') {
+    <svg lucideHeartPulse size="16" aria-hidden="true"></svg>
+  } @else if (feedback().kind === 'guard' || feedback().kind === 'blocked') {
+    <svg lucideShield size="16" aria-hidden="true"></svg>
+  } @else if (feedback().action === 'magic') {
+    <svg lucideWandSparkles size="16" aria-hidden="true"></svg>
+  } @else {
+    <svg lucideSword size="16" aria-hidden="true"></svg>
+  }
+  <strong>{{ feedbackText(feedback()) }}</strong>
+</div>

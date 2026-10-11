@@ -1,0 +1,148 @@
+@if (session.player(); as player) {
+<article class="combatant-card player-combatant">
+          <div class="combatant-header">
+            <div>
+              <p class="eyebrow">You · level {{ player.level }}</p>
+              <h3>{{ player.name }} the {{ player.character.name }}</h3>
+              @if (session.playerBlock() > 0) {
+                <span class="combat-status guarded"
+                  ><svg lucideShield size="12" aria-hidden="true"></svg>
+                  {{ session.playerBlock() }} Block</span
+                >
+              }
+            </div>
+          </div>
+          <div class="combatant-body">
+            <div class="combat-stat-rail" role="group" aria-label="Your combat stats">
+              @for (stat of statKeys; track stat) {
+                <app-stat-chip
+                  [stat]="stat"
+                  [value]="
+                    combatStatValue(player.stats, stat, session.playerRemainingHealth())
+                  "
+                  [showLabel]="false"
+                  tooltipAlign="end"
+                />
+              }
+            </div>
+            <div
+              class="combatant-visual"
+              [class.hit-reaction]="
+                session.playerAnimation() === 'hit' && !session.playerHitAsset()
+              "
+              [class.action-lunge]="
+                session.playerAnimation() === 'action' && !session.playerActionAsset()
+              "
+              [class.defeat-fade]="
+                session.playerAnimation() === 'defeat' && !player.character.defeatAsset
+              "
+            >
+              @if (session.playerAnimation() === 'action') {
+                @if (session.playerActionAsset(); as actionAsset) {
+                  <span
+                    class="entity-sprite combat-sprite sprite-strip"
+                    role="img"
+                    [attr.aria-label]="player.character.name + ' action animation'"
+                    [style.background-image]="'url(' + actionAsset.src + ')'"
+                    [style.background-size]="spriteBackgroundSize(actionAsset)"
+                    [style.aspect-ratio]="
+                      actionAsset.frameWidth + ' / ' + actionAsset.frameHeight
+                    "
+                    [style.animation]="spriteAnimation(actionAsset, 600)"
+                  ></span>
+                } @else {
+                  <img
+                    class="entity-sprite combat-sprite"
+                    [src]="player.character.idleAsset"
+                    [alt]="player.character.name"
+                  />
+                }
+              } @else if (session.playerAnimation() === 'hit') {
+                @if (session.playerHitAsset(); as hitAsset) {
+                  <span
+                    class="entity-sprite combat-sprite sprite-strip"
+                    role="img"
+                    [attr.aria-label]="player.character.name + ' hit animation'"
+                    [style.background-image]="'url(' + hitAsset.src + ')'"
+                    [style.background-size]="spriteBackgroundSize(hitAsset)"
+                    [style.aspect-ratio]="hitAsset.frameWidth + ' / ' + hitAsset.frameHeight"
+                    [style.animation]="spriteAnimation(hitAsset, 600)"
+                  ></span>
+                } @else {
+                  <img
+                    class="entity-sprite combat-sprite"
+                    [src]="player.character.idleAsset"
+                    [alt]="player.character.name"
+                  />
+                }
+              } @else if (session.playerIdleSpriteAsset(); as idleAsset) {
+                <span
+                  class="entity-sprite combat-sprite sprite-strip"
+                  role="img"
+                  [attr.aria-label]="player.character.name + ' idle animation'"
+                  [style.background-image]="'url(' + idleAsset.src + ')'"
+                  [style.background-size]="spriteBackgroundSize(idleAsset)"
+                  [style.aspect-ratio]="idleAsset.frameWidth + ' / ' + idleAsset.frameHeight"
+                  [style.animation]="spriteAnimation(idleAsset, 900)"
+                ></span>
+              } @else {
+                <img
+                  class="entity-sprite combat-sprite"
+                  [src]="player.character.idleAsset"
+                  [alt]="player.character.name"
+                />
+              }
+              @if (session.combatFeedback(); as feedback) {
+                @if (feedback.target === 'player') {
+                  <app-combat-feedback [feedback]="feedback" />
+                }
+              }
+            </div>
+          </div>
+          <div class="combatant-health">
+            <div class="health-heading">
+              <span><svg lucideHeartPulse size="14" aria-hidden="true"></svg> Health</span>
+              <strong
+                >{{ session.playerRemainingHealth() }} / {{ player.stats.health }}</strong
+              >
+            </div>
+            <div
+              class="health-bar"
+              [class]="healthTone(session.playerRemainingHealth(), player.stats.health)"
+              role="meter"
+              aria-label="Your health"
+              [attr.aria-valuenow]="session.playerRemainingHealth()"
+              aria-valuemin="0"
+              [attr.aria-valuemax]="player.stats.health"
+            >
+              <span
+                class="health-bar-trail"
+                aria-hidden="true"
+                [style.width.%]="session.playerHealthTrail()"
+              ></span>
+              <span
+                class="health-bar-fill"
+                [style.width.%]="
+                  (session.playerRemainingHealth() / player.stats.health) * 100
+                "
+              ></span>
+            </div>
+          </div>
+          <div class="combatant-experience">
+            <div class="progress-heading">
+              <span><svg lucideSparkles size="13" aria-hidden="true"></svg> Experience</span>
+              <strong>{{ player.experience }} / 100</strong>
+            </div>
+            <div
+              class="experience-bar"
+              role="progressbar"
+              aria-label="Experience to next level"
+              [attr.aria-valuenow]="player.experience"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              <span [style.width.%]="player.experience"></span>
+            </div>
+          </div>
+        </article>
+}

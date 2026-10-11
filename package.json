@@ -13,13 +13,9 @@
     "test:e2e:production": "bun run build && E2E_PRODUCTION=1 playwright test",
     "check": "biome ci .",
     "format": "biome format --write .",
-    "lint": "biome lint .",
     "verify:types": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json",
     "verify:assets": "bun tools/verify-assets.mjs",
-    "simulate:balance": "bun tools/simulate-balance.ts",
-    "simulate:relics": "BALANCE_RELIC_MATRIX=1 bun tools/simulate-balance.ts",
-    "simulate:full-run": "bun tools/simulate-full-run.ts",
-    "simulate:full-run:relics": "FULL_RUN_RELIC_MATRIX=1 bun tools/simulate-full-run.ts"
+    "simulate:full-run": "bun tools/simulate.ts"
   },
   "private": true,
   "engines": {
@@ -32,12 +28,14 @@
     "@angular/platform-browser": "^21.2.0",
     "@lucide/angular": "^1.31.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "valibot": "^1.5.0"
   },
   "devDependencies": {
     "@angular/build": "^21.2.21",
     "@angular/cli": "^21.2.21",
     "@angular/compiler-cli": "^21.2.0",
+    "@axe-core/playwright": "^4.13.0",
     "@biomejs/biome": "2.5.10",
     "@playwright/test": "^1.62.1",
     "jsdom": "^28.0.0",

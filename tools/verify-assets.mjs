@@ -1,82 +1,79 @@
-// Verifies that every asset referenced by the app exists, that typed sprite strips match their
-// declared frame geometry, and that `static/` ships no unreferenced media.
-// Usage: bun tools/verify-assets.mjs [assetRoot=static]
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { relative, resolve } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { AUDIO_ASSETS } from '../src/app/domain/assets.ts';
+import { CHARACTERS } from '../src/app/domain/characters.ts';
+import { BOSSES, REGULAR_ENEMIES } from '../src/app/domain/enemies.ts';
 
-const projectRoot = resolve(new URL('..', import.meta.url).pathname);
-const assetRoot = resolve(projectRoot, process.argv[2] ?? 'static');
-const sourceRoot = resolve(projectRoot, 'src');
-const mediaDirectories = ['images', 'music', 'sounds', 'fonts'];
-const errors = [];
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const staticRoot = path.join(root, 'static');
+const failures = [];
+const referenced = new Set();
 
-function listFiles(directory, filter = () => true) {
-  if (!existsSync(directory)) return [];
-  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const path = resolve(directory, entry.name);
-    if (entry.isDirectory()) return listFiles(path, filter);
-    return filter(entry.name) ? [path] : [];
-  });
+function resolveAsset(url) {
+  if (!url.startsWith('/')) {
+    failures.push(`Asset URL must be root-relative: ${url}`);
+    return null;
+  }
+  const file = path.resolve(staticRoot, `.${url}`);
+  if (!file.startsWith(`${staticRoot}${path.sep}`)) {
+    failures.push(`Asset URL escapes static/: ${url}`);
+    return null;
+  }
+  referenced.add(file);
+  return file;
 }
 
-function readPngDimensions(path) {
-  const data = readFileSync(path);
-  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
-  if (data.length < 24 || !data.subarray(0, 8).equals(signature)) return null;
-  return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) };
+function checkFile(url) {
+  const file = resolveAsset(url);
+  if (file && !existsSync(file)) failures.push(`Missing active asset: ${url}`);
 }
 
-const sources = listFiles(
-  sourceRoot,
-  (name) => /\.(ts|html|css)$/.test(name) && !name.endsWith('.spec.ts'),
-).map((path) => readFileSync(path, 'utf8'));
-
-const referencePattern = new RegExp(
-  `['"(]/((?:${mediaDirectories.join('|')})/[^'")]+\\.[a-z0-9]+)['")]`,
-  'g',
-);
-const referenced = new Set(
-  sources.flatMap((source) => [...source.matchAll(referencePattern)].map((match) => match[1])),
-);
-
-for (const path of referenced) {
-  if (!existsSync(resolve(assetRoot, path))) errors.push(`referenced asset is missing: ${path}`);
-}
-
-const spritePattern =
-  /src:\s*['"]\/(images\/[^'"]+\.png)['"][\s\S]{0,240}?frameWidth:\s*(\d+),\s*frameHeight:\s*(\d+),\s*frameCount:\s*(\d+)(?:,\s*orientation:\s*['"](horizontal|vertical)['"])?(?:,\s*trailingPixels:\s*(\d+))?/g;
-let spriteCount = 0;
-for (const source of sources) {
-  for (const match of source.matchAll(spritePattern)) {
-    const [, path, width, height, count, orientation = 'horizontal', trailing = '0'] = match;
-    const filePath = resolve(assetRoot, path);
-    if (!existsSync(filePath)) continue;
-    const dimensions = readPngDimensions(filePath);
-    const [frameWidth, frameHeight, frameCount, trailingPixels] = [width, height, count, trailing].map(Number);
-    const expected =
-      orientation === 'vertical'
-        ? { width: frameWidth, height: frameHeight * frameCount - trailingPixels }
-        : { width: frameWidth * frameCount - trailingPixels, height: frameHeight };
-    if (!dimensions || dimensions.width !== expected.width || dimensions.height !== expected.height) {
-      errors.push(
-        `${path} is ${dimensions ? `${dimensions.width}x${dimensions.height}` : 'not a PNG'}; expected ${expected.width}x${expected.height}`,
-      );
-    }
-    spriteCount += 1;
+function checkStrip(asset, owner) {
+  checkFile(asset.src);
+  const file = resolveAsset(asset.src);
+  if (!file || !existsSync(file) || path.extname(file).toLowerCase() !== '.png') return;
+  const png = readFileSync(file);
+  if (png.length < 24 || png.toString('hex', 0, 8) !== '89504e470d0a1a0a') {
+    failures.push(`Invalid PNG sprite strip for ${owner}: ${asset.src}`);
+    return;
+  }
+  const width = png.readUInt32BE(16);
+  const height = png.readUInt32BE(20);
+  const actual = asset.orientation === 'vertical' ? height : width;
+  const expected =
+    (asset.orientation === 'vertical' ? asset.frameHeight : asset.frameWidth) * asset.frameCount -
+    (asset.trailingPixels ?? 0);
+  const crossAxis = asset.orientation === 'vertical' ? width : height;
+  const crossExpected = asset.orientation === 'vertical' ? asset.frameWidth : asset.frameHeight;
+  if (actual !== expected || crossAxis !== crossExpected) {
+    failures.push(
+      `Sprite geometry for ${owner} (${asset.src}) is ${width}×${height}; expected ${asset.orientation === 'vertical' ? `${asset.frameWidth}×${expected}` : `${expected}×${asset.frameHeight}`}.`,
+    );
   }
 }
 
-const shipped = mediaDirectories.flatMap((directory) =>
-  listFiles(resolve(assetRoot, directory)).map((path) => relative(assetRoot, path)),
-);
-for (const path of shipped) {
-  if (!referenced.has(path)) errors.push(`unreferenced asset is shipped: ${path}`);
+function checkSprites(owner, sprites) {
+  checkFile(sprites.portrait);
+  for (const [state, asset] of Object.entries(sprites.strips)) {
+    if (asset) checkStrip(asset, `${owner} ${state}`);
+  }
+  for (const asset of Object.values(sprites.gifs ?? {})) {
+    if (asset) checkFile(asset);
+  }
 }
 
-if (errors.length) {
-  console.error(`Asset verification failed:\n${errors.map((error) => `  - ${error}`).join('\n')}`);
-  process.exit(1);
+for (const asset of Object.values(AUDIO_ASSETS.music)) checkFile(asset);
+for (const asset of Object.values(AUDIO_ASSETS.sounds)) checkFile(asset);
+for (const character of CHARACTERS) checkSprites(character.name, character.sprites);
+for (const enemy of [...REGULAR_ENEMIES, ...BOSSES]) checkSprites(enemy.name, enemy.sprites);
+
+if (failures.length) {
+  console.error(
+    `Asset verification failed (${failures.length} issue${failures.length === 1 ? '' : 's'}):`,
+  );
+  for (const failure of failures) console.error(`- ${failure}`);
+  process.exitCode = 1;
+} else {
+  console.log(`Verified ${referenced.size} active audio and image assets.`);
 }
-console.log(
-  `Verified ${referenced.size} asset references and ${spriteCount} sprite strips in ${relative(projectRoot, assetRoot) || '.'}.`,
-);

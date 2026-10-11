@@ -1,0 +1,181 @@
+@if (session.player(); as player) {
+  @if (session.routeMap(); as route) {
+    <section
+      class="panel route-panel door-panel"
+      data-screen="map"
+      aria-labelledby="route-map-title"
+    >
+      <div class="section-heading route-heading">
+        <div>
+          <p class="eyebrow">Room {{ route.floor }} · {{ route.nodes.length === 1 ? 'milestone' : 'room selection' }}</p>
+          <h2 id="route-map-title" data-screen-heading tabindex="-1">Choose your path</h2>
+          <p class="section-lead">
+            @if (route.nodes.length === 1) {
+              The milestone guardian awaits. Defeat it to keep moving.
+            } @else {
+              Pick a route through the next fork. The trail ahead gives you enough warning to
+              plan without revealing every secret.
+            }
+          </p>
+        </div>
+        <div class="route-summary" aria-label="Run summary">
+          <span
+            ><svg lucideSparkles size="14" aria-hidden="true"></svg> Level
+            {{ player.level }}</span
+          >
+          <span
+            ><svg lucideStore size="14" aria-hidden="true"></svg> {{ player.gold }} gold</span
+          >
+        </div>
+      </div>
+
+      <div class="route-origin" aria-hidden="true">
+        <span class="route-origin-mark"><svg lucideMapPin size="17"></svg></span>
+        <span>{{ route.nodes.length === 1 ? 'One guardian · no detour' : 'You stand at the fork' }}</span>
+      </div>
+      <div
+        class="run-progress"
+        role="progressbar"
+        aria-label="Dungeon progress"
+        aria-valuemin="0"
+        [attr.aria-valuemax]="session.totalRooms"
+        [attr.aria-valuenow]="session.completedRooms()"
+        [attr.aria-valuetext]="
+          session.completedRooms() + ' of ' + session.totalRooms + ' rooms complete'
+        "
+      >
+        <div class="progress-heading run-progress-heading">
+          <span>Run progress</span>
+          <strong>{{ session.completedRooms() }} / {{ session.totalRooms }} rooms</strong>
+        </div>
+        <div class="run-progress-track experience-bar">
+          <span [style.width.%]="session.runProgressPercent()"></span>
+        </div>
+        <div class="run-progress-bosses" aria-hidden="true">
+          <span [class.reached]="player.bossesDefeated >= 1">I · Room 10</span>
+          <span [class.reached]="player.bossesDefeated >= 2">II · Room 20</span>
+          <span [class.reached]="player.bossesDefeated >= 3">III · Room 30</span>
+        </div>
+      </div>
+      <div class="expedition-overview" aria-label="Expedition route preview">
+        <div class="expedition-overview-heading">
+          <span><svg lucideMap size="14" aria-hidden="true"></svg> Expedition route</span>
+          <small>Current fork · next three rooms</small>
+        </div>
+        <div class="expedition-layers">
+          @for (layer of session.routeLayers(); track layer.floor) {
+            <div
+              class="expedition-layer"
+              [class.current-layer]="layer.floor === route.floor"
+              [class.milestone-layer]="layer.nodes.length === 1"
+            >
+              <span class="expedition-layer-label">
+                {{ layer.floor === route.floor ? 'NOW' : 'ROOM ' + layer.floor }}
+              </span>
+              <div class="expedition-layer-nodes">
+                @for (node of layer.nodes; track node.id) {
+                  <span
+                    class="expedition-node"
+                    role="img"
+                    [class]="
+                      'expedition-node ' +
+                      (node.hidden ? 'node-hidden' : node.kind) +
+                      ' lane-' +
+                      node.lane
+                    "
+                    [attr.title]="node.hidden ? 'Unrevealed route' : node.title"
+                    [attr.aria-label]="
+                      node.hidden ? 'Unrevealed route' : node.title + ', room ' + layer.floor
+                    "
+                  >
+                    @if (node.hidden) {
+                      <svg lucideCircleHelp size="13" aria-hidden="true"></svg>
+                    } @else if (node.kind === 'boss') {
+                      <svg lucideTrophy size="13" aria-hidden="true"></svg>
+                    } @else if (node.kind === 'store') {
+                      <svg lucideStore size="13" aria-hidden="true"></svg>
+                    } @else if (node.kind === 'rest') {
+                      <svg lucideTentTree size="13" aria-hidden="true"></svg>
+                    } @else {
+                      <svg lucideSwords size="13" aria-hidden="true"></svg>
+                    }
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+        <p class="expedition-overview-note">
+          The visible lanes are connected. Choosing one now changes which rooms remain within
+          reach.
+        </p>
+      </div>
+      <div
+        class="route-map door-stage"
+        [class.boss-stage]="route.nodes.length === 1"
+        role="group"
+        aria-label="Available paths"
+      >
+        <div class="route-nodes door-grid" [class.boss-room]="route.nodes.length === 1">
+          @for (node of route.nodes; track node.id; let index = $index) {
+            <button
+              class="route-node door-card"
+              [class]="'route-node door-card ' + (node.hidden ? 'door-hidden' : node.kind)"
+              type="button"
+              [attr.aria-label]="
+                'Path ' +
+                  (index + 1) +
+                ': ' +
+                (node.hidden
+                  ? 'Unrevealed path. Reveal on entry.'
+                  : node.title + ': ' + node.description)
+              "
+              (click)="session.chooseRouteNode(node.id)"
+            >
+              <span class="route-node-index">PATH 0{{ index + 1 }}</span>
+              @if (node.hidden) {
+                <span class="route-node-icon door-question" aria-hidden="true">
+                  <svg lucideCircleHelp size="28"></svg>
+                </span>
+                <span class="route-node-copy">
+                  <strong>Unrevealed path</strong>
+                  <span>The dungeon keeps this room hidden.</span>
+                  <small>Reveal on entry</small>
+                </span>
+              } @else {
+                <span class="route-node-icon" aria-hidden="true">
+                  @if (node.kind === 'battle') {
+                    <svg lucideSwords size="22"></svg>
+                  } @else if (node.kind === 'elite') {
+                    <svg lucideTrophy size="22"></svg>
+                  } @else if (node.kind === 'boss') {
+                    <svg lucideTrophy size="22"></svg>
+                  } @else if (node.kind === 'store') {
+                    <svg lucideStore size="22"></svg>
+                  } @else {
+                    <svg lucideTentTree size="22"></svg>
+                  }
+                </span>
+                <span class="route-node-copy">
+                  <strong>{{ node.title }}</strong>
+                  <span>{{ node.description }}</span>
+                  <small>{{ node.reward }} · {{ routeRiskLabel(node) }}</small>
+                </span>
+              }
+              <span class="route-node-forecast">
+                <svg lucideFootprints size="13" aria-hidden="true"></svg>
+                {{ routeForecast(node) }}
+              </span>
+              <svg
+                class="route-node-arrow"
+                lucideArrowRight
+                size="16"
+                aria-hidden="true"
+              ></svg>
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+  }
+}

@@ -1,0 +1,268 @@
+.inventory-panel {
+  margin: 1.5rem 0;
+  border: 1px solid #3f3f46;
+  border-radius: 0.75rem;
+  background: #18181b;
+  padding: 1rem;
+}
+
+.inventory-panel h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.inventory-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.inventory-item {
+  display: flex;
+  min-width: 12rem;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 0.5rem;
+  background: #27272a;
+  padding: 0.5rem 0.75rem;
+}
+
+.inventory-item span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.inventory-item small {
+  color: #a1a1aa;
+}
+
+.combatant-visual.action-lunge {
+  animation: combat-action-lunge 320ms ease-out;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.action-button kbd {
+  display: inline-grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 0.15rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.68rem;
+  line-height: 1;
+}
+
+.action-button {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  border: 1px solid #52525b;
+  border-radius: 0.6rem;
+  background: #27272a;
+  color: #fafafa;
+  padding: 0.9rem 1rem;
+  text-align: left;
+  font-weight: 800;
+}
+
+.action-button > svg {
+  grid-row: 1 / span 2;
+}
+
+.action-button span {
+  color: #a1a1aa;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.action-button:hover:not(:disabled) {
+  background: #3f3f46;
+}
+
+.action-button.attack:hover:not(:disabled) {
+  border-color: #fbbf24;
+}
+
+.action-button.magic:hover:not(:disabled) {
+  border-color: #38bdf8;
+}
+
+.action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.power-up-panel {
+  margin: 1rem 0;
+  border: 1px solid #fbbf24;
+  border-radius: 0.75rem;
+  background: #422006;
+  padding: 1rem;
+}
+
+.power-up-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.combat-dock .inventory-panel {
+  grid-area: relics;
+  min-width: 0;
+  margin: 0;
+  padding: 0.45rem 0.55rem;
+}
+
+.combat-dock .inventory-panel h3 {
+  margin-bottom: 0.3rem;
+  font-size: 0.75rem;
+}
+
+.combat-dock .inventory-grid {
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+  overflow: hidden;
+}
+
+.combat-dock .inventory-item {
+  min-width: 0;
+  flex: 1 1 0;
+  gap: 0.35rem;
+  padding: 0.25rem 0.35rem;
+}
+
+.combat-dock .inventory-item .item-sprite {
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: 0 0 auto;
+}
+
+.combat-dock .inventory-item span {
+  min-width: 0;
+}
+
+.combat-dock .inventory-item strong,
+.combat-dock .inventory-item small {
+  overflow: hidden;
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.combat-dock .inventory-empty {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.combat-dock .action-heading {
+  margin-bottom: 0.4rem;
+}
+
+.combat-dock .action-heading h3 {
+  font-size: 1rem;
+}
+
+.combat-dock .action-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.combat-dock .action-button.guard:hover:not(:disabled) {
+  border-color: #a6b9c2;
+}
+
+.combat-dock .action-button {
+  min-height: 3.15rem;
+  gap: 0.25rem;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.78rem;
+}
+
+.combat-dock .action-button span {
+  font-size: 0.58rem;
+  line-height: 1.15;
+}
+
+.combat-dock > app-power-up-picker > .power-up-panel,
+.combat-dock > app-power-up-picker > .primary-button,
+.combat-dock > app-power-up-picker > .validation {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 700px) {
+  .combat-dock .inventory-panel {
+    padding: 0.25rem 0.35rem;
+  }
+
+  .combat-dock .inventory-panel h3 {
+    display: none;
+  }
+
+  .combat-dock .inventory-item {
+    min-height: 2rem;
+  }
+
+  .combat-dock .inventory-item .item-sprite {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  .combat-dock .inventory-item strong,
+  .combat-dock .inventory-item small {
+    font-size: 0.48rem;
+  }
+
+  .combat-dock .inventory-empty {
+    font-size: 0.48rem;
+  }
+
+  .combat-dock .action-heading {
+    margin-bottom: 0.25rem;
+  }
+
+  .combat-dock .action-heading .eyebrow,
+  .combat-dock .action-heading h3 {
+    font-size: 0.68rem;
+  }
+
+  .combat-dock .action-turn {
+    padding: 0.2rem 0.3rem;
+    font-size: 0.48rem;
+  }
+
+  .combat-dock .action-button {
+    min-height: 2.7rem;
+    justify-items: center;
+    grid-template-columns: auto 1fr;
+    padding: 0.3rem 0.2rem;
+    font-size: 0.64rem;
+  }
+
+  .combat-dock .action-button > svg {
+    width: 14px;
+  }
+
+  .combat-dock .action-button span {
+    display: none;
+  }
+
+  .combat-dock .action-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.28rem;
+  }
+}

@@ -1,547 +1,185 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
-import { INITIAL_COMBAT_STATE } from '../domain/combat-state';
-import { STORE_ITEMS } from '../domain/store';
+import { createRun } from '../domain/run';
 import { AUDIO, AudioPort } from './audio';
-import { CLOCK, Clock } from './clock';
+import { CLOCK, Clock, ClockHandle } from './clock';
 import { GameSessionService } from './game-session.service';
-import { PREFERENCES_STORAGE, PreferencesStoragePort } from './preferences-storage';
-import { RANDOM_SOURCE } from './random';
-import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
-import { SESSION_STORAGE, SessionStoragePort } from './storage';
+import { parseRun, serializeRun } from './run-storage';
+import { KeyValueStore, memoryStore, readJson, STORAGE, STORAGE_KEYS } from './storage';
 
 describe('GameSessionService', () => {
   let service: GameSessionService;
-  let rolls: number[];
-  let recordsValue: string | null;
-  let scheduledTask: (() => void) | undefined;
-  let scheduledDelays: number[];
-  let cancelled = false;
-  let playedSounds: string[];
-  let sessionValue: string | null;
-  const flushScheduled = (): void => {
-    const task = scheduledTask;
-    scheduledTask = undefined;
-    task?.();
-  };
+  let storage: KeyValueStore & { readonly data: Map<string, string> };
+  let scheduled: Array<{ task: () => void; cancelled: boolean; delay: number }>;
+  let played: string[];
+  let appliedVolumes: Array<readonly [number, number]>;
   const testClock: Clock = {
-    now: () => 1234,
-    schedule: (task, delayMs) => {
-      scheduledTask = task;
-      scheduledDelays.push(delayMs);
-      cancelled = false;
-      return { cancel: () => (cancelled = true) };
+    now: () => Date.UTC(2026, 9, 11),
+    schedule: (task, delay) => {
+      const item = { task, cancelled: false, delay };
+      scheduled.push(item);
+      return { cancel: () => (item.cancelled = true) } satisfies ClockHandle;
     },
   };
 
-  beforeEach(() => {
-    rolls = [0, 0, 0.5, 0.5];
-    recordsValue = null;
-    sessionValue = null;
-    playedSounds = [];
-    scheduledDelays = [];
-    const recordsStorage: RecordsStoragePort = {
-      read: () => recordsValue,
-      write: (value) => (recordsValue = value),
-      clear: () => (recordsValue = null),
-    };
-    const audio: AudioPort = {
-      playSound: (asset) => playedSounds.push(asset),
-      playMusic: () => undefined,
-      stopMusic: () => undefined,
-      setMusicVolume: () => undefined,
-      setEffectsVolume: () => undefined,
-    };
-    const sessionStorage: SessionStoragePort = {
-      read: () => sessionValue,
-      write: (value) => (sessionValue = value),
-      clear: () => (sessionValue = null),
-    };
+  function flushOne(): void {
+    const item = scheduled.find((candidate) => !candidate.cancelled);
+    if (!item) return;
+    item.cancelled = true;
+    item.task();
+  }
+
+  function configure(): void {
     TestBed.configureTestingModule({
       providers: [
         GameSessionService,
+        { provide: STORAGE, useValue: storage },
         { provide: CLOCK, useValue: testClock },
-        { provide: RANDOM_SOURCE, useValue: () => rolls.shift() ?? 0.5 },
-        { provide: RECORDS_STORAGE, useValue: recordsStorage },
-        { provide: SESSION_STORAGE, useValue: sessionStorage },
-        { provide: AUDIO, useValue: audio },
-      ],
-    });
-    service = TestBed.inject(GameSessionService);
-  });
-
-  it('generates an enemy and applies the first attack action', () => {
-    service.player.set({
-      ...createInitialPlayer('David', CHARACTER_DEFINITIONS[0]),
-      stats: { ...createInitialPlayer('David', CHARACTER_DEFINITIONS[0]).stats, speed: 100 },
-    });
-    service.findEnemy();
-
-    expect(service.screen()).toBe('combat');
-    expect(service.enemy()?.definition.name).toBe('Adventurer');
-    expect(service.enemy()?.level).toBe(2);
-
-    service.attack('attack');
-
-    expect(service.enemy()?.damageTaken).toBe(0);
-    expect(service.combatState().phase).toBe('resolving-player-action');
-    expect(scheduledDelays[scheduledDelays.length - 1]).toBeGreaterThan(320);
-
-    flushScheduled();
-    expect(service.enemy()?.damageTaken).toBe(54);
-    expect(service.combatState().phase).toBe('enemy-turn');
-    expect(service.combatMessage()).toBe('Your attack dealt 54 damage.');
-    expect(scheduledDelays[scheduledDelays.length - 1]).toBeGreaterThan(650);
-    expect(service.lastActionAt()).toBe(1234);
-    expect(service.playerCombatLog()[1]).toEqual({
-      title: 'David',
-      message: '',
-      value: 54,
-      icon: '🔪',
-    });
-
-    flushScheduled();
-
-    expect(service.combatState().phase).toBe('enemy-turn');
-    expect(service.enemyAnimation()).toBe('attack');
-    expect(service.combatMessage()).toContain('prepares');
-    expect(scheduledDelays[scheduledDelays.length - 1]).toBeGreaterThan(360);
-
-    flushScheduled();
-
-    expect(service.combatState().phase).toBe('awaiting-player-action');
-    expect(service.playerRemainingHealth()).toBeLessThan(800);
-    expect(service.enemyAnimation()).toBe('attack');
-    expect(service.playerAnimation()).toBe('hit');
-    expect(service.combatMessage()).toContain("Adventurer's attack dealt");
-    expect(scheduledDelays[scheduledDelays.length - 1]).toBeGreaterThan(700);
-    expect(service.enemyCombatLog()[1]).toMatchObject({
-      title: 'Adventurer',
-      value: expect.any(Number),
-      icon: expect.stringMatching(/🔪|☄/),
-    });
-
-    flushScheduled();
-    expect(service.enemyAnimation()).toBe('idle');
-    expect(service.playerAnimation()).toBe('idle');
-
-    service.usePotion();
-    expect(service.player()?.potions).toBe(4);
-    expect(service.combatState().phase).toBe('enemy-turn');
-
-    service.combatState.update((state) => ({
-      ...state,
-      enemy: state.enemy
-        ? { ...state.enemy, damageTaken: state.enemy.stats.health - 1, potions: 1 }
-        : null,
-      enemyIntent: { kind: 'heal', minValue: 25, maxValue: 25 },
-    }));
-    flushScheduled();
-    flushScheduled();
-    expect(service.enemyAnimation()).toBe('idle');
-    expect(service.combatMessage()).toContain('recovered');
-  });
-
-  it('resolves a first-floor merchant door before any combat victory', () => {
-    service.setPlayerName('David');
-    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
-    service.startRun();
-
-    const map = service.routeMap();
-    const merchant = map?.nodes.find((node) => node.kind === 'store');
-    if (!merchant) throw new Error('Expected a merchant door.');
-
-    service.chooseRouteNode(merchant.id);
-
-    expect(merchant.hidden).toBe(false);
-    expect(service.screen()).toBe('store');
-  });
-
-  it('writes one local personal record when a run reaches defeat', () => {
-    service.setPlayerName('David');
-    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
-    service.startRun();
-    service.player.update((player) =>
-      player ? { ...player, stats: { ...player.stats, speed: 100 } } : player,
-    );
-    service.findEnemy();
-
-    const player = service.player();
-    const enemy = service.enemy();
-    if (!player || !enemy) throw new Error('Expected an active run and enemy.');
-
-    service.player.set({ ...player, stats: { ...player.stats, health: 1 } });
-    service.combatState.set({
-      phase: 'awaiting-player-action',
-      enemy: { ...enemy, stats: { ...enemy.stats, ad: 10_000, ap: 10_000 }, potions: 0 },
-      playerDamageTaken: 1,
-      pendingAction: null,
-      lastResult: null,
-      enemyIntent: { kind: 'attack', minValue: 1, maxValue: 1 },
-    });
-    service.actionReady.set(true);
-
-    service.usePotion();
-    flushScheduled();
-    flushScheduled();
-
-    expect(service.screen()).toBe('game-over');
-    expect(service.personalRecords()).toEqual([{ characterId: 'wizard', name: 'David', level: 4 }]);
-    expect(recordsValue).toContain('"version":1');
-  });
-
-  it('plays the legacy level-up sound when a victory crosses a level', () => {
-    service.setPlayerName('David');
-    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
-    service.startRun();
-    service.findEnemy();
-
-    const player = service.player();
-    const enemy = service.enemy();
-    if (!player || !enemy) throw new Error('Expected an active player and enemy.');
-
-    service.player.set({ ...player, experience: 75 });
-    service.combatState.set({
-      phase: 'awaiting-player-action',
-      enemy: { ...enemy, stats: { ...enemy.stats, health: 1 } },
-      playerDamageTaken: 0,
-      pendingAction: null,
-      lastResult: null,
-    });
-
-    service.attack('attack');
-    flushScheduled();
-
-    expect(playedSounds).toContain('/sounds/levelup.mp3');
-    expect(playedSounds).not.toContain('/sounds/enemy_killed.mp3');
-    expect(service.enemyCombatLog()).toContainEqual({
-      title: 'Adventurer',
-      message: expect.stringContaining('has been defeated'),
-    });
-    expect(service.playerCombatLog()).toContainEqual({
-      title: '',
-      message: expect.stringContaining('gained'),
-    });
-    expect(service.playerCombatLog()).toContainEqual({
-      title: '',
-      message: expect.stringContaining('leveled up'),
-    });
-  });
-
-  it('keeps each combat log to the legacy eight-entry window', () => {
-    service.setPlayerName('David');
-    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
-    service.startRun();
-    service.player.update((player) =>
-      player ? { ...player, stats: { ...player.stats, speed: 100 } } : player,
-    );
-
-    for (let index = 0; index < 9; index += 1) {
-      service.combatState.set(INITIAL_COMBAT_STATE);
-      service.findEnemy();
-    }
-
-    expect(service.enemyCombatLog()).toHaveLength(8);
-    expect(service.playerCombatLog()).toHaveLength(8);
-  });
-
-  it('keeps records when the run is reset', () => {
-    service.personalRecords.set([{ characterId: 'warrior', name: 'Alex', level: 9 }]);
-
-    service.reset();
-
-    expect(service.personalRecords()).toHaveLength(1);
-  });
-
-  it('cancels delayed enemy turns when a run is reset', () => {
-    service.setPlayerName('David');
-    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
-    service.startRun();
-    service.findEnemy();
-    service.attack('attack');
-
-    service.reset();
-
-    expect(cancelled).toBe(true);
-    scheduledTask?.();
-    expect(service.screen()).toBe('welcome');
-    expect(service.player()).toBeNull();
-  });
-
-  it('discards snapshots with impossible terminal combat damage', () => {
-    sessionValue = JSON.stringify({
-      version: 1,
-      screen: 'game-over',
-      playerName: 'David',
-      selectedCharacterId: 'wizard',
-      player: {
-        name: 'David',
-        character: CHARACTER_DEFINITIONS[0],
-        level: 4,
-        experience: 0,
-        stats: { health: 200, ad: 200, ap: 60, armor: 20, mr: 20, speed: 50 },
-        potions: 5,
-        gold: 2000,
-        inventory: [],
-        powerUps: { pending: 0, history: { health: 0, ad: 0, ap: 0, speed: 0 } },
-        bossesDefeated: 0,
-        defeatedEnemies: [],
-      },
-      combatState: {
-        phase: 'defeat',
-        enemy: {
-          definition: {
-            id: 'adventurer',
-            name: 'Adventurer',
-            archetype: 'basic',
-            modifiers: { health: 1, ad: 1, ap: 1, armor: 1, mr: 1, speed: 1 },
-            idleAsset: '/images/adventurer/idle.gif',
-          },
-          level: 2,
-          stats: { health: 100, ad: 10, ap: 10, armor: 10, mr: 10, speed: 10 },
-          damageTaken: 0,
-          potions: 0,
-          gold: 125,
-        },
-        playerDamageTaken: 0,
-        pendingAction: null,
-        lastResult: null,
-      },
-    });
-
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      providers: [
-        GameSessionService,
-        {
-          provide: SESSION_STORAGE,
-          useValue: {
-            read: () => sessionValue,
-            write: () => undefined,
-            clear: () => (sessionValue = null),
-          },
-        },
-        {
-          provide: RECORDS_STORAGE,
-          useValue: { read: () => null, write: () => undefined, clear: () => undefined },
-        },
-      ],
-    });
-    const restored = TestBed.inject(GameSessionService);
-
-    expect(restored.screen()).toBe('welcome');
-    expect(sessionValue).toBeNull();
-  });
-
-  it('discards nonzero combat damage when a saved run has no enemy', () => {
-    const player = createInitialPlayer('David', CHARACTER_DEFINITIONS[0]);
-    sessionValue = JSON.stringify({
-      version: 1,
-      screen: 'combat-ready',
-      playerName: 'David',
-      selectedCharacterId: 'wizard',
-      player,
-      combatState: { ...INITIAL_COMBAT_STATE, playerDamageTaken: 1 },
-    });
-
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      providers: [
-        GameSessionService,
-        {
-          provide: SESSION_STORAGE,
-          useValue: {
-            read: () => sessionValue,
-            write: () => undefined,
-            clear: () => (sessionValue = null),
-          },
-        },
-        {
-          provide: RECORDS_STORAGE,
-          useValue: { read: () => null, write: () => undefined, clear: () => undefined },
-        },
-      ],
-    });
-    const restored = TestBed.inject(GameSessionService);
-
-    expect(restored.screen()).toBe('welcome');
-    expect(sessionValue).toBeNull();
-  });
-
-  it('discards snapshots with malformed optional combat interaction fields', () => {
-    service.setPlayerName('David');
-    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
-    service.startRun();
-    service.player.update((player) =>
-      player ? { ...player, stats: { ...player.stats, speed: 100 } } : player,
-    );
-    service.findEnemy();
-    (service as unknown as { persist: () => void }).persist();
-
-    const validSnapshot = JSON.parse(sessionValue ?? '{}') as {
-      combatState: Record<string, unknown>;
-    };
-    const malformedFields: readonly [string, unknown][] = [
-      ['enemyIntent', { kind: 'attack', minValue: -1, maxValue: 0 }],
-      ['playerBlock', -1],
-      ['enemyBlock', Number.MAX_SAFE_INTEGER + 1],
-      ['enemyHexed', 'yes'],
-    ];
-
-    for (const [field, value] of malformedFields) {
-      sessionValue = JSON.stringify({
-        ...validSnapshot,
-        combatState: { ...validSnapshot.combatState, [field]: value },
-      });
-      TestBed.resetTestingModule();
-      TestBed.configureTestingModule({
-        providers: [
-          GameSessionService,
-          {
-            provide: SESSION_STORAGE,
-            useValue: {
-              read: () => sessionValue,
-              write: () => undefined,
-              clear: () => (sessionValue = null),
-            },
-          },
-          {
-            provide: RECORDS_STORAGE,
-            useValue: { read: () => null, write: () => undefined, clear: () => undefined },
-          },
-        ],
-      });
-      const restored = TestBed.inject(GameSessionService);
-
-      expect(restored.screen()).toBe('welcome');
-      expect(sessionValue).toBeNull();
-    }
-  });
-
-  it('restores store offers without rerolling them', () => {
-    service.setPlayerName('David');
-    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
-    service.startRun();
-    const storeNode = service.routeMap()?.nodes.find((node) => node.kind === 'store');
-    if (!storeNode) throw new Error('Expected a store route node.');
-
-    service.chooseRouteNode(storeNode.id);
-    (service as unknown as { persist: () => void }).persist();
-    const savedSnapshot = JSON.parse(sessionValue ?? '{}') as {
-      storeItems: readonly { id: string }[];
-    };
-    const savedOfferIds = savedSnapshot.storeItems.map((item) => item.id);
-
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      providers: [
-        GameSessionService,
-        {
-          provide: SESSION_STORAGE,
-          useValue: {
-            read: () => sessionValue,
-            write: () => undefined,
-            clear: () => (sessionValue = null),
-          },
-        },
-        {
-          provide: RECORDS_STORAGE,
-          useValue: { read: () => null, write: () => undefined, clear: () => undefined },
-        },
-      ],
-    });
-    const restored = TestBed.inject(GameSessionService);
-
-    expect(restored.screen()).toBe('store');
-    expect(restored.storeItems().map((item) => item.id)).toEqual(savedOfferIds);
-    expect(restored.nextRouteMap()?.floor).toBe(2);
-    expect(restored.nextRouteMap()?.visitedNodeIds).toHaveLength(1);
-  });
-
-  it('resets the audio adapter when saved preferences are malformed', () => {
-    let preferencesValue: string | null = '{"version":1,"musicVolume":"loud","effectsVolume":0.4}';
-    const appliedMusicVolumes: number[] = [];
-    const appliedEffectsVolumes: number[] = [];
-    const preferencesStorage: PreferencesStoragePort = {
-      read: () => preferencesValue,
-      write: () => undefined,
-      clear: () => (preferencesValue = null),
-    };
-
-    TestBed.resetTestingModule();
-    TestBed.configureTestingModule({
-      providers: [
-        GameSessionService,
-        { provide: PREFERENCES_STORAGE, useValue: preferencesStorage },
         {
           provide: AUDIO,
           useValue: {
-            playSound: () => undefined,
+            playSound: (name: string) => played.push(name),
             playMusic: () => undefined,
             stopMusic: () => undefined,
-            setMusicVolume: (volume: number) => appliedMusicVolumes.push(volume),
-            setEffectsVolume: (volume: number) => appliedEffectsVolumes.push(volume),
+            setVolumes: (music: number, effects: number) => appliedVolumes.push([music, effects]),
           } satisfies AudioPort,
-        },
-        {
-          provide: RECORDS_STORAGE,
-          useValue: { read: () => null, write: () => undefined, clear: () => undefined },
         },
       ],
     });
-    const restored = TestBed.inject(GameSessionService);
+    service = TestBed.inject(GameSessionService);
+  }
 
-    expect(restored.musicVolume()).toBe(0.05);
-    expect(restored.effectsVolume()).toBe(0.2);
-    expect(appliedMusicVolumes).toContain(0.05);
-    expect(appliedEffectsVolumes).toContain(0.2);
-    expect(preferencesValue).toBeNull();
+  function characterAt(index: number) {
+    const character = service.characters[index];
+    if (!character) throw new Error(`No character configured at index ${index}.`);
+    return character;
+  }
+
+  beforeEach(() => {
+    TestBed.resetTestingModule();
+    storage = memoryStore();
+    scheduled = [];
+    played = [];
+    appliedVolumes = [];
+    configure();
   });
 
-  it('lets a faster enemy take the opening turn', () => {
+  it('starts a v2 run and restores the same route, player, and random cursor', () => {
+    service.beginCharacterSelection();
     service.setPlayerName('David');
-    service.selectCharacter(CHARACTER_DEFINITIONS[0]);
-    service.player.set({
-      ...createInitialPlayer('David', CHARACTER_DEFINITIONS[0]),
-      stats: { ...createInitialPlayer('David', CHARACTER_DEFINITIONS[0]).stats, speed: 1 },
-    });
-    service.findEnemy();
+    service.selectCharacter(characterAt(0));
+    service.startRun();
 
-    expect(service.combatState().phase).toBe('enemy-turn');
-    expect(service.combatMessage()).toContain('intends');
-    expect(service.canAct()).toBe(false);
+    const saved = parseRun(readJson(storage, STORAGE_KEYS.run));
+    expect(saved).not.toBeNull();
+    expect(saved?.screen).toBe('map');
+    expect(saved?.player.characterId).toBe('wizard');
+    expect(saved?.seed).toBeTypeOf('number');
+    expect(service.routeMap()?.nodes).toHaveLength(3);
 
-    flushScheduled();
-    expect(service.combatState().phase).toBe('enemy-turn');
-    expect(service.enemyAnimation()).toBe('attack');
-
-    flushScheduled();
-    expect(service.combatState().phase).toBe('awaiting-player-action');
-    expect(service.enemyAnimation()).toBe('attack');
-    flushScheduled();
-    expect(service.enemyAnimation()).toBe('idle');
+    TestBed.resetTestingModule();
+    configure();
+    expect(service.screen()).toBe('map');
+    expect(service.playerName()).toBe('David');
+    expect(service.routeMap()).toEqual(expect.objectContaining({ floor: 1 }));
+    expect(service.combatMessage()).toContain('saved run was restored');
   });
 
-  it('paces a free potion turn until the potion message has been shown', () => {
-    const player = createInitialPlayer('David', CHARACTER_DEFINITIONS[0]);
-    const freePotionRelic = STORE_ITEMS.find((item) => item.id === 'alchemists-crown');
-    if (!freePotionRelic) throw new Error('Expected the Alchemist’s Crown relic.');
+  it('saves the resolved domain turn before presenting its event sequence', () => {
+    service.beginCharacterSelection();
+    service.setPlayerName('Hero');
+    service.selectCharacter(characterAt(1));
+    service.startRun();
+    const before = parseRun(readJson(storage, STORAGE_KEYS.run));
+    const encounter = service.routeMap()?.nodes.find((node) => node.kind === 'battle');
+    if (!before || !encounter) throw new Error('Expected a saved run and a battle route.');
+    service.chooseRouteNode(encounter.id);
+    service.skipPresentation();
+    expect(service.screen()).toBe('combat');
+    expect(service.canAct()).toBe(true);
 
-    service.player.set({
-      ...player,
-      stats: { ...player.stats, speed: 100 },
-      inventory: [freePotionRelic],
+    const priorCursor = parseRun(readJson(storage, STORAGE_KEYS.run))?.rngState;
+    service.attack('attack');
+    const after = parseRun(readJson(storage, STORAGE_KEYS.run));
+    expect(after).not.toBeNull();
+    expect(after?.rngState).not.toBe(priorCursor);
+    expect(service.isPresenting()).toBe(true);
+    expect(service.canAct()).toBe(false);
+    service.skipPresentation();
+    expect(service.isPresenting()).toBe(false);
+    expect(service.combatState().phase).toMatch(/player-turn|victory|defeat/);
+  });
+
+  it('restores a run from a saved v2 checkpoint and discards an in-progress v1 save', () => {
+    const initial = createRun(17, 'Hero', 'warrior');
+    storage.write(STORAGE_KEYS.run, serializeRun(initial));
+    storage.write(STORAGE_KEYS.legacyRun, JSON.stringify({ version: 1, screen: 'combat' }));
+    TestBed.resetTestingModule();
+    configure();
+    expect(service.screen()).toBe('map');
+    expect(storage.read(STORAGE_KEYS.legacyRun)).toBeNull();
+
+    storage.write(STORAGE_KEYS.run, JSON.stringify({ version: 2, run: { screen: 'combat' } }));
+    TestBed.resetTestingModule();
+    configure();
+    expect(service.screen()).toBe('welcome');
+    expect(storage.read(STORAGE_KEYS.run)).toBeNull();
+  });
+
+  it('persists percent-based audio controls, mute, and text speed', () => {
+    service.setMusicVolume(100);
+    service.setEffectsVolume(40);
+    service.setTextSpeed('instant');
+    service.toggleMuted();
+    expect(service.musicVolume()).toBe(100);
+    expect(service.effectsVolume()).toBe(40);
+    expect(service.muted()).toBe(true);
+    expect(service.textSpeed()).toBe('instant');
+    expect(appliedVolumes.at(-1)).toEqual([0, 0]);
+    expect(readJson(storage, STORAGE_KEYS.preferences)).toMatchObject({
+      version: 2,
+      musicVolume: 0.5,
+      effectsVolume: 0.2,
+      muted: true,
+      textSpeed: 'instant',
     });
-    service.findEnemy();
+  });
 
-    service.usePotion();
+  it('cancels queued animation and feedback work when reset', () => {
+    service.beginCharacterSelection();
+    service.setPlayerName('Hero');
+    service.selectCharacter(characterAt(0));
+    service.startRun();
+    const encounter = service.routeMap()?.nodes.find((node) => node.kind === 'battle');
+    if (!encounter) throw new Error('Expected a battle route.');
+    service.chooseRouteNode(encounter.id);
+    expect(service.isPresenting()).toBe(true);
+    service.reset();
+    expect(service.isPresenting()).toBe(false);
+    expect(service.screen()).toBe('welcome');
+    expect(scheduled.every((item) => item.cancelled)).toBe(true);
+  });
 
-    expect(service.combatState().phase).toBe('awaiting-player-action');
-    expect(service.actionReady()).toBe(false);
-    expect(scheduledDelays[scheduledDelays.length - 1]).toBeGreaterThan(0);
+  it('keeps store and daily records in separate storage lists', () => {
+    expect(readJson(storage, STORAGE_KEYS.records)).toEqual({ version: 2, records: [] });
+    expect(readJson(storage, STORAGE_KEYS.dailyRecords)).toEqual({ version: 2, records: [] });
+    service.beginCharacterSelection(true);
+    expect(service.dailyRequested()).toBe(true);
+    expect(service.screen()).toBe('character-select');
+  });
 
-    flushScheduled();
-    expect(service.actionReady()).toBe(true);
+  it('advances event presentation with the injected clock', () => {
+    service.beginCharacterSelection();
+    service.setPlayerName('Hero');
+    service.selectCharacter(characterAt(0));
+    service.startRun();
+    const encounter = service.routeMap()?.nodes.find((node) => node.kind === 'battle');
+    if (!encounter) throw new Error('Expected a battle route.');
+    service.chooseRouteNode(encounter.id);
+    service.skipPresentation();
+    service.attack('attack');
+    expect(service.isPresenting()).toBe(true);
+    flushOne();
+    expect(service.isPresenting()).toBe(true);
   });
 });

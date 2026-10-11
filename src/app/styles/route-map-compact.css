@@ -1,0 +1,61 @@
+.route-node-forecast {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ember-bright);
+  font-family: 'Courier New', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+}
+.route-node-forecast svg {
+  flex: 0 0 auto;
+}
+@media (max-width: 700px) {
+  .door-panel .route-heading {
+    flex-direction: row;
+  }
+
+  .door-panel .route-summary {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.35rem;
+    font-size: 0.5rem;
+  }
+
+  .door-panel .route-origin {
+    font-size: 0.52rem;
+  }
+
+  .door-panel .route-origin-mark {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .door-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .door-card {
+    justify-items: center;
+    padding: 0.45rem 0.3rem;
+    text-align: center;
+  }
+
+  .door-card .route-node-copy {
+    justify-items: center;
+  }
+
+  .door-card .route-node-copy span {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .door-card .route-node-arrow {
+    right: 0.35rem;
+    bottom: 0.35rem;
+  }
+}

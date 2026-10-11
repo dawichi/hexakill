@@ -1,0 +1,343 @@
+.enemy-intent,
+.combat-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+  border: 1px solid currentColor;
+  padding: 0.18rem 0.3rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.enemy-intent.attack {
+  color: #e5aa59;
+}
+
+.enemy-intent.magic {
+  color: #67c8db;
+}
+
+.enemy-intent.guard,
+.combat-status.guarded {
+  color: #a6b9c2;
+}
+
+.enemy-intent.heal {
+  color: #8ecf91;
+}
+
+.combat-status.hexed {
+  color: #b99ce0;
+}
+
+.combat-stat-rail {
+  display: grid;
+  align-content: center;
+  gap: 0.42rem;
+}
+
+.combat-stat-rail app-stat-chip {
+  justify-self: start;
+}
+
+.enemy-combatant .combat-stat-rail app-stat-chip {
+  justify-self: end;
+}
+
+.combatant-health {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.versus {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  color: #fbbf24;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.versus span {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border: 1px solid #fbbf24;
+  border-radius: 50%;
+  background: var(--stone-0);
+  box-shadow: 0 0 1.5rem rgb(251 191 36 / 15%);
+}
+
+.versus small {
+  color: var(--muted);
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.health-bar {
+  position: relative;
+  height: 0.7rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #342f2c;
+}
+
+.health-bar span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  min-width: 0;
+  border-radius: inherit;
+}
+
+.health-bar-trail {
+  z-index: 0;
+  background: #89837c;
+  transition: width 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.health-bar-fill {
+  z-index: 1;
+  transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.health-bar.healthy .health-bar-fill {
+  background: #55c271;
+}
+
+.health-bar.wounded .health-bar-fill {
+  background: #e5aa59;
+}
+
+.health-bar.critical .health-bar-fill {
+  background: #db6a62;
+}
+
+.combatant-experience {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.experience-bar {
+  height: 0.35rem;
+  overflow: hidden;
+  border: 1px solid rgb(103 200 219 / 35%);
+  background: #182e35;
+}
+
+.experience-bar span {
+  display: block;
+  height: 100%;
+  background: #67c8db;
+  transition: width 250ms ease;
+}
+
+@media (max-width: 700px) {
+  .versus {
+    text-align: center;
+  }
+}
+
+@media (max-width: 700px) {
+  .combat-screen-panel .combat-stat-rail {
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.15rem;
+  }
+
+  .combat-screen-panel .combat-stat-rail app-stat-chip,
+  .combat-screen-panel .enemy-combatant .combat-stat-rail app-stat-chip {
+    justify-self: center;
+  }
+
+  .combat-screen-panel .combatant-health {
+    gap: 0.2rem;
+  }
+
+  .combat-screen-panel .health-bar {
+    height: 0.4rem;
+  }
+
+  .combat-screen-panel .combatant-experience {
+    gap: 0.2rem;
+  }
+}
+@media (max-width: 700px) {
+  .combat-screen-panel .player-combatant .combat-stat-rail {
+    position: absolute;
+    top: 2.2rem;
+    right: 0;
+    width: 45%;
+  }
+
+  .combat-screen-panel .enemy-combatant .combat-stat-rail {
+    position: absolute;
+    top: 2.2rem;
+    left: 0;
+    width: 45%;
+  }
+
+  .combat-screen-panel .combat-stat-rail {
+    position: absolute;
+    grid-template-columns: repeat(2, max-content);
+    align-content: center;
+    gap: 0.12rem;
+  }
+
+  .combat-screen-panel .combat-stat-rail app-stat-chip,
+  .combat-screen-panel .enemy-combatant .combat-stat-rail app-stat-chip {
+    justify-self: center;
+  }
+
+  .combat-screen-panel .combatant-health {
+    position: absolute;
+    z-index: 3;
+    bottom: 0.85rem;
+    width: 51%;
+    border: 1px solid var(--line-soft);
+    background: rgb(16 15 18 / 88%);
+    padding: 0.25rem 0.3rem;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-health {
+    right: 0;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-health {
+    left: 0;
+  }
+
+  .combat-screen-panel .combatant-experience {
+    position: absolute;
+    z-index: 3;
+    right: 0;
+    bottom: 0.1rem;
+    width: 51%;
+    gap: 0.12rem;
+    padding: 0 0.1rem 0.1rem;
+  }
+
+  .combat-screen-panel .versus {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .combat-screen-panel .versus span {
+    width: 1.8rem;
+    height: 1.8rem;
+    background: var(--stone-0);
+    font-size: 0.58rem;
+  }
+
+  .combat-screen-panel .versus small {
+    display: none;
+  }
+}
+@media (max-width: 700px) {
+  .combat-screen-panel .combat-stat-rail,
+  .combat-screen-panel .player-combatant .combat-stat-rail,
+  .combat-screen-panel .enemy-combatant .combat-stat-rail {
+    position: static;
+    inset: auto;
+    width: auto;
+    grid-row: 1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: center;
+    gap: 0.15rem;
+  }
+
+  .combat-screen-panel .player-combatant .combat-stat-rail {
+    grid-column: 2;
+  }
+
+  .combat-screen-panel .enemy-combatant .combat-stat-rail {
+    grid-column: 1;
+  }
+
+  .combat-screen-panel .combat-stat-rail app-stat-chip,
+  .combat-screen-panel .enemy-combatant .combat-stat-rail app-stat-chip {
+    justify-self: stretch;
+  }
+
+  .combat-screen-panel .combatant-health {
+    position: static;
+    z-index: auto;
+    width: 100%;
+    grid-row: 3;
+    border: 0;
+    border-top: 1px solid var(--line-soft);
+    background: transparent;
+    padding: 0.25rem 0.15rem 0;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-health,
+  .combat-screen-panel .enemy-combatant .combatant-health {
+    right: auto;
+    left: auto;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-health {
+    margin-top: clamp(1.25rem, 4vh, 2rem);
+  }
+
+  .combat-screen-panel .player-combatant .combatant-health,
+  .combat-screen-panel .player-combatant .combatant-experience {
+    margin-left: 0;
+  }
+
+  .combat-screen-panel .combatant-experience {
+    position: static;
+    z-index: auto;
+    width: 100%;
+    grid-row: 4;
+    gap: 0.12rem;
+    padding: 0 0.15rem 0.05rem;
+  }
+
+  .combat-screen-panel .versus {
+    top: calc(50% - clamp(0.5rem, 1.5vh, 0.75rem));
+    left: 50%;
+  }
+}
+@media (max-width: 700px) {
+  .combat-screen-panel .enemy-combatant .combatant-health {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    margin: 0;
+  }
+
+  .combat-screen-panel .versus {
+    grid-column: 2;
+    grid-row: 4;
+    position: static;
+    align-self: center;
+    justify-self: center;
+    transform: none;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-health {
+    grid-column: 1 / -1;
+    grid-row: 7;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-experience {
+    grid-column: 1 / -1;
+    grid-row: 8;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-experience {
+    margin-top: 0.4rem;
+  }
+}

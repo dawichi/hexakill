@@ -1,0 +1,269 @@
+.primary-button,
+.quiet-button,
+.character-card {
+  cursor: pointer;
+  border: 0;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--ink);
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.field-help {
+  color: var(--muted);
+  font-family: Georgia, serif;
+  font-size: 0.9rem;
+}
+
+.name-altar {
+  display: grid;
+  grid-template-columns: auto minmax(10rem, 0.7fr) minmax(14rem, 1.3fr);
+  align-items: center;
+  gap: 1rem;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+  background: rgb(0 0 0 / 12%);
+  padding: 0.9rem 1rem;
+}
+
+.altar-mark {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid var(--ember);
+  color: var(--ember-bright);
+}
+
+.name-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 0.1rem;
+  outline: 0;
+  background: var(--stone-0);
+  color: var(--ink);
+  padding: 0.8rem 0.9rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.84rem;
+}
+
+.name-input::placeholder {
+  color: #746b5d;
+}
+
+.name-input:focus {
+  border-color: var(--ember);
+  box-shadow: 0 0 0 1px var(--ember);
+}
+
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 1.75rem 0;
+}
+
+.character-card {
+  display: grid;
+  min-height: 22rem;
+  align-content: start;
+  gap: 0.6rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 0.15rem;
+  background: linear-gradient(180deg, rgb(50 45 43 / 48%), rgb(24 22 24 / 92%));
+  color: var(--ink);
+  padding: 0.75rem;
+  text-align: left;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.character-card:hover,
+.character-card.selected {
+  background: linear-gradient(180deg, rgb(70 54 45 / 72%), rgb(33 27 27 / 98%));
+  transform: translateY(-3px);
+}
+
+.character-card:hover {
+  border-color: #8c654b;
+}
+
+.character-card.selected.blue {
+  border-color: #38bdf8;
+}
+
+.character-card.selected.amber {
+  border-color: var(--amber);
+}
+
+.character-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 1.2rem;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+}
+
+.character-card-header > svg {
+  color: var(--ember);
+}
+
+.selected-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--ember-bright);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+}
+
+.character-card-copy {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.2rem 0.15rem 0;
+}
+
+.starting-stat-summary {
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.58rem;
+  line-height: 1.35;
+}
+
+.selection-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 1.25rem;
+}
+
+.selection-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.selection-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+}
+
+.selection-hint svg {
+  color: var(--ember);
+}
+
+@media (max-width: 700px) {
+  .name-altar {
+    grid-template-columns: auto 1fr;
+  }
+
+  .name-altar .name-input {
+    grid-column: 1 / -1;
+  }
+
+  .selection-footer,
+  .selection-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .selection-actions .primary-button,
+  .selection-actions .quiet-button {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+.character-select-panel {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: clamp(0.55rem, 1.3vh, 1rem);
+}
+
+.game-active .name-altar {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+}
+
+.game-active .character-grid {
+  min-height: 0;
+  gap: 0.65rem;
+}
+
+.game-active .character-card {
+  min-height: 0;
+  gap: 0.45rem;
+  padding: 0.65rem;
+}
+
+@media (min-width: 701px) and (max-height: 760px) {
+  .game-active .character-card {
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+
+  .game-active .character-card-copy {
+    gap: 0.2rem;
+  }
+
+  .game-active .starting-stat-summary {
+    font-size: 0.5rem;
+    line-height: 1.15;
+  }
+}
+
+.game-active .selection-footer {
+  padding-top: 0.6rem;
+}
+
+@media (max-width: 700px) {
+  .game-active .character-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .game-active .character-card {
+    padding: 0.4rem;
+  }
+
+  .game-active .character-card-header {
+    font-size: 0.5rem;
+  }
+
+  .game-active .selection-footer {
+    gap: 0.45rem;
+    padding-top: 0.4rem;
+  }
+
+  .game-active .selection-hint {
+    font-size: 0.58rem;
+  }
+
+  .game-active .selection-actions {
+    flex-direction: row;
+  }
+
+  .game-active .selection-actions .primary-button,
+  .game-active .selection-actions .quiet-button {
+    width: auto;
+    padding: 0.55rem 0.65rem;
+    font-size: 0.65rem;
+  }
+}

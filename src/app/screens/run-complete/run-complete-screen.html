@@ -1,0 +1,49 @@
+@if (session.player(); as player) {
+  <section class="panel run-complete" data-screen="run-complete" aria-labelledby="run-complete-title">
+    <header class="run-complete-header">
+      <div>
+        <p class="eyebrow">The dungeon is conquered</p>
+        <h2 id="run-complete-title" data-screen-heading tabindex="-1">Run complete.</h2>
+        <p class="lead">
+          {{ player.name }} defeated the Fire Knight, Water Priestess, and Bringer of Death, clearing all
+          {{ session.totalRooms }} rooms.
+        </p>
+      </div>
+      <span class="run-complete-trophy" aria-hidden="true">
+        <svg lucideTrophy size="42"></svg>
+      </span>
+    </header>
+    <div
+      class="run-progress run-progress-complete"
+      role="progressbar"
+      aria-label="Dungeon progress"
+      aria-valuemin="0"
+      [attr.aria-valuemax]="session.totalRooms"
+      [attr.aria-valuenow]="session.completedRooms()"
+      [attr.aria-valuetext]="session.totalRooms + ' of ' + session.totalRooms + ' rooms complete'"
+    >
+      <div class="progress-heading run-progress-heading">
+        <span>Run progress</span>
+        <strong>{{ session.completedRooms() }} / {{ session.totalRooms }} rooms</strong>
+      </div>
+      <div class="run-progress-track experience-bar"><span [style.width.%]="session.runProgressPercent()"></span></div>
+      <div class="run-progress-bosses">
+        <span class="reached">I · Fire Knight</span>
+        <span class="reached">II · Water Priestess</span>
+        <span class="reached">III · Bringer of Death</span>
+      </div>
+    </div>
+    <div class="seed-share">
+      @if (session.dailyLabel()) { <span>{{ session.dailyLabel() }}</span> }
+      <span>Seed {{ session.shareSeed() }}</span>
+      <button class="quiet-button" type="button" (click)="session.copySeed()">Copy seed</button>
+    </div>
+    <p class="combat-message" role="status" aria-atomic="true">{{ session.combatMessage() }}</p>
+    <footer class="game-over-footer">
+      <span><svg lucideTrophy size="15" aria-hidden="true"></svg> Your legend is written in stone.</span>
+      <button class="primary-button" type="button" (click)="session.reset()">
+        Return to home <svg lucideArrowRight size="16" aria-hidden="true"></svg>
+      </button>
+    </footer>
+  </section>
+}

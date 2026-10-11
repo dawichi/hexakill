@@ -1,11 +1,4 @@
-import {
-  PLAYER_ACTION_ASSETS,
-  PLAYER_DEFEAT_ASSETS,
-  PLAYER_HIT_ASSETS,
-  PLAYER_IDLE_ASSETS,
-  PLAYER_MAGIC_ASSETS,
-} from './assets';
-import { CharacterDefinition, CharacterId, PlayerState, Stats } from './game-types';
+import { CharacterId, CombatantSprites, Stats, scaleStats } from './game-types';
 
 export const BASE_STATS: Stats = {
   health: 200,
@@ -16,82 +9,116 @@ export const BASE_STATS: Stats = {
   speed: 4,
 };
 
-export const INITIAL_PLAYER_LEVEL = 4;
+export const STARTING_LEVEL = 4;
+/** Character modifiers apply at half strength to the starting stats and in full on level-up. */
+export const STARTING_MODIFIER_WEIGHT = 0.5;
+export const STARTING_POTIONS = 5;
+export const STARTING_GOLD = 2000;
 
-function statsAtLevel(level: number): Stats {
-  const stats = { ...BASE_STATS };
-
-  (Object.keys(BASE_STATS) as (keyof Stats)[]).forEach((stat) => {
-    stats[stat] = BASE_STATS[stat] * level;
-  });
-
-  return stats;
+export interface CharacterPassive {
+  readonly name: string;
+  readonly description: string;
 }
 
-export const CHARACTER_DEFINITIONS: readonly [
-  CharacterDefinition,
-  CharacterDefinition,
-  CharacterDefinition,
-] = [
-  {
-    id: 'wizard',
-    name: 'Wizard',
-    description: 'Destroy enemies with explosive magic.',
-    modifiers: { health: 1, ad: 0.5, ap: 2, armor: 0.5, mr: 0.75, speed: 1.25 },
-    accent: 'blue',
-    idleAsset: '/images/wizard/idle.gif',
-    idleSpriteAsset: PLAYER_IDLE_ASSETS.wizard,
-    actionAsset: PLAYER_ACTION_ASSETS.wizard,
-    magicAsset: PLAYER_MAGIC_ASSETS.wizard,
-    hitAsset: PLAYER_HIT_ASSETS.wizard,
-    defeatAsset: PLAYER_DEFEAT_ASSETS.wizard,
-  },
-  {
-    id: 'samurai',
-    name: 'Samurai',
-    description: 'Master the sword and strike first.',
-    modifiers: { health: 0.75, ad: 2, ap: 0.5, armor: 0.75, mr: 0.75, speed: 1.5 },
-    accent: 'red',
-    idleAsset: '/images/samurai/idle.gif',
-    idleSpriteAsset: PLAYER_IDLE_ASSETS.samurai,
-    actionAsset: PLAYER_ACTION_ASSETS.samurai,
-    magicAsset: PLAYER_MAGIC_ASSETS.samurai,
-    hitAsset: PLAYER_HIT_ASSETS.samurai,
-    defeatAsset: PLAYER_DEFEAT_ASSETS.samurai,
-  },
-  {
-    id: 'warrior',
-    name: 'Warrior',
-    description: 'A durable fighter built to survive.',
-    modifiers: { health: 1.75, ad: 1.5, ap: 0.5, armor: 1.5, mr: 1.25, speed: 0.5 },
-    accent: 'amber',
-    idleAsset: '/images/warrior/idle.gif',
-  },
-];
+export interface CharacterDefinition {
+  readonly id: CharacterId;
+  readonly name: string;
+  readonly description: string;
+  readonly passive: CharacterPassive;
+  /** Per-level growth multipliers relative to BASE_STATS. */
+  readonly modifiers: Stats;
+  readonly accent: 'blue' | 'red' | 'amber';
+  readonly sprites: CombatantSprites;
+}
+
+/** Wizard Magic ignores this share of the enemy's Magic resist. */
+export const WIZARD_MAGIC_PENETRATION = 0.15;
+/** Samurai Attacks gain this much critical chance, and the Samurai wins speed ties. */
+export const SAMURAI_CRITICAL_BONUS = 0.2;
+/** Warrior Guard grants this much more Block. */
+export const WARRIOR_GUARD_MULTIPLIER = 1.5;
+/** Share of the damage absorbed by the Warrior's Block that strikes back at the attacker. */
+export const WARRIOR_RETALIATION = 0.15;
+
+const strip = (src: string, frameWidth: number, frameHeight: number, frameCount: number) => ({
+  src,
+  frameWidth,
+  frameHeight,
+  frameCount,
+});
+
+export const CHARACTERS: readonly [CharacterDefinition, CharacterDefinition, CharacterDefinition] =
+  [
+    {
+      id: 'wizard',
+      name: 'Wizard',
+      description: 'Fragile and fast, with devastating Magic.',
+      passive: {
+        name: 'Spellweaver',
+        description: `Magic ignores ${WIZARD_MAGIC_PENETRATION * 100}% of the enemy's Magic resist.`,
+      },
+      modifiers: { health: 1, ad: 0.5, ap: 2, armor: 0.6, mr: 0.9, speed: 1.25 },
+      accent: 'blue',
+      sprites: {
+        portrait: '/images/wizard/idle.gif',
+        strips: {
+          idle: strip('/images/wizard/sprites/Idle.png', 231, 190, 6),
+          attack: strip('/images/wizard/sprites/Attack1.png', 231, 190, 8),
+          magic: strip('/images/wizard/sprites/Attack2.png', 231, 190, 8),
+          hit: strip('/images/wizard/sprites/Hit.png', 231, 190, 4),
+          defeat: strip('/images/wizard/sprites/Death.png', 231, 190, 7),
+        },
+      },
+    },
+    {
+      id: 'samurai',
+      name: 'Samurai',
+      description: 'A precise duelist who strikes first and cuts deep.',
+      passive: {
+        name: 'Iaijutsu',
+        description: `Wins speed ties. Attacks gain +${SAMURAI_CRITICAL_BONUS * 100}% critical chance.`,
+      },
+      modifiers: { health: 1.1, ad: 2.6, ap: 0.5, armor: 0.8, mr: 0.7, speed: 1.5 },
+      accent: 'red',
+      sprites: {
+        portrait: '/images/samurai/idle.gif',
+        strips: {
+          idle: strip('/images/samurai/Sprites/Idle.png', 200, 200, 8),
+          attack: strip('/images/samurai/Sprites/Attack1.png', 200, 200, 6),
+          magic: strip('/images/samurai/Sprites/Attack2.png', 200, 200, 6),
+          hit: strip('/images/samurai/Sprites/Take Hit.png', 200, 200, 4),
+          defeat: strip('/images/samurai/Sprites/Death.png', 200, 200, 6),
+        },
+      },
+    },
+    {
+      id: 'warrior',
+      name: 'Warrior',
+      description: 'A slow, armored wall who punishes every blow.',
+      passive: {
+        name: 'Bulwark',
+        description: `Guard grants ${(WARRIOR_GUARD_MULTIPLIER - 1) * 100}% more Block. Block that absorbs a hit strikes back for ${WARRIOR_RETALIATION * 100}% of the absorbed damage.`,
+      },
+      modifiers: { health: 1.2, ad: 1.4, ap: 0.5, armor: 1.1, mr: 1, speed: 0.5 },
+      accent: 'amber',
+      sprites: { portrait: '/images/warrior/idle.gif', strips: {} },
+    },
+  ];
 
 export function findCharacter(id: CharacterId): CharacterDefinition {
-  const character = CHARACTER_DEFINITIONS.find((candidate) => candidate.id === id);
-
-  if (!character) {
-    throw new Error(`Unknown character: ${id}`);
-  }
-
+  const character = CHARACTERS.find((candidate) => candidate.id === id);
+  if (!character) throw new RangeError(`Unknown character: ${id}`);
   return character;
 }
 
-export function createInitialPlayer(name: string, character: CharacterDefinition): PlayerState {
-  return {
-    name,
-    character,
-    level: INITIAL_PLAYER_LEVEL,
-    experience: 0,
-    stats: statsAtLevel(INITIAL_PLAYER_LEVEL),
-    potions: 5,
-    gold: 2000,
-    inventory: [],
-    relicCharges: {},
-    powerUps: { pending: 0, history: { health: 0, ad: 0, ap: 0, speed: 0 } },
-    bossesDefeated: 0,
-    defeatedEnemies: [],
-  };
+export function isCharacterId(value: unknown): value is CharacterId {
+  return CHARACTERS.some((character) => character.id === value);
+}
+
+export function startingStats(character: CharacterDefinition): Stats {
+  return scaleStats(BASE_STATS, (stat, base) =>
+    Math.round(
+      base * STARTING_LEVEL * (1 + (character.modifiers[stat] - 1) * STARTING_MODIFIER_WEIGHT),
+    ),
+  );
 }

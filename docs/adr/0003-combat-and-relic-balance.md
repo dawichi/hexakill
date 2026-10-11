@@ -2,13 +2,16 @@
 
 ## Status
 
-Accepted for the gameplay prototype — 2026-08-17
+Accepted balance baseline — 2026-08-17. Character identity and starting stats are superseded by
+[ADR-0006](0006-distinct-character-starts-and-passives.md); catalog data and power-up coverage are
+updated by [ADR-0009](0009-catalog-driven-relic-effects.md) and
+[ADR-0010](0010-six-stat-power-up-choices.md).
 
 ## Decision
 
-Hexakill's combat loop uses persistent health across route encounters and a small set of passive
-relics purchased from merchants. Relics modify actions, incoming damage, rewards, or recovery;
-they do not directly modify the character's base stat row.
+Hexakill's combat loop uses persistent health across route encounters and passive relics purchased
+from merchants. Relics modify actions, incoming damage, rewards, recovery, and selected maximum
+stats. Their effects and tunable values live in the typed catalog.
 
 Combat is intentionally predictable enough to support reading an enemy:
 
@@ -42,8 +45,8 @@ best action difficult to read and made the route map less meaningful.
   permanent base stats.
 - A damaged player must weigh a safe route, campfire, potion, or relic purchase against pushing
   forward.
-- Character identity remains in the base stats and attack/magic preference, while relic choices
-  create run-specific builds.
+- Distinct starting profiles and passives now shape character identity; relic choices create
+  run-specific builds.
 - The merchant can evolve toward Slay the Spire-style rotating offers without redesigning the
   combat state again.
 - The numbers are a balance baseline, not final tuning; manual runs will determine whether enemy

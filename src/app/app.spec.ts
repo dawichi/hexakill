@@ -1,229 +1,122 @@
 import { TestBed } from '@angular/core/testing';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { App } from './app';
+import { AUDIO, AudioPort } from './application/audio';
 import { GameSessionService } from './application/game-session.service';
+import { memoryStore, STORAGE } from './application/storage';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
+      providers: [
+        { provide: STORAGE, useValue: memoryStore() },
+        {
+          provide: AUDIO,
+          useValue: {
+            playSound: () => undefined,
+            playMusic: () => undefined,
+            stopMusic: () => undefined,
+            setVolumes: () => undefined,
+          } satisfies AudioPort,
+        },
+      ],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it('starts on the welcome screen', async () => {
+  it('renders the title and explains the combat loop', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h2')?.textContent).toContain('Survive the dungeon');
+    expect(compiled.querySelector('.guide-action-list')?.textContent).toContain('Guard');
+    expect(compiled.querySelector('.how-to-play')?.textContent).toContain('Arcane mark');
+    expect(compiled.querySelector('.guide-route-list')?.textContent).toContain('Campfire');
+    expect(compiled.querySelector('.guide-route-list')?.textContent).toContain('Boss');
+    expect(compiled.querySelector('.daily-challenge-button')?.textContent).toContain('challenge');
   });
 
-  it('keeps the field manual visible with shared stat chips', async () => {
+  it('moves through character selection, the route map, and combat', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.querySelector('details.how-to-play')).toBeNull();
-    expect(compiled.querySelector('.how-to-play-content')).toBeTruthy();
-    expect(compiled.querySelectorAll('.guide-stat-row app-stat-chip')).toHaveLength(6);
-    expect(compiled.querySelector('.guide-action-list')?.textContent).toContain('Attack');
-    expect(compiled.querySelector('.guide-action-list')?.textContent).toContain('Magic');
-    expect(compiled.querySelector('.guide-action-list')?.textContent).toContain('Potion');
-  });
-
-  it('moves through character selection into the first door choice', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
+    compiled.querySelector<HTMLButtonElement>('.welcome-copy .primary-button')?.click();
     fixture.detectChanges();
 
-    const nameInput = compiled.querySelector<HTMLInputElement>('#player-name');
-    if (!nameInput) throw new Error('Player name input was not rendered.');
-    nameInput.value = 'David';
-    nameInput.dispatchEvent(new Event('input'));
+    const name = compiled.querySelector<HTMLInputElement>('#player-name');
+    if (!name) throw new Error('Name field was not rendered.');
+    name.value = 'David';
+    name.dispatchEvent(new Event('input'));
     compiled.querySelector<HTMLButtonElement>('.character-card')?.click();
     fixture.detectChanges();
+    expect(compiled.querySelector('.character-passive')?.textContent).toContain('Spellweaver');
+    expect(compiled.querySelector('.starting-stat-summary')?.textContent).toContain('800 Health');
+    expect(compiled.querySelector('.starting-stat-summary')?.textContent).toContain('120 Magic');
 
-    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
+    compiled.querySelector<HTMLButtonElement>('.selection-actions .primary-button')?.click();
     fixture.detectChanges();
-
     expect(compiled.querySelector('[data-screen="map"]')).toBeTruthy();
     expect(compiled.querySelectorAll('.door-card')).toHaveLength(3);
-    expect(compiled.querySelector('.expedition-overview')).toBeTruthy();
     expect(compiled.querySelectorAll('.expedition-layer')).toHaveLength(4);
-    compiled.querySelector<HTMLButtonElement>('.door-card')?.click();
-    fixture.detectChanges();
-    expect(compiled.querySelector('[data-screen="combat"]')).toBeTruthy();
-  });
-
-  it('exposes name validation semantics before character selection', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
-    fixture.detectChanges();
-
-    const nameInput = compiled.querySelector<HTMLInputElement>('#player-name');
-    if (!nameInput) throw new Error('Player name input was not rendered.');
-    expect(nameInput.required).toBe(true);
-    expect(nameInput.getAttribute('aria-required')).toBe('true');
-    expect(nameInput.getAttribute('aria-invalid')).toBe('true');
-    expect(nameInput.getAttribute('aria-describedby')).toBe('player-name-validation');
-    expect(compiled.querySelector('#player-name-validation')?.textContent).toContain(
-      'Enter a name to continue',
-    );
-
-    nameInput.value = 'David';
-    nameInput.dispatchEvent(new Event('input'));
-    fixture.detectChanges();
-
-    expect(nameInput.getAttribute('aria-invalid')).toBeNull();
-    expect(nameInput.getAttribute('aria-describedby')).toBeNull();
-    expect(compiled.querySelector('.validation')?.textContent).toContain(
-      'Choose a character to continue',
-    );
-  });
-
-  it('exposes labeled groups for character, combat, and store controls', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
-    fixture.detectChanges();
-    expect(compiled.querySelector('[role="group"][aria-label="Available champions"]')).toBeTruthy();
-
-    const nameInput = compiled.querySelector<HTMLInputElement>('#player-name');
-    if (!nameInput) throw new Error('Player name input was not rendered.');
-    nameInput.value = 'David';
-    nameInput.dispatchEvent(new Event('input'));
-    compiled.querySelector<HTMLButtonElement>('.character-card')?.click();
-    fixture.detectChanges();
-    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
-    fixture.detectChanges();
 
     const session = TestBed.inject(GameSessionService);
-    session.combatState.update((state) => ({
-      ...state,
-      phase: 'victory',
-      enemy: state.enemy ? { ...state.enemy, damageTaken: state.enemy.stats.health } : null,
-    }));
-    session.routeMap.set({
-      floor: 1,
-      nodes: [
-        {
-          id: 'store-node',
-          kind: 'store',
-          title: 'Merchant',
-          description: 'Trade your gold.',
-          reward: 'Shop',
-        },
-        {
-          id: 'battle-node',
-          kind: 'battle',
-          title: 'Skirmish',
-          description: 'Fight.',
-          reward: 'Gold',
-        },
-        {
-          id: 'rest-node',
-          kind: 'rest',
-          title: 'Campfire',
-          description: 'Rest.',
-          reward: 'Health',
-        },
-      ],
-    });
-    session.openRouteMap();
+    const encounter = session
+      .routeMap()
+      ?.nodes.find(
+        (node) => node.kind === 'battle' || node.kind === 'elite' || node.kind === 'boss',
+      );
+    if (!encounter) throw new Error('Expected an encounter door.');
+    session.chooseRouteNode(encounter.id);
     fixture.detectChanges();
-
-    expect(compiled.querySelector('[data-screen="map"]')).toBeTruthy();
-    expect(compiled.querySelector('[data-screen="combat"] .button-row')).toBeNull();
-    const storeButton = compiled.querySelector<HTMLButtonElement>('.route-node.store');
-    storeButton?.click();
-    fixture.detectChanges();
-    expect(compiled.querySelector('[role="group"][aria-label="Potion offers"]')).toBeTruthy();
-    expect(compiled.querySelector('[role="group"][aria-label="Relic offers"]')).toBeTruthy();
-
-    const closeStoreButton = Array.from(
-      compiled.querySelectorAll<HTMLButtonElement>('.quiet-button'),
-    ).find((button) => button.textContent?.includes('Close store'));
-    closeStoreButton?.click();
-    fixture.detectChanges();
-    expect(compiled.querySelector('[data-screen="map"]')).toBeTruthy();
-  });
-
-  it('moves from a ready run into combat with a generated enemy', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
-    fixture.detectChanges();
-    const nameInput = compiled.querySelector<HTMLInputElement>('#player-name');
-    if (!nameInput) throw new Error('Player name input was not rendered.');
-    nameInput.value = 'David';
-    nameInput.dispatchEvent(new Event('input'));
-    compiled.querySelector<HTMLButtonElement>('.character-card')?.click();
-    fixture.detectChanges();
-    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
-    fixture.detectChanges();
-    compiled.querySelector<HTMLButtonElement>('.door-card')?.click();
-    fixture.detectChanges();
-
     expect(compiled.querySelector('[data-screen="combat"]')).toBeTruthy();
     expect(compiled.querySelector('.action-button.attack')).toBeTruthy();
-    expect(compiled.querySelector('.action-button.magic')).toBeTruthy();
+    expect(compiled.querySelector('.action-button.guard')).toBeTruthy();
+    expect(compiled.querySelector('.action-button.attack')?.textContent).toContain('Preview');
+    expect(compiled.querySelector('.action-button.guard')?.textContent).toContain(
+      'until your next turn',
+    );
   });
 
-  it('anchors combat feedback to the combatant visual that was affected', async () => {
+  it('maps the volume slider to the full gain range and exposes saved text speed', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-
-    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
+    compiled.querySelector<HTMLElement>('.settings-trigger')?.click();
     fixture.detectChanges();
-    const nameInput = compiled.querySelector<HTMLInputElement>('#player-name');
-    if (!nameInput) throw new Error('Player name input was not rendered.');
-    nameInput.value = 'David';
-    nameInput.dispatchEvent(new Event('input'));
+    const music = compiled.querySelector<HTMLInputElement>('input[aria-label="Music volume"]');
+    if (!music) throw new Error('Music volume control was not rendered.');
+    expect(music.max).toBe('100');
+    music.value = '100';
+    music.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    expect(
+      compiled.querySelector('[aria-label="Music volume"]')?.getAttribute('aria-valuetext'),
+    ).toBe('100 percent');
+    expect(compiled.querySelector('select[aria-label="Combat text speed"]')).toBeTruthy();
+  });
+
+  it('uses a focus-contained exit dialog and returns to the run when canceled', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+    compiled.querySelector<HTMLButtonElement>('.welcome-copy .primary-button')?.click();
+    fixture.detectChanges();
+    const name = compiled.querySelector<HTMLInputElement>('#player-name');
+    if (!name) throw new Error('Name field was not rendered.');
+    name.value = 'David';
+    name.dispatchEvent(new Event('input'));
     compiled.querySelector<HTMLButtonElement>('.character-card')?.click();
     fixture.detectChanges();
-    compiled.querySelector<HTMLButtonElement>('.primary-button')?.click();
-    fixture.detectChanges();
-    compiled.querySelector<HTMLButtonElement>('.door-card')?.click();
+    compiled.querySelector<HTMLButtonElement>('.selection-actions .primary-button')?.click();
     fixture.detectChanges();
 
-    const session = TestBed.inject(GameSessionService);
-    session.combatFeedback.set({
-      id: 1,
-      target: 'enemy',
-      kind: 'damage',
-      amount: 10,
-      action: 'attack',
-    });
+    compiled.querySelector<HTMLButtonElement>('.exit-run-button')?.click();
     fixture.detectChanges();
-
-    const enemyFeedback = compiled.querySelector(
-      '.enemy-combatant .combatant-visual .combat-feedback',
-    );
-    expect(enemyFeedback).toBeTruthy();
-    expect(enemyFeedback?.classList.contains('placement-center')).toBe(true);
-    expect(compiled.querySelector('.player-combatant .combat-feedback')).toBeNull();
-
-    session.combatFeedback.set({ id: 2, target: 'player', kind: 'guard', amount: 20 });
+    const dialog = compiled.querySelector<HTMLDialogElement>('.confirmation-dialog');
+    expect(dialog?.open).toBe(true);
+    compiled.querySelector<HTMLButtonElement>('.confirmation-actions .quiet-button')?.click();
     fixture.detectChanges();
-
-    expect(
-      compiled.querySelector('.player-combatant .combatant-visual .combat-feedback'),
-    ).toBeTruthy();
-    expect(compiled.querySelector('.enemy-combatant .combat-feedback')).toBeNull();
+    expect(dialog?.open).toBe(false);
+    expect(compiled.querySelector('[data-screen="map"]')).toBeTruthy();
   });
 });

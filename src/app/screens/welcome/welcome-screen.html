@@ -1,0 +1,217 @@
+<section class="panel welcome" data-screen="welcome" aria-labelledby="welcome-title">
+  <div class="welcome-layout">
+    <div class="welcome-copy">
+      <p class="eyebrow">A new run begins here · floor 01</p>
+      <h2 id="welcome-title" data-screen-heading tabindex="-1">Survive the dungeon.</h2>
+      <p class="lead">
+        The dark is full of teeth. Choose a champion, take the first step, and leave your mark
+        in the stone.
+      </p>
+      <button
+        class="primary-button"
+        type="button"
+        (click)="session.beginCharacterSelection()"
+      >
+        Enter the dungeon <svg lucideArrowRight size="16" aria-hidden="true"></svg>
+      </button>
+      <button class="quiet-button daily-challenge-button" type="button" (click)="session.beginCharacterSelection(true)">
+        Play today’s challenge
+      </button>
+      <p class="button-note">No save slots. Every run writes its own legend.</p>
+    </div>
+
+    <div class="welcome-visual" aria-hidden="true">
+      <div class="dungeon-gate">
+        <svg class="gate-rune rune-top" lucideSparkles size="18" aria-hidden="true"></svg>
+        <svg class="gate-rune rune-left" lucideSparkles size="12" aria-hidden="true"></svg>
+        <svg class="gate-rune rune-right" lucideSparkles size="12" aria-hidden="true"></svg>
+        <div class="hero-characters">
+          @for (character of session.characters; track character.id; let index = $index) {
+            <img
+              class="hero-character"
+              [class.hero-character-back]="index !== 1"
+              [class.hero-character-front]="index === 1"
+              [src]="character.idleAsset"
+              alt=""
+            />
+          }
+        </div>
+        <div class="gate-floor"></div>
+      </div>
+      <p class="visual-caption"><span></span> The depths are waiting <span></span></p>
+    </div>
+  </div>
+
+  <div class="welcome-tools">
+    <section class="records-panel how-to-play" aria-labelledby="how-to-play-title">
+      <div class="how-to-play-heading">
+        <h3 id="how-to-play-title">
+          <svg lucideCircleHelp size="16" aria-hidden="true"></svg> How to play
+        </h3>
+        <span class="guide-tag">Field manual</span>
+      </div>
+      <div class="how-to-play-content">
+        <p class="how-to-play-intro">
+          Choose a champion, read the enemy, and make each turn count. Your run ends when your
+          <app-stat-chip stat="health" [value]="0" [showLabel]="false" /> reaches zero.
+        </p>
+
+        <div class="guide-sections">
+          <section class="guide-block" aria-labelledby="guide-actions-title">
+            <h4 id="guide-actions-title">
+              <svg lucideFootprints size="15" aria-hidden="true"></svg> Make your move
+            </h4>
+            <p>When it is your turn, choose the tool that matches the enemy’s weakness.</p>
+            <div class="guide-action-list">
+              <div class="guide-action physical">
+                <svg lucideSword size="16" aria-hidden="true"></svg>
+                <span
+                  ><strong>Attack</strong> deals physical damage, checked against Armor.</span
+                >
+              </div>
+              <div class="guide-action arcane">
+                <svg lucideWandSparkles size="16" aria-hidden="true"></svg>
+                <span
+                  ><strong>Magic</strong> deals magic damage, checked against Magic
+                  resist.</span
+                >
+              </div>
+              <div class="guide-action recovery">
+                <svg lucideHeartPulse size="16" aria-hidden="true"></svg>
+                <span
+                  ><strong>Potion</strong> restores health, but gives the enemy the next
+                  turn.</span
+                >
+              </div>
+              <div class="guide-action physical">
+                <svg lucideShield size="16" aria-hidden="true"></svg>
+                <span><strong>Guard</strong> gains temporary Block, which absorbs incoming damage until your next turn.</span>
+              </div>
+            </div>
+            <p>Enemy intents preview the next action and show damage per hit. Block absorbs each hit until your next turn. A Magic hit applies an Arcane mark, making your next Attack deal 25% more damage. Venom damages an enemy at the start of its turn.</p>
+          </section>
+
+          <section class="guide-block" aria-labelledby="guide-routes-title">
+            <h4 id="guide-routes-title">
+              <svg lucideMap size="15" aria-hidden="true"></svg> Choose a route
+            </h4>
+            <div class="guide-route-list">
+              <p><strong>Skirmish</strong> · A standard fight for experience and gold.</p>
+              <p><strong>Elite</strong> · A tougher fight with a better reward.</p>
+              <p><strong>Merchant</strong> · Buy potions and passive relics.</p>
+              <p><strong>Campfire</strong> · Recover some Health before moving on.</p>
+              <p><strong>Boss</strong> · Face a guardian at rooms 10, 20, and 30.</p>
+            </div>
+          </section>
+
+          <section class="guide-block" aria-labelledby="guide-stats-title">
+            <h4 id="guide-stats-title">
+              <svg lucideShield size="15" aria-hidden="true"></svg> Read the battlefield
+            </h4>
+            <p>Every icon has a job. The same colors and symbols follow you into combat.</p>
+            <div class="guide-stat-list">
+              <div class="guide-stat-row">
+                <app-stat-chip stat="health" [value]="800" [showLabel]="false" />
+                <span
+                  ><strong>Health</strong> is your life total. Reach zero and the run is
+                  over.</span
+                >
+              </div>
+              <div class="guide-stat-row">
+                <app-stat-chip stat="ad" [value]="64" [showLabel]="false" />
+                <span><strong>Attack</strong> powers physical strikes.</span>
+              </div>
+              <div class="guide-stat-row">
+                <app-stat-chip stat="ap" [value]="80" [showLabel]="false" />
+                <span><strong>Magic</strong> powers arcane strikes.</span>
+              </div>
+              <div class="guide-stat-row">
+                <app-stat-chip stat="armor" [value]="48" [showLabel]="false" />
+                <span><strong>Armor</strong> reduces physical damage received.</span>
+              </div>
+              <div class="guide-stat-row">
+                <app-stat-chip stat="mr" [value]="48" [showLabel]="false" />
+                <span><strong>Magic resist</strong> reduces magic damage received.</span>
+              </div>
+              <div class="guide-stat-row">
+                <app-stat-chip stat="speed" [value]="16" [showLabel]="false" />
+                <span><strong>Speed</strong> decides who opens the encounter.</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="guide-block guide-run" aria-labelledby="guide-run-title">
+            <h4 id="guide-run-title">
+              <svg lucideSparkles size="15" aria-hidden="true"></svg> Build the run
+            </h4>
+            <ol class="guide-step-list">
+              <li>
+                <strong>Find an enemy.</strong> Compare speed, then trade turns until someone
+                falls.
+              </li>
+              <li>
+                <strong>Claim the victory.</strong> Earn experience and gold; level-ups
+                improve your stats.
+              </li>
+              <li>
+                <strong>Choose your power-up.</strong> Pending upgrades must be selected
+                before the next encounter.
+              </li>
+              <li>
+                <strong>Spend with intent.</strong> The store sells repeatable potions and
+                one-time equipment.
+              </li>
+            </ol>
+            <p class="guide-tip">
+              <svg lucideTrophy size="14" aria-hidden="true"></svg>
+              Survive deeper floors, defeat the guardians at milestone rooms, and leave a
+              record on the wall.
+            </p>
+          </section>
+        </div>
+      </div>
+    </section>
+    <section class="records-panel" aria-labelledby="records-title">
+      <div class="records-heading">
+        <h3 id="records-title">
+          <svg lucideTrophy size="16" aria-hidden="true"></svg> Personal records
+        </h3>
+        @if (session.personalRecords().length) {
+          <button class="quiet-button" type="button" (click)="session.clearPersonalRecords()">
+            Clear records
+          </button>
+        }
+      </div>
+      @if (session.personalRecords().length) {
+        <ol class="records-list">
+          @for (record of session.personalRecords(); track $index) {
+            <li [class]="'record-row ' + recordCharacter(record).accent">
+              <span>{{ record.name }} · {{ recordCharacter(record).name }}</span>
+              <strong>{{ record.victory ? 'Won' : record.rooms + ' rooms' }} · Lv {{ record.level }}</strong>
+            </li>
+          }
+        </ol>
+      } @else {
+        <p class="empty-records">No records yet. Be the first name on the wall.</p>
+      }
+    </section>
+    <section class="records-panel" aria-labelledby="daily-records-title">
+      <div class="records-heading"><h3 id="daily-records-title">Daily challenge records</h3></div>
+      @if (session.dailyRecords().length) {
+        <ol class="records-list">
+          @for (record of session.dailyRecords(); track $index) {
+            <li [class]="'record-row ' + recordCharacter(record).accent">
+              <span>{{ record.name }} · {{ recordCharacter(record).name }} · {{ record.date }}</span>
+              <strong>{{ record.victory ? 'Won' : record.rooms + ' rooms' }} · Lv {{ record.level }}</strong>
+            </li>
+          }
+        </ol>
+      } @else {
+        <p class="empty-records">Daily challenge runs have their own record list.</p>
+      }
+    </section>
+  </div>
+  <p class="prototype-note">
+    Angular first playable · combat, progression, store and audio are active
+  </p>
+</section>

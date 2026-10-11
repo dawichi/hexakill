@@ -1,0 +1,59 @@
+.entity-sprite {
+  display: block;
+  width: 5rem;
+  height: 5rem;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.combatant-visual.hit-reaction {
+  animation: combat-hit-reaction 360ms steps(2, end);
+}
+
+@keyframes combat-hit-reaction {
+  0%,
+  100% {
+    filter: none;
+    transform: translateX(0);
+  }
+
+  18% {
+    filter: brightness(2) saturate(0.55);
+    transform: translateX(-0.18rem);
+  }
+
+  42% {
+    filter: brightness(1.45) saturate(0.75);
+    transform: translateX(0.16rem);
+  }
+
+  68% {
+    filter: brightness(1.2);
+    transform: translateX(-0.08rem);
+  }
+}
+
+@keyframes combat-action-lunge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  45% {
+    transform: translateX(0.22rem) scale(1.04);
+  }
+}
+
+@keyframes combat-defeat-fade {
+  from {
+    filter: none;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    filter: grayscale(0.85);
+    opacity: 0.4;
+    transform: translateY(0.35rem);
+  }
+}

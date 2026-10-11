@@ -1,0 +1,73 @@
+@if (session.player(); as player) {
+@if (session.combatStatus() === 'defeated') {
+          @if (session.combatState().phase === 'victory') {
+            @if (session.player(); as rewardedPlayer) {
+              @if (rewardedPlayer.powerUps.pending > 0) {
+                <div class="power-up-panel" role="group" aria-labelledby="power-up-title">
+                  <p class="eyebrow">Choose an upgrade</p>
+                  <h3 id="power-up-title" data-focus-target="power-up" tabindex="-1">
+                    Power-up available
+                  </h3>
+                  <div class="power-up-grid">
+                    <button
+                      type="button"
+                      class="action-button"
+                      (click)="session.choosePowerUp('health')"
+                    >
+                      <svg lucideHeartPulse size="16" aria-hidden="true"></svg> Health
+                      <span>+{{ powerUpValue(rewardedPlayer, 'health') }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="action-button"
+                      (click)="session.choosePowerUp('ad')"
+                    >
+                      <svg lucideSword size="16" aria-hidden="true"></svg> Attack
+                      <span>+{{ powerUpValue(rewardedPlayer, 'ad') }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="action-button"
+                      (click)="session.choosePowerUp('ap')"
+                    >
+                      <svg lucideWandSparkles size="16" aria-hidden="true"></svg> Magic
+                      <span>+{{ powerUpValue(rewardedPlayer, 'ap') }}</span>
+                    </button>
+                    <button
+                      type="button"
+                      class="action-button"
+                      (click)="session.choosePowerUp('speed')"
+                    >
+                      <svg lucideFootprints size="16" aria-hidden="true"></svg> Speed
+                      <span>+10</span>
+                    </button>
+                    <button type="button" class="action-button" (click)="session.choosePowerUp('armor')">
+                      <svg lucideShield size="16" aria-hidden="true"></svg> Armor
+                      <span>+{{ powerUpValue(rewardedPlayer, 'armor') }}</span>
+                    </button>
+                    <button type="button" class="action-button" (click)="session.choosePowerUp('mr')">
+                      <svg lucideSparkles size="16" aria-hidden="true"></svg> Magic resist
+                      <span>+{{ powerUpValue(rewardedPlayer, 'mr') }}</span>
+                    </button>
+                  </div>
+                  <p class="health-label">Pending: {{ rewardedPlayer.powerUps.pending }}</p>
+                </div>
+}
+            }
+            <button
+              class="primary-button"
+              data-focus-target="route-map"
+              type="button"
+              [disabled]="player.powerUps.pending > 0"
+              (click)="session.openRouteMap()"
+            >
+              View route map <svg lucideMap size="16" aria-hidden="true"></svg>
+            </button>
+          } @else {
+            <p class="validation" role="alert">You have been defeated.</p>
+            <button class="primary-button" type="button" (click)="session.reset()">
+              Start a new run
+            </button>
+          }
+        }
+}

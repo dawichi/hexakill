@@ -2,85 +2,63 @@ import {
   afterRenderEffect,
   Component,
   DOCUMENT,
-  effect,
+  ElementRef,
+  HostListener,
   inject,
-  OnDestroy,
   signal,
+  ViewEncapsulation,
+  viewChild,
 } from '@angular/core';
-import {
-  LucideArrowRight,
-  LucideCheck,
-  LucideCircleHelp,
-  LucideDoorOpen,
-  LucideFootprints,
-  LucideHeartPulse,
-  LucideLogOut,
-  LucideMap,
-  LucideMapPin,
-  LucideScrollText,
-  LucideShield,
-  LucideSparkles,
-  LucideStore,
-  LucideSword,
-  LucideSwords,
-  LucideTentTree,
-  LucideTriangleAlert,
-  LucideTrophy,
-  LucideVolume2,
-  LucideWandSparkles,
-} from '@lucide/angular';
-import { CombatFeedback, GameSessionService } from './application/game-session.service';
-import { RelicIconComponent } from './components/relic-icon/relic-icon';
-import { StatChipComponent } from './components/stat-chip/stat-chip';
-import { EnemyIntent } from './domain/combat-state';
-import { CharacterDefinition, ItemState, SpriteStripAsset, Stat, Stats } from './domain/game-types';
-import { PersonalRecord } from './domain/records';
-import { RouteNode, RouteNodeKind } from './domain/route-map';
+import { LucideDoorOpen, LucideLogOut, LucideTriangleAlert, LucideVolume2 } from '@lucide/angular';
+import { GameSessionService } from './application/game-session.service';
+import { TextSpeed } from './domain/preferences';
+import { CharacterSelectScreen } from './screens/character-select/character-select-screen';
+import { CombatScreen } from './screens/combat/combat-screen';
+import { GameOverScreen } from './screens/game-over/game-over-screen';
+import { RouteMapScreen } from './screens/route-map/route-map-screen';
+import { RunCompleteScreen } from './screens/run-complete/run-complete-screen';
+import { StoreScreen } from './screens/store/store-screen';
+import { WelcomeScreen } from './screens/welcome/welcome-screen';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [
-    LucideArrowRight,
-    LucideCheck,
-    LucideCircleHelp,
     LucideDoorOpen,
-    LucideFootprints,
-    LucideHeartPulse,
     LucideLogOut,
-    LucideMap,
-    LucideMapPin,
-    LucideScrollText,
-    LucideShield,
-    LucideSparkles,
-    LucideStore,
-    LucideSword,
-    LucideSwords,
-    LucideTentTree,
-    LucideTrophy,
     LucideTriangleAlert,
     LucideVolume2,
-    LucideWandSparkles,
-    StatChipComponent,
-    RelicIconComponent,
+    CharacterSelectScreen,
+    CombatScreen,
+    GameOverScreen,
+    RouteMapScreen,
+    RunCompleteScreen,
+    StoreScreen,
+    WelcomeScreen,
   ],
   templateUrl: './app.html',
-  styleUrl: './app.css',
+  encapsulation: ViewEncapsulation.None,
 })
-export class App implements OnDestroy {
+export class App {
   protected readonly session = inject(GameSessionService);
   private readonly document = inject(DOCUMENT);
-  protected readonly statKeys: readonly Stat[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed'];
-  protected readonly displayedCombatMessage = signal('');
-  protected readonly combatMessageTyping = signal(false);
+  private readonly exitDialog = viewChild<ElementRef<HTMLDialogElement>>('exitDialog');
   protected readonly exitConfirmationOpen = signal(false);
-  private typewriterTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
-    effect(() => {
-      this.animateCombatMessage(this.session.combatMessage());
-    });
-
     afterRenderEffect(() => {
+      const dialog = this.exitDialog()?.nativeElement;
+      if (this.exitConfirmationOpen()) {
+        if (dialog && !dialog.open) {
+          if (typeof dialog.showModal === 'function') dialog.showModal();
+          else dialog.setAttribute('open', '');
+        }
+        return;
+      }
+      if (dialog?.open) {
+        if (typeof dialog.close === 'function') dialog.close();
+        else dialog.removeAttribute('open');
+      }
       const screen = this.session.screen();
       const pendingPowerUps = this.session.player()?.powerUps.pending ?? 0;
       const selector =
@@ -94,52 +72,6 @@ export class App implements OnDestroy {
         this.document.querySelector<HTMLElement>(`[data-screen="${screen}"] [data-screen-heading]`);
       if (target && this.document.activeElement !== target) target.focus();
     });
-  }
-
-  ngOnDestroy(): void {
-    this.stopCombatMessageAnimation();
-  }
-
-  private animateCombatMessage(message: string): void {
-    this.stopCombatMessageAnimation();
-
-    if (!message) {
-      this.displayedCombatMessage.set('');
-      return;
-    }
-
-    const view = this.document.defaultView;
-    const prefersReducedMotion =
-      typeof view?.matchMedia === 'function' &&
-      view.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
-      this.displayedCombatMessage.set(message);
-      return;
-    }
-
-    this.displayedCombatMessage.set('');
-    this.combatMessageTyping.set(true);
-    let characterIndex = 0;
-    this.typewriterTimer = setInterval(() => {
-      characterIndex += 1;
-      this.displayedCombatMessage.set(message.slice(0, characterIndex));
-      if (characterIndex >= message.length) {
-        this.stopCombatMessageAnimation();
-      }
-    }, 22);
-  }
-
-  private stopCombatMessageAnimation(): void {
-    if (this.typewriterTimer) {
-      clearInterval(this.typewriterTimer);
-      this.typewriterTimer = null;
-    }
-    this.combatMessageTyping.set(false);
-  }
-
-  protected onNameInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.session.setPlayerName(input.value);
   }
 
   protected requestExitRun(): void {
@@ -156,58 +88,6 @@ export class App implements OnDestroy {
     this.session.reset();
   }
 
-  protected nameValidationMessage(): string {
-    const name = this.session.playerName().trim();
-
-    if (!name) return 'Enter a name to continue.';
-    if (name.length < 3 || name.length > 14) {
-      return 'Name must contain between 3 and 14 characters.';
-    }
-
-    return '';
-  }
-
-  protected nameValidationMessageId(): string | null {
-    return this.nameValidationMessage() ? 'player-name-validation' : null;
-  }
-
-  protected feedbackClass(feedback: CombatFeedback): string {
-    return `${feedback.target} ${feedback.kind} ${feedback.action ?? ''}`;
-  }
-
-  protected feedbackPlacementClass(feedback: CombatFeedback): string {
-    const placements = ['placement-left', 'placement-center', 'placement-right'] as const;
-    return placements[feedback.id % placements.length] ?? 'placement-center';
-  }
-
-  protected feedbackText(feedback: CombatFeedback): string {
-    switch (feedback.kind) {
-      case 'damage':
-        return `-${feedback.amount ?? 0}`;
-      case 'critical':
-        return `CRIT! -${feedback.amount ?? 0}`;
-      case 'miss':
-        return 'MISS';
-      case 'blocked':
-        return `BLOCKED ${feedback.amount ?? 0}`;
-      case 'heal':
-        return `+${feedback.amount ?? 0}`;
-      case 'guard':
-        return `GUARD +${feedback.amount ?? 0}`;
-      case 'hex':
-        return 'HEXED';
-    }
-  }
-
-  protected intentValue(intent: EnemyIntent): string {
-    if (intent.minValue === intent.maxValue) return `${intent.maxValue}`;
-    return `${intent.minValue}–${intent.maxValue}`;
-  }
-
-  protected selectCharacter(character: CharacterDefinition): void {
-    this.session.selectCharacter(character);
-  }
-
   protected setMusicVolume(event: Event): void {
     this.session.setMusicVolume(Number((event.target as HTMLInputElement).value));
   }
@@ -217,83 +97,49 @@ export class App implements OnDestroy {
   }
 
   protected volumeLabel(volume: number): string {
-    return `${Math.round(volume * 100)} percent`;
+    return `${Math.round(volume)} percent`;
   }
 
-  protected recordCharacter(record: PersonalRecord): CharacterDefinition {
-    const firstCharacter = this.session.characters[0];
-    if (!firstCharacter) throw new Error('At least one character must be configured.');
-    return (
-      this.session.characters.find((character) => character.id === record.characterId) ??
-      firstCharacter
-    );
+  protected setTextSpeed(event: Event): void {
+    this.session.setTextSpeed((event.target as HTMLSelectElement).value as TextSpeed);
   }
 
-  protected itemDescription(item: ItemState): string {
-    return item.description;
-  }
-
-  protected spriteBackgroundSize(asset: SpriteStripAsset): string {
-    return asset.orientation === 'vertical'
-      ? `100% ${asset.frameCount * 100}%`
-      : `${asset.frameCount * 100}% 100%`;
-  }
-
-  protected spriteAnimation(asset: SpriteStripAsset, duration: number): string {
-    const animationName =
-      asset.orientation === 'vertical' ? 'sprite-strip-play-vertical' : 'sprite-strip-play';
-    return `${animationName} ${duration}ms steps(${asset.frameCount}) 1 both`;
-  }
-
-  protected combatStatValue(stats: Stats, stat: Stat, currentHealth?: number): number {
-    return stat === 'health' && currentHealth !== undefined ? currentHealth : stats[stat];
-  }
-
-  protected healthTone(current: number, maximum: number): 'healthy' | 'wounded' | 'critical' {
-    const ratio = maximum > 0 ? current / maximum : 0;
-    if (ratio > 0.6) return 'healthy';
-    if (ratio > 0.3) return 'wounded';
-    return 'critical';
-  }
-
-  protected statHighlights(character: CharacterDefinition): ReadonlyArray<{
-    stat: Stat;
-    value: number;
-  }> {
-    return (['health', 'ad', 'ap', 'armor', 'mr', 'speed'] as Stat[])
-      .map((stat) => ({ stat, value: character.modifiers[stat] }))
-      .filter(({ value }) => value !== 1)
-      .sort((left, right) => Math.abs(right.value - 1) - Math.abs(left.value - 1))
-      .slice(0, 3);
-  }
-
-  protected routeKindLabel(kind: RouteNodeKind): string {
-    return kind === 'battle'
-      ? 'Skirmish'
-      : kind === 'elite'
-        ? 'Elite'
-        : kind === 'store'
-          ? 'Merchant'
-          : kind === 'rest'
-            ? 'Campfire'
-            : 'Boss';
-  }
-
-  protected routeForecast(node: RouteNode): string {
-    const kinds = [...new Set(node.nextKinds ?? [])];
-    if (!kinds.length)
-      return node.kind === 'boss' ? 'The run ends beyond this fight' : 'The way ahead is obscured';
-    if (kinds.length === 1) return `Next: ${this.routeKindLabel(kinds[0]!)}`;
-    return `Ahead: ${kinds.map((kind) => this.routeKindLabel(kind)).join(' · ')}`;
-  }
-
-  protected routeRiskLabel(node: RouteNode): string {
-    return node.risk === 'safe'
-      ? 'Low risk'
-      : node.risk === 'dangerous'
-        ? 'High risk'
-        : node.risk === 'milestone'
-          ? 'Milestone'
-          : 'Steady risk';
+  @HostListener('document:keydown', ['$event'])
+  protected handleKeyboardShortcuts(event: KeyboardEvent): void {
+    if (event.repeat || event.altKey || event.ctrlKey || event.metaKey) return;
+    const target = event.target;
+    if (
+      target instanceof HTMLElement &&
+      target.closest('input, select, textarea, [contenteditable="true"]')
+    )
+      return;
+    if (event.key.toLowerCase() === 'm') {
+      this.session.toggleMuted();
+      return;
+    }
+    if (this.session.isPresenting() && (event.key === ' ' || event.key === 'Enter')) {
+      if (target instanceof HTMLElement && target.closest('button, a')) return;
+      event.preventDefault();
+      this.session.skipPresentation();
+      return;
+    }
+    if (!this.session.canAct()) return;
+    switch (event.key) {
+      case '1':
+        this.session.attack('attack');
+        break;
+      case '2':
+        this.session.attack('magic');
+        break;
+      case '3':
+        this.session.guard();
+        break;
+      case '4':
+        this.session.usePotion();
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
   }
 }

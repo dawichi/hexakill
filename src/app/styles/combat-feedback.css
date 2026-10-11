@@ -1,0 +1,92 @@
+.combat-feedback {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: calc(100% - 0.5rem);
+  pointer-events: none;
+  white-space: nowrap;
+  --feedback-offset-x: -50%;
+  animation: combat-feedback-pop 850ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(0.7rem, 1.5vw, 0.95rem);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 0 #101013;
+}
+
+.combat-feedback.placement-left {
+  left: 22%;
+}
+
+.combat-feedback.placement-center {
+  left: 50%;
+}
+
+.combat-feedback.placement-right {
+  left: 78%;
+}
+
+.combat-feedback.damage,
+.combat-feedback.attack {
+  color: #ef817a;
+}
+
+.combat-feedback.magic {
+  color: #67c8db;
+}
+
+.combat-feedback.critical {
+  color: #fbbf24;
+  font-size: clamp(0.78rem, 1.7vw, 1.05rem);
+}
+
+.combat-feedback.miss {
+  color: #aaa0a0;
+}
+
+.combat-feedback.blocked,
+.combat-feedback.guard {
+  color: #a6b9c2;
+}
+
+.combat-feedback.heal {
+  color: #8ecf91;
+}
+
+@keyframes combat-feedback-pop {
+  0% {
+    opacity: 0;
+    transform: translateX(var(--feedback-offset-x)) translateY(0.45rem) scale(0.8);
+  }
+
+  18% {
+    opacity: 1;
+    transform: translateX(var(--feedback-offset-x)) translateY(0) scale(1.05);
+  }
+
+  72% {
+    opacity: 1;
+    transform: translateX(var(--feedback-offset-x)) translateY(-0.35rem) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(var(--feedback-offset-x)) translateY(-0.8rem) scale(0.96);
+  }
+}
+
+@media (max-width: 700px) {
+  .combat-feedback.enemy {
+    top: 31%;
+    right: 12%;
+  }
+
+  .combat-feedback.player {
+    bottom: 25%;
+    left: 12%;
+  }
+}

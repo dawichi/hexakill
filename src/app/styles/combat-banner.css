@@ -1,0 +1,108 @@
+.battle-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 4.5rem;
+  margin: 1.25rem 0;
+  border: 1px solid rgb(103 200 219 / 45%);
+  border-left-width: 1px;
+  background: linear-gradient(90deg, rgb(20 57 64 / 72%), rgb(18 23 25 / 85%));
+  padding: 0.85rem 1rem;
+}
+
+.battle-banner.enemy-turn {
+  border-color: rgb(229 170 89 / 45%);
+  background: linear-gradient(90deg, rgb(74 52 28 / 72%), rgb(25 22 19 / 85%));
+}
+
+.battle-banner.victory {
+  border-color: rgb(85 194 113 / 52%);
+  background: linear-gradient(90deg, rgb(27 70 42 / 72%), rgb(18 24 20 / 85%));
+}
+
+.battle-banner-icon {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: #67c8db;
+}
+
+.battle-banner.enemy-turn .battle-banner-icon {
+  color: #e5aa59;
+}
+
+.battle-banner.victory .battle-banner-icon {
+  color: #55c271;
+}
+
+.battle-banner-text {
+  flex: 1;
+  margin-top: 0.28rem;
+  color: var(--ink);
+  font-family: Georgia, serif;
+  font-size: clamp(0.95rem, 2vw, 1.12rem);
+  line-height: 1.35;
+}
+
+.battle-banner-text.typing::after {
+  content: '▌';
+  display: inline-block;
+  margin-left: 0.12rem;
+  color: currentColor;
+  animation: typewriter-caret 700ms steps(1, end) infinite;
+}
+
+@keyframes typewriter-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.combat-message {
+  min-height: 1.5rem;
+  margin: 1.5rem 0 1rem;
+  color: #cffafe;
+}
+
+.combat-screen-panel > .battle-banner {
+  grid-area: callout;
+  min-height: 3.2rem;
+  margin: 0;
+  padding: 0.5rem 0.65rem;
+}
+
+.combat-screen-panel > .battle-banner .battle-banner-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.combat-screen-panel > .battle-banner .battle-banner-text {
+  margin-top: 0.1rem;
+  font-size: clamp(0.78rem, 1.5vw, 0.95rem);
+}
+@media (max-width: 700px) {
+  .combat-screen-panel > .battle-banner {
+    grid-area: callout;
+    min-height: 2.4rem;
+    margin: 0;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .combat-screen-panel > .battle-banner .battle-banner-icon {
+    width: 1.55rem;
+    height: 1.55rem;
+  }
+
+  .combat-screen-panel > .battle-banner .battle-banner-icon svg {
+    width: 15px;
+  }
+
+  .combat-screen-panel > .battle-banner .battle-banner-text {
+    margin-top: 0;
+    font-size: 0.68rem;
+  }
+}

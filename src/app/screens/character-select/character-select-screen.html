@@ -1,0 +1,125 @@
+<section
+  class="panel character-select-panel"
+  data-screen="character-select"
+  aria-labelledby="select-title"
+>
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">The first chamber · choose wisely</p>
+      <h2 id="select-title" data-screen-heading tabindex="-1">Choose your champion</h2>
+      <p class="section-lead">
+        @if (session.dailyRequested()) { Today’s daily challenge · {{ session.dailyLabel() || 'UTC challenge' }}. }
+        Every legend starts with a single name and a loaded blade.
+      </p>
+    </div>
+  </div>
+
+  <div class="name-altar">
+    <div class="altar-mark" aria-hidden="true"><svg lucideScrollText size="22"></svg></div>
+    <div>
+      <label class="field-label" for="player-name">Inscription</label>
+      <p class="field-help">What shall the dungeon remember?</p>
+    </div>
+    <input
+      id="player-name"
+      class="name-input"
+      type="text"
+      aria-label="Player name"
+      required
+      aria-required="true"
+      maxlength="14"
+      autocomplete="nickname"
+      placeholder="Enter your name · 3–14 characters"
+      [attr.aria-invalid]="nameValidationMessage() ? 'true' : null"
+      [attr.aria-describedby]="nameValidationMessageId()"
+      [value]="session.playerName()"
+      (input)="onNameInput($event)"
+    />
+  </div>
+
+  <div class="character-grid" role="group" aria-label="Available champions">
+    @for (character of session.characters; track character.id) {
+      <button
+        class="character-card"
+        [class.selected]="session.selectedCharacter()?.id === character.id"
+        [class.blue]="character.accent === 'blue'"
+        [class.red]="character.accent === 'red'"
+        [class.amber]="character.accent === 'amber'"
+        type="button"
+        [attr.aria-pressed]="session.selectedCharacter()?.id === character.id"
+        (click)="selectCharacter(character)"
+      >
+        <span class="character-card-header">
+          <span class="character-index">0{{ $index + 1 }}</span>
+          @if (character.id === 'wizard') {
+            <svg lucideWandSparkles size="18" aria-hidden="true"></svg>
+          } @else if (character.id === 'samurai') {
+            <svg lucideSwords size="18" aria-hidden="true"></svg>
+          } @else {
+            <svg lucideShield size="18" aria-hidden="true"></svg>
+          }
+          @if (session.selectedCharacter()?.id === character.id) {
+            <span class="selected-mark"
+              ><svg lucideCheck size="14" aria-hidden="true"></svg> Selected</span
+            >
+          }
+        </span>
+        <span class="character-art-frame">
+          <img class="character-art" [src]="character.idleAsset" alt="" aria-hidden="true" />
+          <span class="art-ground"></span>
+        </span>
+        <span class="character-card-copy">
+          <span class="character-name">{{ character.name }}</span>
+          <span class="character-role">{{ character.description }}</span>
+          <small class="character-passive"><strong>{{ character.passive.name }}</strong> · {{ character.passive.description }}</small>
+          <span class="starting-stat-summary">
+            Starts with {{ character.startingStats.health }} Health · {{ character.startingStats.ad }} Attack ·
+            {{ character.startingStats.ap }} Magic · {{ character.startingStats.armor }} Armor ·
+            {{ character.startingStats.mr }} Magic resist · {{ character.startingStats.speed }} Speed
+          </span>
+          <span class="stat-highlights" aria-label="Character stat modifiers">
+            @for (highlight of statHighlights(character); track highlight.stat) {
+              <app-stat-chip
+                [stat]="highlight.stat"
+                [value]="highlight.value"
+                format="modifier"
+              />
+            }
+          </span>
+        </span>
+      </button>
+    }
+  </div>
+
+  <div class="selection-footer">
+    <div>
+      @if (session.validationMessage(); as validationMessage) {
+        <p
+          class="validation"
+          [id]="nameValidationMessageId()"
+          role="status"
+          aria-atomic="true"
+        >
+          {{ validationMessage }}
+        </p>
+      } @else {
+        <p class="selection-hint">
+          <svg lucideSwords size="16" aria-hidden="true"></svg> Select a champion to continue
+        </p>
+      }
+    </div>
+    <div class="selection-actions">
+      <button class="quiet-button" type="button" (click)="session.reset()">
+        Return to title
+      </button>
+      <button
+        class="primary-button"
+        type="button"
+        [disabled]="!session.canStartRun()"
+        (click)="session.startRun()"
+      >
+        Start run <svg lucideArrowRight size="16" aria-hidden="true"></svg>
+      </button>
+    </div>
+  </div>
+</section>

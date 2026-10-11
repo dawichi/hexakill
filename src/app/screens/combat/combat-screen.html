@@ -1,0 +1,31 @@
+@if (session.player(); as player) {
+  @if (session.enemy(); as enemy) {
+    <section class="panel combat-screen-panel" data-screen="combat" aria-label="Combat">
+      <div class="combat-grid">
+        <app-player-combatant />
+
+        <div class="versus" aria-hidden="true"><span>VS</span><small>encounter</small></div>
+
+        <app-enemy-combatant />
+
+      </div>
+
+      <app-battle-banner />
+      @if (session.isPresenting()) {
+        <button class="quiet-button skip-presentation" type="button" (click)="session.skipPresentation()">
+          Skip animation <span aria-hidden="true">· Space</span>
+        </button>
+      }
+
+      <div class="combat-dock">
+        <app-combat-inventory />
+
+        @if (session.combatStatus() === 'ready') {
+          <app-action-bar />
+        }
+
+        <app-power-up-picker />
+      </div>
+    </section>
+  }
+}

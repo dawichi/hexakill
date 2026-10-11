@@ -2,19 +2,19 @@
 
 ## Status
 
-Accepted — 2026-08-30
+Accepted — fixed room milestones remain active; boss identities and levels are superseded by [ADR-0007](0007-distinct-milestone-bosses.md) — 2026-10-11
 
 ## Decision
 
-Each run contains 30 rooms. Gold Slime bosses appear at fixed milestones:
+Each run contains 30 rooms. A guardian appears at each fixed milestone:
 
-- Room 10: Gold Slime 1
-- Room 20: Gold Slime 2
-- Room 30: Gold Slime 3 and run completion
+- Room 10: Fire Knight
+- Room 20: Water Priestess
+- Room 30: Bringer of Death and run completion
 
-The provisional boss levels are 8, 12, and 16 in that order. Boss stats use a moderated linear
-multiplier curve, giving the fixed encounters an escalating but room-appropriate difficulty curve.
-Regular rooms never invoke the boss schedule, even when the player reaches level 10 or higher.
+The current boss levels are 9, 16, and 22 in that order. These values are balance inputs, not a
+compatibility promise. Regular rooms never invoke the boss schedule, even when the player reaches
+level 10 or higher.
 
 Milestone rooms show one visible boss door instead of the normal three route choices. Defeating
 the room-30 boss enters the `run-complete` screen and the run-progress indicator reaches 30 of 30.

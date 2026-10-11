@@ -1,97 +1,39 @@
-# Balance simulation lab
+# Balance simulation
 
-The active Angular root includes a deterministic, headless encounter simulator in
-[`src/app/domain/balance-simulation.ts`](../src/app/domain/balance-simulation.ts). It reuses the
-current combat rules, enemy intent policy, Guard/block behavior, Arcane mark behavior, and the
-implemented relic triggers without starting Angular or the browser.
+The simulator in `src/sim/simulation.ts` runs seeded 30-room expeditions through the same run and
+combat domain used by the game. It varies class, combat policy, and route policy, then reports win
+rate, rooms cleared, final level and health, relics, bosses, and boss-room deaths.
 
 ## Run it
 
-From the repository root:
-
 ```sh
-npm run simulate:balance
+bun run simulate:full-run
+SIM_SAMPLES=100 SIM_SEED=42 bun run simulate:full-run
+SIM_SAMPLES=100 SIM_SEED=42 SIM_RELICS=1 bun run simulate:full-run
 ```
 
-The default report runs 1,000 seeded encounters for each character, enemy scenario, and policy.
-Use `BALANCE_SAMPLES` for a faster exploratory run or a larger batch:
+`SIM_SAMPLES` controls the number of runs per report cell (default `200`). `SIM_SEED` sets the
+reproducible batch seed (default `42`). `SIM_RELICS=1` adds a table showing the win-rate change
+when each relic is owned from the start. That sensitivity pass leaves the starting gold unchanged;
+it does not measure purchase timing or cost.
 
-```sh
-BALANCE_SAMPLES=100 npm run simulate:balance
-BALANCE_SAMPLES=10000 npm run simulate:balance
-```
+## Reading the report
 
-The command prints a human-readable table. The simulator API also returns structured summaries so
-future tooling can write JSON/CSV reports without changing gameplay code.
+- `class` chooses the strongest expected strike and uses class-specific Guard or Potion decisions.
+- `reactive` responds to visible incoming damage and health pressure.
+- `balanced`, `aggressive`, and `safe` choose routes using different risk and recovery preferences.
+- Relic impact is a simulated sensitivity check, not a price recommendation.
 
-## Policies
+With 100 samples per cell and seed `42`, the average win rates across the six combat/route policy
+pairs were Wizard **58.3%**, Samurai **51.0%**, and Warrior **59.8%**. Balanced-route class
+policies ranged from 70–81% by class, while aggressive routes ranged from 32–55%. This spread
+shows that route choice matters substantially. These are deterministic bot results, not player
+telemetry or a final difficulty target; human play is still needed to judge whether risks and
+rewards feel fair.
 
-- `random` is a lower-quality baseline and helps reveal whether combat decisions matter.
-- `class` follows each character's basic identity: Wizard prefers Magic, Samurai prefers Attack,
-  and Warrior uses Guard against larger threats.
-- `reactive` responds to visible enemy intent, health pressure, Hex, and potion value.
-- `greedy` scores the immediate result of each legal action. It is a diagnostic upper-bound style
-  policy, not a claim about how humans should play.
+The report uses a 150-turn combat cap. A capped fight is reported as stalled and does not count as
+a win. Boss levels are fixed at 9, 16, and 22. Compare reports with the same seed when changing a
+rule, and explain differences caused by the changed rule before adjusting a regression threshold.
 
-Policy choice randomness uses a separate seeded stream from combat randomness. This keeps the
-damage, miss, critical, and intent rolls comparable when policies are compared with the same seed.
-
-## What to inspect
-
-The first report is intentionally encounter-focused. Useful signals include:
-
-- Normal-fight win rate and average remaining health
-- Elite-fight win rate and potion consumption
-- Action rates, especially whether one action dominates
-- Guard damage prevented and whether Guard is used against meaningful threats
-- Differences between `class`, `reactive`, and `greedy` policies
-- Draws at the turn cap, which can indicate defensive or healing stalls
-
-Simulation output is evidence for balance decisions, not a replacement for human playtests. A
-bot can expose a mathematical problem, while a human still needs to validate readability,
-decision quality, and game feel.
-
-## Full-run lab
-
-The second command simulates the complete route loop, including combat rewards, level-ups,
-power-ups, hidden paths, campfires, merchants, relic purchases, potion purchases, elite rooms, and
-the three-boss completion condition:
-
-```sh
-npm run simulate:full-run
-FULL_RUN_SAMPLES=1000 npm run simulate:full-run
-# Optional: inspect sensitivity to the combat turn cap.
-FULL_RUN_SAMPLES=1000 FULL_RUN_MAX_COMBAT_TURNS=150 npm run simulate:full-run
-# Optional: compare each relic when active from the beginning of a run.
-FULL_RUN_SAMPLES=100 npm run simulate:full-run:relics
-```
-
-The full-run report compares class and reactive combat policies against balanced, aggressive, and
-safe route policies. Route policies only inspect revealed frontier kinds; hidden paths remain unknown
-until selected. Rooms 10, 20, and 30 are fixed boss rooms; room 30 is the completion boundary.
-Combat seeds, route rolls, and policy decisions are deterministic and reproducible.
-
-Important full-run signals include completion rate, rooms survived, boss progress, relic count,
-campfire/store frequency, gold spent, and final health. Completion means defeating all three
-sequential Gold Slime bosses by room 30. A loss or turn-cap draw ends the run at the unresolved
-encounter; the simulator never walks past an undefeated enemy. The current pass uses a 15% elite
-stat premium and caps elite encounter levels at the current player level; regular encounters retain
-the `floor(playerLevel / 2)` through `playerLevel + 1` range. It also uses provisional boss levels
-8, 12, and 16. The current seeded 500-sample matrix lands roughly in the 35–65% completion band
-across class and reactive policies, with the three classes in the same broad range; this is an
-investigation signal, not a final balance verdict, because route heuristics, item offers, fixed-room
-pressure, and the boss curve all affect it.
-
-The relic matrix seeds one relic into a run while leaving starting gold unchanged, so it measures
-combat and route contribution before purchase timing and price. It models Compass map reveals and
-Salvager's Map store slots; use it to find outliers, then validate candidate price/effect changes
-with a normal purchase path and manual play.
-
-## Current scope and next layer
-
-The milestone boss curve is currently level 8, 12, and 16 for rooms 10, 20, and 30 respectively;
-boss stats use a moderated linear multiplier curve so the level-10 regular-enemy formula change does
-not create a sudden guardian spike. These values are provisional targets chosen to keep the fixed
-rooms reachable while preserving escalation. The lab now covers single encounters and full runs. It does not yet model human telemetry, event
-rooms, a learned policy, or confidence intervals/CSV export. Those should come after we establish
-the intended normal/elite/boss difficulty targets from the current report and manual playtests.
+The simulator does not launch Angular or depend on browser storage. Its route and combat policies
+live in `src/sim/`; game rules remain in `src/app/domain/`.

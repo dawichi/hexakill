@@ -1,0 +1,98 @@
+@if (session.player(); as player) {
+  <section class="panel game-over" data-screen="game-over" aria-labelledby="game-over-title">
+    <header class="game-over-header">
+      <div>
+        <p class="eyebrow">Run ended</p>
+        <h2 id="game-over-title" data-screen-heading tabindex="-1">Game over.</h2>
+        <p class="lead">
+          {{ player.name }} reached level {{ player.level }} with {{ player.bossesDefeated }} boss
+          {{ player.bossesDefeated === 1 ? 'defeat' : 'defeats' }}.
+        </p>
+        <div class="seed-share">
+          @if (session.dailyLabel()) { <span>{{ session.dailyLabel() }}</span> }
+          <span>Seed {{ session.shareSeed() }}</span>
+          <button class="quiet-button" type="button" (click)="session.copySeed()">Copy seed</button>
+        </div>
+        <p class="validation" role="alert" aria-atomic="true">
+          {{ session.combatMessage() }}
+        </p>
+      </div>
+      @if (
+        session.playerAnimation() === 'defeat' && player.character.defeatAsset;
+        as defeatAsset
+      ) {
+        <span
+          class="entity-sprite game-over-sprite sprite-strip"
+          role="img"
+          [attr.aria-label]="player.character.name + ' defeat animation'"
+          [style.background-image]="'url(' + defeatAsset.src + ')'"
+          [style.background-size]="spriteBackgroundSize(defeatAsset)"
+          [style.aspect-ratio]="defeatAsset.frameWidth + ' / ' + defeatAsset.frameHeight"
+          [style.animation]="spriteAnimation(defeatAsset, 900)"
+        ></span>
+      } @else if (session.playerAnimation() === 'defeat') {
+        <img
+          class="entity-sprite game-over-sprite defeat-fade"
+          [src]="player.character.idleAsset"
+          [alt]="player.character.name"
+        />
+      }
+    </header>
+
+    <div
+      class="game-over-body"
+      [class.has-enemy-history]="session.defeatedEnemySummary().length > 0"
+    >
+      @if (session.defeatedEnemySummary().length) {
+        <section class="enemy-history" aria-labelledby="enemy-history-title">
+          <h3 id="enemy-history-title">Enemies defeated</h3>
+          <div class="enemy-history-grid">
+            @for (summary of session.defeatedEnemySummary(); track summary.enemyId) {
+              <article
+                class="enemy-history-tile"
+                [attr.aria-label]="summary.name + ', defeated ' + summary.count + ' times'"
+                [title]="summary.name + ' · Levels ' + summary.levelsLabel"
+              >
+                <img class="history-sprite" [src]="summary.idleAsset" [alt]="summary.name" />
+                <strong class="enemy-history-count" aria-hidden="true">x{{ summary.count }}</strong>
+                <span class="enemy-history-name">{{ summary.name }}</span>
+              </article>
+            }
+          </div>
+        </section>
+      }
+      <section class="records-panel game-over-records" aria-labelledby="game-over-records-title">
+        <div class="records-heading">
+          <h3 id="game-over-records-title">Personal records</h3>
+          @if (session.personalRecords().length) {
+            <button class="quiet-button" type="button" (click)="session.clearPersonalRecords()">
+              Clear records
+            </button>
+          }
+        </div>
+        @if (session.personalRecords().length) {
+          <ol class="records-list">
+            @for (record of session.personalRecords(); track $index) {
+              <li [class]="'record-row ' + recordCharacter(record).accent">
+                <span>{{ record.name }} · {{ recordCharacter(record).name }}</span>
+                <strong>{{ record.victory ? 'Won' : record.rooms + ' rooms' }} · Lv {{ record.level }}</strong>
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="empty-records">No records yet. Be the first name on the wall.</p>
+        }
+      </section>
+    </div>
+
+    <footer class="game-over-footer">
+      <span
+        ><svg lucideMapPin size="15" aria-hidden="true"></svg> The dungeon waits at the
+        entrance.</span
+      >
+      <button class="primary-button" type="button" (click)="session.reset()">
+        Return to home <svg lucideArrowRight size="16" aria-hidden="true"></svg>
+      </button>
+    </footer>
+  </section>
+}

@@ -1,0 +1,114 @@
+@if (session.enemy(); as enemy) {
+<article class="combatant-card enemy-combatant">
+          <div class="combatant-header">
+            <div>
+              <p class="eyebrow">
+                {{ enemy.definition.archetype }} enemy · level {{ enemy.level }}
+              </p>
+              <h3>{{ enemy.definition.name }}</h3>
+              @if (session.enemyIntent(); as intent) {
+                <app-enemy-intent [intent]="intent" />
+              }
+              @if (session.enemyHexed()) {
+                <span
+                  class="combat-status hexed"
+                  title="Arcane mark: your next Attack deals bonus damage."
+                  ><svg lucideSparkles size="12" aria-hidden="true"></svg> Arcane mark</span
+                >
+              }
+            </div>
+          </div>
+          <div class="combatant-body">
+            <div
+              class="combatant-visual"
+              [class.hit-reaction]="
+                session.enemyAnimation() === 'hit' && !session.enemySpriteAsset()
+              "
+              [class.action-lunge]="
+                session.enemyAnimation() === 'attack' && !session.enemySpriteAsset()
+              "
+              [class.defeat-fade]="
+                session.enemyAnimation() === 'defeat' && !session.enemySpriteAsset()
+              "
+            >
+              @if (session.enemySpriteAsset(); as enemySpriteAsset) {
+                <span
+                  class="entity-sprite combat-sprite sprite-strip enemy-sprite-strip"
+                  role="img"
+                  [attr.aria-label]="
+                    enemy.definition.name +
+                    (session.enemyAnimation() === 'attack'
+                      ? session.enemyActionKind() === 'magic'
+                        ? ' magic animation'
+                        : ' attack animation'
+                      : session.enemyAnimation() === 'hit'
+                        ? ' hit animation'
+                        : session.enemyAnimation() === 'defeat'
+                          ? ' defeat animation'
+                          : ' idle animation')
+                  "
+                  [style.background-image]="'url(' + enemySpriteAsset.src + ')'"
+                  [style.background-size]="spriteBackgroundSize(enemySpriteAsset)"
+                  [style.aspect-ratio]="
+                    enemySpriteAsset.frameWidth + ' / ' + enemySpriteAsset.frameHeight
+                  "
+                  [style.animation]="spriteAnimation(enemySpriteAsset, 600)"
+                ></span>
+              } @else {
+                <img
+                  class="entity-sprite combat-sprite"
+                  [src]="session.enemyAsset()"
+                  [alt]="enemy.definition.name"
+                />
+              }
+              @if (session.combatFeedback(); as feedback) {
+                @if (feedback.target === 'enemy') {
+                  <app-combat-feedback [feedback]="feedback" />
+                }
+              }
+            </div>
+            <div class="combat-stat-rail" role="group" aria-label="Enemy combat stats">
+              @for (stat of statKeys; track stat) {
+                <app-stat-chip
+                  [stat]="stat"
+                  [value]="
+                    combatStatValue(enemy.stats, stat, enemy.stats.health - enemy.damageTaken)
+                  "
+                  [showLabel]="false"
+                  tooltipAlign="start"
+                />
+              }
+            </div>
+          </div>
+          <div class="combatant-health">
+            <div class="health-heading">
+              <span><svg lucideHeartPulse size="14" aria-hidden="true"></svg> Health</span>
+              <strong
+                >{{ enemy.stats.health - enemy.damageTaken }} /
+                {{ enemy.stats.health }}</strong
+              >
+            </div>
+            <div
+              class="health-bar"
+              [class]="healthTone(enemy.stats.health - enemy.damageTaken, enemy.stats.health)"
+              role="meter"
+              aria-label="Enemy health"
+              [attr.aria-valuenow]="enemy.stats.health - enemy.damageTaken"
+              aria-valuemin="0"
+              [attr.aria-valuemax]="enemy.stats.health"
+            >
+              <span
+                class="health-bar-trail"
+                aria-hidden="true"
+                [style.width.%]="session.enemyHealthTrail()"
+              ></span>
+              <span
+                class="health-bar-fill"
+                [style.width.%]="
+                  ((enemy.stats.health - enemy.damageTaken) / enemy.stats.health) * 100
+                "
+              ></span>
+            </div>
+          </div>
+        </article>
+}

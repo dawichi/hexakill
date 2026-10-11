@@ -1,0 +1,381 @@
+.player-combatant {
+  border-color: #38bdf8;
+}
+
+.combatant-card {
+  display: grid;
+  min-height: 27rem;
+  align-content: space-between;
+  gap: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.2rem;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 2%) 25%, transparent 25%) 0 0 / 8px 8px,
+    linear-gradient(315deg, rgb(0 0 0 / 12%) 25%, transparent 25%) 0 0 / 8px 8px,
+    var(--stone-0);
+  padding: 1rem;
+}
+
+.combatant-header {
+  display: flex;
+  min-width: 0;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.combatant-header > div {
+  min-width: 0;
+  width: 100%;
+}
+
+.combatant-header h3 {
+  width: 100%;
+  margin-top: 0.3rem;
+  color: var(--ink);
+  font-family: Georgia, serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.55rem);
+  line-height: 1.05;
+}
+
+.combatant-body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 14rem;
+}
+
+.enemy-combatant .combatant-body {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.combatant-visual {
+  display: grid;
+  min-width: 0;
+  min-height: 12rem;
+  place-items: center;
+  border: 1px solid var(--line-soft);
+  background: radial-gradient(circle at 50% 45%, rgb(105 197 211 / 9%), transparent 48%), #141316;
+}
+
+.enemy-combatant .combatant-visual {
+  background: radial-gradient(circle at 50% 45%, rgb(219 106 98 / 10%), transparent 48%), #141316;
+}
+
+@media (max-width: 700px) {
+  .combatant-card {
+    min-height: 23rem;
+  }
+
+  .combatant-body {
+    min-height: 11rem;
+  }
+
+  .combatant-visual {
+    min-height: 10rem;
+  }
+}
+
+.combat-screen-panel .combatant-card {
+  min-height: 0;
+  gap: 0.5rem;
+  padding: clamp(0.55rem, 1.3vw, 0.9rem);
+}
+
+@media (min-width: 701px) {
+  .combat-screen-panel .combatant-card:has(.tooltip-open) {
+    position: relative;
+    z-index: 30;
+  }
+}
+
+.combat-screen-panel .combatant-body {
+  min-height: 0;
+  overflow: visible;
+}
+
+.combat-screen-panel .combatant-visual {
+  position: relative;
+  min-height: 0;
+  height: 100%;
+}
+
+@media (max-width: 700px) {
+  .combat-screen-panel .combatant-card {
+    padding: 0.35rem;
+  }
+
+  .combat-screen-panel .combatant-header {
+    display: block;
+  }
+
+  .combat-screen-panel .combatant-header .eyebrow {
+    overflow: hidden;
+    font-size: 0.48rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .combat-screen-panel .combatant-header h3 {
+    overflow: hidden;
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .combat-screen-panel .combatant-body,
+  .combat-screen-panel .enemy-combatant .combatant-body {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .combat-screen-panel .combatant-visual {
+    order: -1;
+    min-height: 0;
+    height: clamp(4rem, 14vh, 7rem);
+  }
+}
+@media (max-width: 700px) {
+  .combat-screen-panel .combatant-card {
+    position: absolute;
+    z-index: 1;
+    display: block;
+    width: 78%;
+    height: 51%;
+    min-height: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0.15rem;
+    background: transparent;
+    box-shadow: none;
+    padding: 0.25rem;
+  }
+
+  .combat-screen-panel .player-combatant {
+    bottom: 0.2rem;
+    left: 0.25rem;
+  }
+
+  .combat-screen-panel .enemy-combatant {
+    top: 0.2rem;
+    right: 0.25rem;
+  }
+
+  .combat-screen-panel .combatant-header {
+    position: absolute;
+    z-index: 3;
+    top: 0.2rem;
+    width: 51%;
+    border: 1px solid var(--line-soft);
+    background: rgb(16 15 18 / 88%);
+    padding: 0.3rem 0.35rem;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-header {
+    right: 0;
+    text-align: right;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-header {
+    left: 0;
+  }
+
+  .combat-screen-panel .combatant-header .eyebrow {
+    color: var(--muted);
+    font-size: 0.43rem;
+  }
+
+  .combat-screen-panel .combatant-header h3 {
+    margin-top: 0.1rem;
+    font-size: 0.72rem;
+  }
+
+  .combat-screen-panel .combatant-body,
+  .combat-screen-panel .enemy-combatant .combatant-body {
+    position: absolute;
+    inset: 0;
+    display: block;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-visual {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 56%;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-visual {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 56%;
+  }
+
+  .combat-screen-panel .combatant-visual {
+    height: clamp(4rem, 13vh, 6.5rem);
+    border: 0;
+    background: transparent;
+  }
+}
+@media (max-width: 700px) {
+  .combat-screen-panel .combatant-card {
+    position: absolute;
+    inset: auto;
+    z-index: 1;
+    display: grid;
+    width: calc(100% - 0.3rem);
+    height: auto;
+    min-height: 0;
+    grid-template-rows: auto clamp(6rem, 15vh, 8rem) auto auto;
+    gap: 0.2rem;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    padding: 0.35rem;
+  }
+
+  .combat-screen-panel .enemy-combatant {
+    top: 0.35rem;
+    right: 0.15rem;
+    left: 0.15rem;
+  }
+
+  .combat-screen-panel .player-combatant {
+    right: 0.15rem;
+    bottom: 0.35rem;
+    left: 0.15rem;
+  }
+
+  .combat-screen-panel .combatant-header {
+    position: static;
+    z-index: auto;
+    width: 100%;
+    grid-row: 1;
+    border: 0;
+    border-bottom: 1px solid var(--line-soft);
+    background: transparent;
+    padding: 0.05rem 0.15rem 0.25rem;
+    text-align: left;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-header,
+  .combat-screen-panel .enemy-combatant .combatant-header {
+    right: auto;
+    left: auto;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-header {
+    margin-left: auto;
+    position: relative;
+    top: calc(-1 * clamp(1.25rem, 4vh, 1.75rem));
+    text-align: right;
+  }
+
+  .combat-screen-panel .player-combatant {
+    overflow: visible;
+  }
+
+  .combat-screen-panel .combatant-header .eyebrow {
+    font-size: 0.46rem;
+  }
+
+  .combat-screen-panel .combatant-header h3 {
+    width: 100%;
+    max-width: none;
+    font-size: 0.82rem;
+  }
+
+  .combat-screen-panel .combatant-body,
+  .combat-screen-panel .enemy-combatant .combatant-body {
+    position: static;
+    inset: auto;
+    display: grid;
+    min-height: 0;
+    grid-row: 2;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 0.3rem;
+    overflow: hidden;
+  }
+
+  .combat-screen-panel .combatant-visual,
+  .combat-screen-panel .player-combatant .combatant-visual,
+  .combat-screen-panel .enemy-combatant .combatant-visual {
+    position: relative;
+    inset: auto;
+    width: auto;
+    height: 100%;
+    min-height: 0;
+    grid-row: 1;
+    border: 0;
+    background: transparent;
+    order: initial;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-visual {
+    grid-column: 1;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-visual {
+    grid-column: 2;
+  }
+}
+@media (max-width: 700px) {
+  .combat-screen-panel .combatant-card {
+    display: contents;
+  }
+
+  .combat-screen-panel .combatant-header {
+    position: static;
+    width: auto;
+    grid-row: 4;
+    align-self: center;
+    border: 0;
+    padding: 0;
+  }
+
+  .combat-screen-panel .combatant-header .eyebrow {
+    font-size: 0.55rem;
+  }
+
+  .combat-screen-panel .combatant-header h3 {
+    width: 100%;
+    max-width: none;
+    margin-top: 0.2rem;
+    font-size: clamp(0.86rem, 3.8vw, 1.05rem);
+  }
+
+  .combat-screen-panel .player-combatant .combatant-header {
+    grid-column: 1;
+    margin: 0;
+    position: static;
+    top: auto;
+    text-align: left;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-header {
+    grid-column: 3;
+    text-align: right;
+  }
+
+  .combat-screen-panel .enemy-combatant .combatant-body {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .combat-screen-panel .player-combatant .combatant-body {
+    grid-column: 1 / -1;
+    grid-row: 6;
+  }
+
+  .combat-screen-panel .combatant-body,
+  .combat-screen-panel .enemy-combatant .combatant-body {
+    overflow: visible;
+  }
+}

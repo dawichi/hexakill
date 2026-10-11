@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const productionPreview = process.env['E2E_PRODUCTION'] === '1';
+const port = Number(process.env['E2E_PORT'] ?? (productionPreview ? '4300' : '4200'));
+const baseURL = `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: './e2e',
@@ -9,7 +11,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
-    baseURL: productionPreview ? 'http://127.0.0.1:4300' : 'http://127.0.0.1:4200',
+    baseURL,
     trace: 'on-first-retry',
   },
   projects: [
@@ -19,8 +21,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: productionPreview ? 'bun run serve:dist' : 'bun run start --host 127.0.0.1',
-    url: productionPreview ? 'http://127.0.0.1:4300' : 'http://127.0.0.1:4200',
+    command: productionPreview
+      ? `PORT=${port} bun run serve:dist`
+      : `bun run start --host 127.0.0.1 --port ${port}`,
+    url: baseURL,
     // A stale process on the production port can serve a different project and
     // create false-positive navigation or false-negative journey failures.
     reuseExistingServer: productionPreview ? false : !process.env.CI,

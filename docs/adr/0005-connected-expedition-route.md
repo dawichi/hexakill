@@ -2,44 +2,35 @@
 
 ## Status
 
-Accepted — 2026-08-30
+Accepted — connected route decisions remain active. Graph persistence details are superseded by
+[ADR-0008](0008-seeded-v2-persistence-and-records.md) — 2026-10-11.
 
 ## Decision
 
-Runs use a deterministic, persisted 30-room expedition graph. Ordinary rooms expose the reachable
-nodes from the current frontier; choosing a node advances the frontier through that node's
-successor edges. The graph uses three readable lanes that can preserve, split, or merge between
-rooms. Rooms 10, 20, and 30 remain fixed single-node Gold Slime milestones, and room 30 remains
-the end of the run.
+Runs use a deterministic 30-room expedition graph. Ordinary rooms expose nodes reachable from the
+current frontier; choosing a node advances through successor edges. The graph uses three readable
+lanes that can preserve, split, or merge between rooms. Rooms 10, 20, and 30 remain fixed
+single-node guardian milestones, and room 30 ends the run.
 
-The route screen presents the current frontier as a cinematic fork and previews up to the next
-three reachable layers. A path card may show its room type, risk, reward, and a privacy-safe
-forecast of the next layer. Hidden nodes remain unknown until entered or revealed by Traveler's
-Compass; hidden content is not exposed through the forecast.
+The route screen presents the current frontier and previews up to three reachable layers. Path cards
+show room type, risk, reward, and a privacy-safe forecast. Hidden nodes stay unknown until entered
+or revealed by Traveler's Compass.
 
-New sessions persist the full graph and the next frontier so combat, stores, reloads, and campfires
-do not regenerate disconnected doors. Older v1 snapshots without graph layers remain restorable
-through the legacy three-node compatibility shape and receive a connected graph when the next
-frontier is generated.
-
-The full-run simulator traverses the same successor graph as the live session. Route policies may
-choose among the currently revealed frontier nodes, while future route intelligence remains a
-future policy/balance improvement.
+The graph is derived from the run seed. Saves retain the visited path instead of a duplicate copy of
+the generated graph. The full-run simulator traverses the same graph as the live session.
 
 ## Context
 
 The previous route screen displayed three independent room lotteries. The selected door had no
-effect on future choices, so the screen looked like a map without giving the player meaningful
-route planning. The fixed milestone decision in [ADR-0004](0004-fixed-room-run.md) provides useful
-landmarks, but it does not by itself create path identity or forward consequences.
+effect on future choices, so the screen looked like a map without giving the player meaningful route
+planning. Fixed milestone rooms provide landmarks; a connected graph adds path identity and forward
+consequences.
 
 ## Consequences
 
-- Players can understand the current fork and see several rooms ahead before committing.
-- Route choices now have persistent identity and can converge on the fixed boss landmarks.
-- The route state is larger because it stores the full 30-room graph and a pending next frontier.
-- Hidden-node privacy must be preserved in both the UI and any route policy that models player
-  knowledge.
-- New route events can be added as node kinds without replacing the graph model.
-- Balance reports must use graph traversal; independent per-room route rolls are no longer a valid
-  model of the live run.
+- Players can plan from the current fork and the visible horizon.
+- Route choices have persistent identity and converge on the fixed boss landmarks.
+- The graph is reproducible from the seed, reducing stored state.
+- Hidden-node privacy must be preserved in the UI and route policies.
+- Balance reports must use graph traversal; independent per-room route rolls do not model the live
+  run.

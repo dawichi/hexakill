@@ -25,10 +25,33 @@
                 "input": "static"
               }
             ],
-            "styles": ["src/styles.css"]
+            "styles": [
+              "src/styles.css",
+              "src/app/styles/shared-base.css",
+              "src/app/styles/shared-components.css",
+              "src/app/styles/shared-layout.css",
+              "src/app/styles/welcome.css",
+              "src/app/styles/character-select.css",
+              "src/app/styles/route-map-core.css",
+              "src/app/styles/route-map-compact.css",
+              "src/app/styles/combat-shell.css",
+              "src/app/styles/combatant-panels.css",
+              "src/app/styles/combatant-info.css",
+              "src/app/styles/combat-animations.css",
+              "src/app/styles/combat-feedback.css",
+              "src/app/styles/combat-banner.css",
+              "src/app/styles/combat-actions.css",
+              "src/app/styles/store.css",
+              "src/app/styles/ending.css"
+            ]
           },
           "configurations": {
             "production": {
+              "optimization": {
+                "styles": {
+                  "inlineCritical": false
+                }
+              },
               "budgets": [
                 {
                   "type": "initial",

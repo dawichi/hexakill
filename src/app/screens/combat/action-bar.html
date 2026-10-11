@@ -1,0 +1,59 @@
+@if (session.player(); as player) {
+<section class="combat-actions" aria-labelledby="combat-actions-title">
+            <div class="action-heading">
+              <div>
+                <p class="eyebrow">Your move</p>
+                <h3 id="combat-actions-title">Choose an action</h3>
+              </div>
+              <span class="action-turn" [class.enemy-turn]="!session.canAct()">
+                {{ session.canAct() ? 'Your turn' : 'Enemy turn' }}
+              </span>
+            </div>
+            <div class="action-grid" role="group" aria-label="Combat actions">
+              <button
+                class="action-button attack"
+                type="button"
+                aria-keyshortcuts="1"
+                [disabled]="!session.canAct()"
+                (click)="session.attack('attack')"
+              >
+                <svg lucideSword size="17" aria-hidden="true"></svg>
+                Attack <kbd>1</kbd>
+                <span>Preview {{ damagePreview('attack') }} vs Armor</span>
+              </button>
+              <button
+                class="action-button magic"
+                type="button"
+                aria-keyshortcuts="2"
+                [disabled]="!session.canAct()"
+                (click)="session.attack('magic')"
+              >
+                <svg lucideWandSparkles size="17" aria-hidden="true"></svg>
+                Magic <kbd>2</kbd>
+                <span>Preview {{ damagePreview('magic') }} vs Magic resist</span>
+              </button>
+              <button
+                class="action-button guard"
+                type="button"
+                aria-keyshortcuts="3"
+                [disabled]="!session.canAct()"
+                (click)="session.guard()"
+              >
+                <svg lucideShield size="17" aria-hidden="true"></svg>
+                Guard <kbd>3</kbd>
+                <span>Gain {{ session.playerGuardAmount() }} Block until your next turn</span>
+              </button>
+              <button
+                class="action-button potion"
+                type="button"
+                aria-keyshortcuts="4"
+                [disabled]="!session.canAct() || !player.potions"
+                (click)="session.usePotion()"
+              >
+                <svg lucideHeartPulse size="17" aria-hidden="true"></svg>
+                Potion <kbd>4</kbd>
+                <span>Restore 25% max health · {{ player.potions }} left</span>
+              </button>
+            </div>
+</section>
+}

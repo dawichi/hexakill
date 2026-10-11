@@ -1,1842 +1,596 @@
-import { computed, effect, Injectable, inject, signal } from '@angular/core';
-import { ASSET_MANIFEST } from '../domain/assets';
-import { CHARACTER_DEFINITIONS, createInitialPlayer } from '../domain/characters';
+import { effect, Injectable, inject, signal } from '@angular/core';
+import { SoundEffect } from '../domain/assets';
+import { CombatEvent, CombatSnapshot, EnemyMove, PlayerAction } from '../domain/combat';
+import { DamageKind } from '../domain/game-types';
+import { PowerUpType } from '../domain/player';
+import { NAME_MAX, validatePlayerName } from '../domain/player-name';
+import { Preferences, TextSpeed, volumeFromPercent } from '../domain/preferences';
+import { dailyChallenge, formatSeed, parseSeed } from '../domain/random';
+import { addPersonalRecord, PersonalRecord } from '../domain/records';
+import { isRelicId, RelicId } from '../domain/relics';
+import { FINAL_ROOM } from '../domain/route-map';
 import {
-  chooseEnemyIntent,
-  determineFirstActor,
-  guardBlockAmount,
-  resolveHeal,
-} from '../domain/combat-actions';
-import { DamageKind, DamageResult, damageDealt, resolveDamage } from '../domain/combat-rules';
-import {
-  CombatState,
-  EnemyIntent,
-  INITIAL_COMBAT_STATE,
-  isEnemyIntent,
-  transitionCombat,
-} from '../domain/combat-state';
-import {
-  ENEMY_DEFINITIONS,
-  enemyAssetFor,
-  enemySpriteAssetFor,
-  findEnemyDefinition,
-  generateEnemy,
-} from '../domain/enemies';
-import {
-  CharacterDefinition,
-  CombatLogEntry,
-  DefeatedEnemy,
-  EnemyState,
-  ItemState,
-  MAX_COMBAT_LOG_ENTRIES,
-  PlayerState,
-  SpriteStripAsset,
-  Stats,
-} from '../domain/game-types';
-import {
-  AudioPreferences,
-  clampVolume,
-  DEFAULT_EFFECTS_VOLUME,
-  DEFAULT_MUSIC_VOLUME,
-  isStoredPreferencesSnapshot,
-} from '../domain/preferences';
-import {
-  applyPowerUp,
-  applyVictoryReward,
-  calculateVictoryReward,
-  MAX_POWER_UPS,
-  MAX_POWER_UPS_PER_STAT,
-} from '../domain/progression';
-import {
-  createPersonalRecord,
-  isStoredRecordsSnapshot,
-  PersonalRecord,
-  sortPersonalRecords,
-} from '../domain/records';
-import {
-  RelicCombatContext,
-  relicArcaneMarkMultiplier,
-  relicBloodLedgerHeal,
-  relicCrownOfThornsDamage,
-  relicCrownOfThornsVenom,
-  relicDamageRules,
-  relicGuardBonus,
-  relicIncomingDamageMultiplier,
-  relicLethalProtectionAvailable,
-  relicMagicBlock,
-  relicMagicVenom,
-  relicPotionBlock,
-  relicPotionIsFree,
-  relicStartEnemyDamage,
-  relicStartOfCombatBlock,
-  relicThornsDamage,
-  relicVictoryMaxHealthBonus,
-} from '../domain/relic-rules';
-import { hasRelic } from '../domain/relics';
-import {
-  advanceRouteMap,
-  BOSS_ROOMS,
-  createRouteMap,
-  FINAL_ROOM,
-  findRouteNode,
-  isRouteMapState,
-  RouteLayer,
-  RouteMapState,
-  RouteNodeKind,
-  revealHiddenRouteNodes,
-} from '../domain/route-map';
-import {
-  generateStoreOffers,
-  purchaseItem,
+  choosePowerUp as applyRunPowerUp,
+  createRun,
+  chooseRouteNode as enterRouteNode,
+  isRunOver,
+  leaveCombat,
+  leaveStore,
+  playerAction,
   purchasePotions,
-  relicGuardBlockMultiplier,
-  relicGuardBreakMultiplier,
-  relicPotionHealingFraction,
-  relicVictoryHealAmount,
-  STORE_ITEMS,
-  STORE_POTIONS,
-} from '../domain/store';
+  purchaseRelic,
+  RunState,
+  roomsCleared,
+} from '../domain/run';
+import { POTION_OFFERS, PotionOfferId } from '../domain/store';
+import { combatEventMessage } from '../ui/combat-messages';
 import { AUDIO, AudioPort } from './audio';
-import { BROWSER_CLOCK, CLOCK, Clock, ClockHandle } from './clock';
-import { PREFERENCES_STORAGE, PreferencesStoragePort } from './preferences-storage';
-import { RANDOM_SOURCE, RandomSource } from './random';
-import { RECORDS_STORAGE, RecordsStoragePort } from './records-storage';
-import { SESSION_STORAGE, SessionStoragePort } from './storage';
+import { BROWSER_CLOCK, CLOCK, Clock } from './clock';
+import { PresentationQueue } from './presentation-queue';
+import { musicForScreen } from './screen-music';
+import { SessionPersistence } from './session-persistence';
+import type {
+  CharacterView,
+  CombatFeedback,
+  CombatFeedbackKind,
+  CombatUiPhase,
+} from './session-view-model';
+import { createSessionViews, phaseForRun } from './session-view-model';
+import { BROWSER_STORAGE, KeyValueStore, STORAGE } from './storage';
 
-const COMBAT_MESSAGE_CHARACTER_MS = 22;
-const COMBAT_MESSAGE_PAUSE_MS = 400;
+export type {
+  CharacterView,
+  CombatFeedback,
+  CombatFeedbackKind,
+  DefeatedEnemySummary,
+  EnemyIntentView,
+  EnemyView,
+  GameScreen,
+  PlayerView,
+  RouteLayerView,
+  RouteMapView,
+  RouteNodeView,
+} from './session-view-model';
 
-export type GameScreen =
-  | 'welcome'
-  | 'character-select'
-  | 'map'
-  | 'combat'
-  | 'store'
-  | 'game-over'
-  | 'run-complete';
+const PLAYER_ACTION_SOUND: Readonly<Record<EnemyMove['kind'] | PlayerAction, SoundEffect>> = {
+  attack: 'attack',
+  magic: 'magic',
+  guard: 'guard',
+  potion: 'potion',
+  heal: 'potion',
+  charge: 'magic',
+};
 
-export interface DefeatedEnemySummary {
-  readonly enemyId: string;
-  readonly name: string;
-  readonly idleAsset: string;
-  readonly count: number;
-  readonly levelsLabel: string;
-}
-
-export type CombatFeedbackKind =
-  | 'damage'
-  | 'critical'
-  | 'miss'
-  | 'blocked'
-  | 'heal'
-  | 'guard'
-  | 'hex';
-
-export interface CombatFeedback {
-  readonly id: number;
-  readonly target: 'player' | 'enemy';
-  readonly kind: CombatFeedbackKind;
-  readonly amount?: number;
-  readonly action?: DamageKind;
-}
-
-interface StoredSessionSnapshot {
-  readonly version: 1;
-  readonly screen: GameScreen;
-  readonly playerName: string;
-  readonly selectedCharacterId: string | null;
-  readonly player: PlayerState | null;
-  readonly combatState: CombatState;
-  readonly routeFloor?: number;
-  readonly routeMap?: RouteMapState | null;
-  readonly nextRouteMap?: RouteMapState | null;
-  readonly storeItems?: readonly ItemState[];
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-const STAT_KEYS: readonly (keyof Stats)[] = ['health', 'ad', 'ap', 'armor', 'mr', 'speed'];
-
-function hasNumberFields(value: unknown, fields: readonly string[]): boolean {
-  return (
-    isRecord(value) &&
-    fields.every(
-      (field) =>
-        typeof value[field] === 'number' && Number.isFinite(value[field]) && value[field] >= 0,
-    )
-  );
-}
-
-function isStats(value: unknown): value is Stats {
-  return hasNumberFields(value, STAT_KEYS);
-}
-
-function isNonNegativeInteger(value: unknown): value is number {
-  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
-}
-
-function isRestorablePlayer(value: unknown): value is PlayerState {
-  if (
-    !isRecord(value) ||
-    typeof value['name'] !== 'string' ||
-    value['name'].trim().length < 3 ||
-    value['name'].length > 14 ||
-    !isNonNegativeInteger(value['level']) ||
-    value['level'] < 1 ||
-    !isNonNegativeInteger(value['experience']) ||
-    value['experience'] >= 100 ||
-    !isStats(value['stats']) ||
-    value['stats']['health'] <= 0 ||
-    !isNonNegativeInteger(value['potions']) ||
-    !isNonNegativeInteger(value['gold']) ||
-    !isNonNegativeInteger(value['bossesDefeated']) ||
-    value['bossesDefeated'] > 3 ||
-    (value['defeatedEnemies'] !== undefined &&
-      (!Array.isArray(value['defeatedEnemies']) ||
-        !value['defeatedEnemies'].every(isRestorableDefeatedEnemy)))
-  ) {
-    return false;
+function readUrlSeed(): number | null {
+  try {
+    const raw = new URLSearchParams(globalThis.location?.search ?? '').get('seed');
+    if (!raw) return null;
+    if (/^\d+$/.test(raw)) {
+      const decimal = Number(raw);
+      if (Number.isSafeInteger(decimal) && decimal >= 0 && decimal <= 0xffff_ffff) return decimal;
+    }
+    return parseSeed(raw);
+  } catch {
+    return null;
   }
-
-  const character = value['character'];
-  const powerUps = value['powerUps'];
-  const history = isRecord(powerUps) ? powerUps['history'] : null;
-  const inventory = value['inventory'];
-  const relicCharges = value['relicCharges'];
-  const powerUpTypes = ['health', 'ad', 'ap', 'speed'] as const;
-
-  if (
-    !isRecord(character) ||
-    !CHARACTER_DEFINITIONS.some((candidate) => candidate.id === character['id']) ||
-    !Array.isArray(inventory) ||
-    !inventory.every(
-      (item) =>
-        isRecord(item) &&
-        typeof item['id'] === 'string' &&
-        STORE_ITEMS.some((candidate) => candidate.id === item['id']),
-    ) ||
-    new Set(inventory.map((item) => (item as Record<string, unknown>)['id'])).size !==
-      inventory.length ||
-    (relicCharges !== undefined &&
-      (!isRecord(relicCharges) ||
-        Object.entries(relicCharges).some(
-          ([id, charge]) =>
-            !STORE_ITEMS.some((candidate) => candidate.id === id) || !isNonNegativeInteger(charge),
-        ))) ||
-    !isRecord(powerUps) ||
-    !isNonNegativeInteger(powerUps['pending']) ||
-    powerUps['pending'] > MAX_POWER_UPS ||
-    !isRecord(history) ||
-    !powerUpTypes.every(
-      (type) => isNonNegativeInteger(history[type]) && history[type] <= MAX_POWER_UPS_PER_STAT,
-    )
-  ) {
-    return false;
-  }
-
-  const historyTotal = powerUpTypes.reduce((total, type) => total + Number(history[type]), 0);
-  return Number(powerUps['pending']) + historyTotal <= MAX_POWER_UPS;
-}
-
-function isRestorableDefeatedEnemy(value: unknown): value is DefeatedEnemy {
-  if (!isRecord(value)) return false;
-
-  return (
-    typeof value['enemyId'] === 'string' &&
-    findEnemyDefinition(value['enemyId']) !== undefined &&
-    isNonNegativeInteger(value['level']) &&
-    value['level'] >= 1
-  );
-}
-
-function isRestorableEnemy(value: unknown): value is EnemyState {
-  if (!isRecord(value)) return false;
-
-  const definition = value['definition'];
-  return (
-    isRecord(definition) &&
-    typeof definition['id'] === 'string' &&
-    (ENEMY_DEFINITIONS.some((candidate) => candidate.id === definition['id']) ||
-      /^gold-slime-[1-3]$/.test(definition['id'])) &&
-    typeof definition['name'] === 'string' &&
-    ['basic', 'ad', 'ap', 'tank', 'boss'].includes(String(definition['archetype'])) &&
-    isStats(definition['modifiers']) &&
-    typeof definition['idleAsset'] === 'string' &&
-    isNonNegativeInteger(value['level']) &&
-    value['level'] >= 1 &&
-    isStats(value['stats']) &&
-    value['stats']['health'] > 0 &&
-    isNonNegativeInteger(value['damageTaken']) &&
-    value['damageTaken'] <= value['stats']['health'] &&
-    isNonNegativeInteger(value['potions']) &&
-    isNonNegativeInteger(value['gold'])
-  );
-}
-
-function isDamageKind(value: unknown): value is DamageKind {
-  return value === 'attack' || value === 'magic';
-}
-
-function isRestorableDamageResult(value: unknown): value is DamageResult {
-  return (
-    isRecord(value) &&
-    isDamageKind(value['kind']) &&
-    hasNumberFields(value, ['rawDamage', 'damageAfterResistance', 'damageTaken']) &&
-    typeof value['critical'] === 'boolean' &&
-    typeof value['missed'] === 'boolean'
-  );
-}
-
-function isRestorableCombatState(value: unknown): value is CombatState {
-  if (!isRecord(value)) return false;
-
-  const enemy = value['enemy'];
-  const lastResult = value['lastResult'];
-  const coherentLastResult =
-    lastResult === null ||
-    (isRecord(enemy) &&
-      isRestorableDamageResult(lastResult) &&
-      typeof enemy['damageTaken'] === 'number' &&
-      isRecord(enemy['stats']) &&
-      typeof enemy['stats']['health'] === 'number' &&
-      lastResult.damageTaken === enemy['damageTaken'] &&
-      lastResult.damageTaken <= enemy['stats']['health']);
-
-  const phases = [
-    'idle',
-    'awaiting-player-action',
-    'resolving-player-action',
-    'enemy-turn',
-    'victory',
-    'defeat',
-  ];
-  const combatCounters = [
-    'playerActions',
-    'damagingActions',
-    'attackCount',
-    'magicActions',
-    'potionUses',
-    'enemyDamageActions',
-    'enemyVenom',
-    'turn',
-  ] as const;
-  const relicFlags = value['relicFlags'];
-  const enemyIntent = value['enemyIntent'];
-  const playerBlock = value['playerBlock'];
-  const enemyBlock = value['enemyBlock'];
-  const enemyHexed = value['enemyHexed'];
-  return (
-    typeof value['phase'] === 'string' &&
-    phases.includes(value['phase']) &&
-    (enemy === null || isRestorableEnemy(enemy)) &&
-    isNonNegativeInteger(value['playerDamageTaken']) &&
-    (enemy !== null || value['playerDamageTaken'] === 0) &&
-    value['pendingAction'] === null &&
-    combatCounters.every(
-      (counter) => value[counter] === undefined || isNonNegativeInteger(value[counter]),
-    ) &&
-    (value['openingActor'] === undefined ||
-      value['openingActor'] === null ||
-      value['openingActor'] === 'player' ||
-      value['openingActor'] === 'enemy') &&
-    (enemyIntent === undefined || enemyIntent === null || isEnemyIntent(enemyIntent)) &&
-    (playerBlock === undefined || isNonNegativeInteger(playerBlock)) &&
-    (enemyBlock === undefined || isNonNegativeInteger(enemyBlock)) &&
-    (enemyHexed === undefined || typeof enemyHexed === 'boolean') &&
-    (relicFlags === undefined ||
-      (isRecord(relicFlags) &&
-        Object.values(relicFlags).every((flag) => typeof flag === 'boolean'))) &&
-    coherentLastResult
-  );
-}
-
-function isRestorableStoreItems(value: unknown): value is readonly ItemState[] {
-  if (!Array.isArray(value)) return false;
-
-  const ids = value.map((item) => (isRecord(item) ? item['id'] : undefined));
-  return (
-    ids.every((id) => typeof id === 'string' && STORE_ITEMS.some((item) => item.id === id)) &&
-    new Set(ids).size === ids.length
-  );
-}
-
-function isRestorableRouteFloor(value: unknown): value is number {
-  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 1;
-}
-
-function strengthenEliteEnemy(enemy: EnemyState): EnemyState {
-  const stats = { ...enemy.stats };
-  (Object.keys(stats) as (keyof Stats)[]).forEach((stat) => {
-    stats[stat] = Math.round(stats[stat] * 1.15);
-  });
-  return { ...enemy, stats, gold: Math.round(enemy.gold * 1.5), elite: true };
-}
-
-function hasCoherentSessionState(snapshot: Partial<StoredSessionSnapshot>): boolean {
-  const hasPlayer = snapshot.player !== null && snapshot.player !== undefined;
-  const hasEnemy = snapshot.combatState?.enemy !== null;
-  const phase = snapshot.combatState?.phase;
-
-  if (!hasPlayer) {
-    return (
-      (snapshot.screen === 'welcome' || snapshot.screen === 'character-select') &&
-      phase === 'idle' &&
-      !hasEnemy
-    );
-  }
-
-  if (snapshot.screen === 'combat') {
-    if (!hasEnemy || !snapshot.combatState?.enemy) return false;
-
-    const enemyDefeated =
-      snapshot.combatState.enemy.damageTaken >= snapshot.combatState.enemy.stats.health;
-    return (
-      (phase === 'awaiting-player-action' && !enemyDefeated) ||
-      (phase === 'victory' && enemyDefeated)
-    );
-  }
-
-  if (snapshot.screen === 'map') {
-    const mapEnemy = snapshot.combatState?.enemy;
-    return (
-      phase === 'victory' &&
-      mapEnemy !== null &&
-      mapEnemy !== undefined &&
-      mapEnemy.damageTaken >= mapEnemy.stats.health &&
-      isRouteMapState(snapshot.routeMap)
-    );
-  }
-
-  if (snapshot.screen === 'store') {
-    const storeEnemy = snapshot.combatState?.enemy;
-    return (
-      ((phase === 'idle' && storeEnemy === null) ||
-        (phase === 'victory' &&
-          storeEnemy !== null &&
-          storeEnemy !== undefined &&
-          storeEnemy.damageTaken >= storeEnemy.stats.health)) &&
-      (snapshot.routeMap === null || snapshot.routeMap === undefined)
-    );
-  }
-
-  if (snapshot.screen === 'run-complete') {
-    const finalEnemy = snapshot.combatState?.enemy;
-    return (
-      phase === 'victory' &&
-      finalEnemy !== null &&
-      finalEnemy !== undefined &&
-      finalEnemy.damageTaken >= finalEnemy.stats.health &&
-      snapshot.player !== null &&
-      snapshot.player !== undefined &&
-      snapshot.player.bossesDefeated >= BOSS_ROOMS.length
-    );
-  }
-
-  return (
-    snapshot.screen === 'game-over' &&
-    phase === 'defeat' &&
-    hasEnemy &&
-    snapshot.player !== null &&
-    snapshot.player !== undefined &&
-    snapshot.combatState !== undefined &&
-    snapshot.combatState.playerDamageTaken >= snapshot.player.stats.health
-  );
 }
 
 @Injectable({ providedIn: 'root' })
 export class GameSessionService {
-  private readonly random: RandomSource = inject(RANDOM_SOURCE, { optional: true }) ?? Math.random;
-  private readonly clock: Clock = inject(CLOCK, { optional: true }) ?? BROWSER_CLOCK;
-  private readonly storage: SessionStoragePort | null = inject(SESSION_STORAGE, { optional: true });
-  private readonly recordsStorage: RecordsStoragePort | null = inject(RECORDS_STORAGE, {
-    optional: true,
-  });
-  private readonly preferencesStorage: PreferencesStoragePort | null = inject(PREFERENCES_STORAGE, {
-    optional: true,
-  });
+  private readonly storage: KeyValueStore = inject(STORAGE, { optional: true }) ?? BROWSER_STORAGE;
+  private readonly persistence = new SessionPersistence(this.storage);
   private readonly audio: AudioPort | null = inject(AUDIO, { optional: true });
-  private pendingEnemyTurn: ClockHandle | null = null;
-  private pendingEnemyAnimationReset: ClockHandle | null = null;
-  private pendingPlayerImpact: ClockHandle | null = null;
-  private pendingPlayerActionReady: ClockHandle | null = null;
-  private pendingCombatFeedbackReset: ClockHandle | null = null;
-  private runGeneration = 0;
+  private readonly clock: Clock = inject(CLOCK, { optional: true }) ?? BROWSER_CLOCK;
+  private readonly presentationQueue = new PresentationQueue(this.clock);
+  private readonly urlSeed = readUrlSeed();
+  private readonly runState = signal<RunState | null>(this.persistence.restoreRun());
+  private readonly preRunScreen = signal<'welcome' | 'character-select'>('welcome');
+  private readonly preferencesState = signal<Preferences>(this.persistence.restorePreferences());
+  private readonly visiblePhase = signal<CombatUiPhase>('player-turn');
+  private readonly displaySnapshot = signal<CombatSnapshot | null>(null);
   private feedbackSequence = 0;
-  readonly screen = signal<GameScreen>('welcome');
-  readonly playerName = signal('');
-  readonly selectedCharacter = signal<CharacterDefinition | null>(null);
-  readonly player = signal<PlayerState | null>(null);
-  readonly combatState = signal<CombatState>(INITIAL_COMBAT_STATE);
-  readonly routeFloor = signal(1);
-  readonly totalRooms = FINAL_ROOM;
-  readonly completedRooms = computed(() =>
-    Math.min(this.totalRooms, Math.max(0, this.routeFloor() - 1)),
-  );
-  readonly runProgressPercent = computed(() =>
-    Math.round((this.completedRooms() / this.totalRooms) * 100),
-  );
-  readonly routeMap = signal<RouteMapState | null>(null);
-  /** The next frontier survives combat/store screens so path choices stay connected. */
-  readonly nextRouteMap = signal<RouteMapState | null>(null);
-  readonly routeLayers = computed(() => {
-    const map = this.routeMap();
-    if (!map) return [] as readonly RouteLayer[];
-    if (!map.layers) return [{ floor: map.floor, nodes: map.nodes }] as readonly RouteLayer[];
+  private animationSequence = 0;
 
-    const layers: RouteLayer[] = [];
-    let reachableIds = new Set(map.nodes.map((node) => node.id));
-    for (let floor = map.floor; floor <= Math.min(FINAL_ROOM, map.floor + 3); floor += 1) {
-      const layer = map.layers.find((candidate) => candidate.floor === floor);
-      if (!layer) break;
-      const visibleNodes = layer.nodes.filter((node) => reachableIds.has(node.id));
-      if (!visibleNodes.length) break;
-      layers.push({ ...layer, nodes: visibleNodes });
-      reachableIds = new Set(visibleNodes.flatMap((node) => node.nextNodeIds ?? []));
-    }
-    return layers;
-  });
-  readonly enemy = computed(() => this.combatState().enemy);
-  readonly enemyIntent = computed(() => this.combatState().enemyIntent ?? null);
-  readonly playerBlock = computed(() => this.combatState().playerBlock ?? 0);
-  readonly enemyBlock = computed(() => this.combatState().enemyBlock ?? 0);
-  readonly enemyHexed = computed(() => this.combatState().enemyHexed ?? false);
-  readonly playerHealthTrail = signal(0);
-  readonly enemyHealthTrail = signal(0);
+  readonly playerName = signal(this.runState()?.player.name ?? '');
+  readonly selectedCharacter = signal<CharacterView | null>(null);
+  readonly dailyRequested = signal(false);
+  readonly isPresenting = signal(false);
+  readonly personalRecords = signal<readonly PersonalRecord[]>(this.persistence.readRecords(false));
+  readonly dailyRecords = signal<readonly PersonalRecord[]>(this.persistence.readRecords(true));
+  readonly combatMessage = signal('');
   readonly enemyAnimation = signal<'idle' | 'attack' | 'hit' | 'defeat'>('idle');
   readonly enemyActionKind = signal<DamageKind | null>(null);
   readonly playerAnimation = signal<'idle' | 'action' | 'hit' | 'defeat'>('idle');
   readonly playerActionKind = signal<DamageKind | null>(null);
   readonly combatFeedback = signal<CombatFeedback | null>(null);
-  readonly actionReady = signal(false);
-  readonly playerActionAsset = computed<SpriteStripAsset | null>(() => {
-    const player = this.player();
-    if (!player) return null;
-    if (this.playerActionKind() === 'magic') {
-      return player.character.magicAsset ?? player.character.actionAsset ?? null;
-    }
-    return player.character.actionAsset ?? null;
-  });
-  readonly playerIdleSpriteAsset = computed<SpriteStripAsset | null>(
-    () => this.player()?.character.idleSpriteAsset ?? null,
-  );
-  readonly playerHitAsset = computed<SpriteStripAsset | null>(
-    () => this.player()?.character.hitAsset ?? null,
-  );
-  readonly enemyAsset = computed(
-    () => enemyAssetFor(this.enemy()?.definition.id ?? '', this.enemyAnimation()) ?? '',
-  );
-  readonly enemySpriteAsset = computed<SpriteStripAsset | null>(
-    () =>
-      enemySpriteAssetFor(
-        this.enemy()?.definition.id ?? '',
-        this.enemyAnimation(),
-        this.enemyActionKind() ?? 'attack',
-      ) ?? null,
-  );
-  readonly defeatedEnemySummary = computed<readonly DefeatedEnemySummary[]>(() => {
-    const history = this.player()?.defeatedEnemies ?? [];
-    const grouped = new Map<string, number[]>();
-
-    for (const defeatedEnemy of history) {
-      const levels = grouped.get(defeatedEnemy.enemyId) ?? [];
-      levels.push(defeatedEnemy.level);
-      grouped.set(defeatedEnemy.enemyId, levels);
-    }
-
-    return [...grouped.entries()].map(([enemyId, levels]) => {
-      const definition = findEnemyDefinition(enemyId);
-      return {
-        enemyId,
-        name: definition?.name ?? enemyId,
-        idleAsset: enemyAssetFor(enemyId, 'idle') ?? '',
-        count: levels.length,
-        levelsLabel: levels.join(', '),
-      };
-    });
-  });
-  readonly combatStatus = computed<'ready' | 'defeated'>(() =>
-    this.combatState().phase === 'victory' || this.combatState().phase === 'defeat'
-      ? 'defeated'
-      : 'ready',
-  );
-  readonly playerRemainingHealth = computed(() => {
-    const player = this.player();
-    return player ? Math.max(0, player.stats.health - this.combatState().playerDamageTaken) : 0;
-  });
-  readonly canAct = computed(
-    () => this.combatState().phase === 'awaiting-player-action' && this.actionReady(),
-  );
-  readonly storeItems = signal<readonly ItemState[]>([]);
-  readonly storePotions = STORE_POTIONS;
   readonly lastActionAt = signal<number | null>(null);
-  readonly combatMessage = signal('');
-  readonly personalRecords = signal<readonly PersonalRecord[]>([]);
-  readonly musicVolume = signal(DEFAULT_MUSIC_VOLUME);
-  readonly effectsVolume = signal(DEFAULT_EFFECTS_VOLUME);
-  readonly playerCombatLog = signal<readonly CombatLogEntry[]>([]);
-  readonly enemyCombatLog = signal<readonly CombatLogEntry[]>([]);
+  private readonly views = createSessionViews({
+    run: this.runState,
+    preRunScreen: this.preRunScreen,
+    isPresenting: this.isPresenting,
+    visiblePhase: this.visiblePhase,
+    displaySnapshot: this.displaySnapshot,
+    playerName: this.playerName,
+    selectedCharacter: this.selectedCharacter,
+    dailyRequested: this.dailyRequested,
+    preferences: this.preferencesState,
+    playerActionKind: this.playerActionKind,
+    enemyActionKind: this.enemyActionKind,
+    enemyAnimation: this.enemyAnimation,
+    now: () => this.clock.now(),
+  });
+
+  readonly characters = this.views.characters;
+  readonly screen = this.views.screen;
+  readonly player = this.views.player;
+  readonly enemy = this.views.enemy;
+  readonly routeMap = this.views.routeMap;
+  readonly routeLayers = this.views.routeLayers;
+  readonly storeItems = this.views.storeItems;
+  readonly storePotions = POTION_OFFERS;
+  readonly totalRooms = FINAL_ROOM;
+  readonly completedRooms = this.views.completedRooms;
+  readonly runProgressPercent = this.views.runProgressPercent;
+  readonly playerRemainingHealth = this.views.playerRemainingHealth;
+  readonly playerHealthTrail = this.views.playerHealthTrail;
+  readonly enemyHealthTrail = this.views.enemyHealthTrail;
+  readonly enemyIntent = this.views.enemyIntent;
+  readonly playerDamageRanges = this.views.playerDamageRanges;
+  readonly playerGuardAmount = this.views.playerGuardAmount;
+  readonly playerBlock = this.views.playerBlock;
+  readonly enemyBlock = this.views.enemyBlock;
+  readonly enemyHexed = this.views.enemyHexed;
+  readonly combatState = this.views.combatState;
+  readonly combatStatus = this.views.combatStatus;
+  readonly canAct = this.views.canAct;
+  readonly playerActionAsset = this.views.playerActionAsset;
+  readonly playerIdleSpriteAsset = this.views.playerIdleSpriteAsset;
+  readonly playerHitAsset = this.views.playerHitAsset;
+  readonly enemyAsset = this.views.enemyAsset;
+  readonly enemySpriteAsset = this.views.enemySpriteAsset;
+  readonly defeatedEnemySummary = this.views.defeatedEnemySummary;
+  readonly validationMessage = this.views.validationMessage;
+  readonly canStartRun = this.views.canStartRun;
+  readonly musicVolume = this.views.musicVolume;
+  readonly effectsVolume = this.views.effectsVolume;
+  readonly muted = this.views.muted;
+  readonly textSpeed = this.views.textSpeed;
+  readonly shareSeed = this.views.shareSeed;
+  readonly dailyLabel = this.views.dailyLabel;
 
   constructor() {
-    this.restorePreferences();
-    this.restorePersonalRecords();
-    this.restore();
-    this.syncMusicToScreen();
-    effect(() => this.persist());
+    this.audio?.setVolumes(
+      this.preferencesState().muted ? 0 : this.preferencesState().musicVolume,
+      this.preferencesState().muted ? 0 : this.preferencesState().effectsVolume,
+    );
+    effect(() => this.syncMusic());
+    const restored = this.runState();
+    if (restored) {
+      this.selectedCharacter.set(
+        this.characters.find((character) => character.id === restored.player.characterId) ?? null,
+      );
+      this.combatMessage.set('Your saved run was restored.');
+    }
+    this.persistRecords();
   }
-  readonly validationMessage = computed(() => {
-    const name = this.playerName().trim();
 
-    if (!name) {
-      return 'Enter a name to continue.';
-    }
-
-    if (name.length < 3 || name.length > 14) {
-      return 'Name must contain between 3 and 14 characters.';
-    }
-
-    if (!this.selectedCharacter()) {
-      return 'Choose a character to continue.';
-    }
-
-    return '';
-  });
-
-  readonly canStartRun = computed(() => this.validationMessage() === '');
-
-  beginCharacterSelection(): void {
-    this.screen.set('character-select');
-    this.audio?.playMusic(ASSET_MANIFEST.music.characterSelect);
+  beginCharacterSelection(daily = false): void {
+    this.dailyRequested.set(daily);
+    this.preRunScreen.set('character-select');
+    this.audio?.playMusic('characterSelect');
   }
 
   setPlayerName(name: string): void {
-    this.playerName.set(name.slice(0, 14));
+    this.playerName.set(name.slice(0, NAME_MAX));
   }
 
-  selectCharacter(character: CharacterDefinition): void {
+  selectCharacter(character: CharacterView): void {
     this.selectedCharacter.set(character);
   }
 
   startRun(): void {
     const character = this.selectedCharacter();
     const name = this.playerName().trim();
-
-    if (!character || name.length < 3 || name.length > 14) {
-      return;
-    }
-
-    this.player.set(createInitialPlayer(name, character));
-    this.combatState.set(INITIAL_COMBAT_STATE);
-    this.playerHealthTrail.set(100);
-    this.enemyHealthTrail.set(0);
-    this.routeFloor.set(1);
-    this.routeMap.set(null);
-    this.nextRouteMap.set(null);
-    this.storeItems.set([]);
-    this.actionReady.set(false);
-    this.enemyAnimation.set('idle');
-    this.enemyActionKind.set(null);
-    this.playerAnimation.set('idle');
-    this.playerActionKind.set(null);
-    this.clearCombatLogs();
-    this.combatMessage.set('Choose a door. The dungeon will reveal what waits beyond it.');
-    this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
-    this.showRouteMap();
-  }
-
-  findEnemy(routeKind: Extract<RouteNodeKind, 'battle' | 'elite' | 'boss'> = 'battle'): void {
-    const player = this.player();
-
-    if (!player || player.powerUps.pending > 0) {
-      return;
-    }
-
-    const generatedEnemy = generateEnemy(
-      player.level,
-      this.random(),
-      this.random(),
-      player.bossesDefeated,
-      routeKind === 'boss',
-      routeKind === 'elite' ? player.level : undefined,
+    if (!character || validatePlayerName(name)) return;
+    const daily = this.dailyRequested() ? dailyChallenge(new Date(this.clock.now())) : null;
+    const randomSeed = Math.floor(Math.random() * 0x1_0000_0000) >>> 0;
+    const seed = daily?.seed ?? this.urlSeed ?? randomSeed;
+    this.cancelAll();
+    this.clearCombatPresentation();
+    const run = createRun(seed, name, character.id, daily?.date ?? null);
+    this.setRun(run);
+    this.combatMessage.set(
+      daily
+        ? `${this.dailyLabel()} · today's route is ready.`
+        : 'Choose a door. The dungeon will reveal what waits beyond it.',
     );
-    const spawnedEnemy =
-      routeKind === 'elite' ? strengthenEliteEnemy(generatedEnemy) : generatedEnemy;
-    const openingActor = determineFirstActor(player.stats.speed, spawnedEnemy.stats.speed);
-    if (
-      !this.applyCombatEvent({
-        type: 'enemy-spawned',
-        enemy: spawnedEnemy,
-      })
-    ) {
-      return;
-    }
-    this.routeMap.set(null);
-    this.syncHealthTrail('player', this.playerRemainingHealth(), player.stats.health);
-    this.syncHealthTrail('enemy', spawnedEnemy.stats.health, spawnedEnemy.stats.health);
-    this.enemyAnimation.set('idle');
-    this.playerAnimation.set('idle');
-    this.enemyActionKind.set(null);
-    this.playerActionKind.set(null);
-    this.actionReady.set(false);
-    const intent = chooseEnemyIntent(spawnedEnemy, player.stats, this.random(), 0);
-    this.combatState.update((state) => ({
-      ...state,
-      enemyIntent: intent,
-      turn: 0,
-      openingActor,
-      playerBlock: relicStartOfCombatBlock(player),
-    }));
-    this.addCombatLog('enemy', {
-      title: spawnedEnemy.definition.name,
-      message: 'has appeared and revealed its intent.',
-    });
-    this.screen.set('combat');
-    this.audio?.playMusic(
-      spawnedEnemy.definition.archetype === 'boss'
-        ? ASSET_MANIFEST.music.boss
-        : ASSET_MANIFEST.music.dungeon,
-    );
-
-    if (openingActor === 'enemy') {
-      this.combatMessage.set(this.enemyIntentMessage(spawnedEnemy, intent));
-      this.addCombatLog('enemy', {
-        title: spawnedEnemy.definition.name,
-        message: 'acts first!',
-      });
-      this.startEnemyTurn();
-    } else {
-      this.actionReady.set(true);
-      this.combatMessage.set(
-        `${this.enemyIntentMessage(spawnedEnemy, intent)} Choose your response.`,
-      );
-      this.addCombatLog('player', { title: 'You', message: 'attack first!' });
-    }
-  }
-
-  openStore(): void {
-    if (!this.player() || this.screen() !== 'map') return;
-    const player = this.player();
-    if (!player) return;
-    this.storeItems.set(
-      generateStoreOffers(player, { floor: this.routeFloor(), random: this.random }),
-    );
-    this.screen.set('store');
-    this.combatMessage.set('');
-    this.audio?.playMusic(ASSET_MANIFEST.music.store);
-  }
-
-  closeStore(): void {
-    if (this.screen() !== 'store') return;
-    this.showRouteMap();
-  }
-
-  openRouteMap(): void {
-    const player = this.player();
-    if (
-      !player ||
-      this.combatState().phase !== 'victory' ||
-      player.powerUps.pending > 0 ||
-      player.bossesDefeated >= BOSS_ROOMS.length
-    )
-      return;
-    this.showRouteMap();
-  }
-
-  private showRouteMap(): void {
-    const player = this.player();
-    if (!player) return;
-    if (!this.routeMap()) {
-      const map = this.nextRouteMap() ?? createRouteMap(this.routeFloor(), this.random());
-      this.nextRouteMap.set(null);
-      const hasCompass = this.player()?.inventory.some((item) => item.id === 'travelers-compass');
-      this.routeMap.set(hasCompass ? revealHiddenRouteNodes(map, 1) : map);
-    }
-    this.screen.set('map');
-    this.actionReady.set(false);
-    this.audio?.playMusic(ASSET_MANIFEST.music.dungeon);
   }
 
   chooseRouteNode(nodeId: string): void {
-    const player = this.player();
-    const map = this.routeMap();
-    const node = map ? findRouteNode(map, nodeId) : undefined;
-    if (!player || !map || !node || this.screen() !== 'map') return;
-
-    this.nextRouteMap.set(advanceRouteMap(map, node.id));
-    this.routeMap.set(null);
-    this.routeFloor.set(map.floor + 1);
-
-    if (node.kind === 'store') {
-      this.openStore();
-      return;
-    }
-
-    if (node.kind === 'rest') {
-      const damageTaken = this.combatState().playerDamageTaken;
-      const restResult = resolveHeal(damageTaken, player.stats.health, 0.3);
-      this.combatState.update((state) => ({
-        ...state,
-        playerDamageTaken: Math.max(0, state.playerDamageTaken - restResult.healed),
-      }));
+    const run = this.runState();
+    if (!run) return;
+    const step = enterRouteNode(run, nodeId);
+    if (step.run === run) return;
+    this.setRun(step.run);
+    this.handleNotice(step.notice);
+    this.enqueueEvents(step.events);
+    if (step.notice?.type === 'rest') {
       this.combatMessage.set(
-        restResult.healed > 0
-          ? `The campfire restored ${restResult.healed} HP for the next encounter.`
+        step.notice.healed > 0
+          ? `The campfire restored ${step.notice.healed} HP for the next encounter.`
           : 'The campfire found you at full health. The next route awaits.',
       );
-      this.showRouteMap();
-      return;
     }
+  }
 
-    this.findEnemy(node.kind);
+  openRouteMap(): void {
+    const run = this.runState();
+    if (run?.screen !== 'combat' || run.combat?.phase !== 'victory' || this.isPresenting()) return;
+    this.setRun(leaveCombat(run).run);
+    this.combatMessage.set('Choose your next route.');
+  }
+
+  closeStore(): void {
+    const run = this.runState();
+    if (run?.screen === 'store') this.setRun(leaveStore(run).run);
   }
 
   buyItem(itemId: string): void {
-    const player = this.player();
-    if (!player) return;
-    const result = purchaseItem(player, itemId);
-    this.player.set(result.player);
-    this.combatMessage.set(result.purchased ? result.message : result.reason);
-    this.audio?.playSound(
-      result.purchased ? ASSET_MANIFEST.sounds.coin : ASSET_MANIFEST.sounds.error,
-    );
+    const run = this.runState();
+    if (!run || !isRelicId(itemId)) return;
+    const step = purchaseRelic(run, itemId as RelicId);
+    this.setRun(step.run);
+    this.handleNotice(step.notice);
   }
 
   buyPotions(offerId: string): void {
-    const player = this.player();
-    if (!player) return;
-    const result = purchasePotions(player, offerId);
-    this.player.set(result.player);
-    this.combatMessage.set(result.purchased ? result.message : result.reason);
-    this.audio?.playSound(
-      result.purchased ? ASSET_MANIFEST.sounds.potion : ASSET_MANIFEST.sounds.error,
-    );
+    const run = this.runState();
+    if (!run || !POTION_OFFERS.some((offer) => offer.id === offerId)) return;
+    const step = purchasePotions(run, offerId as PotionOfferId);
+    this.setRun(step.run);
+    this.handleNotice(step.notice);
   }
 
   attack(kind: DamageKind): void {
-    this.beginPlayerAction(kind);
+    this.performAction(kind);
   }
 
   guard(): void {
-    this.beginPlayerAction('guard');
-  }
-
-  private beginPlayerAction(kind: DamageKind | 'guard'): void {
-    if (!this.player() || !this.enemy() || !this.canAct()) return;
-    if (!this.applyCombatEvent({ type: 'player-action-started', kind })) return;
-
-    this.actionReady.set(false);
-    this.playerActionKind.set(kind === 'guard' ? null : kind);
-    this.playerAnimation.set(kind === 'guard' ? 'idle' : 'action');
-    this.lastActionAt.set(this.clock.now());
-    this.combatMessage.set(
-      kind === 'guard'
-        ? 'You raise your guard and prepare for the incoming action.'
-        : `You use ${kind === 'attack' ? 'Attack' : 'Magic'}.`,
-    );
-    this.audio?.playSound(
-      kind === 'guard'
-        ? ASSET_MANIFEST.sounds.guard
-        : kind === 'attack'
-          ? ASSET_MANIFEST.sounds.attack
-          : ASSET_MANIFEST.sounds.magic,
-    );
-    this.pendingPlayerImpact = this.clock.schedule(
-      () => {
-        this.pendingPlayerImpact = null;
-        if (kind === 'guard') this.resolvePlayerGuard();
-        else this.resolvePlayerDamage(kind);
-      },
-      this.combatMessagePacingDelay(this.combatMessage(), 320),
-    );
-  }
-
-  private resolvePlayerGuard(): void {
-    const player = this.player();
-    const enemy = this.enemy();
-    if (!player || !enemy || this.combatState().pendingAction !== 'guard') return;
-
-    const block =
-      guardBlockAmount(player.stats, relicGuardBlockMultiplier(player)) + relicGuardBonus(player);
-    if (!this.applyCombatEvent({ type: 'player-guard-resolved', block })) return;
-    this.combatState.update((state) => ({
-      ...state,
-      playerActions: (state.playerActions ?? 0) + 1,
-    }));
-
-    this.showCombatFeedback({ target: 'player', kind: 'guard', amount: block });
-    this.combatMessage.set(`Guard raised ${block} Block.`);
-    this.addCombatLog('player', {
-      title: player.name,
-      message: `raised ${block} Block.`,
-      value: block,
-      icon: '🛡',
-    });
-    this.scheduleEnemyTurn();
-  }
-
-  private relicContext(player: PlayerState): RelicCombatContext {
-    const state = this.combatState();
-    return {
-      playerHealth: player.stats.health,
-      playerDamageTaken: state.playerDamageTaken,
-      playerActions: state.playerActions ?? 0,
-      damagingActions: state.damagingActions ?? 0,
-      attackCount: state.attackCount ?? 0,
-      magicActions: state.magicActions ?? 0,
-      potionUses: state.potionUses ?? 0,
-      enemyDamageActions: state.enemyDamageActions ?? 0,
-      openingActor: state.openingActor ?? null,
-      relicFlags: state.relicFlags ?? {},
-    };
-  }
-
-  private resolvePlayerDamage(kind: DamageKind): void {
-    const player = this.player();
-    const enemy = this.enemy();
-    if (!player || !enemy || this.combatState().pendingAction !== kind) return;
-
-    const stateBeforeAction = this.combatState();
-    const enemyHexed = stateBeforeAction.enemyHexed ?? false;
-    const previousEnemyHealth = enemy.stats.health - enemy.damageTaken;
-    const damageRules = relicDamageRules(player, kind, this.relicContext(player));
-    const damageMultiplier =
-      damageRules.damageMultiplier *
-      (kind === 'attack' && enemyHexed ? relicArcaneMarkMultiplier(player) : 1);
-    const result = resolveDamage(
-      { stats: player.stats },
-      enemy,
-      kind,
-      {
-        damageRoll: this.random(),
-        chanceRoll: damageRules.guaranteedHit ? Math.max(0.11, this.random()) : this.random(),
-      },
-      {
-        damageMultiplier,
-        block:
-          (this.combatState().enemyBlock ?? 0) /
-          (kind === 'attack' ? relicGuardBreakMultiplier(player) : 1),
-      },
-    );
-    if (!this.applyCombatEvent({ type: 'player-action-resolved', result })) return;
-
-    const dealt = damageDealt(result);
-    this.combatState.update((state) => ({
-      ...state,
-      playerActions: (state.playerActions ?? 0) + 1,
-      damagingActions: (state.damagingActions ?? 0) + 1,
-      attackCount: (state.attackCount ?? 0) + (kind === 'attack' ? 1 : 0),
-      magicActions: (state.magicActions ?? 0) + (kind === 'magic' ? 1 : 0),
-      relicFlags:
-        kind === 'magic' && dealt > 0
-          ? { ...state.relicFlags, 'arcane-battery-used': true }
-          : state.relicFlags,
-      playerBlock:
-        (state.playerBlock ?? 0) +
-        (kind === 'magic' && dealt > 0 ? relicMagicBlock(player, this.relicContext(player)) : 0),
-      enemyVenom:
-        (state.enemyVenom ?? 0) + (kind === 'magic' && dealt > 0 ? relicMagicVenom(player) : 0),
-    }));
-
-    if (dealt > 0) {
-      this.showHealthDamageTrail(
-        'enemy',
-        previousEnemyHealth,
-        enemy.stats.health - result.damageTaken,
-        enemy.stats.health,
-      );
-    }
-    const defeated = result.damageTaken >= enemy.stats.health;
-    this.addCombatLog('player', {
-      title: player.name,
-      message: result.missed ? `${kind} missed.` : '',
-      ...(result.missed ? {} : { value: dealt }),
-      icon: kind === 'attack' ? '🔪' : '☄',
-    });
-
-    if (result.missed) {
-      this.showCombatFeedback({ target: 'enemy', kind: 'miss', action: kind });
-      this.combatMessage.set(`Your ${kind} missed.`);
-    } else if (dealt === 0 && (result.blocked ?? 0) > 0) {
-      this.showCombatFeedback({
-        target: 'enemy',
-        kind: 'blocked',
-        amount: result.blocked,
-        action: kind,
-      });
-      this.combatMessage.set(`${enemy.definition.name} blocked the ${kind}.`);
-    } else {
-      this.enemyAnimation.set(defeated ? 'defeat' : 'hit');
-      this.enemyActionKind.set(null);
-      this.showCombatFeedback({
-        target: 'enemy',
-        kind: result.critical ? 'critical' : 'damage',
-        amount: dealt,
-        action: kind,
-      });
-      const criticalMessage = result.critical ? ' Critical hit!' : '';
-      const hexMessage =
-        kind === 'magic' && !result.missed
-          ? ' Arcane mark applied: your next Attack hits harder.'
-          : '';
-      this.combatMessage.set(`Your ${kind} dealt ${dealt} damage.${criticalMessage}${hexMessage}`);
-    }
-
-    if (defeated) {
-      this.finishVictory(player, enemy);
-      return;
-    }
-
-    this.scheduleEnemyTurn();
+    this.performAction('guard');
   }
 
   usePotion(): void {
-    const player = this.player();
-    const enemy = this.enemy();
-    if (!player || !enemy || !this.canAct() || player.potions <= 0) return;
-
-    const relicContext = this.relicContext(player);
-    const freeTurn = relicPotionIsFree(player, relicContext);
-    const potionBlock = relicPotionBlock(player, relicContext);
-
-    const healResult = resolveHeal(
-      this.combatState().playerDamageTaken,
-      player.stats.health,
-      relicPotionHealingFraction(player),
-    );
-    if (!this.applyCombatEvent({ type: 'player-potion-used', freeTurn })) return;
-
-    this.actionReady.set(false);
-    this.player.set({ ...player, potions: player.potions - 1 });
-    this.combatState.update((state) => ({
-      ...state,
-      playerDamageTaken: Math.max(0, state.playerDamageTaken - healResult.healed),
-      playerActions: (state.playerActions ?? 0) + 1,
-      potionUses: (state.potionUses ?? 0) + 1,
-      playerBlock: (state.playerBlock ?? 0) + potionBlock,
-    }));
-    this.syncHealthTrail('player', this.playerRemainingHealth(), player.stats.health);
-    this.combatMessage.set(`You used a potion and healed ${healResult.healed} HP.`);
-    this.addCombatLog('player', {
-      title: player.name,
-      message: `healed ${healResult.healed} HP.`,
-      icon: '❤',
-    });
-    this.showCombatFeedback({ target: 'player', kind: 'heal', amount: healResult.healed });
-    this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
-    if (freeTurn) this.schedulePlayerActionReady();
-    else this.scheduleEnemyTurn();
+    this.performAction('potion');
   }
 
-  choosePowerUp(type: Parameters<typeof applyPowerUp>[1]): void {
-    const player = this.player();
-    if (!player) return;
-    this.player.set(applyPowerUp(player, type));
+  choosePowerUp(type: PowerUpType): void {
+    const run = this.runState();
+    if (!run || !['health', 'ad', 'ap', 'armor', 'mr', 'speed'].includes(type)) return;
+    const step = applyRunPowerUp(run, type);
+    if (step.run !== run) this.setRun(step.run);
   }
 
   clearPersonalRecords(): void {
     this.personalRecords.set([]);
-    this.recordsStorage?.clear();
+    this.dailyRecords.set([]);
+    this.persistRecords();
   }
 
-  setMusicVolume(volume: number): void {
-    const next = clampVolume(volume);
-    this.musicVolume.set(next);
-    this.audio?.setMusicVolume(next);
-    this.persistPreferences();
+  setMusicVolume(percent: number): void {
+    this.updatePreferences({ musicVolume: volumeFromPercent(percent) });
   }
 
-  setEffectsVolume(volume: number): void {
-    const next = clampVolume(volume);
-    this.effectsVolume.set(next);
-    this.audio?.setEffectsVolume(next);
-    this.persistPreferences();
+  setEffectsVolume(percent: number): void {
+    this.updatePreferences({ effectsVolume: volumeFromPercent(percent) });
+  }
+
+  setTextSpeed(speed: TextSpeed): void {
+    if (speed === 'slow' || speed === 'normal' || speed === 'instant')
+      this.updatePreferences({ textSpeed: speed });
+  }
+
+  toggleMuted(): void {
+    this.updatePreferences({ muted: !this.preferencesState().muted });
+  }
+
+  copySeed(): void {
+    const seed = this.shareSeed();
+    if (!seed) return;
+    try {
+      const clipboard = globalThis.navigator?.clipboard;
+      if (clipboard)
+        void clipboard.writeText(seed).then(
+          () => this.combatMessage.set(`Seed ${seed} copied.`),
+          () => this.combatMessage.set(`Share seed: ${seed}`),
+        );
+      else this.combatMessage.set(`Share seed: ${seed}`);
+    } catch {
+      this.combatMessage.set(`Share seed: ${seed}`);
+    }
+  }
+
+  /** Skip the remaining presentation events and reveal the already-saved domain result. */
+  skipPresentation(): void {
+    if (!this.isPresenting()) return;
+    this.presentationQueue.skip();
+  }
+
+  /** All transient animation and message work is stopped through this one reset path. */
+  cancelAll(): void {
+    this.presentationQueue.cancelAll();
+    this.animationSequence += 1;
+    this.isPresenting.set(false);
+    this.displaySnapshot.set(null);
+    this.visiblePhase.set(phaseForRun(this.runState()));
   }
 
   reset(): void {
-    this.cancelPendingEnemyTurn();
-    this.cancelPendingEnemyAnimationReset();
-    this.cancelPendingPlayerImpact();
-    this.cancelPendingPlayerActionReady();
-    this.cancelPendingCombatFeedbackReset();
-    this.runGeneration += 1;
-    this.screen.set('welcome');
+    this.cancelAll();
+    this.clearCombatPresentation();
+    this.setRun(null);
+    this.preRunScreen.set('welcome');
+    this.dailyRequested.set(false);
     this.playerName.set('');
     this.selectedCharacter.set(null);
-    this.player.set(null);
-    this.routeFloor.set(1);
-    this.routeMap.set(null);
-    this.nextRouteMap.set(null);
-    this.actionReady.set(false);
-    this.applyCombatEvent({ type: 'reset' });
-    this.enemyAnimation.set('idle');
-    this.enemyActionKind.set(null);
-    this.playerAnimation.set('idle');
-    this.playerActionKind.set(null);
-    this.combatFeedback.set(null);
-    this.playerHealthTrail.set(0);
-    this.enemyHealthTrail.set(0);
-    this.clearCombatLogs();
-    this.lastActionAt.set(null);
     this.combatMessage.set('');
-    this.storage?.clear();
-    this.audio?.stopMusic();
-    this.audio?.playMusic(ASSET_MANIFEST.music.welcome);
   }
 
-  private syncMusicToScreen(): void {
-    const asset =
-      this.screen() === 'welcome' || this.screen() === 'run-complete'
-        ? ASSET_MANIFEST.music.welcome
-        : this.screen() === 'character-select'
-          ? ASSET_MANIFEST.music.characterSelect
-          : this.screen() === 'store'
-            ? ASSET_MANIFEST.music.store
-            : this.screen() === 'combat' && this.enemy()?.definition.archetype === 'boss'
-              ? ASSET_MANIFEST.music.boss
-              : ASSET_MANIFEST.music.dungeon;
-    this.audio?.playMusic(asset);
+  private performAction(action: PlayerAction): void {
+    if (!this.canAct()) return;
+    const run = this.runState();
+    if (!run) return;
+    this.lastActionAt.set(this.clock.now());
+    const step = playerAction(run, action);
+    if (step.run === run) return;
+    this.setRun(step.run);
+    this.enqueueEvents(step.events);
   }
 
-  private applyCombatEvent(event: Parameters<typeof transitionCombat>[1]): boolean {
-    const transition = transitionCombat(this.combatState(), event);
+  private enqueueEvents(events: readonly CombatEvent[]): void {
+    if (!events.length) return;
+    this.isPresenting.set(true);
+    const steps = events.map((event, index) => ({
+      delayMs: index === 0 ? 0 : this.eventDelay(events[index - 1] ?? event),
+      apply: (fastForward: boolean) => this.applyPresentationEvent(event, fastForward),
+    }));
+    const lastEvent = events[events.length - 1];
+    if (lastEvent) {
+      steps.push({
+        delayMs: this.eventDelay(lastEvent),
+        apply: () => this.finishPresentation(),
+      });
+    }
+    this.presentationQueue.enqueue(steps);
+  }
 
-    if (!transition.accepted) {
+  private eventDelay(event: CombatEvent): number {
+    if (this.prefersReducedMotion() || this.textSpeed() === 'instant') return 0;
+    const slow = this.textSpeed() === 'slow';
+    if (event.type === 'action' || event.type === 'combat-start') return slow ? 520 : 360;
+    return slow ? 340 : 220;
+  }
+
+  private applyPresentationEvent(event: CombatEvent, fastForward = false): void {
+    this.displaySnapshot.set(event.snapshot);
+    const message = combatEventMessage(event, this.enemy()?.definition.name ?? 'The enemy');
+    switch (event.type) {
+      case 'combat-start':
+        this.visiblePhase.set(event.opening === 'enemy' ? 'enemy-turn' : 'player-turn');
+        this.combatMessage.set(message);
+        break;
+      case 'action':
+        if (event.actor === 'player') {
+          this.visiblePhase.set('player-turn');
+          this.playerActionKind.set(
+            event.action === 'attack' || event.action === 'magic' ? event.action : null,
+          );
+          this.playerAnimation.set(
+            event.action === 'attack' || event.action === 'magic' ? 'action' : 'idle',
+          );
+          this.combatMessage.set(message);
+          if (!fastForward) this.audio?.playSound(this.soundForPlayerAction(event.action));
+        } else {
+          this.visiblePhase.set('enemy-turn');
+          this.enemyActionKind.set(
+            event.action === 'attack' || event.action === 'magic' ? event.action : null,
+          );
+          this.enemyAnimation.set(
+            event.action === 'attack' || event.action === 'magic' ? 'attack' : 'idle',
+          );
+          this.combatMessage.set(message);
+        }
+        if (!fastForward) this.resetAnimationsLater(520);
+        break;
+      case 'hit': {
+        const target = event.target;
+        const isDefeated =
+          target === 'enemy' ? event.snapshot.enemyHealth <= 0 : event.snapshot.playerHealth <= 0;
+        const kind: CombatFeedbackKind = event.missed
+          ? 'miss'
+          : event.critical
+            ? 'critical'
+            : event.amount === 0 && event.blocked > 0
+              ? 'blocked'
+              : 'damage';
+        if (!fastForward)
+          this.showFeedback({
+            target,
+            kind,
+            amount: event.missed
+              ? undefined
+              : event.target === 'enemy'
+                ? event.amount
+                : event.blocked,
+            action: event.kind,
+          });
+        if (target === 'enemy') {
+          this.enemyAnimation.set(isDefeated ? 'defeat' : 'hit');
+          this.enemyActionKind.set(null);
+        } else {
+          this.playerAnimation.set(isDefeated ? 'defeat' : 'hit');
+        }
+        this.combatMessage.set(message);
+        if (!fastForward && !event.missed)
+          this.audio?.playSound(target === 'enemy' ? 'enemyKilled' : event.kind);
+        if (!fastForward) this.resetAnimationsLater(620);
+        break;
+      }
+      case 'effect-damage':
+        if (!fastForward)
+          this.showFeedback({ target: event.target, kind: 'damage', amount: event.amount });
+        this.combatMessage.set(message);
+        break;
+      case 'block':
+        if (!fastForward)
+          this.showFeedback({
+            target: event.target,
+            kind: event.source === 'guard' ? 'guard' : 'blocked',
+            amount: event.amount,
+          });
+        this.combatMessage.set(message);
+        break;
+      case 'heal':
+        if (!fastForward)
+          this.showFeedback({ target: event.target, kind: 'heal', amount: event.amount });
+        this.combatMessage.set(message);
+        break;
+      case 'status':
+        if (!fastForward)
+          this.showFeedback({
+            target: event.target,
+            kind: event.status === 'hex' ? 'hex' : 'guard',
+            amount: event.amount,
+          });
+        this.combatMessage.set(message);
+        break;
+      case 'relic':
+        this.combatMessage.set(message);
+        break;
+      case 'victory':
+        this.visiblePhase.set('victory');
+        this.combatMessage.set(message);
+        if (!fastForward) this.audio?.playSound('enemyKilled');
+        break;
+      case 'defeat':
+        this.visiblePhase.set('defeat');
+        this.playerAnimation.set('defeat');
+        this.combatMessage.set(message);
+        break;
+    }
+  }
+
+  private finishPresentation(): void {
+    this.displaySnapshot.set(null);
+    this.isPresenting.set(false);
+    this.visiblePhase.set(phaseForRun(this.runState()));
+    if (this.visiblePhase() !== 'defeat') this.playerAnimation.set('idle');
+    if (this.visiblePhase() !== 'victory') this.enemyAnimation.set('idle');
+    this.syncMusic();
+  }
+
+  private soundForPlayerAction(action: EnemyMove['kind'] | PlayerAction): SoundEffect {
+    return PLAYER_ACTION_SOUND[action];
+  }
+
+  private showFeedback(feedback: Omit<CombatFeedback, 'id'>): void {
+    const current = { ...feedback, id: ++this.feedbackSequence };
+    this.combatFeedback.set(current);
+    this.presentationQueue.schedule(720, () => {
+      if (this.combatFeedback()?.id === current.id) this.combatFeedback.set(null);
+    });
+  }
+
+  private resetAnimationsLater(delay: number): void {
+    const currentSequence = ++this.animationSequence;
+    this.presentationQueue.schedule(delay, () => {
+      if (currentSequence !== this.animationSequence) return;
+      if (this.enemyAnimation() !== 'defeat') this.enemyAnimation.set('idle');
+      if (this.playerAnimation() !== 'defeat') this.playerAnimation.set('idle');
+    });
+  }
+
+  private handleNotice(notice: ReturnType<typeof enterRouteNode>['notice']): void {
+    if (notice?.type !== 'purchase') return;
+    this.combatMessage.set(notice.message);
+    this.audio?.playSound(notice.purchased ? 'coin' : 'error');
+  }
+
+  private setRun(run: RunState | null): void {
+    this.runState.set(run);
+    this.persistence.saveRun(run);
+    if (run) {
+      this.playerName.set(run.player.name);
+      this.selectedCharacter.set(
+        this.characters.find((character) => character.id === run.player.characterId) ?? null,
+      );
+      this.preRunScreen.set('welcome');
+      this.writeRunRecordIfNeeded(run);
+    }
+    this.syncMusic();
+  }
+
+  private writeRunRecordIfNeeded(run: RunState): void {
+    if (!isRunOver(run)) return;
+    const record: PersonalRecord = {
+      name: run.player.name,
+      characterId: run.player.characterId,
+      level: run.player.level,
+      rooms: roomsCleared(run),
+      victory: run.screen === 'run-complete',
+      seed: formatSeed(run.seed),
+      date: new Date(this.clock.now()).toISOString().slice(0, 10),
+      daily: run.daily !== null,
+    };
+    const records = record.daily ? this.dailyRecords() : this.personalRecords();
+    if (
+      records.some(
+        (item) =>
+          item.seed === record.seed &&
+          item.characterId === record.characterId &&
+          item.name === record.name,
+      )
+    )
+      return;
+    const updated = addPersonalRecord(records, record);
+    if (record.daily) this.dailyRecords.set(updated);
+    else this.personalRecords.set(updated);
+    this.persistRecords();
+  }
+
+  private persistRecords(): void {
+    this.persistence.saveRecords(this.personalRecords(), this.dailyRecords());
+  }
+
+  private updatePreferences(changes: Partial<Preferences>): void {
+    const preferences = { ...this.preferencesState(), ...changes };
+    this.preferencesState.set(preferences);
+    this.persistence.savePreferences(preferences);
+    this.audio?.setVolumes(
+      preferences.muted ? 0 : preferences.musicVolume,
+      preferences.muted ? 0 : preferences.effectsVolume,
+    );
+  }
+
+  private syncMusic(): void {
+    const track = musicForScreen(this.screen(), this.runState());
+    if (track) this.audio?.playMusic(track);
+    else this.audio?.stopMusic();
+  }
+
+  private prefersReducedMotion(): boolean {
+    try {
+      return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    } catch {
       return false;
     }
-
-    this.combatState.set(transition.state);
-    return true;
   }
 
-  private finishVictory(player: PlayerState, enemy: EnemyState): void {
-    const reward = calculateVictoryReward(player, enemy);
-    const rewardedPlayerBase = applyVictoryReward(player, enemy);
-    const maxHealthBonus = relicVictoryMaxHealthBonus(rewardedPlayerBase);
-    const rewardedPlayer =
-      maxHealthBonus > 0
-        ? {
-            ...rewardedPlayerBase,
-            stats: {
-              ...rewardedPlayerBase.stats,
-              health: rewardedPlayerBase.stats.health + maxHealthBonus,
-            },
-          }
-        : rewardedPlayerBase;
-    this.player.set(rewardedPlayer);
-    const victoryHeal = relicVictoryHealAmount(rewardedPlayer);
-    if (victoryHeal > 0) {
-      this.combatState.update((state) => ({
-        ...state,
-        playerDamageTaken: Math.max(0, state.playerDamageTaken - victoryHeal),
-      }));
-    }
-    this.addCombatLog('enemy', {
-      title: enemy.definition.name,
-      message: `lv ${enemy.level} has been defeated!`,
-    });
-    this.addCombatLog('player', {
-      title: '',
-      message: `Well done, you have gained ${reward.experience} exp!`,
-    });
-    if (reward.powerUpsGranted > 0) {
-      this.addCombatLog('player', {
-        title: '',
-        message: 'You have leveled up!',
-      });
-    }
-    this.combatMessage.set(
-      `The ${enemy.definition.name} was defeated. You gained ${reward.experience} exp and ${reward.gold} gold.`,
-    );
-    this.audio?.playSound(
-      reward.levelsGained > 0 ? ASSET_MANIFEST.sounds.levelUp : ASSET_MANIFEST.sounds.enemyKilled,
-    );
-    if (rewardedPlayer.bossesDefeated >= BOSS_ROOMS.length) {
-      this.actionReady.set(false);
-      this.screen.set('run-complete');
-      this.combatMessage.set(
-        `The final Gold Slime was defeated. You completed all ${FINAL_ROOM} rooms.`,
-      );
-      this.audio?.playMusic(ASSET_MANIFEST.music.welcome);
-    }
-  }
-
-  private beginEnemyAction(): void {
-    this.pendingEnemyTurn = null;
-    const enemy = this.enemy();
-    const player = this.player();
-    let intent = this.combatState().enemyIntent;
-    if (!player || !enemy || this.combatState().phase !== 'enemy-turn') return;
-    if (!intent) {
-      intent = chooseEnemyIntent(
-        enemy,
-        this.player()?.stats ?? enemy.stats,
-        this.random(),
-        this.combatState().turn ?? 0,
-      );
-      this.combatState.update((state) => ({ ...state, enemyIntent: intent }));
-    }
-
-    const currentVenom = this.combatState().enemyVenom ?? 0;
-    const startDamage = relicStartEnemyDamage(player) + currentVenom;
-    if (startDamage > 0) {
-      const damageTaken = Math.min(enemy.stats.health, enemy.damageTaken + startDamage);
-      const enemyAfterStart = { ...enemy, damageTaken };
-      this.combatState.update((state) => ({
-        ...state,
-        enemy: enemyAfterStart,
-        enemyVenom: Math.max(0, currentVenom - (currentVenom > 0 ? 1 : 0)),
-      }));
-      this.showHealthDamageTrail(
-        'enemy',
-        enemy.stats.health - enemy.damageTaken,
-        enemy.stats.health - damageTaken,
-        enemy.stats.health,
-      );
-      this.showCombatFeedback({ target: 'enemy', kind: 'damage', amount: startDamage });
-      this.combatMessage.set(
-        currentVenom > 0
-          ? `${enemy.definition.name} suffered ${startDamage} damage from Venom.`
-          : `${enemy.definition.name} suffered ${startDamage} damage from Soot Charm.`,
-      );
-      if (damageTaken >= enemy.stats.health) {
-        this.enemyAnimation.set('defeat');
-        this.combatState.update((state) => ({ ...state, phase: 'victory' }));
-        this.finishVictory(player, enemyAfterStart);
-        return;
-      }
-    }
-
-    this.cancelPendingEnemyAnimationReset();
-    const damageAction = intent.kind === 'attack' || intent.kind === 'magic';
-    this.enemyActionKind.set(damageAction ? (intent.kind as DamageKind) : null);
-    this.enemyAnimation.set(damageAction ? 'attack' : 'idle');
-    this.combatMessage.set(`${enemy.definition.name} ${this.intentVerb(intent)}.`);
-    if (damageAction) {
-      this.audio?.playSound(
-        intent.kind === 'attack' ? ASSET_MANIFEST.sounds.attack : ASSET_MANIFEST.sounds.magic,
-      );
-    } else if (intent.kind === 'guard') {
-      this.audio?.playSound(ASSET_MANIFEST.sounds.guard);
-    } else {
-      this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
-    }
-
-    const generation = this.runGeneration;
-    this.pendingEnemyTurn = this.clock.schedule(
-      () => {
-        if (generation !== this.runGeneration) return;
-        this.resolveEnemyTurn();
-      },
-      this.combatMessagePacingDelay(undefined, 360),
-    );
-  }
-
-  private resolveEnemyTurn(): void {
-    this.pendingEnemyTurn = null;
-    const player = this.player();
-    const enemy = this.enemy();
-    const intent = this.combatState().enemyIntent;
-
-    if (!player || !enemy || !intent || this.combatState().phase !== 'enemy-turn') return;
-
-    const currentPlayerBlock = this.combatState().playerBlock ?? 0;
-    let playerDamageTaken = this.combatState().playerDamageTaken;
-    const previousPlayerHealth = player.stats.health - playerDamageTaken;
-    let remainingPlayerBlock = currentPlayerBlock;
-    let updatedEnemy = enemy;
-    let reactiveEnemyDamage = 0;
-    let addedVenom = 0;
-    let bloodHeal = 0;
-    let playerForTurn = player;
-    let result: DamageResult | null = null;
-
-    if (intent.kind === 'guard') {
-      const block = guardBlockAmount(enemy.stats);
-      updatedEnemy = enemy;
-      this.combatState.update((state) => ({ ...state, enemyBlock: block }));
-      this.showCombatFeedback({ target: 'enemy', kind: 'guard', amount: block });
-      this.combatMessage.set(`${enemy.definition.name} raised ${block} Block.`);
-      this.addCombatLog('enemy', {
-        title: enemy.definition.name,
-        message: `raised ${block} Block.`,
-        value: block,
-        icon: '🛡',
-      });
-    } else if (intent.kind === 'heal') {
-      const healResult = resolveHeal(enemy.damageTaken, enemy.stats.health);
-      updatedEnemy = {
-        ...enemy,
-        damageTaken: healResult.damageTaken,
-        potions: Math.max(0, enemy.potions - 1),
-      };
-      this.combatState.update((state) => ({ ...state, enemy: updatedEnemy }));
-      this.showCombatFeedback({ target: 'enemy', kind: 'heal', amount: healResult.healed });
-      this.combatMessage.set(`${enemy.definition.name} recovered ${healResult.healed} HP.`);
-      this.addCombatLog('enemy', {
-        title: enemy.definition.name,
-        message: `recovered ${healResult.healed} HP.`,
-        icon: '❤',
-      });
-      this.audio?.playSound(ASSET_MANIFEST.sounds.potion);
-    } else {
-      const incomingDamageMultiplier = relicIncomingDamageMultiplier(
-        player,
-        this.relicContext(player),
-      );
-      result = resolveDamage(
-        { stats: enemy.stats },
-        { stats: player.stats, damageTaken: this.combatState().playerDamageTaken },
-        intent.kind,
-        { damageRoll: this.random(), chanceRoll: this.random() },
-        { receivedDamageMultiplier: incomingDamageMultiplier, block: currentPlayerBlock },
-      );
-      playerDamageTaken = result.damageTaken;
-      remainingPlayerBlock = Math.max(0, currentPlayerBlock - (result.blocked ?? 0));
-      const dealt = damageDealt(result);
-
-      if (result.damageTaken >= player.stats.health && relicLethalProtectionAvailable(player)) {
-        playerDamageTaken = Math.max(0, player.stats.health - 1);
-        remainingPlayerBlock += 30;
-        playerForTurn = {
-          ...player,
-          relicCharges: { ...player.relicCharges, 'phoenix-feather': 0 },
-        };
-        this.player.set(playerForTurn);
-        this.combatMessage.set('Phoenix Feather saved you from a lethal hit and shattered.');
-      }
-
-      const contextAfterHit: RelicCombatContext = {
-        ...this.relicContext(player),
-        playerDamageTaken,
-      };
-      const bloodLedgerUsed = this.combatState().relicFlags?.['blood-ledger-used'] ?? false;
-      bloodHeal = bloodLedgerUsed ? 0 : relicBloodLedgerHeal(player, contextAfterHit);
-      if (bloodHeal > 0) playerDamageTaken = Math.max(0, playerDamageTaken - bloodHeal);
-
-      const blocked = result.blocked ?? 0;
-      reactiveEnemyDamage += relicThornsDamage(player, blocked);
-      reactiveEnemyDamage += relicCrownOfThornsDamage(player, blocked);
-      addedVenom += relicCrownOfThornsVenom(player, blocked);
-      if (intent.kind === 'magic' && dealt > 0 && hasRelic(player, 'mirror-of-night')) {
-        reactiveEnemyDamage += Math.trunc(dealt * 0.25);
-      }
-      if (reactiveEnemyDamage > 0) {
-        updatedEnemy = {
-          ...enemy,
-          damageTaken: Math.min(enemy.stats.health, enemy.damageTaken + reactiveEnemyDamage),
-        };
-      }
-      if (dealt > 0) {
-        this.showHealthDamageTrail(
-          'player',
-          previousPlayerHealth,
-          player.stats.health - playerDamageTaken,
-          player.stats.health,
-        );
-      }
-      this.addCombatLog('enemy', {
-        title: enemy.definition.name,
-        message: result.missed ? `${intent.kind} missed.` : '',
-        ...(result.missed ? {} : { value: dealt }),
-        icon: intent.kind === 'attack' ? '🔪' : '☄',
-      });
-      if (bloodHeal > 0) {
-        this.showCombatFeedback({ target: 'player', kind: 'heal', amount: bloodHeal });
-        this.combatMessage.set(`${this.combatMessage()} Blood Ledger restored ${bloodHeal} HP.`);
-      }
-      if (result.missed) {
-        this.showCombatFeedback({ target: 'player', kind: 'miss', action: intent.kind });
-        this.combatMessage.set(`${enemy.definition.name}'s ${intent.kind} missed.`);
-      } else if (dealt === 0 && (result.blocked ?? 0) > 0) {
-        this.showCombatFeedback({
-          target: 'player',
-          kind: 'blocked',
-          amount: result.blocked,
-          action: intent.kind,
-        });
-        this.combatMessage.set(`${enemy.definition.name}'s attack was blocked.`);
-      } else {
-        this.showCombatFeedback({
-          target: 'player',
-          kind: result.critical ? 'critical' : 'damage',
-          amount: dealt,
-          action: intent.kind,
-        });
-        this.combatMessage.set(
-          `${enemy.definition.name}'s ${intent.kind} dealt ${dealt} damage.${
-            result.critical ? ' Critical hit!' : ''
-          }`,
-        );
-      }
-      this.audio?.playSound(
-        result.missed || dealt === 0 ? ASSET_MANIFEST.sounds.miss : ASSET_MANIFEST.sounds.impact,
-      );
-    }
-
-    if (result && !result.missed && damageDealt(result) > 0) {
-      this.playerAnimation.set('hit');
-    } else {
-      this.playerAnimation.set('idle');
-    }
-
-    const nextTurn = (this.combatState().turn ?? 0) + 1;
-    const nextEnemy = updatedEnemy;
-    const enemyDefeatedByReaction = nextEnemy.damageTaken >= nextEnemy.stats.health;
-    const nextIntent = enemyDefeatedByReaction
-      ? null
-      : chooseEnemyIntent(nextEnemy, playerForTurn.stats, this.random(), nextTurn);
-    if (
-      !this.applyCombatEvent({
-        type: 'enemy-action-resolved',
-        playerDamageTaken,
-        playerHealth: playerForTurn.stats.health,
-        playerBlock: remainingPlayerBlock,
-        enemyIntent: nextIntent,
-        turn: nextTurn,
-        allowPlayerHealing: bloodHeal > 0,
-      })
-    ) {
-      return;
-    }
-
-    this.combatState.update((state) => ({
-      ...state,
-      enemyDamageActions:
-        (state.enemyDamageActions ?? 0) +
-        (intent.kind === 'attack' || intent.kind === 'magic' ? 1 : 0),
-      enemyVenom: (state.enemyVenom ?? 0) + addedVenom,
-      relicFlags:
-        bloodHeal > 0 ? { ...state.relicFlags, 'blood-ledger-used': true } : state.relicFlags,
-      enemy: nextEnemy,
-    }));
-    if (updatedEnemy !== enemy) {
-      this.syncHealthTrail(
-        'enemy',
-        updatedEnemy.stats.health - updatedEnemy.damageTaken,
-        updatedEnemy.stats.health,
-      );
-    }
-
-    if (enemyDefeatedByReaction) {
-      this.enemyAnimation.set('defeat');
-      this.combatState.update((state) => ({ ...state, phase: 'victory' }));
-      this.finishVictory(playerForTurn, nextEnemy);
-      return;
-    }
-
-    if (this.combatState().phase === 'defeat') {
-      this.playerAnimation.set('defeat');
-      this.addCombatLog('player', {
-        title: 'Oh no!',
-        message: 'You have been defeated!',
-      });
-      this.addPersonalRecord(playerForTurn);
-      this.screen.set('game-over');
-      this.combatMessage.set('You have been defeated. Start a new run to try again.');
-    } else {
-      this.scheduleEnemyAnimationReset();
-    }
-  }
-
-  private startEnemyTurn(): void {
-    this.actionReady.set(false);
-    if (!this.applyCombatEvent({ type: 'enemy-turn-started' })) return;
-    this.combatMessage.set(this.enemyIntentMessage(this.enemy()));
-    this.scheduleEnemyTurn();
-  }
-
-  private scheduleEnemyTurn(): void {
-    this.cancelPendingEnemyTurn();
-    const generation = this.runGeneration;
-    this.pendingEnemyTurn = this.clock.schedule(
-      () => {
-        if (generation !== this.runGeneration) return;
-        this.beginEnemyAction();
-      },
-      this.combatMessagePacingDelay(undefined, 650),
-    );
-  }
-
-  private cancelPendingEnemyTurn(): void {
-    this.pendingEnemyTurn?.cancel();
-    this.pendingEnemyTurn = null;
-  }
-
-  private scheduleEnemyAnimationReset(): void {
-    const generation = this.runGeneration;
-    this.pendingEnemyAnimationReset = this.clock.schedule(
-      () => {
-        this.pendingEnemyAnimationReset = null;
-        if (
-          generation !== this.runGeneration ||
-          this.combatState().phase !== 'awaiting-player-action'
-        ) {
-          return;
-        }
-        this.enemyAnimation.set('idle');
-        this.enemyActionKind.set(null);
-        this.playerAnimation.set('idle');
-        this.syncHealthTrails();
-        this.actionReady.set(true);
-      },
-      this.combatMessagePacingDelay(undefined, 700),
-    );
-  }
-
-  private cancelPendingEnemyAnimationReset(): void {
-    this.pendingEnemyAnimationReset?.cancel();
-    this.pendingEnemyAnimationReset = null;
-  }
-
-  private cancelPendingPlayerImpact(): void {
-    this.pendingPlayerImpact?.cancel();
-    this.pendingPlayerImpact = null;
-  }
-
-  private schedulePlayerActionReady(): void {
-    const generation = this.runGeneration;
-    this.pendingPlayerActionReady = this.clock.schedule(() => {
-      this.pendingPlayerActionReady = null;
-      if (
-        generation !== this.runGeneration ||
-        this.combatState().phase !== 'awaiting-player-action'
-      ) {
-        return;
-      }
-      this.actionReady.set(true);
-    }, this.combatMessagePacingDelay());
-  }
-
-  private cancelPendingPlayerActionReady(): void {
-    this.pendingPlayerActionReady?.cancel();
-    this.pendingPlayerActionReady = null;
-  }
-
-  private cancelPendingCombatFeedbackReset(): void {
-    this.pendingCombatFeedbackReset?.cancel();
-    this.pendingCombatFeedbackReset = null;
-  }
-
-  private showHealthDamageTrail(
-    target: 'player' | 'enemy',
-    previousHealth: number,
-    currentHealth: number,
-    maximumHealth: number,
-  ): void {
-    const previousPercent = this.healthPercent(previousHealth, maximumHealth);
-    const currentPercent = this.healthPercent(currentHealth, maximumHealth);
-    const trail = Math.max(previousPercent, currentPercent);
-    if (target === 'player') this.playerHealthTrail.set(trail);
-    else this.enemyHealthTrail.set(trail);
-  }
-
-  private syncHealthTrail(
-    target: 'player' | 'enemy',
-    remainingHealth: number,
-    maximumHealth: number,
-  ): void {
-    const percent = this.healthPercent(remainingHealth, maximumHealth);
-    if (target === 'player') this.playerHealthTrail.set(percent);
-    else this.enemyHealthTrail.set(percent);
-  }
-
-  private syncHealthTrails(): void {
-    const player = this.player();
-    const enemy = this.enemy();
-    if (player) {
-      this.syncHealthTrail('player', this.playerRemainingHealth(), player.stats.health);
-    }
-    if (enemy) {
-      this.syncHealthTrail('enemy', enemy.stats.health - enemy.damageTaken, enemy.stats.health);
-    }
-  }
-
-  private healthPercent(remainingHealth: number, maximumHealth: number): number {
-    if (maximumHealth <= 0) return 0;
-    return Math.max(0, Math.min(100, (remainingHealth / maximumHealth) * 100));
-  }
-
-  private showCombatFeedback(feedback: Omit<CombatFeedback, 'id'>): void {
-    this.cancelPendingCombatFeedbackReset();
-    this.combatFeedback.set({ ...feedback, id: ++this.feedbackSequence });
-    const generation = this.runGeneration;
-    this.pendingCombatFeedbackReset = this.clock.schedule(() => {
-      this.pendingCombatFeedbackReset = null;
-      if (generation === this.runGeneration) this.combatFeedback.set(null);
-    }, 850);
-  }
-
-  private combatMessagePacingDelay(message = this.combatMessage(), minimumMs = 0): number {
-    return Math.max(
-      minimumMs,
-      message.length * COMBAT_MESSAGE_CHARACTER_MS + COMBAT_MESSAGE_PAUSE_MS,
-    );
-  }
-
-  private intentVerb(intent: EnemyIntent): string {
-    if (intent.kind === 'guard') return `raises ${intent.maxValue} Block`;
-    if (intent.kind === 'heal') return `prepares to recover ${intent.maxValue} HP`;
-    return `prepares ${intent.kind === 'attack' ? 'Attack' : 'Magic'}`;
-  }
-
-  private enemyIntentMessage(
-    enemy: EnemyState | null,
-    intent = this.combatState().enemyIntent,
-  ): string {
-    if (!enemy || !intent) return 'Choose your action.';
-    if (intent.kind === 'guard')
-      return `${enemy.definition.name} intends to Guard for ${intent.maxValue} Block.`;
-    if (intent.kind === 'heal')
-      return `${enemy.definition.name} intends to recover ${intent.maxValue} HP.`;
-    const range =
-      intent.minValue === intent.maxValue
-        ? `${intent.maxValue}`
-        : `${intent.minValue}–${intent.maxValue}`;
-    return `${enemy.definition.name} intends to use ${intent.kind === 'attack' ? 'Attack' : 'Magic'} for ${range} damage.`;
-  }
-
-  private addCombatLog(side: 'player' | 'enemy', entry: CombatLogEntry): void {
-    const log = side === 'player' ? this.playerCombatLog : this.enemyCombatLog;
-    log.update((entries) =>
-      entries.length >= MAX_COMBAT_LOG_ENTRIES ? [...entries.slice(1), entry] : [...entries, entry],
-    );
-  }
-
-  private clearCombatLogs(): void {
-    this.playerCombatLog.set([]);
-    this.enemyCombatLog.set([]);
-  }
-
-  get characters(): readonly CharacterDefinition[] {
-    return CHARACTER_DEFINITIONS;
-  }
-
-  private persist(): void {
-    if (!this.storage) return;
-
-    const phase = this.combatState().phase;
-    if (phase === 'resolving-player-action' || phase === 'enemy-turn') return;
-
-    if (this.screen() === 'welcome' && !this.player() && !this.playerName()) {
-      this.storage.clear();
-      return;
-    }
-
-    this.storage.write(
-      JSON.stringify({
-        version: 1,
-        screen: this.screen(),
-        playerName: this.playerName(),
-        selectedCharacterId: this.selectedCharacter()?.id ?? null,
-        player: this.player(),
-        combatState: this.combatState(),
-        routeFloor: this.routeFloor(),
-        routeMap: this.routeMap(),
-        nextRouteMap: this.nextRouteMap(),
-        storeItems: this.screen() === 'store' ? this.storeItems() : undefined,
-      }),
-    );
-  }
-
-  private addPersonalRecord(player: PlayerState): void {
-    const records = sortPersonalRecords([
-      ...this.personalRecords(),
-      createPersonalRecord(player.character.id, player.name, player.level),
-    ]);
-    this.personalRecords.set(records);
-    this.recordsStorage?.write(JSON.stringify({ version: 1, records }));
-  }
-
-  private restorePersonalRecords(): void {
-    const raw = this.recordsStorage?.read();
-    if (!raw) return;
-
-    try {
-      const snapshot: unknown = JSON.parse(raw);
-      if (!isStoredRecordsSnapshot(snapshot)) {
-        this.recordsStorage?.clear();
-        return;
-      }
-
-      this.personalRecords.set(sortPersonalRecords(snapshot.records));
-    } catch {
-      this.recordsStorage?.clear();
-    }
-  }
-
-  private persistPreferences(): void {
-    const preferences: AudioPreferences = {
-      musicVolume: this.musicVolume(),
-      effectsVolume: this.effectsVolume(),
-    };
-    this.preferencesStorage?.write(JSON.stringify({ version: 1, ...preferences }));
-  }
-
-  private restorePreferences(): void {
-    const applyPreferences = (preferences: AudioPreferences): void => {
-      this.musicVolume.set(preferences.musicVolume);
-      this.effectsVolume.set(preferences.effectsVolume);
-      this.audio?.setMusicVolume(preferences.musicVolume);
-      this.audio?.setEffectsVolume(preferences.effectsVolume);
-    };
-    const raw = this.preferencesStorage?.read();
-    if (!raw) {
-      applyPreferences({
-        musicVolume: DEFAULT_MUSIC_VOLUME,
-        effectsVolume: DEFAULT_EFFECTS_VOLUME,
-      });
-      return;
-    }
-
-    try {
-      const snapshot: unknown = JSON.parse(raw);
-      if (!isStoredPreferencesSnapshot(snapshot)) {
-        this.preferencesStorage?.clear();
-        applyPreferences({
-          musicVolume: DEFAULT_MUSIC_VOLUME,
-          effectsVolume: DEFAULT_EFFECTS_VOLUME,
-        });
-        return;
-      }
-
-      applyPreferences(snapshot);
-    } catch {
-      this.preferencesStorage?.clear();
-      applyPreferences({
-        musicVolume: DEFAULT_MUSIC_VOLUME,
-        effectsVolume: DEFAULT_EFFECTS_VOLUME,
-      });
-    }
-  }
-
-  private restore(): void {
-    const raw = this.storage?.read();
-    if (!raw) return;
-
-    try {
-      const snapshot = JSON.parse(raw) as Partial<StoredSessionSnapshot>;
-      const selectedCharacter = CHARACTER_DEFINITIONS.find(
-        (item) => item.id === snapshot.selectedCharacterId,
-      );
-      const playerCharacterId = isRecord(snapshot.player?.character)
-        ? snapshot.player.character['id']
-        : undefined;
-      const playerHealth = isRestorablePlayer(snapshot.player)
-        ? snapshot.player.stats.health
-        : null;
-      const routeFloor = snapshot.routeFloor ?? 1;
-      if (
-        snapshot.version !== 1 ||
-        typeof snapshot.playerName !== 'string' ||
-        snapshot.selectedCharacterId === undefined ||
-        ![
-          'welcome',
-          'character-select',
-          'map',
-          'combat',
-          'store',
-          'game-over',
-          'run-complete',
-        ].includes(String(snapshot.screen)) ||
-        !isRestorableRouteFloor(routeFloor) ||
-        (snapshot.routeMap !== undefined &&
-          snapshot.routeMap !== null &&
-          !isRouteMapState(snapshot.routeMap)) ||
-        (snapshot.nextRouteMap !== undefined &&
-          snapshot.nextRouteMap !== null &&
-          !isRouteMapState(snapshot.nextRouteMap)) ||
-        (snapshot.storeItems !== undefined && !isRestorableStoreItems(snapshot.storeItems)) ||
-        !isRestorableCombatState(snapshot.combatState) ||
-        (snapshot.player !== null && !isRestorablePlayer(snapshot.player)) ||
-        (snapshot.selectedCharacterId !== null && !selectedCharacter) ||
-        (playerCharacterId !== undefined && selectedCharacter?.id !== playerCharacterId) ||
-        (playerHealth !== null && snapshot.combatState.playerDamageTaken > playerHealth) ||
-        !hasCoherentSessionState(snapshot)
-      ) {
-        this.storage?.clear();
-        return;
-      }
-
-      const character = selectedCharacter;
-      if (character) this.selectedCharacter.set(character);
-      this.playerName.set(snapshot.playerName.slice(0, 14));
-      this.routeFloor.set(routeFloor);
-      this.routeMap.set(snapshot.routeMap ?? null);
-      this.nextRouteMap.set(snapshot.nextRouteMap ?? null);
-      if (snapshot.player) {
-        const inventory = snapshot.player.inventory.map(
-          (item) => STORE_ITEMS.find((candidate) => candidate.id === item.id) ?? item,
-        );
-        this.player.set({
-          ...snapshot.player,
-          character: character ?? snapshot.player.character,
-          inventory,
-          relicCharges: snapshot.player.relicCharges ?? {},
-          defeatedEnemies: snapshot.player.defeatedEnemies ?? [],
-        });
-        const restoredEnemy = snapshot.combatState.enemy;
-        const restoredIntent =
-          snapshot.combatState.enemyIntent ??
-          (restoredEnemy
-            ? chooseEnemyIntent(
-                restoredEnemy,
-                snapshot.player.stats,
-                this.random(),
-                snapshot.combatState.turn ?? 0,
-              )
-            : null);
-        this.combatState.set({
-          ...snapshot.combatState,
-          enemyIntent: restoredIntent,
-          playerBlock: snapshot.combatState.playerBlock ?? 0,
-          enemyBlock: snapshot.combatState.enemyBlock ?? 0,
-          enemyHexed: snapshot.combatState.enemyHexed ?? false,
-          turn: snapshot.combatState.turn ?? 0,
-          playerActions: snapshot.combatState.playerActions ?? 0,
-          damagingActions: snapshot.combatState.damagingActions ?? 0,
-          attackCount: snapshot.combatState.attackCount ?? 0,
-          magicActions: snapshot.combatState.magicActions ?? 0,
-          potionUses: snapshot.combatState.potionUses ?? 0,
-          enemyDamageActions: snapshot.combatState.enemyDamageActions ?? 0,
-          enemyVenom: snapshot.combatState.enemyVenom ?? 0,
-          openingActor: snapshot.combatState.openingActor ?? null,
-          relicFlags: snapshot.combatState.relicFlags ?? {},
-          enemy: restoredEnemy
-            ? {
-                ...restoredEnemy,
-                definition:
-                  findEnemyDefinition(restoredEnemy.definition.id) ?? restoredEnemy.definition,
-              }
-            : null,
-        });
-        this.syncHealthTrails();
-        this.enemyAnimation.set('idle');
-        this.enemyActionKind.set(null);
-        this.playerAnimation.set(
-          snapshot.screen === 'game-over' && snapshot.combatState.phase === 'defeat'
-            ? 'defeat'
-            : 'idle',
-        );
-        this.screen.set(snapshot.screen as GameScreen);
-        if (snapshot.screen === 'store') {
-          this.storeItems.set(
-            snapshot.storeItems
-              ? snapshot.storeItems.map(
-                  (item) => STORE_ITEMS.find((candidate) => candidate.id === item.id) ?? item,
-                )
-              : generateStoreOffers(this.player()!, { floor: routeFloor, random: this.random }),
-          );
-        }
-        this.actionReady.set(
-          snapshot.screen === 'combat' && snapshot.combatState.phase === 'awaiting-player-action',
-        );
-        this.combatMessage.set('Your saved run was restored.');
-      } else {
-        this.screen.set(snapshot.screen === 'character-select' ? 'character-select' : 'welcome');
-      }
-    } catch {
-      this.storage?.clear();
-    }
+  private clearCombatPresentation(): void {
+    this.playerAnimation.set('idle');
+    this.enemyAnimation.set('idle');
+    this.playerActionKind.set(null);
+    this.enemyActionKind.set(null);
+    this.combatFeedback.set(null);
+    this.displaySnapshot.set(null);
   }
 }
